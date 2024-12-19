@@ -33,7 +33,7 @@ Here we can specify the pose and fov of the viewer camera. The viewer will run a
 
 Once the scene is created, you can access the viewer object via `scene.visualizer.viewer`, or simply `scene.viewer` as a shortcut. You can query or set the viewer camera pose:
 ```python
-cam_pose = scene.viewer.camera_pose()
+cam_pose = scene.viewer.camera_pose
 
 scene.viewer.set_camera_pose(cam_pose)
 ```
