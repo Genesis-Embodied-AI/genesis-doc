@@ -10,7 +10,7 @@ We start by creating a gym-style environment (go2-env).
 
 The `__init__` function sets up the simulation environment with the following steps:
 1. **Control Frequency**.
-    The simulation runs at 50 Hz, matching the real robot's control frequency. Wo further bridge sim2real gap, we also manually simulate the action latecy (~20ms, one dt) shown on the real robot.
+    The simulation runs at 50 Hz, matching the real robot's control frequency. To further bridge sim2real gap, we also manually simulate the action latecy (~20ms, one dt) shown on the real robot.
 2. **Scene Creation**.
     A simulation scene is created, including the robot and a static plane.
 3. **PD Controller Setup**.
