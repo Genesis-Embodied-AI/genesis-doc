@@ -1,16 +1,17 @@
-# 🦾 Inverse Kinematics & Motion Planning
+# 🦾 逆运动学与运动规划
 
-In this tutorial, we will go through several examples illustrating how to use solve inverse kinematics (IK) and motion planning in Genesis, and perform a simple grasping task.
+在本教程中，我们将通过几个示例来说明如何在Genesis中使用逆运动学（IK）和运动规划，并执行一个简单的抓取任务。
 
-Let's first create a scene, load your favorite robotic arm and a small cube, build the scene, and then set control gains:
+首先，我们创建一个场景，加载你喜欢的机械臂和一个小立方体，构建场景，然后设置控制增益：
+
 ```python
 import numpy as np
 import genesis as gs
 
-########################## init ##########################
+########################## 初始化 ##########################
 gs.init(backend=gs.gpu)
 
-########################## create a scene ##########################
+########################## 创建场景 ##########################
 scene = gs.Scene(
     viewer_options = gs.options.ViewerOptions(
         camera_pos    = (3, -1, 1.5),
@@ -20,12 +21,12 @@ scene = gs.Scene(
     ),
     sim_options = gs.options.SimOptions(
         dt = 0.01,
-        substeps = 4, # for more stable grasping contact
+        substeps = 4, # 为了更稳定的抓取接触
     ),
     show_viewer = True,
 )
 
-########################## entities ##########################
+########################## 实体 ##########################
 plane = scene.add_entity(
     gs.morphs.Plane(),
 )
@@ -38,16 +39,16 @@ cube = scene.add_entity(
 franka = scene.add_entity(
     gs.morphs.MJCF(file='xml/franka_emika_panda/panda.xml'),
 )
-########################## build ##########################
+########################## 构建 ##########################
 scene.build()
 
 motors_dof = np.arange(7)
 fingers_dof = np.arange(7, 9)
 
-# set control gains
-# Note: the following values are tuned for achieving best behavior with Franka
-# Typically, each new robot would have a different set of parameters.
-# Sometimes high-quality URDF or XML file would also provide this and will be parsed.
+# 设置控制增益
+# 注意：以下值是为实现Franka最佳行为而调整的
+# 通常，每个新机器人都会有一组不同的参数。
+# 有时高质量的URDF或XML文件也会提供这些参数，并会被解析。
 franka.set_dofs_kp(
     np.array([4500, 4500, 3500, 3500, 2000, 2000, 2000, 100, 100]),
 )
@@ -62,45 +63,50 @@ franka.set_dofs_force_range(
 
 ```{figure} ../../_static/images/IK_mp_grasp.png
 ```
-Next, let's move the robot's end-effector to a pre-grasping pose. This is done by two steps:
-- using IK to solve the joint position given a target end-effector pose
-- using a motion planner to reach the target position
-  
-Motion planning in genesis uses OMPL library. You can install it following the instructions in the [installation](../overview/installation.md) page.
 
-IK and motion planning in Genesis are as simple as it can get: each can be done via a single function call.
+接下来，让我们将机器人的末端执行器移动到预抓取姿态。这分两步完成：
+
+- 使用IK求解给定目标末端执行器姿态的关节位置
+- 使用运动规划器到达目标位置
+
+Genesis中的运动规划使用OMPL库。你可以按照[安装](../overview/installation.md)页面中的说明进行安装。
+
+在Genesis中，IK和运动规划非常简单：每个都可以通过一个函数调用完成。
+
 ```python
 
-# get the end-effector link
+# 获取末端执行器链接
 end_effector = franka.get_link('hand')
 
-# move to pre-grasp pose
+# 移动到预抓取姿态
 qpos = franka.inverse_kinematics(
     link = end_effector,
     pos  = np.array([0.65, 0.0, 0.25]),
     quat = np.array([0, 1, 0, 0]),
 )
-# gripper open pos
+# 夹爪打开位置
 qpos[-2:] = 0.04
 path = franka.plan_path(
     qpos_goal     = qpos,
-    num_waypoints = 200, # 2s duration
+    num_waypoints = 200, # 2秒持续时间
 )
-# execute the planned path
+# 执行规划路径
 for waypoint in path:
     franka.control_dofs_position(waypoint)
     scene.step()
 
-# allow robot to reach the last waypoint
+# 让机器人到达最后一个路径点
 for i in range(100):
     scene.step()
 
 ```
-As you can see, both IK solving and motion planning are two integrated methods of the robot entity. For IK solving, you simply tell the robot's IK solver which link is the end-effector, and specify the target pose. Then, you tell the motion planner the target joint position (qpos) and it will return a planned and smoothed list of waypoints. Note that after we execute the path, we let the controller run for another 100 steps. This is because we are using a PD controller, and there will be a gap between the desired target position and the current position. Therefore, we let the controller run a bit longer so that the robot can reach the last waypoint in the planned trajectory.
 
-Next, we move the robot gripper down, grasp the cube, and lift it:
+如你所见，IK求解和运动规划都是机器人实体的两个集成方法。对于IK求解，你只需告诉机器人的IK求解器哪个链接是末端执行器，并指定目标姿态。然后，你告诉运动规划器目标关节位置（qpos），它会返回一个规划和平滑的路径点列表。注意，在我们执行路径后，我们让控制器再运行100步。这是因为我们使用的是PD控制器，目标位置和当前实际位置之间会有一个差距。因此，我们让控制器多运行一段时间，以便机器人能够到达规划轨迹的最后一个路径点。
+
+接下来，我们将机器人夹爪向下移动，抓取立方体并将其抬起：
+
 ```python
-# reach
+# 到达
 qpos = franka.inverse_kinematics(
     link = end_effector,
     pos  = np.array([0.65, 0.0, 0.135]),
@@ -110,14 +116,14 @@ franka.control_dofs_position(qpos[:-2], motors_dof)
 for i in range(100):
     scene.step()
 
-# grasp
+# 抓取
 franka.control_dofs_position(qpos[:-2], motors_dof)
 franka.control_dofs_force(np.array([-0.5, -0.5]), fingers_dof)
 
 for i in range(100):
     scene.step()
 
-# lift
+# 抬起
 qpos = franka.inverse_kinematics(
     link=end_effector,
     pos=np.array([0.65, 0.0, 0.3]),
@@ -127,4 +133,6 @@ franka.control_dofs_position(qpos[:-2], motors_dof)
 for i in range(200):
     scene.step()
 ```
-When grasping the object, we used force control for the 2 gripper dofs, and applied a 0.5N grasping force. If everything goes right, you will see the object being grasped and lifted.
+
+在抓取物体时，我们对2个夹爪自由度使用了力控制，并施加了0.5N的抓取力。如果一切顺利，你将看到物体被抓取并抬起。
+

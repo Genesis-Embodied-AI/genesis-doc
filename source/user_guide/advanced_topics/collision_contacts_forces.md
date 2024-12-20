@@ -1,4 +1,5 @@
-# 💥 Collision, Contacts & Forces
+# 💥 碰撞、接触和力
 
+即将推出...
 
-Coming soon...
+本章节将介绍在Genesis项目中，物体之间的碰撞、接触和力的相关概念和应用。敬请期待更多详细内容。
