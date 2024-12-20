@@ -12,4 +12,7 @@ pip install -e ".[docs]"
 ```bash
 # In doc/
 rm -rf build/; make html; sphinx-autobuild ./source ./build/html
+# zh_CN
+rm -rf build/; make html; sphinx-autobuild -b html -E -a -q -z zh_CN ./source ./build/html
+
 ```
