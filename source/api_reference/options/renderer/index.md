@@ -1,6 +1,7 @@
-# Renderer
+# 渲染器
 
-This configures the backend renderer used by all the cameras in a scene.
+此配置用于场景中所有摄像机使用的后端渲染器。
+
 ```{toctree}
 :maxdepth: 2
 

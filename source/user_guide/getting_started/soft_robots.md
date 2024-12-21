@@ -1,18 +1,18 @@
-# 🐛 Soft Robots
+# 🐛 软体机器人
 
-## Volumetric muscle simulation
+## 体积肌肉模拟
 
-Genesis supports volumetric muscle simulation using MPM and FEM for soft robots. In the following example, we demonstrate an extremely simple soft robot with a sphere body, actuated by a sine-wave control signal.
+Genesis 支持使用 MPM 和 FEM 进行软体机器人的体积肌肉模拟。在以下示例中，我们展示了一个非常简单的软体机器人，其球体身体由正弦波控制信号驱动。
 
 ```python
 import numpy as np
 import genesis as gs
 
 
-########################## init ##########################
+########################## 初始化 ##########################
 gs.init(seed=0, precision='32', logging_level='debug')
 
-########################## create a scene ##########################
+########################## 创建场景 ##########################
 dt = 5e-4
 scene = gs.Scene(
     sim_options=gs.options.SimOptions(
@@ -38,7 +38,7 @@ scene = gs.Scene(
     ),
 )
 
-########################## entities ##########################
+########################## 实体 ##########################
 scene.add_entity(morph=gs.morphs.Plane())
 
 E, nu = 3.e4, 0.45
@@ -70,10 +70,10 @@ robot_fem = scene.add_entity(
     ),
 )
 
-########################## build ##########################
+########################## 构建 ##########################
 scene.build()
 
-########################## run ##########################
+########################## 运行 ##########################
 scene.reset()
 for i in range(1000):
     actu = np.array([0.2 * (0.5 + np.sin(0.01 * np.pi * i))])
@@ -82,23 +82,24 @@ for i in range(1000):
     robot_fem.set_actuation(actu)
     scene.step()
 ```
-This is what you will see:
+
+这是你将看到的效果：
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/muscle.mp4" type="video/mp4">
 </video>
 
-Most of the code is pretty standard compared to instantiating regular deformable entities. There are only two small differences that do the trick:
+大部分代码与实例化常规可变形实体相当标准。只有两个小差异实现了这个效果：
 
-* When instantiating soft robots `robot_mpm` and `robot_fem`, we use materials `gs.materials.MPM.Muscle` and `gs.materials.FEM.Muscle` respectively.
-* When stepping the simulation, we use `robot_mpm.set_actuation` or `robot_fem.set_actuation` to set the actuation of the muscle.
+* 在实例化软体机器人 `robot_mpm` 和 `robot_fem` 时，我们分别使用了材料 `gs.materials.MPM.Muscle` 和 `gs.materials.FEM.Muscle`。
+* 在进行仿真步进时，我们使用 `robot_mpm.set_actuation` 或 `robot_fem.set_actuation` 来设置肌肉的驱动。
 
-By default, there is only one muscle that spans the entire robot body with the muscle direction perpendicular to the ground `[0, 0, 1]`.
+默认情况下，只有一个肌肉覆盖整个机器人身体，肌肉方向垂直于地面 `[0, 0, 1]`。
 
-In the next example, we show how to simulate a worm crawling forward by setting muscle groups and directions, as shown in the following. (The full script can be found in [tutorials/advanced_worm.py](https://github.com/zhouxian/Genesis-dev/tree/main/examples/tutorials/advanced_worm.py).)
+在下一个示例中，我们展示了如何通过设置肌肉组和方向来模拟蠕虫向前爬行，如下所示。（完整脚本可以在 [tutorials/advanced_worm.py](https://github.com/zhouxian/Genesis-dev/tree/main/examples/tutorials/advanced_worm.py) 中找到。）
 
 ```python
-########################## entities ##########################
+########################## 实体 ##########################
 worm = scene.add_entity(
     morph=gs.morphs.Mesh(
         file='meshes/worm/worm.obj',
@@ -115,7 +116,7 @@ worm = scene.add_entity(
     ),
 )
 
-########################## set muscle ##########################
+########################## 设置肌肉 ##########################
 def set_muscle_by_pos(robot):
     if isinstance(robot.material, gs.materials.MPM.Muscle):
         pos = robot.get_state().pos
@@ -134,10 +135,10 @@ def set_muscle_by_pos(robot):
     muscle_group = np.zeros((n_units,), dtype=int)
     mask_upper = pos[:, 2] > (pos_min[2] + pos_range[2] * lu_thresh)
     mask_fore = pos[:, 1] < (pos_min[1] + pos_range[1] * fh_thresh)
-    muscle_group[ mask_upper &  mask_fore] = 0 # upper fore body
-    muscle_group[ mask_upper & ~mask_fore] = 1 # upper hind body
-    muscle_group[~mask_upper &  mask_fore] = 2 # lower fore body
-    muscle_group[~mask_upper & ~mask_fore] = 3 # lower hind body
+    muscle_group[ mask_upper &  mask_fore] = 0 # 上前身体
+    muscle_group[ mask_upper & ~mask_fore] = 1 # 上后身体
+    muscle_group[~mask_upper &  mask_fore] = 2 # 下前身体
+    muscle_group[~mask_upper & ~mask_fore] = 3 # 下后身体
 
     muscle_direction = np.array([[0, 1, 0]] * n_units, dtype=float)
 
@@ -148,7 +149,7 @@ def set_muscle_by_pos(robot):
 
 set_muscle_by_pos(worm)
 
-########################## run ##########################
+########################## 运行 ##########################
 scene.reset()
 for i in range(1000):
     actu = np.array([0, 0, 0, 1. * (0.5 + np.sin(0.005 * np.pi * i))])
@@ -156,33 +157,33 @@ for i in range(1000):
     worm.set_actuation(actu)
     scene.step()
 ```
-This is what you will see:
+
+这是你将看到的效果：
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/worm.mp4" type="video/mp4">
 </video>
 
-Several things that worth noticing in this code snippet:
+代码片段中值得注意的几点：
 
-* When specifying the material `gs.materials.MPM.Muscle`, we set an additional argument `n_groups = 4`, which means there can be at most 4 different muscles in this robot.
-* We can set the muscle by calling `robot.set_muscle`, which takes `muscle_group` and `muscle_direction` as inputs. Both have the same length as `n_units`, where in MPM `n_units` is the number of particles while in FEM `n_units` is the number of elements. `muscle_group` is an array of integer ranging from `0` to `n_groups - 1`, indicating which muscle group an unit of the robot body belongs to. `muscle_direction` is an array of floating-point numbers that specify vectors for muscle direction. Note that we don't do normalization and thus you may want to make sure the input `muscle_direction` is already normalized.
-* How we set the muscle of this worm example is simply breaking the body into four parts: upper fore, upper hind, lower fore, and lower hind body, using `lu_thresh` for thresholding between lower/upper and `fh_thresh` for thresholding between fore/hind.
-* Now given four muscle groups, when setting the control via `set_actuation`, the actuation input is thus an array of shape `(4,)`.
+* 在指定材料 `gs.materials.MPM.Muscle` 时，我们设置了一个额外的参数 `n_groups = 4`，这意味着这个机器人最多可以有 4 个不同的肌肉。
+* 我们可以通过调用 `robot.set_muscle` 来设置肌肉，该函数接受 `muscle_group` 和 `muscle_direction` 作为输入。两者的长度都与 `n_units` 相同，在 MPM 中 `n_units` 是粒子的数量，而在 FEM 中 `n_units` 是元素的数量。`muscle_group` 是一个从 `0` 到 `n_groups - 1` 的整数数组，表示机器人身体的一个单元属于哪个肌肉组。`muscle_direction` 是一个浮点数数组，指定肌肉方向的向量。请注意，我们不进行归一化，因此您可能需要确保输入的 `muscle_direction` 已经归一化。
+* 我们设置这个蠕虫示例的肌肉的方法是简单地将身体分为四部分：上前、上后、下前和下后身体，使用 `lu_thresh` 作为上下阈值，使用 `fh_thresh` 作为前后阈值。
+* 现在给定四个肌肉组，在通过 `set_actuation` 设置控制时，驱动输入是一个形状为 `(4,)` 的数组。
 
+## 混合（刚体和软体）机器人
 
-## Hybrid (rigid-and-soft) robot
-
-Another type of soft robot is using rigid-bodied inner skeleton to actuatuate soft-bodied outer skin, or more precisely speaking, hybrid robot. With both rigid-bodied and soft-bodied dynamics implemented already, Genesis also supports hybrid robot. The following example is a hybrid robot with a two-link skeleton wrapped by soft skin pushing a rigid ball.
+另一种软体机器人是使用刚体内骨骼驱动软体外皮，或更准确地说，混合机器人。由于已经实现了刚体和软体动力学，Genesis 也支持混合机器人。以下示例是一个具有两节骨骼的混合机器人，包裹着软皮肤，推动一个刚性球。
 
 ```python
 import numpy as np
 import genesis as gs
 
 
-########################## init ##########################
+########################## 初始化 ##########################
 gs.init(seed=0, precision='32', logging_level='debug')
 
-######################## create a scene ##########################
+######################## 创建场景 ##########################
 dt = 3e-3
 scene = gs.Scene(
     sim_options=gs.options.SimOptions(
@@ -203,7 +204,7 @@ scene = gs.Scene(
         dt=dt,
         lower_bound=( 0.0,  0.0, -0.2),
         upper_bound=( 1.0,  1.0,  1.0),
-        gravity=(0, 0, 0), # mimic gravity compensation
+        gravity=(0, 0, 0), # 模拟重力补偿
         enable_CPIC=True,
     ),
     vis_options=gs.options.VisOptions(
@@ -212,7 +213,7 @@ scene = gs.Scene(
     ),
 )
 
-########################## entities ##########################
+########################## 实体 ##########################
 scene.add_entity(morph=gs.morphs.Plane())
 
 robot = scene.add_entity(
@@ -227,7 +228,7 @@ robot = scene.add_entity(
         mat_rigid=gs.materials.Rigid(
             gravity_compensation=1.,
         ),
-        mat_soft=gs.materials.MPM.Muscle( # to allow setting group
+        mat_soft=gs.materials.MPM.Muscle( # 允许设置组
             E=1e4,
             nu=0.45,
             rho=1000.,
@@ -249,10 +250,10 @@ ball = scene.add_entity(
     material=gs.materials.Rigid(rho=1000, friction=0.5),
 )
 
-########################## build ##########################
+########################## 构建 ##########################
 scene.build()
 
-########################## run ##########################
+########################## 运行 ##########################
 scene.reset()
 for i in range(1000):
     dofs_ctrl = np.array([
@@ -263,15 +264,16 @@ for i in range(1000):
 
     scene.step()
 ```
-This is what you will see:
+
+这是你将看到的效果：
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/hybrid_robot.mp4" type="video/mp4">
 </video>
 
-* You can specify hybrid robot with the material `gs.materials.Hybrid`, which consists of `gs.materials.Rigid` and `gs.materials.MPM.Muscle`. Note that only MPM is supported here and it must be the Muscle class since the hybrid material reuses internally the `muscle_group` implemented for `Muscle`.
-* When controlling the robot, given the actuation being from the inner rigid-bodied skeleton, there is a similar interface to rigid-bodied robot, e.g., `control_dofs_velocity`, `control_dofs_force`, `control_dofs_position`. Also, the control dimension is the same as the DoFs of the inner skeleton (in the above example, 2).
-* The skin is determined by the shape of the inner skeleton, where `thickness` determines the skin thickness when wrapping the skeleton.
-* By default, we grow skin based on the shape of the skeleton, which is specified by `morph` (in this example, the `urdf/simple/two_link_arm.urdf`). The argument `func_instantiate_soft_from_rigid` of `gs.materials.Hybrid` defines concretely how skin should grow based on the rigid-bodied `morph`. There is a default implementation `default_func_instantiate_soft_from_rigid` in [genesis/engine/entities/hybrid_entity.py](https://github.com/zhouxian/Genesis-dev/blob/main/genesis/engine/entities/hybrid_entity.py). You can also implement your own function.
-* When `morph` is `Mesh` instead of `URDF`, the mesh specifies the soft outer body and the inner skeleton is grown based on the skin shape. This is defined by `func_instantiate_rigid_from_soft`. There is also a default implementation `default_func_instantiate_rigid_from_soft`, which basically implements skeletonization of 3D meshes.
-* The argument `func_instantiate_rigid_soft_association` of `gs.materials.Hybrid` determines how each skeletal part is associated with skin. The default implementation is to find the closest particles of the soft skin to the rigid skeletal parts.
+* 你可以使用材料 `gs.materials.Hybrid` 指定混合机器人，该材料由 `gs.materials.Rigid` 和 `gs.materials.MPM.Muscle` 组成。请注意，这里只支持 MPM，并且它必须是 Muscle 类，因为混合材料内部重用了 `Muscle` 实现的 `muscle_group`。
+* 在控制机器人时，由于驱动来自内部刚体骨骼，因此有一个类似于刚体机器人的接口，例如 `control_dofs_velocity`、`control_dofs_force`、`control_dofs_position`。此外，控制维度与内部骨骼的自由度相同（在上述示例中为 2）。
+* 皮肤由内部骨骼的形状决定，其中 `thickness` 决定了包裹骨骼时的皮肤厚度。
+* 默认情况下，我们根据骨骼的形状生长皮肤，这由 `morph` 指定（在此示例中为 `urdf/simple/two_link_arm.urdf`）。`gs.materials.Hybrid` 的参数 `func_instantiate_soft_from_rigid` 具体定义了如何根据刚体 `morph` 生长皮肤。有一个默认实现 `default_func_instantiate_soft_from_rigid` 在 [genesis/engine/entities/hybrid_entity.py](https://github.com/zhouxian/Genesis-dev/blob/main/genesis/engine/entities/hybrid_entity.py) 中。你也可以实现自己的函数。
+* 当 `morph` 是 `Mesh` 而不是 `URDF` 时，网格指定软体外部，内部骨骼根据皮肤形状生长。这由 `func_instantiate_rigid_from_soft` 定义。还有一个默认实现 `default_func_instantiate_rigid_from_soft`，它基本上实现了 3D 网格的骨架化。
+* `gs.materials.Hybrid` 的参数 `func_instantiate_rigid_soft_association` 决定了每个骨骼部分如何与皮肤关联。默认实现是找到软皮肤中最接近刚体骨骼部分的粒子。

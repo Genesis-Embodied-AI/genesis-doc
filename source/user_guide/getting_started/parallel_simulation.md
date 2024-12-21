@@ -1,23 +1,24 @@
-# 🚀 Parallel Simulation
+# 🚀 并行仿真
 
 ```{figure} ../../_static/images/parallel_sim.png
 ```
 
-The biggest advantage of using GPU to accelerate simulation is to enable scene-level parallelism, so that we can train robots in thousands of environments simultaneously.
+使用GPU加速仿真的最大优势是能够实现场景级别的并行性，这样我们可以在成千上万个环境中同时训练机器人。
 
-In Genesis, creating parallel simulation is as simple as you would imagine: when building your scene, you simply add an additional parameter `n_envs` to tell the simulator how many environments you want. That's it.
+在Genesis中，创建并行仿真非常简单：在构建场景时，只需添加一个额外的参数`n_envs`来告诉模拟器你想要多少个环境。就是这么简单。
 
-Note that in order to mimic the name convention in learning literature, we will also use the term `batching` to indicate the parallelization operation.
+请注意，为了模仿学习文献中的命名约定，我们也会使用术语`batching`来表示并行化操作。
 
-Example script:
+示例脚本：
+
 ```python
 import genesis as gs
 import torch
 
-########################## init ##########################
+########################## 初始化 ##########################
 gs.init(backend=gs.gpu)
 
-########################## create a scene ##########################
+########################## 创建场景 ##########################
 scene = gs.Scene(
     show_viewer    = True,
     viewer_options = gs.options.ViewerOptions(
@@ -30,7 +31,7 @@ scene = gs.Scene(
     ),
 )
 
-########################## entities ##########################
+########################## 实体 ##########################
 plane = scene.add_entity(
     gs.morphs.Plane(),
 )
@@ -39,13 +40,13 @@ franka = scene.add_entity(
     gs.morphs.MJCF(file='xml/franka_emika_panda/panda.xml'),
 )
 
-########################## build ##########################
+########################## 构建 ##########################
 
-# create 20 parallel environments
+# 创建20个并行环境
 B = 20
 scene.build(n_envs=B, env_spacing=(1.0, 1.0))
 
-# control all the robots
+# 控制所有机器人
 franka.control_dofs_position(
     torch.tile(
         torch.tensor([0, 0, 0, -1.0, 0, 0, 0, 0.02, 0.02], device=gs.device), (B, 1)
@@ -56,29 +57,36 @@ for i in range(1000):
     scene.step()
 ```
 
-The above script is almost identical to the example you see in [Hello, Genesis](hello_genesis.md), except `scene.build()` is now appended with two extra parameters:
-- `n_envs`: this specifies how many batched environments you want to create
-- `env_spacing`: the spawned parallel envs share identical states. For visualization purpose, you can specify this parameter to ask the visualizer to distribute all the envs in a grid with a distance of (x, y) in meters between each env. Note that this only affects the visualization behavior, and doesn't change the actual position of the entities in each env.
+上述脚本与[Hello, Genesis](hello_genesis.md)中的示例几乎相同，只是`scene.build()`现在附加了两个额外的参数：
 
-### Control the robots in batched environments
-Recall that we use APIs such as `franka.control_dofs_position()` in the previous tutorials. Now you can use the exact same API to control batched robots, except that the input variable needs an additional batch dimension: 
+- `n_envs`：指定你想要创建的批量环境数量
+- `env_spacing`：生成的并行环境共享相同的状态。为了可视化目的，你可以指定此参数，要求可视化工具将所有环境以(x, y)米的距离分布在网格中。请注意，这只影响可视化行为，并不会改变每个环境中实体的实际位置。
+
+### 控制批量环境中的机器人
+
+回想一下我们在之前的教程中使用的API，例如`franka.control_dofs_position()`。现在你可以使用完全相同的API来控制批量机器人，只是输入变量需要一个额外的批量维度：
+
 ```python
 franka.control_dofs_position(torch.zeros(B, 9, device=gs.device))
 ```
-Since we are running simulation on GPU, in order to reduce data transfer overhead between cpu and gpu, we can use torch tensors selected using `gs.device` instead of numpy arrays (but numpy array will also work). This could bring noticeable performance gain when you need to send a tensor with a huge batch size frequently.
 
-The above call will control all the robots in the batched envs. If you want to control only a subset of environments, you can additionally pass in `envs_idx`, but make sure the size of the `position` tensor's batch dimension matches the length of `envs_idx`:
+由于我们在GPU上运行仿真，为了减少CPU和GPU之间的数据传输开销，我们可以使用通过`gs.device`选择的torch张量而不是numpy数组（但numpy数组也可以工作）。当你需要频繁发送一个具有巨大批量大小的张量时，这可以带来显著的性能提升。
+
+上述调用将控制批量环境中的所有机器人。如果你只想控制某些环境，可以另外传入`envs_idx`，但请确保`position`张量的批量维度大小与`envs_idx`的长度匹配：
+
 ```python
-# control only 3 environments: 1, 5, and 7.
+# 只控制3个环境：1, 5和7。
 franka.control_dofs_position(
     position = torch.zeros(3, 9, device=gs.device),
     envs_idx = torch.tensor([1, 5, 7], device=gs.device),
 )
 ```
-This call will only send a zero-position command to 3 selected environments.
 
-### Enjoy a futuristic speed!
-Genesis supports up to tens of thousands of parallel environments, and unlocks unprecedented simulation speed this way. Now, let's turn off the viewer, and change batch size to 30000 (consider using a smaller one if your GPU has a relatively small vram):
+此调用将仅向3个选定的环境发送零位置命令。
+
+### 享受未来的速度
+
+Genesis支持多达数万个并行环境，并以这种方式解锁前所未有的仿真速度。现在，让我们关闭查看器，并将批量大小更改为30000（如果你的GPU显存较小，请考虑使用较小的批量大小）：
 
 ```python
 import torch
@@ -103,7 +111,7 @@ franka = scene.add_entity(
 
 scene.build(n_envs=30000)
 
-# control all the robots
+# 控制所有机器人
 franka.control_dofs_position(
     torch.tile(
         torch.tensor([0, 0, 0, -1.0, 0, 0, 0, 0.02, 0.02], device=gs.device), (30000, 1)
@@ -114,10 +122,11 @@ for i in range(1000):
     scene.step()
 ```
 
-Running the above script on a desktop with RTX 4090 and 14900K gives you a futuristic simulation speed -- over **43 million** frames per second, this is 430,000 faster than real-time. Enjoy!
+在配备RTX 4090和14900K的桌面上运行上述脚本可以实现未来的仿真速度——每秒超过**4300万**帧，这比实时快430,000倍。享受吧！
+
 ```{figure} ../../_static/images/parallel_speed.png
 ```
 
 :::{tip}
-**FPS logging:** By default, genesis logger will display real-time simulation speed in the terminal. You can disable this behavior by setting `show_FPS=False` when creating the scene.
+**FPS日志记录：** 默认情况下，Genesis记录器将在终端显示实时仿真速度。你可以在创建场景时设置`show_FPS=False`来禁用此行为。
 :::
