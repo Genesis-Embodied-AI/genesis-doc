@@ -1,4 +1,4 @@
-# Genesis Documentation
+# Genesis Documentation (Chinese Version)
 
 1. Create a clean env using python 3.10, install Sphinx and other dependencies
 
