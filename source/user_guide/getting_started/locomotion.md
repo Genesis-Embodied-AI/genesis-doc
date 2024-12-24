@@ -8,7 +8,7 @@ Genesis支持并行仿真，使其成为高效训练强化学习（RL）运动�
 
 我们首先创建一个类似gym的环境（go2-env）。
 
-#### 初始化
+### 初始化
 
 `__init__`函数通过以下步骤设置仿真环境：
 
@@ -23,11 +23,11 @@ Genesis支持并行仿真，使其成为高效训练强化学习（RL）运动�
 5. **缓冲区初始化**。
     初始化缓冲区以存储环境状态、观察和奖励。
 
-#### 重置
+### 重置
 
 `reset_idx`函数重置指定环境的初始姿态和状态缓冲区。这确保了机器人从预定义的配置开始，对于一致的训练至关重要。
 
-#### 步骤
+### 步骤
 
 `step`函数执行动作并返回新的观察和奖励。其工作原理如下：
 
@@ -41,7 +41,7 @@ Genesis支持并行仿真，使其成为高效训练强化学习（RL）运动�
 5. **观察计算**。
     用于训练的观察包括基础角速度、投影重力、命令、自由度位置、自由度速度和先前的动作。
 
-#### 奖励
+### 奖励
 
 奖励函数对于策略指导至关重要。在本示例中，我们使用：
 
@@ -56,7 +56,7 @@ Genesis支持并行仿真，使其成为高效训练强化学习（RL）运动�
 
 在此阶段，我们已经定义了环境。现在，我们使用rsl-rl的PPO实现来训练策略。请按照以下安装步骤操作：
 
-```
+```bash
 # 安装rsl_rl。
 git clone https://github.com/leggedrobotics/rsl_rl
 cd rsl_rl && git checkout v1.0.2 && pip install -e .
@@ -67,13 +67,13 @@ pip install tensorboard
 
 安装完成后，通过运行以下命令开始训练：
 
-```
+```bash
 python examples/locomotion/go2_train.py
 ```
 
 要监控训练过程，请启动TensorBoard：
 
-```
+```bash
 tensorboard --logdir logs
 ```
 
@@ -86,7 +86,7 @@ tensorboard --logdir logs
 
 最后，让我们展开训练好的策略。运行以下命令：
 
-```
+```bash
 python examples/locomotion/go2_eval.py
 ```
 

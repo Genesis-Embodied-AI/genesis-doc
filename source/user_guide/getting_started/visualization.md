@@ -1,12 +1,18 @@
 # 📸 可视化与渲染
 
-Genesis的可视化系统由您刚创建的场景的`visualizer`管理（即`scene.visualizer`）。有两种方式来可视化场景：1）使用在单独线程中运行的交互式查看器，2）手动向场景添加相机并使用相机渲染图像。
+Genesis的可视化系统由场景的`visualizer`管理（即`scene.visualizer`）。可以通过两种方式来可视化场景：
+
+1. 使用独立线程运行的交互式查看器
+2. 手动添加相机并渲染图像
 
 ## 查看器
 
-如果您连接了显示器，可以使用交互式查看器来可视化场景。Genesis使用不同的`options`组来配置场景中的不同组件。要配置查看器，可以在创建场景时更改`viewer_options`中的参数。此外，我们使用`vis_options`来指定与可视化相关的属性，这些属性将由查看器和相机共享（我们很快会添加相机）。
+连接显示器后可使用交互式查看器来查看场景。Genesis用不同的`options`组来配置场景中的组件。可以通过以下方式配置:
 
-创建一个具有更详细查看器和可视化设置的场景（这看起来有点复杂，但只是为了说明目的）：
+- 创建场景时修改`viewer_options`中的参数
+- 使用`vis_options`设置可视化属性(查看器和相机共用)
+
+下面创建一个详细配置的场景:
 
 ```python
 scene = gs.Scene(
@@ -19,30 +25,35 @@ scene = gs.Scene(
         max_FPS       = 60,
     ),
     vis_options = gs.options.VisOptions(
-        show_world_frame = True, # 可视化`world`在其原点的坐标系
-        world_frame_size = 1.0, # 世界坐标系的长度（米）
-        show_link_frame  = False, # 不可视化实体链接的坐标系
-        show_cameras     = False, # 不可视化添加的相机的网格和视锥
-        plane_reflection = True, # 打开平面反射
-        ambient_light    = (0.1, 0.1, 0.1), # 环境光设置
+        show_world_frame = True, # 显示原点坐标系
+        world_frame_size = 1.0, # 坐标系长度(米)
+        show_link_frame  = False, # 不显示实体链接坐标系 
+        show_cameras     = False, # 不显示相机网格和视锥
+        plane_reflection = True, # 开启平面反射
+        ambient_light    = (0.1, 0.1, 0.1), # 环境光
     ),
-    renderer = gs.renderers.Rasterizer(), # 使用光栅化器进行相机渲染
+    renderer = gs.renderers.Rasterizer(), # 使用光栅化渲染器
 )
 ```
 
-在这里我们可以指定查看器相机的姿态和视场角。如果`max_FPS`设置为`None`，查看器将尽可能快地运行。如果`res`设置为None，Genesis将自动创建一个4:3的窗口，高度设置为显示器高度的一半。还要注意，在上述设置中，我们设置使用光栅化后端进行相机渲染。Genesis提供了两种渲染后端：`gs.renderers.Rasterizer()`和`gs.renderers.RayTracer()`。查看器始终使用光栅化器。默认情况下，相机也使用光栅化器。
+这里可以设置:
 
-一旦场景创建完成，您可以通过`scene.visualizer.viewer`或简写`scene.viewer`访问查看器对象。您可以查询或设置查看器相机姿态：
+- 查看器相机的位置和视场角
+- 如果`max_FPS`为`None`,查看器会全速运行
+- 如果`res`为None,会创建一个4:3窗口,高度为显示器一半
+- Genesis提供两种渲染器:`Rasterizer`和`RayTracer`
+- 查看器固定使用光栅化,相机默认也使用光栅化
+
+场景创建后,可以通过`scene.visualizer.viewer`或`scene.viewer`访问查看器:
 
 ```python
 cam_pose = scene.viewer.camera_pose()
-
 scene.viewer.set_camera_pose(cam_pose)
 ```
 
-## 相机与无头渲染
+## 相机与离线渲染
 
-现在让我们手动向场景添加一个相机对象。相机不连接到查看器或显示器，仅在您需要时返回渲染的图像。因此，相机在无头模式下工作。
+可以手动添加相机对象进行离线渲染:
 
 ```python
 cam = scene.add_camera(
@@ -54,35 +65,42 @@ cam = scene.add_camera(
 )
 ```
 
-如果`GUI=True`，每个相机将创建一个opencv窗口以动态显示渲染的图像。请注意，这与查看器GUI不同。
+设置`GUI=True`会为每个相机创建opencv窗口显示渲染结果。
 
-然后，一旦我们构建场景，我们可以使用相机渲染图像。我们的相机支持渲染rgb图像、深度图、分割掩码和表面法线。默认情况下，仅渲染rgb，您可以通过在调用`camera.render()`时设置参数来打开其他模式：
+构建场景后就可以渲染图像了。相机支持:
+
+- RGB图像
+- 深度图
+- 分割掩码
+- 表面法线
+
+默认只渲染RGB,可以通过参数开启其他模式:
 
 ```python
 scene.build()
 
-# 渲染rgb、深度、分割掩码和法线图
+# 渲染所有类型
 rgb, depth, segmentation, normal = cam.render(depth=True, segmentation=True, normal=True)
 ```
 
-如果您使用了`GUI=True`并连接了显示器，您现在应该能看到4个窗口。（有时opencv窗口会有额外的延迟，所以如果窗口是黑色的，您可以调用额外的`cv2.waitKey(1)`，或者简单地再次调用`render()`来刷新窗口。）
+如果使用`GUI=True`且连接了显示器,会看到4个窗口。(如果窗口是黑的,可以多调用一次`cv2.waitKey(1)`或`render()`来刷新)
 
 ```{figure} ../../_static/images/multimodal.png
 ```
 
-**使用相机录制视频**
+### 录制视频
 
-现在，让我们仅渲染rgb图像，并移动相机并录制视频。Genesis提供了一个方便的工具来录制视频：
+下面演示如何移动相机并录制视频:
 
 ```python
-# 开始相机录制。一旦开始，所有渲染的rgb图像将被内部记录
+# 开始录制
 cam.start_recording()
 
 import numpy as np
 for i in range(120):
     scene.step()
 
-    # 改变相机位置
+    # 移动相机
     cam.set_pose(
         pos    = (3.0 * np.sin(i / 60), 3.0 * np.cos(i / 60), 2.5),
         lookat = (0, 0, 0.5),
@@ -90,17 +108,15 @@ for i in range(120):
     
     cam.render()
 
-# 停止录制并保存视频。如果未指定`filename`，将使用调用文件名自动生成名称。
+# 停止录制并保存视频
 cam.stop_recording(save_to_filename='video.mp4', fps=60)
 ```
 
-您将视频保存到`video.mp4`：
+将视频保存到`video.mp4`：
 
-<video preload="auto" controls="True" width="100%">
-<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/cam_record.mp4" type="video/mp4">
-</video>
+![video](../../_static/videos/cam_record.mp4)
 
-以下是涵盖上述所有内容的完整代码脚本：
+完整代码如下:
 
 ```python
 import genesis as gs
@@ -160,6 +176,6 @@ for i in range(120):
 cam.stop_recording(save_to_filename='video.mp4', fps=60)
 ```
 
-## 逼真的光线追踪渲染
+## 光线追踪渲染
 
-Genesis提供了一个光线追踪渲染后端，用于逼真的渲染。您可以通过在创建场景时设置`renderer=gs.renderers.RayTracer()`轻松切换到使用此后端。此相机允许更多参数调整，例如`spp`、`aperture`、`model`等。教程即将推出。
+Genesis提供光线追踪渲染器用于真实感渲染。创建场景时设置`renderer=gs.renderers.RayTracer()`即可切换。支持调节`spp`、`aperture`、`model`等参数,教程即将发布。

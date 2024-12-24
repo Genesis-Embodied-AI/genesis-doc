@@ -1,5 +1,7 @@
 # `gs.morphs.Plane`
 
+此类提供了对平面形状的各种变形操作的支持，适用于需要处理平面几何形状的应用场景。
+
 ```{eval-rst}  
 .. autoclass:: genesis.options.morphs.Plane
 ```
@@ -8,5 +10,3 @@
 
 - **类名**: `gs.morphs.Plane`
 - **模块**: `genesis.options.morphs`
-
-此类提供了对平面形状的各种变形操作的支持，适用于需要处理平面几何形状的应用场景。

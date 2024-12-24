@@ -2,7 +2,7 @@
 
 ## 体积肌肉模拟
 
-Genesis 支持使用 MPM 和 FEM 进行软体机器人的体积肌肉模拟。在以下示例中，我们展示了一个非常简单的软体机器人，其球体身体由正弦波控制信号驱动。
+Genesis 用 MPM 和 FEM 两种方式模拟软体机器人的肌肉。下面用简单的球形机器人演示正弦波驱动。
 
 ```python
 import numpy as np
@@ -83,20 +83,20 @@ for i in range(1000):
     scene.step()
 ```
 
-这是你将看到的效果：
+展示效果:
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/muscle.mp4" type="video/mp4">
 </video>
 
-大部分代码与实例化常规可变形实体相当标准。只有两个小差异实现了这个效果：
+实现这个效果只需两个关键步骤:
 
-* 在实例化软体机器人 `robot_mpm` 和 `robot_fem` 时，我们分别使用了材料 `gs.materials.MPM.Muscle` 和 `gs.materials.FEM.Muscle`。
-* 在进行仿真步进时，我们使用 `robot_mpm.set_actuation` 或 `robot_fem.set_actuation` 来设置肌肉的驱动。
+* 创建软体机器人时用 `gs.materials.MPM.Muscle` 或 `gs.materials.FEM.Muscle` 作为材料
+* 仿真时用 `robot_mpm.set_actuation` 或 `robot_fem.set_actuation` 设置肌肉驱动
 
-默认情况下，只有一个肌肉覆盖整个机器人身体，肌肉方向垂直于地面 `[0, 0, 1]`。
+默认情况下,肌肉覆盖整个机器人身体,方向垂直于地面 `[0, 0, 1]`。
 
-在下一个示例中，我们展示了如何通过设置肌肉组和方向来模拟蠕虫向前爬行，如下所示。（完整脚本可以在 [tutorials/advanced_worm.py](https://github.com/zhouxian/Genesis-dev/tree/main/examples/tutorials/advanced_worm.py) 中找到。）
+下面用蠕虫爬行的例子演示如何设置多肌肉组和方向。(完整代码见 [tutorials/advanced_worm.py](https://github.com/Genesis-Embodied-AI/Genesis/tree/main/examples/tutorials/advanced_worm.py))
 
 ```python
 ########################## 实体 ##########################
@@ -158,22 +158,24 @@ for i in range(1000):
     scene.step()
 ```
 
-这是你将看到的效果：
+效果:
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/worm.mp4" type="video/mp4">
 </video>
 
-代码片段中值得注意的几点：
+几个要点:
 
-* 在指定材料 `gs.materials.MPM.Muscle` 时，我们设置了一个额外的参数 `n_groups = 4`，这意味着这个机器人最多可以有 4 个不同的肌肉。
-* 我们可以通过调用 `robot.set_muscle` 来设置肌肉，该函数接受 `muscle_group` 和 `muscle_direction` 作为输入。两者的长度都与 `n_units` 相同，在 MPM 中 `n_units` 是粒子的数量，而在 FEM 中 `n_units` 是元素的数量。`muscle_group` 是一个从 `0` 到 `n_groups - 1` 的整数数组，表示机器人身体的一个单元属于哪个肌肉组。`muscle_direction` 是一个浮点数数组，指定肌肉方向的向量。请注意，我们不进行归一化，因此您可能需要确保输入的 `muscle_direction` 已经归一化。
-* 我们设置这个蠕虫示例的肌肉的方法是简单地将身体分为四部分：上前、上后、下前和下后身体，使用 `lu_thresh` 作为上下阈值，使用 `fh_thresh` 作为前后阈值。
-* 现在给定四个肌肉组，在通过 `set_actuation` 设置控制时，驱动输入是一个形状为 `(4,)` 的数组。
+* 用 `gs.materials.MPM.Muscle` 时设置 `n_groups = 4` 表示最多可以有4个不同的肌肉
+* 用 `robot.set_muscle` 设置肌肉,需要 `muscle_group` 和 `muscle_direction` 两个输入,长度跟 `n_units` 相同。MPM 中是粒子数量,FEM 中是元素数量
+* `muscle_group` 是从 `0` 到 `n_groups - 1` 的整数数组,表示每个单元属于哪个肌肉组
+* `muscle_direction` 是浮点数数组,指定肌肉方向向量。要注意数组需要自己归一化
+* 蠕虫例子简单地把身体分为上前、上后、下前和下后四部分,用 `lu_thresh` 作上下阈值,用 `fh_thresh` 作前后阈值
+* 有了4个肌肉组后,`set_actuation` 的输入就是形状为 `(4,)` 的数组
 
-## 混合（刚体和软体）机器人
+## 混合(刚体和软体)机器人
 
-另一种软体机器人是使用刚体内骨骼驱动软体外皮，或更准确地说，混合机器人。由于已经实现了刚体和软体动力学，Genesis 也支持混合机器人。以下示例是一个具有两节骨骼的混合机器人，包裹着软皮肤，推动一个刚性球。
+另一种软体机器人是用刚体内骨骼驱动软体外皮,也就是混合机器人。Genesis 支持混合机器人,下面用两节骨骼包软皮推球的例子演示。
 
 ```python
 import numpy as np
@@ -265,15 +267,17 @@ for i in range(1000):
     scene.step()
 ```
 
-这是你将看到的效果：
+效果:
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/hybrid_robot.mp4" type="video/mp4">
 </video>
 
-* 你可以使用材料 `gs.materials.Hybrid` 指定混合机器人，该材料由 `gs.materials.Rigid` 和 `gs.materials.MPM.Muscle` 组成。请注意，这里只支持 MPM，并且它必须是 Muscle 类，因为混合材料内部重用了 `Muscle` 实现的 `muscle_group`。
-* 在控制机器人时，由于驱动来自内部刚体骨骼，因此有一个类似于刚体机器人的接口，例如 `control_dofs_velocity`、`control_dofs_force`、`control_dofs_position`。此外，控制维度与内部骨骼的自由度相同（在上述示例中为 2）。
-* 皮肤由内部骨骼的形状决定，其中 `thickness` 决定了包裹骨骼时的皮肤厚度。
-* 默认情况下，我们根据骨骼的形状生长皮肤，这由 `morph` 指定（在此示例中为 `urdf/simple/two_link_arm.urdf`）。`gs.materials.Hybrid` 的参数 `func_instantiate_soft_from_rigid` 具体定义了如何根据刚体 `morph` 生长皮肤。有一个默认实现 `default_func_instantiate_soft_from_rigid` 在 [genesis/engine/entities/hybrid_entity.py](https://github.com/zhouxian/Genesis-dev/blob/main/genesis/engine/entities/hybrid_entity.py) 中。你也可以实现自己的函数。
-* 当 `morph` 是 `Mesh` 而不是 `URDF` 时，网格指定软体外部，内部骨骼根据皮肤形状生长。这由 `func_instantiate_rigid_from_soft` 定义。还有一个默认实现 `default_func_instantiate_rigid_from_soft`，它基本上实现了 3D 网格的骨架化。
-* `gs.materials.Hybrid` 的参数 `func_instantiate_rigid_soft_association` 决定了每个骨骼部分如何与皮肤关联。默认实现是找到软皮肤中最接近刚体骨骼部分的粒子。
+要点:
+
+* 用 `gs.materials.Hybrid` 指定混合机器人,由 `gs.materials.Rigid` 和 `gs.materials.MPM.Muscle` 组成。只支持 MPM,且必须用 Muscle 类因为内部用了它的 `muscle_group`
+* 控制时用类似刚体机器人的接口,如 `control_dofs_velocity`、`control_dofs_force`、`control_dofs_position`。控制维度跟内部骨骼自由度相同(例子中是2)
+* 皮肤由内部骨骼形状决定,`thickness` 参数控制包裹厚度
+* 默认用骨骼形状生长皮肤,由 `morph` 指定(例子用 `urdf/simple/two_link_arm.urdf`)。`func_instantiate_soft_from_rigid` 定义如何根据刚体 `morph` 生长皮肤,有默认实现也可以自定义
+* 当 `morph` 是 `Mesh` 时网格指定软体外形,内部骨骼根据皮肤生长,由 `func_instantiate_rigid_from_soft` 定义,默认实现是3D网格骨架化
+* `func_instantiate_rigid_soft_association` 定义骨骼和皮肤如何关联,默认找最近粒子

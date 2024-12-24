@@ -39,4 +39,3 @@ advanced_topics/sparse_computation
 advanced_topics/solvers_and_coupling
 advanced_topics/drone
 ```
-
