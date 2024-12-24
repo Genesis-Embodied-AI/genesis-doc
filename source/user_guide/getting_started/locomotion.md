@@ -86,7 +86,7 @@ tensorboard --logdir logs
 
 最后，让我们展开训练好的策略。运行以下命令：
 
-```
+```bash
 python examples/locomotion/go2_eval.py
 ```
 
