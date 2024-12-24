@@ -96,7 +96,7 @@ for i in range(1000):
 
 默认情况下，只有一个肌肉覆盖整个机器人身体，肌肉方向垂直于地面 `[0, 0, 1]`。
 
-在下一个示例中，我们展示了如何通过设置肌肉组和方向来模拟蠕虫向前爬行，如下所示。（完整脚本可以在 [tutorials/advanced_worm.py](https://github.com/zhouxian/Genesis-dev/tree/main/examples/tutorials/advanced_worm.py) 中找到。）
+在下一个示例中，我们展示了如何通过设置肌肉组和方向来模拟蠕虫向前爬行，如下所示。（完整脚本可以在 [tutorials/advanced_worm.py](https://github.com/Genesis-Embodied-AI/Genesis/tree/main/examples/tutorials/advanced_worm.py) 中找到。）
 
 ```python
 ########################## 实体 ##########################
@@ -274,6 +274,6 @@ for i in range(1000):
 * 你可以使用材料 `gs.materials.Hybrid` 指定混合机器人，该材料由 `gs.materials.Rigid` 和 `gs.materials.MPM.Muscle` 组成。请注意，这里只支持 MPM，并且它必须是 Muscle 类，因为混合材料内部重用了 `Muscle` 实现的 `muscle_group`。
 * 在控制机器人时，由于驱动来自内部刚体骨骼，因此有一个类似于刚体机器人的接口，例如 `control_dofs_velocity`、`control_dofs_force`、`control_dofs_position`。此外，控制维度与内部骨骼的自由度相同（在上述示例中为 2）。
 * 皮肤由内部骨骼的形状决定，其中 `thickness` 决定了包裹骨骼时的皮肤厚度。
-* 默认情况下，我们根据骨骼的形状生长皮肤，这由 `morph` 指定（在此示例中为 `urdf/simple/two_link_arm.urdf`）。`gs.materials.Hybrid` 的参数 `func_instantiate_soft_from_rigid` 具体定义了如何根据刚体 `morph` 生长皮肤。有一个默认实现 `default_func_instantiate_soft_from_rigid` 在 [genesis/engine/entities/hybrid_entity.py](https://github.com/zhouxian/Genesis-dev/blob/main/genesis/engine/entities/hybrid_entity.py) 中。你也可以实现自己的函数。
+* 默认情况下，我们根据骨骼的形状生长皮肤，这由 `morph` 指定（在此示例中为 `urdf/simple/two_link_arm.urdf`）。`gs.materials.Hybrid` 的参数 `func_instantiate_soft_from_rigid` 具体定义了如何根据刚体 `morph` 生长皮肤。有一个默认实现 `default_func_instantiate_soft_from_rigid` 在 [genesis/engine/entities/hybrid_entity.py](https://github.com/Genesis-Embodied-AI/Genesis/tree/main/genesis/engine/entities/hybrid_entity.py) 中。你也可以实现自己的函数。
 * 当 `morph` 是 `Mesh` 而不是 `URDF` 时，网格指定软体外部，内部骨骼根据皮肤形状生长。这由 `func_instantiate_rigid_from_soft` 定义。还有一个默认实现 `default_func_instantiate_rigid_from_soft`，它基本上实现了 3D 网格的骨架化。
 * `gs.materials.Hybrid` 的参数 `func_instantiate_rigid_soft_association` 决定了每个骨骼部分如何与皮肤关联。默认实现是找到软皮肤中最接近刚体骨骼部分的粒子。
