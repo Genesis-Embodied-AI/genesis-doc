@@ -1,7 +1,7 @@
-# 🖥️ Command Line Tools
+# 🖥️ 命令行工具
 
-We provided some command line tools that you can execute in terminal once Genesis is installed. These include:
+Genesis安装完成后，我们提供了一些可以在终端中执行的命令行工具，包括：
 
-- `gs clean`: Clean all the files cached by genesis and taichi
-- `gs view *.*`: Visualize a given asset (mesh/URDF/MJCF) (can be useful if you want to quickly check if your asset can be loaded and visualized correctly)
-- `gs animate 'path/*.png'`: Combine all images that matches the given pattern into a video.
+- `gs clean`：清理所有Genesis和Taichi缓存的文件（当程序运行出现异常时，可以尝试清理缓存）
+- `gs view *.*`：可视化指定的资产文件（支持mesh网格模型/URDF机器人描述文件/MJCF物理引擎配置文件等），这个命令在快速检查资产文件是否能被正确加载和显示时非常有用
+- `gs animate 'path/*.png'`：将指定路径下所有匹配模式的图片合并成一个视频（例如：可以将仿真过程中保存的图片序列合成为动画）
