@@ -25,11 +25,11 @@ for i in range(1000):
 
 你可以在这里停止并开始探索Genesis，但如果你有足够的耐心，让我们一起逐步了解它：
 
-#### 初始化
+## 初始化
 
 第一步是导入Genesis并初始化它：
 
-```
+```python
 import genesis as gs
 gs.init(backend=gs.cpu)
 ```
@@ -54,7 +54,7 @@ gs.init(
 )
 ```
 
-#### 创建场景
+## 创建场景
 
 Genesis中的所有对象、机器人、摄像机等都放置在一个Genesis `Scene`中：
 
@@ -83,7 +83,7 @@ scene = gs.Scene(
 
 此示例将模拟的`dt`设置为每步0.01秒，配置重力，并设置交互式查看器的初始摄像机姿态。
 
-#### 将对象加载到场景中
+## 将对象加载到场景中
 
 在此示例中，我们将一个平面和一个Franka机械臂加载到场景中：
 
@@ -134,7 +134,7 @@ franka = scene.add_entity(
 
 如果你想使用外部**URDF**文件加载Franka机械臂，只需将morph更改为`gs.morphs.URDF(file='urdf/panda_bullet/panda.urdf', fixed=True)`。请注意，与MJCF文件已经指定了连接机器人基座链接和`world`的关节类型不同，URDF文件不包含此信息。因此，默认情况下，URDF机器人树的基座链接与`world`断开连接（更准确地说，通过一个`free` 6自由度关节连接到`world`）。因此，如果希望基座链接固定，需要额外指定`fixed=True`。
 
-#### 构建场景并开始模拟
+## 构建场景并开始模拟
 
 ```Python
 scene.build()

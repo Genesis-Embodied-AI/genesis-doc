@@ -49,7 +49,7 @@ scene.build()
 
 为了知道要控制哪个关节（自由度），我们需要将我们（作为用户）在URDF/MJCF文件中定义的关节名称映射到模拟器内部的实际自由度索引：
 
-```
+```python
 jnt_names = [
     'joint1',
     'joint2',

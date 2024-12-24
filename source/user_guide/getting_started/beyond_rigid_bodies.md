@@ -84,7 +84,7 @@ for i in range(horizon):
 
 您可以通过以下方式获取实时粒子位置：
 
-```
+```python
 particles = liquid.get_particles()
 ```
 
