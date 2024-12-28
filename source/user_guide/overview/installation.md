@@ -1,68 +1,69 @@
-# 🛠️ Installation
-## Prerequisites
-* **Python**: 3.9+
-* **OS**: Linux (*recommended*) / MacOS / Windows
+# 🛠️ インストール方法
+## 前提条件
+* **Python**: 3.9以上
+* **OS**: Linux (*推奨*) / MacOS / Windows
 
 :::{note}
-Genesis is designed to be ***cross-platform***, supporting backend devices including *CPU*, *CUDA GPU* and *non-CUDA GPU*. That said, it is recommended to use **Linux** platform with **CUDA-compatible GPU** to achieve the best performance.
+Genesisは***マルチプラットフォーム***に対応しており、*CPU*、*CUDA対応のGPU*、および*非CUDA GPU*を含むバックエンドデバイスをサポートしています。ただし、ベストな性能を得るためには、**Linux**プラットフォームと**CUDA対応GPU**の使用を推奨します。
 :::
 
-Supported features on various systems are as follows:
+各システムでサポートされる機能は以下の通りです：
 <div style="text-align: center;">
 
-| OS  | GPU Device        | GPU Simulation | CPU Simulation | Interactive Viewer | Headless Rendering |
-| ------- | ----------------- | -------------- | -------------- | ---------------- | ------------------ |
-| Linux   | Nvidia            | ✅             | ✅             | ✅               | ✅                 |
-|         | AMD               | ✅             | ✅             | ✅               | ✅                 |
-|         | Intel             | ✅             | ✅             | ✅               | ✅                 |
-| Windows | Nvidia            | ✅             | ✅             | ❌               | ❌                 |
-|         | AMD               | ✅             | ✅             | ❌               | ❌                 |
-|         | Intel             | ✅             | ✅             | ❌               | ❌                 |
-| MacOS   | Apple Silicon     | ✅             | ✅             | ✅               | ✅                 |
+| OS  | GPUデバイス         | GPUシミュレーション | CPUシミュレーション | インタラクティブビューア | ヘッドレスレンダリング |
+| ------- | ----------------- | ---------------- | ---------------- | -------------------- | ------------------ |
+| Linux   | Nvidia            | ✅               | ✅               | ✅                   | ✅                 |
+|         | AMD               | ✅               | ✅               | ✅                   | ✅                 |
+|         | Intel             | ✅               | ✅               | ✅                   | ✅                 |
+| Windows | Nvidia            | ✅               | ✅               | ❌                   | ❌                 |
+|         | AMD               | ✅               | ✅               | ❌                   | ❌                 |
+|         | Intel             | ✅               | ✅               | ❌                   | ❌                 |
+| MacOS   | Apple Silicon     | ✅               | ✅               | ✅                   | ✅                 |
 
 </div>
 
-## Installation
-1. Genesis is available via PyPI:
+## インストール方法
+1. GenesisはPyPI経由で利用可能です:
     ```bash
     pip install genesis-world
     ```
 
-2. Install **PyTorch** following the [official instructions](https://pytorch.org/get-started/locally/).
+2. **PyTorch**を[公式手順](https://pytorch.org/get-started/locally/)に従ってインストールしてください。
 
+## (オプション) モーションプランニング
+GenesisはOMPLのモーションプランニング機能を統合しており、直感的なAPIを使用して簡単にモーションプランニングを実施できます。組み込みのモーションプランニング機能が必要な場合は、[ここ](https://github.com/ompl/ompl/releases/tag/prerelease)から事前コンパイル済みのOMPLのWheelをダウンロードし、`pip install`でインストールしてください。
 
-## (Optional) Motion planning
-Genesis integrated OMPL's motion planning functionalities and wraps it using a intuitive API for effortless motion planning. If you need the built-in motion planning capability, download pre-compiled OMPL wheel [here](https://github.com/ompl/ompl/releases/tag/prerelease), and then `pip install` it.
+## (オプション) サーフェス再構築
+粒子ベースのエンティティ（流体、変形体など）を視覚化するためのメッシュ表面を再構築する必要がある場合、以下の2つのオプションをご用意しています：
 
-## (Optional) Surface reconstruction
-If you need fancy visuals for visualizing particle-based entities (fluids, deformables, etc.), you typically need to reconstruct the mesh surface using the internal particle-based representation. We provide two options for this purpose:
-
-1. [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf), a state-of-the-art surface reconstruction method for achieving this:
+1. [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf):
+    最先端のサーフェス再構築法を使用して視覚化を実現します。
     ```bash
     cargo install splashsurf
     ```
-2. ParticleMesher, our own openVDB-based surface reconstruction tool (faster but with not as smooth):
+2. ParticleMesher:
+    OpenVDBをベースにした独自のサーフェス再構築ツール（高速だが滑らかさは劣る）。
     ```bash
     echo "export LD_LIBRARY_PATH=${PWD}/ext/ParticleMesher/ParticleMesherPy:$LD_LIBRARY_PATH" >> ~/.bashrc
     source ~/.bashrc
     ```
 
+## (オプション) レイトレーシングレンダラー
 
-## (Optional) Ray Tracing Renderer
+写真のようにリアルなビジュアルを目指す場合、Genesisには[LuisaCompute](https://github.com/LuisaGroup/LuisaCompute)を使用したレイトレーシング（パストレーシング）ベースのレンダラーが組み込まれています。
 
-If you need photo-realistic visuals, Genesis has a built-in a ray-tracing (path-tracing) based renderer developped using [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain specific language designed for rendering.
-
-### 1. Get LuisaRender
-The submodule LuisaRender is under `ext/LuisaRender`:
+### 1. LuisaRenderを取得
+LuisaRenderは`ext/LuisaRender`サブモジュール内にあります：
 ```
 git submodule update --init --recursive
 ```
-### 2. Dependencies 
 
-#### 2.A: If you have sudo access. Preferred.
-**NB**: It seems compilation only works on Ubuntu 20.04+, As vulkan 1.2+ is needed and 18.04 only supports 1.1, but I haven't fully checked this...
+### 2. 依存関係 
 
-- upgrade `g++` and `gcc` to version 11
+#### 2.A: 管理者権限がある場合（推奨）
+**注意**: コンパイルはUbuntu 20.04以降でのみ動作するようです。Vulkan 1.2+が必要であり、18.04は1.1までしかサポートしていませんが、完全には確認していません。
+
+- `g++` と `gcc` のバージョンを11にアップグレード
     ```
     sudo apt install build-essential manpages-dev software-properties-common
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -70,81 +71,83 @@ git submodule update --init --recursive
     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 110
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110
 
-    # verify
+    # バージョン確認
     g++ --version
     gcc --version
     ```
-- cmake
+- cmakeをインストール
     ```
-    # if you system's cmake version is under 3.18, uninstall that and reinstall via snap
+    # システムのcmakeバージョンが3.18未満の場合、卸してsnap経由で再インストール
     sudo snap install cmake --classic
     ```
-- CUDA
-    - You need to install a system-wide cuda (Now 12.0+).
-        - download https://developer.nvidia.com/cuda-11-7-0-download-archive
-        - Install cuda toolkit.
-        - reboot
-- rust
+- CUDAをインストール
+    - システム全体で使用するCUDA（バージョン12.0以上）：
+        - https://developer.nvidia.com/cuda-11-7-0-download-archive からダウンロード
+        - CUDAツールキットをインストール
+        - 再起動
+- rustをインストール
     ```
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     sudo apt-get install patchelf
-    # if the above gives downloader error, make sure your curl was installed via apt, not snap
+    # 上記でエラーが発生する場合、curlがaptからインストールされていることを確認
     ```
-- Vulkan
+- Vulkanをインストール
     ```
     sudo apt install libvulkan-dev
     ```
-- zlib
+- zlibをインストール
     ```
     sudo apt-get install zlib1g-dev
     ```
-- RandR headers
+- RandRヘッダーをインストール
     ```
     sudo apt-get install xorg-dev libglu1-mesa-dev
     ```
-- pybind
+- pybindをインストール
     ```
     pip install "pybind11[global]"
     ```
-- libsnappy
+- libsnappyをインストール
     ```
     sudo apt-get install libsnappy-dev
     ```
-#### 2.B: If you have no sudo.
-- conda dependencies
+#### 2.B: 管理者権限がない場合
+
+- conda依存関係をインストール
     ```
     conda install -c conda-forge gcc=11.4 gxx=11.4 cmake=3.26.1 minizip zlib libuuid patchelf vulkan-tools vulkan-headers
     ```
-- rust
+- rustをインストール
     ```
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     ```
-- pybind
+- pybindをインストール
     ```
     pip install "pybind11[global]"
     ```
 
-### 3. Compile
-- Build LuisaRender and its python binding:
-    - If you used system dependencies (2.A)
+### 3. コンパイル
+- LuisaRenderとそのPythonバインディングをビルドする:
+    - システム依存関係を使用した場合（2.A）
         ```
         cd genesis/ext/LuisaRender
         cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON -D LUISA_COMPUTE_ENABLE_GUI=OFF 
         cmake --build build -j $(nproc)
         ```
-        By default, we use optix deoniser. If you need OIDN, append `-D LUISA_COMPUTE_DOWNLOAD_OIDN=ON`.
-    - If you used conda dependencies (2.B)
+        デフォルトではOptiXデノイザを使用しています。OIDNが必要な場合、`-D LUISA_COMPUTE_DOWNLOAD_OIDN=ON`を追加。
+    - conda依存関係を使用した場合（2.B）
         ```
         export CONDA_INCLUDE_PATH=path/to/anaconda/include
         cd ./ext/LuisaRender
         cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON -D LUISA_COMPUTE_ENABLE_GUI=OFF -D ZLIB_INCLUDE_DIR=$CONDA_INCLUDE_PATH
         cmake --build build -j $(nproc)
         ```
-        The `CONDA_INCLUDE_PATH` typically looks like: `/home/user/anaconda3/envs/genesis/include`
-### 4. FAQs
-- Assertion 'lerror’ failed: Failed to write to the process: Broken pipe:
-  You may need to use CUDA of the same version as compiled.
-- if you followed 2.A and see "`GLIBCXX_3.4.30` not found"
+        `CONDA_INCLUDE_PATH`は典型的には`/home/user/anaconda3/envs/genesis/include`のようになります。
+
+### 4. FAQ
+- アサーションエラー 'lerror’ failed: Broken pipe:
+  CUDAのバージョンがコンパイル時と一致しているか確認してください。
+- 2.Aを使用している場合に"`GLIBCXX_3.4.30`が見つかりません"というエラー
     ```
     cd ~/anaconda3/envs/genesis/lib
     mv libstdc++.so.6 libstdc++.so.6.old

@@ -1,40 +1,40 @@
-# 🪐 Differentiable Simulation
+# 🪐 微分可能シミュレーション
 
-(Under construction. More details coming soon)
+（作成中です。詳細は近日公開予定）
 
 ## genesis.Tensor
-We now have our own tensor data type: `genesis.Tensor()`, for the following reasons:
-- to ensure a consistent user experience :)
-- it enables end-to-end gradient flow from loss all the way back to action input
-- it removes need for specifying datatype (though you still can) when creaing tensors. The datatype specified when calling gs.init() will be used when creating genesis tensors.
-- provides additional safety checks, such as contiguous check and check if tensors from different Scene are accidently being merged into the same computation graph.
-- supports other potential customizations if we need.
+私たち独自のテンソルデータ型である `genesis.Tensor()` を導入しました。以下の理由からです：
+- 一貫したユーザー体験を提供するため
+- 損失からアクション入力に至るまでのエンドツーエンドの勾配フローを可能にするため
+- テンソル作成時にデータ型を指定する必要がなくなるため（もちろん指定することも可能です）。`gs.init()` を呼び出す際に指定されたデータ型が genesis テンソル作成時に使用されます。
+- 連続性チェックや異なる Scene からのテンソルが誤って同じ計算グラフにマージされることを防ぐチェックなど、追加の安全チェックを提供します。
+- 必要に応じて、他のカスタマイズをサポートするため。
 
-This is essentially a subclass of pytorch tensors, so users can simply treat it as torch tensors and apply different kinds of torch operations.
+このテンソルは本質的には PyTorch テンソルのサブクラスであるため、ユーザーはこれを単なる torch テンソルとして扱い、さまざまな torch 演算を適用できます。
 
-In pytorch, the recommended way of creating tensors is to call `torch.tensor` and other tensor creation ops like `torch.rand`, `torch.zeros`, `torch.from_numpy`, etc. We aim to reproduce the same experience in genesis, and genesis tensors can be created simply by replacing `torch` with `genesis`, e.g.
-```
+PyTorch では、テンソルを作成する推奨方法は `torch.tensor` や `torch.rand`、`torch.zeros`、`torch.from_numpy` などのテンソル作成オペレーションを呼び出すことです。genesis ではこれと同じ体験を再現することを目指しており、genesis テンソルは `torch` を `genesis` に置き換えるだけで作成できます。例：
+
+```python
 x = gs.tensor([0.5, 0.73, 0.5])
 y = gs.rand(size=(horizon, 3), requires_grad=True)
 ```
-Tensors created this way are leaf tensors, and their gradient can be accessed with `tensor.grad` after backward pass. Pytorch operations mixing torch and genesis tensors will automatically yield genesis tensors.
 
-There exist a few minor differences though:
-- Similar to torch, genesis tensor creation automatically infers the data type of the tensor based on the parameter (whether int or float), but then will convert to the float or int type with precision specified in gs.init().
-- Users can also can override datatypes, and now we support `dtype=int` or `dtype=float` when calling the tensor creation ops.
-- All genesis tensors are on cuda, so device selection is not allowed. This means unlike `torch.from_numpy`, `genesis.from_numpy` directly gives you tensors on cuda.
-- `genesis.from_torch(detach=True)`: this creates a genesis tensor given a torch tensor. When calling this, if detach is True, the returned genesis tensor will be a new leaf node, detached from pytorch's computation graph. If detach is False, the returned genesis tensor will be connected to the upstream torch computation graph, and when calling backward pass, the gradient will flow back all the way to connected pytorch tensors. By default, we should use purely genesis tensors, but this allows potential integration with upstream applications built on pytorch, e.g. training neural policies.
-- Each genesis tensor object has a `scene` attribute. Any child tensors derived from it would inherit the same scene. This lets us keep track of the source of the gradient flow.
+この方法で作成されたテンソルは葉テンソルであり、逆伝播後に `tensor.grad` を使ってその勾配にアクセスできます。torch と genesis テンソルを混合して使用する場合、PyTorch の演算は自動的に genesis テンソルを返します。
+
+いくつかの小さな違いも存在します：
+- torch と同様に、genesis テンソル作成はパラメータ（整数または浮動小数点数）に基づいてデータ型を自動推定しますが、gs.init() で指定された精度を持つ浮動小数点数または整数型に変換されます。
+- データ型を上書きすることも可能で、現在のところテンソル作成オペレーションでは `dtype=int` または `dtype=float` をサポートしています。
+- すべての genesis テンソルは CUDA 上にあるため、デバイス選択は許可されていません。このため、`torch.from_numpy` とは異なり、`genesis.from_numpy` は CUDA 上のテンソルを直接返します。
+- `genesis.from_torch(detach=True)`：torch テンソルを指定して genesis テンソルを作成します。このとき、detach が True の場合、返される genesis テンソルは PyTorch の計算グラフから切り離された新しい葉ノードになります。detach が False の場合、返される genesis テンソルは上流の torch 計算グラフに接続され、逆伝播時には勾配が接続された PyTorch テンソルにまで流れます。通常は純粋に genesis テンソルを使用することを推奨しますが、これにより、PyTorch 上に構築された上流アプリケーション（例：ニューラルポリシーのトレーニング）との統合が可能になります。
+- 各 genesis テンソルオブジェクトには `scene` 属性があります。これから派生した子テンソルは同じ scene を継承します。これにより、勾配フローの出所を追跡することができます。
     ```python
     state = scene.get_state()
-    # state.pos is a genesis tensor
-    print(state.pos.scene) # output: <class 'genesis.engine.scene.Scene'> id: 'e1a95be2-0947-4dcb-ad02-47b8541df0a0'
+    # state.pos は genesis テンソルです
+    print(state.pos.scene) # 出力: <class 'genesis.engine.scene.Scene'> id: 'e1a95be2-0947-4dcb-ad02-47b8541df0a0'
     random_tensor = gs.rand(size=(), requires_grad=True)
-    print(random_tensor.scene) # output: None
+    print(random_tensor.scene) # 出力: None
     pos_ = state.pos + random_tensor
-    print(pos_.scene) # output: <class 'genesis.engine.scene.Scene'> id: 'e1a95be2-0947-4dcb-ad02-47b8541df0a0'
+    print(pos_.scene) # 出力: <class 'genesis.engine.scene.Scene'> id: 'e1a95be2-0947-4dcb-ad02-47b8541df0a0'
     ```
-    If `tensor.scene` is `None`, `tensor.backward()` behaves identically to a torch tensor's `backward()`. Otherwise, it will allow gradient flow back to `tensor.scene` and trigger upstream gradient flow.
-- To resemble torch's behavior like `nn.Module.zero_grad()` or `optimizer.zero_grad()`, you can also do `tensor.zero_grad()` with a genesis tensor.
-
-
+    `tensor.scene` が `None` の場合、`tensor.backward()` は torch テンソルの `backward()` と同じように動作します。それ以外の場合、`tensor.scene` に対して勾配フローが許可され、上流の勾配フローがトリガーされます。
+- torch の `nn.Module.zero_grad()` や `optimizer.zero_grad()` のような動作を再現するため、genesis テンソルでは `tensor.zero_grad()` を使用することも可能です。

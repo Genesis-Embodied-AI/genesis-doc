@@ -1,88 +1,106 @@
-# 🦿 Training Locomotion Policies with RL
+# 🦿 強化学習を用いた歩行ポリシーのトレーニング
 
-Genesis supports parallel simulation, making it ideal for training reinforcement learning (RL) locomotion policies efficiently. In this tutorial, we will walk you through a complete training example for obtaining a basic locomotion policy that enables a Unitree Go2 Robot to walk. 
+Genesis は並列シミュレーションをサポートしており、強化学習（RL）の歩行ポリシーを効率的にトレーニングするのに最適です。このチュートリアルでは、Unitree Go2 ロボットが歩行できる基本的な歩行ポリシーを取得するための完全なトレーニング例を紹介します。
 
-This is a simple and minimal example that demonstrates a very basic RL training pipeline in Genesis, and with the following example you will be able to obtain a quadruped locomotion policy that's deployable to a real robot very quickly.
+これは Genesis で非常に基本的な RL トレーニングパイプラインを示すシンプルで最小限の例です。この例を使用することで、すぐに実機の四足歩行ロボットに展開可能な歩行ポリシーを取得することができます。
 
-**Note**: This is *NOT* a comprehensive locomotion policy training pipeline. It uses simplified reward terms to get you started easily, and does not exploit Genesis's speed on big batchsizes, so it only serves basic demonstration purposes.
+**注意**: これは包括的な歩行ポリシーのトレーニングパイプラインでは *ありません*。簡略化された報酬項目を使用して入門を容易にするものであり、大規模バッチサイズにおける Genesis のスピードを最大限に活用するものではありません。そのため、基本的なデモンストレーション用途に限定されます。
 
-**Acknowledgement**: This tutorial is inspired by and builds several core concepts from [Legged Gym](https://github.com/leggedrobotics/legged_gym).
+**謝辞**: このチュートリアルは、[Legged Gym](https://github.com/leggedrobotics/legged_gym) のいくつかの基本概念に着想を得て、それらを活用しています。
 
-## Environment Overview
-We start by creating a gym-style environment (go2-env).
-#### Initialize
+---
 
-The `__init__` function sets up the simulation environment with the following steps:
-1. **Control Frequency**.
-    The simulation runs at 50 Hz, matching the real robot's control frequency. To further bridge sim2real gap, we also manually simulate the action latecy (~20ms, one dt) shown on the real robot.
-2. **Scene Creation**.
-    A simulation scene is created, including the robot and a static plane.
-3. **PD Controller Setup**.
-    Motors are first identified based on their names. Stiffness and damping are then set for each motor.
-4. **Reward Registration**.
-    Reward functions, defined in the configuration, are registered to guide the policy. These functions will be explained in the "Reward" section.
-5. **Buffer Initialization**.
-    Buffers are initialized to store environment states, observations, and rewards
+## 環境の概要
 
-#### Reset
-The `reset_idx` function resets the initial pose and state buffers of the specified environments. This ensures robots start from predefined configurations, crucial for consistent training.
+まず、ジムスタイルの環境（go2-env）を作成します。
 
-#### Step
-The `step` function takes the action for execution and returns new observations and rewards. Here is how it works:
-1. **Action Execution**.
-    The input action will be clipped, rescaled, and added on top of default motor positions. The transformed action, representing target joint positions, will then be sent to the robot controller for one-step execution.
-2. **State Updates**.
-    Robot states, such as joint positions and velocities, are retrieved and stored in buffers.
-3. **Termination Checks**.
-    Environments are terminated if (1) Episode length exceeds the maximum allowed (2) The robot’s body orientation deviates significantly. Terminated environments are reset automatically.
-4. **Reward Computation**.
-5. **Observation Computation**.
-    Observation used for training includes base angular velocity, projected gravity, commands, dof position, dof velocity, and previous actions.
+### 初期化
 
+`__init__` 関数は以下の手順でシミュレーション環境を設定します：
+1. **制御周波数**  
+    シミュレーションは 50 Hz で動作し、実機ロボットの制御周波数に合わせています。また、リアルロボットで観測される行動遅延（約20ms、1ステップ）を手動でシミュレートすることで、シミュレーションと実機のギャップを埋めています。
+2. **シーンの作成**  
+    ロボットと静的平面を含むシミュレーションシーンを作成します。
+3. **PD コントローラーのセットアップ**  
+    モーターは名前を基に識別され、各モーターの剛性と減衰が設定されます。
+4. **報酬の登録**  
+    ポリシーを誘導するために、設定に定義された報酬関数を登録します。これらの関数は「報酬」のセクションで説明します。
+5. **バッファの初期化**  
+    環境状態、観測、報酬を格納するためのバッファを初期化します。
 
-#### Reward
-Reward functions are critical for policy guidance. In this example, we use:
-- **tracking_lin_vel**: Tracking of linear velocity commands (xy axes)
-- **tracking_ang_vel**: Tracking of angular velocity commands (yaw)
-- **lin_vel_z**: Penalize z axis base linear velocity
-- **action_rate**: Penalize changes in actions
-- **base_height**: Penalize base height away from target
-- **similar_to_default**: Encourage the robot pose to be similar to the default pose
+### リセット
 
-## Training
-At this stage, we have defined the environments. Now, we use the PPO implementation from rsl-rl to train the policy. Follow these installation steps:
+`reset_idx` 関数は、指定した環境の初期姿勢および状態バッファをリセットします。これにより、ロボットは事前定義された構成から開始でき、一貫したトレーニングが可能になります。
+
+### ステップ
+
+`step` 関数は、行動を実行して新しい観測と報酬を返します。以下のように動作します：
+1. **行動の実行**  
+    入力された行動をクリップし、再スケールして、デフォルトのモーター位置に追加します。この変換後の行動は目標関節位置を表し、ロボットのコントローラーに送信されて1ステップ実行されます。
+2. **状態の更新**  
+    関節位置や速度などのロボットの状態を取得してバッファに格納します。
+3. **終了条件のチェック**  
+    (1) エピソードの長さが最大許容値を超える場合、(2) ロボットの本体の向きが大きく逸れた場合に環境を終了します。終了した環境は自動的にリセットされます。
+4. **報酬の計算**
+5. **観測の計算**  
+    トレーニングに使用する観測には、基礎の角速度、投影重力、コマンド、関節位置、関節速度、過去の行動が含まれます。
+
+---
+
+### 報酬
+
+報酬関数はポリシーの誘導にとって重要です。この例では以下を使用します：
+- **tracking_lin_vel**: 線形速度コマンド（xy軸）の追従
+- **tracking_ang_vel**: 角速度コマンド（yaw）の追従
+- **lin_vel_z**: z軸の基礎線形速度をペナルティ
+- **action_rate**: 行動の変化をペナルティ
+- **base_height**: 基礎の高さが目標から逸れることに対するペナルティ
+- **similar_to_default**: ロボットの姿勢がデフォルト姿勢に近いことを奨励
+
+---
+
+## トレーニング
+
+ここまでで環境を定義しました。次に、`rsl-rl` の PPO 実装を使用してポリシーをトレーニングします。以下のインストール手順に従ってください：
 ```
-# Install rsl_rl.
+# rsl_rl をインストール
 git clone https://github.com/leggedrobotics/rsl_rl
 cd rsl_rl && git checkout v1.0.2 && pip install -e .
 
-# Install tensorboard.
+# tensorboard をインストール
 pip install tensorboard
 ```
-After installation, start training by running:
+
+インストール後、以下のコマンドでトレーニングを開始します：
 ```
 python examples/locomotion/go2_train.py
 ```
-To monitor the training process, launch TensorBoard:
+
+トレーニングプロセスをモニターするには、TensorBoard を起動します：
 ```
 tensorboard --logdir logs
 ```
-You should see a training curve similar to this:
+
+次のようなトレーニング曲線が表示されるはずです：
 ```{figure} ../../_static/images/locomotio_curve.png
 ```
 
-## Evaluation
-Finally, let's roll out the trained policy. Run the following command:
+---
+
+## 評価
+
+最後に、トレーニング済みポリシーをロールアウトします。以下のコマンドを実行してください：
 ```
 python examples/locomotion/go2_eval.py
 ```
-You should see a GUI similar to this:
+
+次のような GUI が表示されるはずです：
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/locomotion_eval.mp4" type="video/mp4">
 </video>
 
-If you happen to have a real Unitree Go2 robot by your side, you can try to deploy the policy. Have fun!
+もし実物の Unitree Go2 ロボットをお持ちであれば、ポリシーを展開することができます。楽しんでください！
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/locomotion_real.mp4" type="video/mp4">

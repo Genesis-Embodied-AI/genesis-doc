@@ -1,15 +1,15 @@
-# 🚀 Parallel Simulation
+# 🚀 並列シミュレーション
 
 ```{figure} ../../_static/images/parallel_sim.png
 ```
 
-The biggest advantage of using GPU to accelerate simulation is to enable scene-level parallelism, so that we can train robots in thousands of environments simultaneously.
+GPUを使用してシミュレーションを高速化する最大の利点は、シーンレベルの並列化を可能にし、数千もの環境でロボットを同時にトレーニングできることです。
 
-In Genesis, creating parallel simulation is as simple as you would imagine: when building your scene, you simply add an additional parameter `n_envs` to tell the simulator how many environments you want. That's it.
+Genesisでは、並列シミュレーションを作成するのは想像以上に簡単です。シーンを構築するとき、「`n_envs`」という追加のパラメータを渡して、必要な環境数をシミュレータに伝えるだけです。それだけです。
 
-Note that in order to mimic the name convention in learning literature, we will also use the term `batching` to indicate the parallelization operation.
+文献での名前の命名規則に倣って、並列化操作を表すために「`batching`」という用語を使用することもあります。
 
-Example script:
+### スクリプト例:
 ```python
 import genesis as gs
 import torch
@@ -41,11 +41,11 @@ franka = scene.add_entity(
 
 ########################## build ##########################
 
-# create 20 parallel environments
+# 20の並列環境を作成
 B = 20
 scene.build(n_envs=B, env_spacing=(1.0, 1.0))
 
-# control all the robots
+# すべてのロボットを制御
 franka.control_dofs_position(
     torch.tile(
         torch.tensor([0, 0, 0, -1.0, 0, 0, 0, 0.02, 0.02], device=gs.device), (B, 1)
@@ -56,29 +56,33 @@ for i in range(1000):
     scene.step()
 ```
 
-The above script is almost identical to the example you see in [Hello, Genesis](hello_genesis.md), except `scene.build()` is now appended with two extra parameters:
-- `n_envs`: this specifies how many batched environments you want to create
-- `env_spacing`: the spawned parallel envs share identical states. For visualization purpose, you can specify this parameter to ask the visualizer to distribute all the envs in a grid with a distance of (x, y) in meters between each env. Note that this only affects the visualization behavior, and doesn't change the actual position of the entities in each env.
+上記のスクリプトは、[Hello, Genesis](hello_genesis.md) の例とほぼ同じですが、`scene.build()` が次の2つの追加パラメータで拡張されています:
+- `n_envs`: 作成するバッチ化された環境の数を指定します。
+- `env_spacing`: 生成された並列環境は同一の状態を共有します。可視化の目的で、このパラメータを指定することで、すべての環境を各環境間の距離を (x, y) メートルで指定されたグリッドに分配するようビジュアライザに指示できます。なお、これは可視化動作のみに影響し、各環境内のエンティティの実際の位置には影響を与えません。
 
-### Control the robots in batched environments
-Recall that we use APIs such as `franka.control_dofs_position()` in the previous tutorials. Now you can use the exact same API to control batched robots, except that the input variable needs an additional batch dimension: 
+---
+
+### バッチ化された環境でのロボット制御
+以前のチュートリアルで `franka.control_dofs_position()` のようなAPIを使用したことを思い出してください。同じAPIをそのまま使用してバッチ化されたロボットを制御できます。ただし、入力変数に追加のバッチ次元を持たせる必要があります:
 ```python
 franka.control_dofs_position(torch.zeros(B, 9, device=gs.device))
 ```
-Since we are running simulation on GPU, in order to reduce data transfer overhead between cpu and gpu, we can use torch tensors selected using `gs.device` instead of numpy arrays (but numpy array will also work). This could bring noticeable performance gain when you need to send a tensor with a huge batch size frequently.
+GPU上でシミュレーションを実行するため、CPUとGPU間のデータ転送オーバーヘッドを削減する目的で、Numpy配列ではなく `gs.device` を使用して選択したTorchテンソルを使用することを推奨します（ただしNumpy配列も使用可能です）。特に大きなバッチサイズのテンソルを頻繁に送信する場合、これにより顕著なパフォーマンス向上が得られることがあります。
 
-The above call will control all the robots in the batched envs. If you want to control only a subset of environments, you can additionally pass in `envs_idx`, but make sure the size of the `position` tensor's batch dimension matches the length of `envs_idx`:
+上記の呼び出しは、バッチ化された環境内のすべてのロボットを制御します。一部の環境のみを制御したい場合は、`envs_idx` を追加で渡します。ただし、`position` テンソルのバッチ次元のサイズが `envs_idx` の長さと一致していることを確認してください:
 ```python
-# control only 3 environments: 1, 5, and 7.
+# 環境1、5、および7のみを制御
 franka.control_dofs_position(
     position = torch.zeros(3, 9, device=gs.device),
     envs_idx = torch.tensor([1, 5, 7], device=gs.device),
 )
 ```
-This call will only send a zero-position command to 3 selected environments.
+この呼び出しは、選択された3つの環境にゼロ位置コマンドを送信します。
 
-### Enjoy a futuristic speed!
-Genesis supports up to tens of thousands of parallel environments, and unlocks unprecedented simulation speed this way. Now, let's turn off the viewer, and change batch size to 30000 (consider using a smaller one if your GPU has a relatively small vram):
+---
+
+### 未来のスピードを堪能しよう！
+Genesisは最大数万もの並列環境をサポートしており、かつてないシミュレーション速度を実現します。では、ビューワーをオフにし、バッチサイズを30000に変更してみましょう（GPUのVRAMが相対的に小さい場合は、より小さい値を検討してください）。
 
 ```python
 import torch
@@ -103,7 +107,7 @@ franka = scene.add_entity(
 
 scene.build(n_envs=30000)
 
-# control all the robots
+# すべてのロボットを制御
 franka.control_dofs_position(
     torch.tile(
         torch.tensor([0, 0, 0, -1.0, 0, 0, 0, 0.02, 0.02], device=gs.device), (30000, 1)
@@ -114,10 +118,11 @@ for i in range(1000):
     scene.step()
 ```
 
-Running the above script on a desktop with RTX 4090 and 14900K gives you a futuristic simulation speed -- over **43 million** frames per second, this is 430,000 faster than real-time. Enjoy!
+上記のスクリプトを、RTX 4090と14900Kを搭載したデスクトップで実行すると、未来的なシミュレーション速度が楽しめます -- **毎秒4300万フレーム以上**を実現します。これはリアルタイムの430,000倍です。お楽しみください！
+
 ```{figure} ../../_static/images/parallel_speed.png
 ```
 
 :::{tip}
-**FPS logging:** By default, genesis logger will display real-time simulation speed in the terminal. You can disable this behavior by setting `show_FPS=False` when creating the scene.
+**FPS ロギング:** デフォルトでは、Genesisのロガーは端末にリアルタイムのシミュレーション速度を表示します。この動作は、シーン作成時に `show_FPS=False` を設定することで無効にできます。
 :::

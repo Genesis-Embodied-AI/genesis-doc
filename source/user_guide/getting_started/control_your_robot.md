@@ -1,16 +1,17 @@
-# 🕹️ Control Your Robot
+# 🕹️ ロボットの制御
 
-Now that we have loaded an robot, let's go through a comprehensive example to show you how you can control your robot via various ways.
+ロボットを読み込んだので、様々な方法でロボットを制御する方法を包括的な例で見ていきましょう。
 
-As usual, let's import genesis, create a scene, and load a franka robot:
+いつもどおり、genesisをインポートし、シーンを作成し、frankaロボットを読み込みます：
+
 ```python
 import numpy as np
 import genesis as gs
 
-########################## init ##########################
+########################## 初期化 ##########################
 gs.init(backend=gs.gpu)
 
-########################## create a scene ##########################
+########################## シーンの作成 ##########################
 scene = gs.Scene(
     viewer_options = gs.options.ViewerOptions(
         camera_pos    = (0, -3.5, 2.5),
@@ -24,12 +25,12 @@ scene = gs.Scene(
     show_viewer = True,
 )
 
-########################## entities ##########################
+########################## エンティティ ##########################
 plane = scene.add_entity(
     gs.morphs.Plane(),
 )
 
-# when loading an entity, you can specify its pose in the morph.
+# エンティティを読み込む際、morphで姿勢を指定できます
 franka = scene.add_entity(
     gs.morphs.MJCF(
         file  = 'xml/franka_emika_panda/panda.xml',
@@ -38,17 +39,17 @@ franka = scene.add_entity(
     ),
 )
 
-########################## build ##########################
+########################## ビルド ##########################
 scene.build()
 ```
 
-This robot arm will fall down due to gravity, if we don't give it any actuation force. Genesis has a built-in PD controller that takes as input target joint position or velocity. You can also directly set torque/force applied to each joint.
+制御力を与えないと、このロボットアームは重力で落下します。Genesisには、目標関節位置や速度を入力として受け取るPD制御器が組み込まれています。また、各関節に直接トルク/力を設定することもできます。
 
-In the context of robotic simulation, `joint` and `dof` (degree-of-freedom) are two related but different concepts. Since we are dealing with a Franka arm, which has 7 revolute joints in the arm and 2 prismatic joints in its gripper, all the joints have 1 dof only, leading to a 9-dof articulated body. In a more general case, there will be joint types such as free joint (6 dofs) or ball joint (3 dofs) that have more than one degrees of freedom. In general, you can think of each dof as a motor and can be controlled independently.
+ロボットシミュレーションの文脈では、「関節（joint）」と「自由度（dof: degree-of-freedom）」は関連しているものの異なる概念です。今回扱うFrankaアームは、アーム部分に7つの回転関節とグリッパーに2つの並進関節を持っており、すべての関節は1自由度のみを持つため、9自由度の関節体となっています。より一般的なケースでは、フリージョイント（6自由度）やボールジョイント（3自由度）のように、複数の自由度を持つ関節タイプも存在します。一般的に、各自由度はモーターとして考えることができ、独立に制御できます。
 
-In order to know which joint (dof) to control, we need to map the joint names we (as a user) defined in the URDF/MJCF file to the actual dof index inside the simulator:
+どの関節（自由度）を制御するかを知るために、URDF/MJCFファイルで（ユーザーとして）定義した関節名をシミュレーター内の実際の自由度インデックスにマッピングする必要があります：
 
-```
+```python
 jnt_names = [
     'joint1',
     'joint2',
@@ -62,35 +63,37 @@ jnt_names = [
 ]
 dofs_idx = [franka.get_joint(name).dof_idx_local for name in jnt_names]
 ```
-Note that here we are using `.dof_idx_local` to obtain the local idx of the dof with respect to the robot entity itself. You can also use `joint.dof_idx` to access each joint's global dof index in the scene.
 
-Next, we can set the control gains for each dof. These gains determine how big the actual control force will be, given a target joint position or velocity. Usually, these information will be parsed from the imported MJCF or URDF file, but it's always recommended to tune it manually or refer to a well-tuned value online.
+ここでは`.dof_idx_local`を使用して、ロボットエンティティ自体に対する自由度のローカルインデックスを取得しています。また、`joint.dof_idx`を使用して、シーン内の各関節のグローバル自由度インデックスにアクセスすることもできます。
+
+次に、各自由度の制御ゲインを設定できます。これらのゲインは、目標関節位置または速度が与えられた時の実際の制御力の大きさを決定します。通常、これらの情報はインポートされたMJCFまたはURDFファイルから解析されますが、手動でチューニングするか、オンラインで十分にチューニングされた値を参照することをお勧めします：
 
 ```python
-############ Optional: set control gains ############
-# set positional gains
+############ オプション：制御ゲインの設定 ############
+# 位置ゲインの設定
 franka.set_dofs_kp(
     kp             = np.array([4500, 4500, 3500, 3500, 2000, 2000, 2000, 100, 100]),
     dofs_idx_local = dofs_idx,
 )
-# set velocity gains
+# 速度ゲインの設定
 franka.set_dofs_kv(
     kv             = np.array([450, 450, 350, 350, 200, 200, 200, 10, 10]),
     dofs_idx_local = dofs_idx,
 )
-# set force range for safety
+# 安全のための力の範囲設定
 franka.set_dofs_force_range(
     lower          = np.array([-87, -87, -87, -87, -12, -12, -12, -100, -100]),
     upper          = np.array([ 87,  87,  87,  87,  12,  12,  12,  100,  100]),
     dofs_idx_local = dofs_idx,
 )
 ```
-Note that these APIs in general takes as input two sets of values: the actual value to be set, and the corresponding dofs indices. Most control-related APIs follow this convention.
 
-Next, instead of using a physically-realistic PD controller, let's first see how we can manually set the configuration of the robot. These APIs can make sudden changes to the robot state without obeying physics:
+これらのAPIは一般的に、2つの入力値を受け取ります：設定する実際の値と、対応する自由度のインデックスです。ほとんどの制御関連APIはこの規則に従っています。
+
+次に、物理的に現実的なPD制御器を使用する代わりに、まずロボットの構成を手動で設定する方法を見てみましょう。これらのAPIは物理法則に従わずにロボットの状態を突然変更することができます：
 
 ```python
-# Hard reset
+# ハードリセット
 for i in range(150):
     if i < 50:
         franka.set_dofs_position(np.array([1, 1, 0, 0, 0, 0, 0, 0.04, 0.04]), dofs_idx)
@@ -101,11 +104,13 @@ for i in range(150):
 
     scene.step()
 ```
-If you have viewer turned on, you will see the robot changes state every 50 steps.
 
-Next, let's try to control the robot using the built in PD controller. The API design in Genesis follows a structured pattern. We used `set_dofs_position` to hard set the dofs position. Now we simply changed `set_*` to `control_*` to use the controller counterpart APIs. Here we illustrate different ways for controlling the robot:
+ビューアーをオンにしている場合、50ステップごとにロボットの状態が変化するのが見えるはずです。
+
+次に、組み込みのPD制御器を使ってロボットを制御してみましょう。GenesisのAPI設計は構造化されたパターンに従っています。`set_dofs_position`を使って自由度の位置を直接設定しました。ここでは、`set_*`を`control_*`に変更して、対応する制御器APIを使用します。以下で、ロボットを制御するさまざまな方法を示します：
+
 ```python
-# PD control
+# PD制御
 for i in range(1250):
     if i == 0:
         franka.control_dofs_position(
@@ -123,7 +128,7 @@ for i in range(1250):
             dofs_idx,
         )
     elif i == 750:
-        # control first dof with velocity, and the rest with position
+        # 最初の自由度を速度で制御し、残りを位置で制御
         franka.control_dofs_position(
             np.array([0, 0, 0, 0, 0, 0, 0, 0, 0])[1:],
             dofs_idx[1:],
@@ -137,41 +142,42 @@ for i in range(1250):
             np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]),
             dofs_idx,
         )
-    # This is the control force computed based on the given control command
-    # If using force control, it's the same as the given control command
-    print('control force:', franka.get_dofs_control_force(dofs_idx))
+    # これは与えられた制御コマンドに基づいて計算された制御力です
+    # 力制御を使用している場合、これは与えられた制御コマンドと同じです
+    print('制御力:', franka.get_dofs_control_force(dofs_idx))
 
-    # This is the actual force experienced by the dof
-    print('internal force:', franka.get_dofs_force(dofs_idx))
+    # これは自由度が実際に経験している力です
+    print('内部力:', franka.get_dofs_force(dofs_idx))
 
     scene.step()
 ```
-Let's dive into it a bit:
-- from step 0 to 500, we are using position control to control all the dofs, and move the robot to 3 target positions sequentially. Note that for `control_*` APIs, once a target value is set, it will be stored internally and you don't need to send repetitive commands to the simulation in the following steps as long as your target stays the same.
-- at step 750, we demonstrate we can do hybrid control for different dofs: for the first dof (dof 0), we send a velocity command, while the rest still follows position control commands
-- at step 1000, we switch to torque (force) control and send a zero-force command to all the dofs, and the robot will again fall onto the floor due to gravity.
 
-At the end of each step, we print two types of forces: `get_dofs_control_force()` and `get_dofs_force()`.
-- `get_dofs_control_force()` returns the force applied by the controller. In case of position or velocity control, this is computed using the target command and the control gains. In case of force (torque) control, this is same as the input control command
-- `get_dofs_force()` returns the actual force experience by each dof, this is a combination of the force applied by the controller, and other internal forces such as collision force and coriolis force.
+少し詳しく見ていきましょう：
+- ステップ0から500まで、すべての自由度に対して位置制御を使用し、ロボットを3つの目標位置に順次移動させています。`control_*` APIでは、目標値が一度設定されると、内部に保存されるため、目標が同じである限り、以降のステップで繰り返しコマンドをシミュレーションに送る必要はありません。
+- ステップ750で、異なる自由度に対して異なる制御が可能であることを示しています：最初の自由度（dof 0）には速度コマンドを送り、残りは位置制御コマンドに従います
+- ステップ1000で、トルク（力）制御に切り替え、すべての自由度にゼロ力コマンドを送ると、ロボットは再び重力によって床に落下します。
 
-If everything goes right, this is what you should see:
+各ステップの最後に、2種類の力を出力しています：`get_dofs_control_force()`と`get_dofs_force()`です。
+- `get_dofs_control_force()`は制御器によって適用される力を返します。位置制御や速度制御の場合、これは目標コマンドと制御ゲインを使用して計算されます。力（トルク）制御の場合、これは入力制御コマンドと同じです。
+- `get_dofs_force()`は各自由度が実際に経験する力を返します。これは制御器によって適用される力と、衝突力やコリオリ力などの他の内部力の組み合わせです。
+
+すべてが正しく動作すれば、以下のような結果が見えるはずです：
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/control_your_robot.mp4" type="video/mp4">
 </video>
 
+上記で説明したすべての内容を含む完全なコードスクリプトは以下の通りです：
 
-Here is the full code script covering everything discussed above:
 ```python
 import numpy as np
 
 import genesis as gs
 
-########################## init ##########################
+########################## 初期化 ##########################
 gs.init(backend=gs.gpu)
 
-########################## create a scene ##########################
+########################## シーンの作成 ##########################
 scene = gs.Scene(
     viewer_options = gs.options.ViewerOptions(
         camera_pos    = (0, -3.5, 2.5),
@@ -186,7 +192,7 @@ scene = gs.Scene(
     show_viewer = True,
 )
 
-########################## entities ##########################
+########################## エンティティ ##########################
 plane = scene.add_entity(
     gs.morphs.Plane(),
 )
@@ -195,7 +201,7 @@ franka = scene.add_entity(
         file  = 'xml/franka_emika_panda/panda.xml',
     ),
 )
-########################## build ##########################
+########################## ビルド ##########################
 scene.build()
 
 jnt_names = [
@@ -211,24 +217,24 @@ jnt_names = [
 ]
 dofs_idx = [franka.get_joint(name).dof_idx_local for name in jnt_names]
 
-############ Optional: set control gains ############
-# set positional gains
+############ オプション：制御ゲインの設定 ############
+# 位置ゲインの設定
 franka.set_dofs_kp(
     kp             = np.array([4500, 4500, 3500, 3500, 2000, 2000, 2000, 100, 100]),
     dofs_idx_local = dofs_idx,
 )
-# set velocity gains
+# 速度ゲインの設定
 franka.set_dofs_kv(
     kv             = np.array([450, 450, 350, 350, 200, 200, 200, 10, 10]),
     dofs_idx_local = dofs_idx,
 )
-# set force range for safety
+# 安全のための力の範囲設定
 franka.set_dofs_force_range(
     lower          = np.array([-87, -87, -87, -87, -12, -12, -12, -100, -100]),
     upper          = np.array([ 87,  87,  87,  87,  12,  12,  12,  100,  100]),
     dofs_idx_local = dofs_idx,
 )
-# Hard reset
+# ハードリセット
 for i in range(150):
     if i < 50:
         franka.set_dofs_position(np.array([1, 1, 0, 0, 0, 0, 0, 0.04, 0.04]), dofs_idx)
@@ -239,7 +245,7 @@ for i in range(150):
 
     scene.step()
 
-# PD control
+# PD制御
 for i in range(1250):
     if i == 0:
         franka.control_dofs_position(
@@ -257,7 +263,7 @@ for i in range(1250):
             dofs_idx,
         )
     elif i == 750:
-        # control first dof with velocity, and the rest with position
+        # 最初の自由度を速度で制御し、残りを位置で制御
         franka.control_dofs_position(
             np.array([0, 0, 0, 0, 0, 0, 0, 0, 0])[1:],
             dofs_idx[1:],
@@ -271,11 +277,11 @@ for i in range(1250):
             np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]),
             dofs_idx,
         )
-    # This is the control force computed based on the given control command
-    # If using force control, it's the same as the given control command
+    # これは与えられた制御コマンドに基づいて計算された制御力です
+    # 力制御を使用している場合、これは与えられた制御コマンドと同じです
     print('control force:', franka.get_dofs_control_force(dofs_idx))
 
-    # This is the actual force experienced by the dof
+    # これは自由度が実際に経験している力です 
     print('internal force:', franka.get_dofs_force(dofs_idx))
 
     scene.step()

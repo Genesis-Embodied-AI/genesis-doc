@@ -1,21 +1,21 @@
-# Roadmap
+# ロードマップ
 
-## In progress and will be released in the near future
-- A differentiable & physics-based tactile sensor module
-- Differentiable rigid body simulation 
-- Tiled rendering
-- Faster JIT kernel compilation
-- A comprehensive generative framework
-    - character motion
-    - camera motion
-    - interactive scene
-    - facial animation
-    - locomotion policy
-    - manipulation policy
-- Boundless MPM simulation for large-scale environment
+## 現在進行中で、近いうちにリリース予定
+- 微分可能で物理ベースの触覚センサーモジュール
+- 微分可能な剛体シミュレーション
+- タイルレンダリング
+- より高速なJITカーネルコンパイル
+- 包括的な生成フレームワーク
+    - キャラクターモーション
+    - カメラモーション
+    - インタラクティブなシーン
+    - 顔のアニメーション
+    - 移動ポリシー
+    - マニピュレーションポリシー
+- 大規模環境のための無境界MPMシミュレーション
 
-## Wanted feature, but not currently working on (Contributions needed!)
-- Viewer and headless rendering on windows
-- An interactive GUI system
-- Support for more MPM-based material models
-- More sensor types
+## 実現したい機能（現在作業中ではありません、貢献が必要です！）
+- Windowsでのビューアーおよびヘッドレスレンダリング
+- インタラクティブなGUIシステム
+- より多くのMPMベースの素材モデルのサポート
+- さらなるセンサータイプのサポート

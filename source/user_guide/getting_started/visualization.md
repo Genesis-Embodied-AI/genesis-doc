@@ -1,12 +1,12 @@
-# 📸 Visualization & Rendering
+# 📸 ビジュアライゼーションとレンダリング
 
-Genesis's visualization system is managed by the `visualizer` of the scene you just created (i.e. `scene.visualizer`). There are two ways for visualizing the scene: 1). using the interactive viewer that runs in a separate thread, and 2). by manually adding cameras to the scene and render images using the camera.
+Genesisのビジュアライゼーションシステムは、作成したシーンの`visualizer`（例えば、`scene.visualizer`）によって管理されます。シーンを視覚化する方法は2つあります。1）別スレッドで動作するインタラクティブビューアを使用する方法、2）シーンにカメラを手動で追加し、それを使って画像をレンダリングする方法です。
 
 
-## Viewer
-If you are connected to a display, you can visualize the scene using the interactive viewer. Genesis uses different `options` groups to configure different components in the scene. To configure the viewer, you can change the parameters in `viewer_options` when creating the scene. In addition, we use `vis_options` to specify visualization-related properties, which will be shared by the viewer and cameras (that we will add very soon).
+## ビューア
+ディスプレイに接続されている場合、インタラクティブビューアを使用してシーンを視覚化できます。Genesisは、シーン内のさまざまなコンポーネントを構成するために異なる`options`グループを使用します。ビューアを構成するには、シーンを作成するときに`viewer_options`のパラメーターを変更できます。さらに、`vis_options`を使用して視覚化に関連するプロパティを指定します。これらのプロパティは、ビューアとカメラ（後ほど追加する）で共有されます。
 
-Create a scene with a more detailed viewer and vis setting (this looks a bit complex, but it's just for illustration purposes):
+より詳細なビューア設定と視覚化設定を使用してシーンを作成します（少し複雑に見えますが、これは説明用の例です）:
 ```python
 scene = gs.Scene(
     show_viewer    = True,
@@ -18,28 +18,27 @@ scene = gs.Scene(
         max_FPS       = 60,
     ),
     vis_options = gs.options.VisOptions(
-        show_world_frame = True, # visualize the coordinate frame of `world` at its origin
-        world_frame_size = 1.0, # length of the world frame in meter
-        show_link_frame  = False, # do not visualize coordinate frames of entity links
-        show_cameras     = False, # do not visualize mesh and frustum of the cameras added
-        plane_reflection = True, # turn on plane reflection
-        ambient_light    = (0.1, 0.1, 0.1), # ambient light setting
+        show_world_frame = True, # `world`の原点座標系を可視化
+        world_frame_size = 1.0, # 座標系の長さ（メートル単位）
+        show_link_frame  = False, # エンティティリンクの座標系は非表示
+        show_cameras     = False, # 追加されたカメラのメッシュと視錐台を非表示
+        plane_reflection = True, # 平面反射を有効化
+        ambient_light    = (0.1, 0.1, 0.1), # 環境光設定
     ),
-    renderer = gs.renderers.Rasterizer(), # using rasterizer for camera rendering
+    renderer = gs.renderers.Rasterizer(), # カメラレンダリングにラスタライザを使用
 )
 ```
-Here we can specify the pose and fov of the viewer camera. The viewer will run as fast as possible if `max_FPS` is set to `None`. If `res` is set to None, genesis will automatically create a 4:3 window with the height set to half of your display height. Also note that in the above setting, we set to use rasterization backend for camera rendering. Genesis provides two rendering backends: `gs.renderers.Rasterizer()` and `gs.renderers.RayTracer()`. The viewer always uses the rasterizer. By default, camera also uses rasterizer.
+ここでは、ビューアカメラのポーズとFOVを指定できます。`max_FPS`が`None`に設定されている場合、ビューアは可能な限り高速で動作します。`res`が`None`の場合、Genesisは表示画面の高さの半分を設定にした4:3のウィンドウを自動的に作成します。また、上記の設定では、カメラレンダリングにラスタライザバックエンドを使用するように設定されています。Genesisは、`gs.renderers.Rasterizer()`（ラスタライザ）と`gs.renderers.RayTracer()`（レイトレーサ）の2つのレンダリングバックエンドを提供します。ビューアは常にラスタライザを使用します。デフォルトでは、カメラもラスタライザを使用します。
 
-
-Once the scene is created, you can access the viewer object via `scene.visualizer.viewer`, or simply `scene.viewer` as a shortcut. You can query or set the viewer camera pose:
+シーンが作成されると、`scene.visualizer.viewer`またはショートカットである単純な`scene.viewer`を使用してビューアオブジェクトにアクセスできます。ビューアカメラのポーズをクエリしたり設定したりすることができます:
 ```python
 cam_pose = scene.viewer.camera_pose
 
 scene.viewer.set_camera_pose(cam_pose)
 ```
 
-## Camera & Headless Rendering
-Now let's manually add a camera object to the scene. Cameras are not connected to the viewer or the display, and returns rendered images only when you need it. Therefore, camera works in headless mode.
+## カメラとヘッドレスレンダリング
+次に、シーンにカメラオブジェクトを手動で追加してみましょう。カメラはビューアやディスプレイに接続されず、必要に応じてレンダリングされた画像を返します。そのため、カメラはヘッドレスモードで動作します。
 
 ```python
 cam = scene.add_camera(
@@ -50,33 +49,34 @@ cam = scene.add_camera(
     GUI    = False
 )
 ```
-If `GUI=True`, each camera will create an opencv window to dynamically display the rendered image. Note that this is different from the viewer GUI.
+`GUI=True`にすると、各カメラでレンダリングされた画像を動的に表示するOpenCVウィンドウが作成されます。これはビューアのGUIとは異なる点に注意してください。
 
-Then, once we build the scene, we can render images using the camera. Our camera supports rendering rgb image, depth, segmentation mask and surface normals. By default, only rgb is rendered, and you can turn other modes on by setting the parameters when calling `camera.render()`:
+次に、シーンをビルドした後、カメラを使って画像をレンダリングできます。カメラは、RGB画像、深度、セグメンテーションマスク、表面法線をレンダリングできます。デフォルトではRGBのみがレンダリングされ、他のモードは`camera.render()`を呼び出す際にパラメータを設定することで有効化できます。
 
 ```python
 scene.build()
 
-# render rgb, depth, segmentation mask and normal map
+# RGB、深度、セグメンテーションマスク、法線マップをレンダリング
 rgb, depth, segmentation, normal = cam.render(depth=True, segmentation=True, normal=True)
 ```
 
-If you used `GUI=True` and have a display connected, you should be able to see 4 windows now. (Sometimes opencv windows comes with extra delay, so you can call extra `cv2.waitKey(1)` if the windows are black, or simply call `render()` again to refresh the window.)
+`GUI=True`を使用し、ディスプレイが接続されている場合、4つのウィンドウを確認できるはずです。（時々OpenCVウィンドウに遅延が発生する場合があるため、画面が真っ黒な場合は`cv2.waitKey(1)`を追加で呼び出すか、単純にもう一度`render()`を呼び出してウィンドウを更新してください。）
+
 ```{figure} ../../_static/images/multimodal.png
 ```
 
-**Record videos using camera**
+**カメラを使用してビデオを録画する**
 
-Now, let's only render rgb images, and move the camera around and record a video. Genesis provides a handy util for recording videos:
+次に、RGB画像だけをレンダリングし、カメラを移動させながらビデオを録画してみましょう。Genesisはビデオ録画のための便利なユーティリティを提供しています:
 ```python
-# start camera recording. Once this is started, all the rgb images rendered will be recorded internally
+# カメラ録画を開始します。開始後、レンダリングされたすべてのRGB画像は内部的に録画されます。
 cam.start_recording()
 
 import numpy as np
 for i in range(120):
     scene.step()
 
-    # change camera position
+    # カメラの位置を変更
     cam.set_pose(
         pos    = (3.0 * np.sin(i / 60), 3.0 * np.cos(i / 60), 2.5),
         lookat = (0, 0, 0.5),
@@ -84,17 +84,16 @@ for i in range(120):
     
     cam.render()
 
-# stop recording and save video. If `filename` is not specified, a name will be auto-generated using the caller file name.
+# 録画を停止してビデオを保存します。`filename`を指定しない場合、呼び出し元のファイル名を使用して名前が自動生成されます。
 cam.stop_recording(save_to_filename='video.mp4', fps=60)
 ```
-You will have the video saved to `video.mp4`:
+これでビデオが`video.mp4`として保存されます:
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/cam_record.mp4" type="video/mp4">
 </video>
 
-
-Here is the full code script covering everything discussed above:
+以下は、上記で説明した内容をカバーする完全なコードスクリプトです:
 ```python
 import genesis as gs
 
@@ -110,14 +109,14 @@ scene = gs.Scene(
         max_FPS       = 60,
     ),
     vis_options = gs.options.VisOptions(
-        show_world_frame = True,
-        world_frame_size = 1.0,
-        show_link_frame  = False,
-        show_cameras     = False,
-        plane_reflection = True,
-        ambient_light    = (0.1, 0.1, 0.1),
+        show_world_frame = True, # ワールド座標系のフレームを表示
+        world_frame_size = 1.0, # ワールドフレームの長さを1.0メートルに設定
+        show_link_frame  = False, # リンクフレームは非表示
+        show_cameras     = False, # カメラのメッシュと視錐体は非表示
+        plane_reflection = True, # 平面反射を有効化
+        ambient_light    = (0.1, 0.1, 0.1), # 環境光を設定
     ),
-    renderer=gs.renderers.Rasterizer(),
+    renderer=gs.renderers.Rasterizer(), # ラスタライザを使用
 )
 
 plane = scene.add_entity(
@@ -137,7 +136,7 @@ cam = scene.add_camera(
 
 scene.build()
 
-# render rgb, depth, segmentation, and normal
+# RGB、深度、セグメンテーションマスク、法線をレンダリング
 # rgb, depth, segmentation, normal = cam.render(rgb=True, depth=True, segmentation=True, normal=True)
 
 cam.start_recording()
@@ -152,18 +151,19 @@ for i in range(120):
     cam.render()
 cam.stop_recording(save_to_filename='video.mp4', fps=60)
 ```
-## Photo-realistic Ray Tracing Rendering
 
-Genesis provides a ray tracing rendering backend for photorealistic rendering. You can easily switch to using this backend by setting `renderer=gs.renderers.RayTracer()` when creating the scene. This camera allows more parameter adjustment, such as `spp`, `aperture`, `model`, etc.
+## フォトリアリスティックなレイトレーシングレンダリング
 
-### Setup
+Genesisは、フォトリアルなレンダリングのためのレイトレーシングレンダリングバックエンドを提供しています。このバックエンドを使用するには、シーン作成時に`renderer=gs.renderers.RayTracer()`を設定するだけです。このカメラでは、`spp`、`aperture`、`model`など、より多くのパラメータ調整が可能です。
 
-Tested on
-- Ubuntu 22.04, CUDA 12.4, python 3.9
+### セットアップ
 
-Get submodules, specifically `genesis/ext/LuisaRender`.
+動作確認環境:
+- Ubuntu 22.04、CUDA 12.4、Python 3.9
+
+サブモジュールを取得します（特に`genesis/ext/LuisaRender`）。
 ```bash
-# inside Genesis/
+# Genesis/ディレクトリ内
 git submodule update --init --recursive
 pip install -e ".[render]"
 ```
@@ -179,39 +179,58 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110
 g++ --version
 gcc --version
 ```
-Install cmake. We use snap instead of apt because we need its version >= 3.26. However, remember to use the correct cmake. You may have `/usr/local/bin/cmake` but the snap installed package is at `/snap/bin/cmake` (or `/usr/bin/snap`). Please double check the order of binary path via `echo $PATH`.
+g++ と gcc をバージョン 11 にインストール/アップグレード
+```bash
+sudo apt install build-essential manpages-dev software-properties-common
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt update && sudo apt install gcc-11 g++-11
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 110
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110
+
+# バージョン確認
+g++ --version
+gcc --version
+```
+
+### cmake をインストール
+apt ではなく snap を使用する理由は、バージョンが 3.26 以上必要だからです。しかし、正しい cmake を使用することを忘れないでください。たとえば、`/usr/local/bin/cmake` があっても、snap でインストールしたパッケージは `/snap/bin/cmake`（または `/usr/bin/snap`）にあります。`echo $PATH` を使用してバイナリパスの順序を確認してください。
 ```bash
 sudo snap install cmake --classic
 cmake --version
 ```
-Install dependencies,
+
+### 依存関係をインストール
 ```bash
 sudo apt install libvulkan-dev # Vulkan
 sudo apt-get install zlib1g-dev # zlib
 sudo apt-get install libx11-dev # X11
-sudo apt-get install xorg-dev libglu1-mesa-dev # RandR headers
+sudo apt-get install xorg-dev libglu1-mesa-dev # RandR ヘッダー
 ```
-Build `LuisaRender`. Remember to use the correct cmake.
+
+### `LuisaRender` をビルド
+正しい cmake を使用することを忘れないでください。
 ```bash
 cd genesis/ext/LuisaRender
-cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON # remember to check python version
+cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON # Python のバージョンを確認
 cmake --build build -j $(nproc)
 ```
 
-If you really struggle getting the build, we have some build [here](https://drive.google.com/drive/folders/1Ah580EIylJJ0v2vGOeSBU_b8zPDWESxS?usp=sharing) and you can check if your machine happens to have the same setup. The naming follows `build_<commit-tag>_cuda<version>_python<version>`. Download the one that matches your system, rename to `build/` and put it in `genesis/ext/LuisaRender`.
+もしビルドがどうしてもうまくいかない場合、いくつかのビルド済みファイルを[こちら](https://drive.google.com/drive/folders/1Ah580EIylJJ0v2vGOeSBU_b8zPDWESxS?usp=sharing)に用意しているので、マシンのセットアップが一致しているか確認できます。命名は `build_<commit-tag>_cuda<version>_python<version>` の形式になっています。一致するものをダウンロードして `build/` にリネームし、`genesis/ext/LuisaRender` に配置してください。
 
-Finally, you can run the example,
+### 最後に例を実行
 ```bash
 cd examples/rendering
 python demo.py
 ```
-You should be able to get
+
+次のような出力が得られるはずです。
 ```{figure} ../../_static/images/raytracing_demo.png
 ```
 
 
 ### FAQ
-- Pybind error when doing `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON`,
+
+- `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON` を実行した際の Pybind エラー
     ```bash
     CMake Error at src/apps/CMakeLists.txt:12 (find_package):
     By not providing "Findpybind11.cmake" in CMAKE_MODULE_PATH this project has
@@ -224,19 +243,21 @@ You should be able to get
         pybind11Config.cmake
         pybind11-config.cmake
     ```
-    You probably forget to do `pip install -e ".[render]"`. Alternatively, you can simply do `pip install "pybind11[global]"`.
-- CUDA runtime compilation error when doing `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON`,
+    → おそらく `pip install -e ".[render]"` を忘れています。代わりに、単に `pip install "pybind11[global]"` を実行することもできます。
+
+- `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON` を実行した際の CUDA ランタイムコンパイルエラー
     ```bash
     /usr/bin/ld: CMakeFiles/luisa-cuda-nvrtc-standalone-compiler.dir/cuda_nvrtc_compiler.cpp.o: in function `main':
     cuda_nvrtc_compiler.cpp:(.text.startup+0x173): undefined reference to `nvrtcGetOptiXIRSize'
     /usr/bin/ld: cuda_nvrtc_compiler.cpp:(.text.startup+0x197): undefined reference to `nvrtcGetOptiXIR'
     ```
-    You need to install "system-wise" cuda-toolkit ([official installation guide](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)). You first check the cuda-toolkit,
+    → システムレベルで CUDA ツールキットをインストールする必要があります（[公式インストールガイド](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)参照）。まず CUDA ツールキットを確認してください。
     ```bash
-    nvcc --version # this should be the consistent with you cuda version from nvidia-smi
-    which nvcc # just to check you are using the cuda-toolkit you expected
+    nvcc --version # これは nvidia-smi で確認した CUDA バージョンと一致するはず
+    which nvcc # 期待している CUDA ツールキットを使用しているか確認
     ```
-    If you don't get proper output from `nvcc`, please follow the official cuda-toolkit installation guide. Yet, just as an example of installing cuda-toolkit for cuda-12.4. Download installer as in [here](https://developer.nvidia.com/cuda-12-4-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local).
+
+    `nvcc` が正しい出力を返さない場合、公式ガイドに従って CUDA ツールキットをインストールしてください。以下は CUDA 12.4 をインストールする例です。[こちら](https://developer.nvidia.com/cuda-12-4-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local)からインストーラーをダウンロードします。
     ```bash
     wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
     sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
@@ -246,12 +267,16 @@ You should be able to get
     sudo apt-get update
     sudo apt-get -y install cuda-toolkit-12-4
     ```
-    Remember to set binary and runtime library path. In `~/.bashrc`, add the following (note that we append the CUDA path at the end since there are also another `gcc` and `g++` in `/usr/local/cuda-12.4/bin` and may not be version 11, which is required for the build),
+
+    バイナリとランタイムライブラリのパスを設定するのを忘れないでください。`~/.bashrc`に以下を追加します（なお、CUDA のパスは最後尾に追加しています。理由は `/usr/local/cuda-12.4/bin` に別バージョンの `gcc` や `g++` が含まれており、バージョン 11 がビルドに必要なためです）。
     ```bash
     PATH=${PATH:+${PATH}:}/usr/local/cuda-12.4/bin
     LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}/usr/local/cuda-12.4/lib64
     ```
-    Remember to either restart the terminal or do `source ~/.bashrc`. Another type of error is,
+
+    ターミナルを再起動するか `source ~/.bashrc` を実行してください。
+
+    別のエラーとして次のようなものが出る場合があります。
     ```bash
     <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_fatal_printf@GLIBC_PRIVATE'
     <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_audit_symbind_alt@GLIBC_PRIVATE'
@@ -261,23 +286,27 @@ You should be able to get
     <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_audit_preinit@GLIBC_PRIVATE'
     <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_find_dso_for_object@GLIBC_PRIVATE'
     ```
-    This may be due to the cuda-toolkit in your conda environment. Please do the following and install the system-wise CUDA,
+
+    これは、conda 環境内の CUDA ツールキットが原因かもしれません。以下を実行してシステムレベルの CUDA をインストールしてください。
     ```bash
     which nvcc
     conda uninstall cuda-toolkit
     ```
-    Alternatively, you can add your conda library path to the runtime library path,
-    ```bash
-    ls $CONDA_PREFIX/lib/libcudart.so # you should have this
 
-    # inside you ~/.bashrc, add
+    もしくは、conda のライブラリパスをランタイムライブラリパスに追加することで解消できます。
+    ```bash
+    ls $CONDA_PREFIX/lib/libcudart.so # このファイルが存在するか確認
+
+    # ~/.bashrc 内に追加
     LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}/usr/local/cuda-12.4/lib64
     ```
-    Lastly, remember to clear the build after doing the above fixed,
+
+    上記の修正を行った後はビルドディレクトリをクリアしてください。
     ```bash
     rm -r build
     ```
-- Compiler error at `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON`,
+
+- `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON` を実行した際のコンパイラーエラー
     ```bash
     CMake Error at /snap/cmake/1435/share/cmake-3.31/Modules/CMakeDetermineCCompiler.cmake:49 (message):
     Could not find compiler set in environment variable CC:
@@ -290,19 +319,22 @@ You should be able to get
     CMake Error: CMAKE_C_COMPILER not set, after EnableLanguage
     CMake Error: CMAKE_CXX_COMPILER not set, after EnableLanguage
     ```
-    You are probably not using `gcc` and `g++` version 11. Please double check (i) the version (ii) if the binary points to the path as expected (iii) the order of your binary path,
+
+    → `gcc` と `g++` のバージョン 11 を使用していない可能性があります。以下を確認してください。
     ```bash
     gcc --version
     g++ --version
     which gcc
     which g++
-    echo $PATH # e.g., /usr/local/cuda-12.4/bin/gcc (version = 10.5) shouldn't be in front of /usr/bin/gcc (version = 11 if you install properly with apt)
+    echo $PATH # 例: /usr/local/cuda-12.4/bin/gcc (バージョン 10.5) が /usr/bin/gcc (バージョン 11) より優先されないようにする
     ```
-- Import error when running `examples/rendering/demo.py`,
+
+- `examples/rendering/demo.py` を実行した際の ImportError:
     ```bash
     [Genesis] [11:29:47] [ERROR] Failed to import LuisaRenderer. ImportError: /home/tsunw/miniconda3/envs/genesis-test1/bin/../lib/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by /home/tsunw/workspace/Genesis/genesis/ext/LuisaRender/build/bin/liblc-core.so)
     ```
-    Conda’s `libstdc++.so.6` doesn’t support 3.4.30. You need to move system’s into conda ([reference](https://stackoverflow.com/a/73708979)).
+
+    Conda の `libstdc++.so.6` が 3.4.30 をサポートしていません。以下のようにしてシステムのものを Conda に適用してください（[参考](https://stackoverflow.com/a/73708979)）。
     ```bash
     cd $CONDA_PREFIX/lib
     mv libstdc++.so.6 libstdc++.so.6.old

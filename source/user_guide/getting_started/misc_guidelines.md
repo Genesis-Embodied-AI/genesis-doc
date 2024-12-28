@@ -1,18 +1,19 @@
 # 📝 Misc Guidelines
 
-(I will keep updating this)
-- Use genesis.tensor whenever possible. Note that when we pass genesis tensor to taichi kernels, call tensor.assert_contiguous() to check whether it's contiguous, since taichi only support contiguous external tensor.
-- Don't expose any taichi-related usage to user.
-- When you add new class, also implement `__repr__()` for easier interactive debugging. (See genesis/engine/states.py as an example)
-- Contain all simulation-related stuff in genesis.engine.
-- Use `genesis.logger.info()`/`debug()`/`warning()` instead of `print()`.
-- Users will be alerted that it's not recommended to query for scene states too many times and not use them. All accessed scene states will be stored in a scene-level list, and considered part of the computation graph. This list will be freed when calling `scene.reset_grad()`, which frees up all occupied gpu memory.
-- Hierarchy - we abstract each level of entity creation, so they are unified and independent of each other:
-    - physics solver: we support various types: MPM, PBD, SPH, FEM, rigid, etc. The idea is to let user flexibly choose among them, without having to change any front-end APIs
-    - material -> this determined backend physics solver. we will have MPMLiquid, SPHLiquid, PBDLiquid, MPMElastic, FEMElastic, etc.
-    - geom -> this defines the entity's geometry. Can be either one of the shape primitives, or from mesh, or from URDF, etc. These geometries are independent of solver used.
-    - all different entities are added via the same `scene.add_entity()`
-- default solver order (for code consistency)
+(随時更新します)
+
+- 可能な限り `genesis.tensor` を使用してください。タブキーをカーネルに渡す際には、 `tensor.assert_contiguous()` を呼び出して、それが連続しているか確認してください。Taichi は連続した外部テンソルのみをサポートします。
+- ユーザーに Taichi に関連する使用例を公開しないでください。
+- 新しいクラスを追加する場合、インタラクティブデバッグを容易にするために `__repr__()` を実装してください。（例: `genesis/engine/states.py` を参照）
+- シミュレーション関連のすべての項目を `genesis.engine` に含めてください。
+- `print()` の代わりに `genesis.logger.info()` / `debug()` / `warning()` を使用してください。
+- ユーザーには、シーンの状態を頻繁にクエリすることが推奨されず、取得したシーン状態を使用しないことを推奨されます。アクセスされたすべてのシーン状態はシーンレベルのリストに保存され、計算グラフの一部とみなされます。このリストは `scene.reset_grad()` を呼び出すことで解放され、すべての占有されたGPUメモリが解放されます。
+- 階層構造 - エンティティの作成を各レベルで抽象化し、それらを統一および独立させます:
+    - **物理ソルバー (physics solver)**: 様々な種類をサポートします: MPM, PBD, SPH, FEM, リジッドなど。ユーザーがフロントエンドAPIを変更することなく、柔軟に選択できるようにします。
+    - **マテリアル (material)** -> これによりバックエンドの物理ソルバーが決定されます。例: `MPMLiquid`, `SPHLiquid`, `PBDLiquid`, `MPMElastic`, `FEMElastic`など。
+    - **ジオメトリ (geom)** -> これはエンティティの幾何学を定義します。形状のプリミティブの一つであるか、メッシュからであるか、またはURDFからである場合があります。これらのジオメトリは使用するソルバーに依存しません。
+    - すべての異なるエンティティは同じ `scene.add_entity()` を経由して追加されます。
+- **デフォルトのソルバー順序**（コードの一貫性のため）:
     - rigid
     - avatar
     - mpm
@@ -20,89 +21,96 @@
     - pbd
     - fem
     - sf
-- Some order convention
-    - quaternion: `[w, x, y, z]`
-    - euler
-        - user input: we use extrinsic x-y-z, in `degree`, as this is more intuitive
-            - interpretation: we use `scipy.Rotation`'s `xyz` ordering.
-        - internal xyz:
-            - euler is defined differently in various sources
-            - in our case, we use xyz to refer to the intrinsic rotation in order x-y-z, same as mujoco. Note that this aligns with others, e.f. dof force and position.
-            - for angular velocity, we use rotvec.
-- We use `id` for each object's `uuid`, and `idx` for its index
-- `uv` order
-    - assimp, trimesh: from bottom left corner
-    - ours, pygltflib, luisa: from top left corner
-- sim options vs solver options
-    - for any parameter that exists both in sim and solver options, the one in solver options has a higher priority, and will be initialized using the value in sim options when undefined
-    - the recommended way is to define dt via sim options, so that all solvers operate in the same temporal scale. However, users can also set different dt for different solvers
-    - RigidSolver operates at step level, and all other solvers operate at substep level. In order to make them compatible, all non-rigid solvers use `substeps` in sim options.
-- Some design and conventions for rigid solver
-    - for attribute, we use `*_idx`. e.g. `link_info.parent_idx`
-    - for id inside loop iteration, we use `i_*`.
-    - For all variables inside kernel loop
-        - suffix abbreviation:
-            - `i_l`: link id
-            - `i_p`: parent link id
-            - `i_r`: root link id
-            - `i_g`: geom id
-            - `i_d`: dof
-        - for prefix, we use:
-            - `l_`: link
-            - `l_info`: links_info[i_l, i_b]
-            - `g_`: geom
-            - `p_`: parent
+- **順序規約**:
+    - **クォータニオン**: `[w, x, y, z]`
+    - **オイラー角**:
+        - **ユーザー入力**: 外部 x-y-z を使用し、`degree` 表記。意味的に直感的です。
+            - 解釈: `scipy.Rotation` の `xyz` オーダーを使用します。
+        - **内部 xyz**:
+            - オイラー角は様々なソースで異なる定義があります。
+            - 当ケースでは、オイラー角は内部回転の順序 x-y-z に沿って定義されます（`mujoco` と同じ）。
+            - 角速度には回転ベクトルを使用します。
+- **`id` vs `idx`**:
+    - 各オブジェクトの `uuid` には `id` を使用し、インデックスには `idx` を使用します。
+- **`uv` 順序**:
+    - `assimp`, `trimesh`: 左下隅からの基準
+    - `ours`, `pygltflib`, `luisa`: 左上隅からの基準
+- **シミュレーションオプション vs ソルバーオプション**:
+    - シミュレーションとソルバー両方に既存するパラメータの場合、ソルバーオプション内のものが優先され、未定義の場合はシミュレーションオプションの値で初期化されます。
+    - 推奨方法としては、`dt` はシミュレーションオプションで定義し、すべてのソルバーが同一の時間スケールで操作するのが理想です。ただし、ユーザーは異なるソルバーに異なる`dt` を設定することも可能です。
+    - **リジッドソルバー** はステップレベルで動作し、他のソルバーはサブステップレベルで動作します。互換性を確保するため、すべての非リジッドソルバーはシミュレーションオプション内で `substeps` を使用します。
+- **リジッドソルバーデザインおよび規約**:
+    - **属性**: `*_idx` を使用。例: `link_info.parent_idx`
+    - **ループ内のID**: `i_*` を使用します。
+    - **カーネルループ内の変数**には以下の規則を使用:
+        - 接尾辞略称:
+            - `i_l`: リンクID
+            - `i_p`: 親リンクID
+            - `i_r`: ルートリンクID
+            - `i_g`: ジオメトリID
+            - `i_d`: 自由度 (dof)
+        - 接頭辞:
+            - `l_`: リンク
+            - `l_info`: `links_info[i_l, i_b]`
+            - `g_`: ジオメトリ
+            - `p_`: 親
             - ...
-    - on index storing
-        - Do we store offset-ed index in each class (`link`, `geom`, etc) or only a local one?
-            - let's do the former, since when user query e.g., an `entity`, it's better if it shows the global link idx
-            - This applies to indexes of `link`, `geom`, `verts`, etc.
-        - each object stores
-            - its parent class. e.g. `link` stores its `entity`
-            - its global `idx` after offset
-            - offset value for its own children. e.g. a `geom` only stores `idx_offset_*` for `vert`, `face`, and `edge`.
-    - root vs base
-        - `root` is a more natural name as we use a tree structure for the links, while `base` is more informative from user's perspective
-        - Let's use `root` link inernally, and `base` link for docs etc.
-    - root pose vs q (current design subject to possible change)
-        - for both arm and single mesh, its pos and euler specified when loaded is its root pose, and q will be w.r.t to this
-    - control interface
-        - root pos should be merged with joint pos of the first (fixed) joint, which connectes world to the first link
-        - if we want to control something, we will command velocity
-            - thus, if it’s a free joint, it’s ok. We will override velocity
-            - if it’s a fixed joint, there’s no dof for it, so we cannot control it
-        - if we need position control, we will write a PD controller and send velocity command under the hood.
-        - we can still change root pos (first joint pos), even if its fixed. but this is NOT recommended.
-            - this applies to both fixed and free joint. Not recommended in both case, because even it’s free joint, setting position will violate physics.
-            - then what’s the difference between free and fixed joint?
-                - the free dof will be affected by external effect, while the fixed joint won’t
-    - mjcf vs urdf
-        - mjcf xml always has a worldbody, so we will skip it. sometimes this worldbody has some geoms associated, let’s not support it for now.
-        - urdf only has robot, so we will load everything. Sometimes the robot can have a included world link, then it will be loaded into genesis's world and be the root link of the entity.
-    - collision handling: we store base on convexelized geoms
-        - for mesh-based assets, we generate a convex hull of all the groups stored in the mesh
-            - this groups can either be originally stored submeshes, or if group_by_material=True, we will group by material
-            - each group will be one RigidGeom
-        - for mjcf, we convexlize based on mujoco's geoms. Each mj geom will be one RigidGeom
-        - for urdf
-            - each urdf can contain multiple links, each link contains multiple geometries (collisions and visuals), and each geomtry will be one primitive or one external assset. Since `.obj` contains multiple sub-meshes, one urdf geomtry can have multiple meshes
-            - we convexlize this lowest-level mesh and store as RigidGeom
-    - control interface design
-        - we will not explicitly have concept like `base pose`
-            - in pybullet, movable mesh is its own baselink, and when pushed its base pose will change
-            - in genesis
-                - everything will connect to world (link -1)
-                - everything will have root pose. This is the initial pose and will not be changed. This is the reference we use when calculating q.
-                - free moving objects will connect to world via a free joint with 6 DoFs. When being pushed, this state will be changed, but its root pose will stay the same.
-    - prefix `v`
-        - this is used for global parameters that are used for visualization (visual geoms, verts, edges, normals etc)
-- `surface.vis_mode`:
-    - For rigid bodies, supported modes are ['visual', 'collision', 'sdf']. Default type is `visual`.
-    - For deformable non-fluid bodies, supported modes are ['visual', 'particle', 'recon']. Default type is `visual`.
-        - `visual` will render the input full visual mesh, skinned using internal particle state
-        - `particle` will render the internal particles. If the input texture is a color texture, the color will be used. In case of a image texture, the particles will be rendered using the texture's mean_color.
-        - `recon` will perform surface reconstruction using the particles.
-    - For fluid bodies, supported modes are ['particle', 'recon']. Default type is `particle`.
-        - `particle` will render the internal particles. If the input texture is a color texture, the color will be used. In case of a image texture, the particles will be rendered using the texture's mean_color.
-        - `recon` will perform surface reconstruction using the particles.
-    '''
+    - **インデックスの保存**について:
+        - クラスごとにオフセット化されたインデックスを保存しますか（`link`、`geom` など）、ローカルのインデックスのみを保存しますか？
+            - 前者を採用します。ユーザーが例えば `entity` をクエリする場合、グローバルリンクインデックスを表示する方が適切です。
+            - これは `link`、`geom`、`verts` などのインデックスに適用されます。
+        - 各オブジェクトが保存するもの:
+            - 親クラス（例: `link` はその `entity` を保存）
+            - オフセット後のグローバルインデックス
+            - 子要素のオフセット値（例: `geom` は `vert`、`face`、`edge` のオフセットインデックスのみを保存）
+    - **ルート vs ベース**:
+        - `root` はリンクをツリー構造で使用するため、自然な名称です。一方、`base` はユーザー視点からより情報的です。
+        - 内部的には `root` リンク、ドキュメントなどでは `base` リンクを使用します。
+    - **ルートポーズ vs q**（現在の設計：変更可能性あり）:
+        - アームと単一メッシュの両方について、ロード時に指定される位置とオイラー角度がそのルートポーズとなり、`q` はこれに相対します。
+    - **制御インターフェース**:
+        - ルート位置は最初のジョイント（固定）が接続するワールド位置と結合されるべきです。
+        - 制御を行う場合は速度を指示する必要があります:
+            - フリージョイントの場合、速度を上書きすることで問題ありません。
+            - 固定ジョイントには自由度がないため、制御は不可能です。
+        - 位置制御が必要な場合、PD制御器を記述し速度コマンドに変換します。
+        - ルート位置（最初のジョイント位置）を変更可能ですが、推奨されません：
+            - 固定ジョイントおよびフリージョイント両方に該当します。
+            - 位置を設定すると物理的に矛盾が生じる可能性があります。
+            - 固定ジョイントとフリージョイントの違い:
+                - フリー自由度は外部影響を受けますが、固定ジョイントは影響を受けません。
+    - **MJCF vs URDF**:
+        - **MJCF**:
+            - XMLは常に `worldbody` を持つためスキップします。
+            - 時々 `worldbody` に関連したジオメトリが含まれますが、今は対応しない予定です。
+        - **URDF**:
+            - `robot` のみを含み、すべてをロードします。
+            - 場合によってはロボットがワールドリンクを含む場合があるため、このリンクが `genesis` のワールドにロードされ、そのエンティティのルートリンクとなります。
+    - **衝突処理**: 凸形状化されたジオメトリに基づいて保存します:
+        - メッシュベースのアセットの場合、メッシュ内のすべてのグループの凸包を生成します:
+            - グループは元々のサブメッシュ、または `group_by_material=True` の場合マテリアルごとにグループ化します。
+            - 各グループは1つの `RigidGeom` になります。
+        - **MJCF**:
+            - 各MJジオメトリは1つの `RigidGeom` として凸形状化されます。
+        - **URDF**:
+            - 複数のリンクを含めることが可能です。各リンクには複数のジオメトリ（衝突用と可視化用）が含まれ、それぞれは1つのプリミティブまたは外部アセットになります。
+            - `.obj` が複数のサブメッシュを含める場合、1つのURDFジオメトリが複数のメッシュを持つことが可能です。
+            - この最低レベルのメッシュを凸形状化し、各メッシュを `RigidGeom` として保存します。
+    - **制御インターフェース設計**:
+        - **`base pose` のような概念は明示的に持ちません**:
+            - **PyBullet**: 動かせるメッシュは独自のベースリンクを持ち、押されるとベースポーズが変化します。
+            - **Genesis**:
+                - すべてがワールド（リンク -1）に接続されます。
+                - すべてのオブジェクトはルートポーズを保持します。この初期ポーズは変更されません。`q` を計算する際の基準です。
+                - 自由に動くオブジェクトは、6自由度を持つフリージョイントでワールドに接続されます。押されるとこの状態は変わりますが、ルートポーズは変わりません。
+    - **接頭辞 `v`**:
+        - 視覚化に使用されるグローバルパラメータ（視覚ジオメトリ、頂点、エッジ、法線など）用に予約します。
+- **`surface.vis_mode`**:
+    - **剛体**: サポートされるモードは `['visual', 'collision', 'sdf']`。デフォルトタイプは `visual` です。
+    - **変形可能非流体ボディ**: サポートされるモードは `['visual', 'particle', 'recon']`。デフォルトタイプは `visual` です。
+        - `visual`: 入力された完全な可視メッシュを内部のパーティクル状態を使ってスキン表示します。
+        - `particle`: 内部パーティクルを表示します。入力されたテクスチャが色テクスチャである場合、対応する色が使用されます。画像テクスチャの場合、粒子はテクスチャの `mean_color` を用いて描画されます。
+        - `recon`: パーティクルを使用して表面再構築を行います。
+    - **流体ボディ**: サポートされるモードは `['particle', 'recon']`。デフォルトタイプは `particle` です。
+        - `particle`: 内部パーティクルを表示します。入力されたテクスチャが色テクスチャである場合、対応する色が使用されます。画像テクスチャの場合、粒子はテクスチャの `mean_color` を用いて描画されます。
+        - `recon`: パーティクルを使用して表面再構築を行います。

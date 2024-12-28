@@ -1,20 +1,20 @@
-# 💡 What is Genesis
+# 💡 Genesisとは
 
 ```{figure} ../../_static/images/teaser.png
 ```
 
-Genesis is a physics platform designed for general purpose *Robotics/Embodied AI/Physical AI* applications. It is simultaneously multiple things:
+Genesisは、汎用的な*ロボティクス/具現化AI/物理AI*アプリケーション向けに設計された物理プラットフォームです。同時に以下のような多面的なプラットフォームです：
 
-1. A **universal physics engine** re-built from the ground up, capable of simulating a wide range of materials and physical phenomena.
-2. A **lightweight**, **ultra-fast**, **pythonic**, and **user-friendly** robotics simulation platform.
-3. A powerful and fast **photo-realistic rendering system**.
-4. A **generative data engine** that transforms user-prompted natural language description into various modalities of data.
+1. **汎用物理エンジン**：ゼロから再構築されたエンジンで、幅広い素材や物理現象をシミュレート可能。
+2. **軽量**かつ**超高速**、**Pythonライク**で**ユーザーフレンドリーな**ロボティクスシミュレーションプラットフォーム。
+3. 強力で高速な**フォトリアリスティックレンダリングシステム**。
+4. ユーザーが入力する自然言語の説明を様々な形式のデータに変換する**生成型データエンジン**。
 
-Powered by a universal physics engine re-designed and re-built from the ground up, Genesis integrates various physics solvers and their coupling into a unified framework. This core physics engine is further enhanced by a generative agent framework that operates at an upper level, aiming towards fully **automated data generation** for robotics and beyond.
-Currently, we are open-sourcing the underlying physics engine and the simulation platform. The generative framework will be released in the near future.
+Genesisは、ゼロから設計・構築し直された汎用物理エンジンにより駆動されています。このエンジンはさまざまな物理シミュレーションソルバーを統合し、それらを結合する統一的なフレームワークを提供します。このコア物理エンジンは、さらに上位のレベルで動作する生成型エージェントフレームワークによって強化され、ロボティクスおよびそれ以外の分野に向けた**完全な自動データ生成**を目指しています。
+現在、基盤となる物理エンジンおよびシミュレーションプラットフォームをオープンソース化しており、生成型フレームワークも近いうちに公開予定です。
 
-Genesis is built and will continuously evolve with the following ***long-term missions***:
+Genesisは以下の***長期的なミッション***に沿って構築され、進化し続けます：
 
-1. **Lowering the barrier** to using physics simulations and making robotics research accessible to everyone. (See our [commitment](https://genesis-world.readthedocs.io/en/latest/user_guide/overview/mission.html))
-2. **Unifying a wide spectrum of state-of-the-art physics solvers** into a single framework, allowing re-creating the whole physical world in a virtual realm with the highest possible physical, visual and sensory fidelity, using the most advanced simulation techniques.
-3. **Minimizing human effort** in collecting and generating data for robotics and other domains, letting the data flywheel spin on its own.
+1. **物理シミュレーションの使用ハードルを下げ**、ロボティクス研究をすべての人にとって利用可能にすること。（[コミットメントを見る](https://genesis-world.readthedocs.io/en/latest/user_guide/overview/mission.html))
+2. **最先端の物理ソルバーの幅広いスペクトルを単一のフレームワークに統一**し、最も高度なシミュレーション技術を用いて、物理、視覚、感覚の忠実度を可能な限り高めた仮想空間内で物理世界全体を再現可能にすること。
+3. ロボティクスおよびその他の分野向けのデータ収集・生成における**人間の労力を最小限にする**ことで、データサイクルをを完全に自動化すること。
