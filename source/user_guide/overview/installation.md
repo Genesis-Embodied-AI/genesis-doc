@@ -90,7 +90,9 @@ git submodule update --init --recursive
     pip install "pybind11[global]"
     ```
 
-* 安装 CUDA 12.0+ 和 Rust:
+* 安装 CUDA 12.0+: https://developer.nvidia.com/cuda-12-1-0-download-archive
+
+* 安装 Rust:
 
     ```bash
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
