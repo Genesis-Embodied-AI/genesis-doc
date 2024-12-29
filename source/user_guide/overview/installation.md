@@ -23,12 +23,12 @@ Genesisは***マルチプラットフォーム***に対応しており、*CPU*�
 </div>
 
 ## インストール方法
-1. GenesisはPyPI経由で利用可能です:
+1. **PyTorch**を[公式手順](https://pytorch.org/get-started/locally/)に従ってインストールしてください。
+
+2. GenesisはPyPI経由で利用可能です:
     ```bash
     pip install genesis-world
     ```
-
-2. **PyTorch**を[公式手順](https://pytorch.org/get-started/locally/)に従ってインストールしてください。
 
 :::{note}
 GenesisをCUDAから利用される場合は適切なnvidia-driverがインストールされているかご確認ください。
