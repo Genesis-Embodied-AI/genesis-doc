@@ -23,13 +23,13 @@ Genesis 是跨平台的，支持 CPU、CUDA GPU 和非 CUDA GPU 设备。建议�
 
 ## 基本安装
 
-1. 用 pip 安装 Genesis:
+1. 根据[官方文档](https://pytorch.org/get-started/locally/)安装 PyTorch
+
+2. 用 pip 安装 Genesis:
 
     ```bash
     pip install genesis-world
     ```
-
-2. 根据[官方文档](https://pytorch.org/get-started/locally/)安装 PyTorch
 
 ## 可选功能
 
