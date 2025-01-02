@@ -95,8 +95,8 @@ To evaluate the trained drone hovering policy, follow these steps:
 2. **Visualize Results**.
     The evaluation script will visualize the drone's performance and save a video if the `--record` flag is set.
 
-<!-- <video preload="auto" controls="True" width="100%">
-<source src="_static/videos/hover_env.mp4" type="video/mp4">
-</video> -->
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/hover_env.mp4" type="video/mp4">
+</video>
 
 By following this tutorial, you'll be able to train and evaluate a basic drone hovering policy using Genesis. Have fun and enjoy!
