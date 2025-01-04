@@ -23,6 +23,7 @@ getting_started/advanced_ik
 getting_started/beyond_rigid_bodies
 getting_started/interactive_debugging
 getting_started/locomotion
+getting_started/hover_env
 getting_started/soft_robots
 getting_started/command_line_tools
 ```
