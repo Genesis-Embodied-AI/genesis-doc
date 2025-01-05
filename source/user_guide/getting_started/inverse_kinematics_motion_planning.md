@@ -21,7 +21,6 @@ scene = gs.Scene(
     ),
     sim_options = gs.options.SimOptions(
         dt = 0.01,
-        substeps = 4, # 增加子步骤提高抓取稳定性
     ),
     show_viewer = True,
 )
