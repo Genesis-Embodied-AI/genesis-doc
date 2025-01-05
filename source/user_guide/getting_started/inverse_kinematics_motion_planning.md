@@ -20,7 +20,6 @@ scene = gs.Scene(
     ),
     sim_options = gs.options.SimOptions(
         dt = 0.01,
-        substeps = 4, # for more stable grasping contact
     ),
     show_viewer = True,
 )
@@ -103,7 +102,7 @@ Next, we move the robot gripper down, grasp the cube, and lift it:
 # reach
 qpos = franka.inverse_kinematics(
     link = end_effector,
-    pos  = np.array([0.65, 0.0, 0.135]),
+    pos  = np.array([0.65, 0.0, 0.130]),
     quat = np.array([0, 1, 0, 0]),
 )
 franka.control_dofs_position(qpos[:-2], motors_dof)
@@ -120,7 +119,7 @@ for i in range(100):
 # lift
 qpos = franka.inverse_kinematics(
     link=end_effector,
-    pos=np.array([0.65, 0.0, 0.3]),
+    pos=np.array([0.65, 0.0, 0.28]),
     quat=np.array([0, 1, 0, 0]),
 )
 franka.control_dofs_position(qpos[:-2], motors_dof)
