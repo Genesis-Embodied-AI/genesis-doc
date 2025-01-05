@@ -21,7 +21,6 @@ scene = gs.Scene(
     ),
     sim_options = gs.options.SimOptions(
         dt = 0.01,
-        substeps = 4, # より安定した把持接触のためのサブステップ
     ),
     show_viewer = True,
 )
