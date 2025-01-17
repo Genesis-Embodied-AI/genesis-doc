@@ -69,11 +69,13 @@ At this stage, we have defined the environments. To train the drone hovering pol
 2. **Run Training Script**.
     Use the provided training script to start training the policy.
     ```bash
-    python hover_train.py -e drone-hovering -B 8192 --max_iterations 500
+    python hover_train.py -e drone-hovering -B 8192 --max_iterations 300
     ```
     - `-e drone-hovering`: Specifies the experiment name as "drone-hovering".
     - `-B 8192`: Sets the number of environments to 8192 for parallel training.
-    - `--max_iterations 500`: Specifies the maximum number of training iterations to 500.
+    - `--max_iterations 300`: Specifies the maximum number of training iterations to 300.
+    - `-v`: Optional. Enables training with visualization.
+    
     To monitor the training process, launch TensorBoard:
     ```bash
     tensorboard --logdir logs
@@ -81,16 +83,19 @@ At this stage, we have defined the environments. To train the drone hovering pol
     You should see a training curve similar to this:
     ```{figure} ../../_static/images/hover_curve.png
     ```
+    When training with visualization enabled, you will see:
+    ```{figure} ../../_static/images/training.gif
+    ```
 
 ## Evaluation
 To evaluate the trained drone hovering policy, follow these steps:
 1. **Run Evaluation Script**.
     Use the provided evaluation script to evaluate the trained policy.
     ```bash
-    python hover_eval.py -e drone-hovering --ckpt 500 --record
+    python hover_eval.py -e drone-hovering --ckpt 300 --record
     ```
     - `-e drone-hovering`: Specifies the experiment name as "drone-hovering".
-    - `--ckpt 500`: Loads the trained policy from checkpoint 500.
+    - `--ckpt 300`: Loads the trained policy from checkpoint 300.
     - `--record`: Records the evaluation and saves a video of the drone's performance.
 2. **Visualize Results**.
     The evaluation script will visualize the drone's performance and save a video if the `--record` flag is set.
