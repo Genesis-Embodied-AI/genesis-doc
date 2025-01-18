@@ -85,12 +85,13 @@ Genesis は並列シミュレーションをサポートしており、強化学
     インストール後、以下のコマンドでトレーニングを開始します：
 
     ```bash
-    python hover_train.py -e drone-hovering -B 8192 --max_iterations 500
+    python hover_train.py -e drone-hovering -B 8192 --max_iterations 300
     ```
 
     - `-e drone-hovering`: 実験名を "drone-hovering" に指定します
     - `-B 8192`: 並列トレーニングの環境数を 8192 に設定します
-    - `--max_iterations 500`: 最大トレーニング反復回数を 500 に指定します
+    - `--max_iterations 300`: 最大トレーニング反復回数を 300 に指定します
+    - `-v`: オプション。可視化を有効にしてトレーニングを行います
 
     トレーニングプロセスをモニターするには、TensorBoard を起動します：
 
@@ -100,6 +101,10 @@ Genesis は並列シミュレーションをサポートしており、強化学
 
     次のようなトレーニング曲線が表示されるはずです：
     ```{figure} ../../_static/images/hover_curve.png
+    ```
+
+    可視化を有効にしてトレーニングを行うと、次のような画面が表示されます：
+    ```{figure} ../../_static/images/training.gif
     ```
 
 ---
@@ -112,11 +117,11 @@ Genesis は並列シミュレーションをサポートしており、強化学
     提供された評価スクリプトでトレーニング済みのポリシーを評価します。
 
     ```bash
-    python hover_eval.py -e drone-hovering --ckpt 500 --record
+    python hover_eval.py -e drone-hovering --ckpt 300 --record
     ```
 
     - `-e drone-hovering`: 実験名を "drone-hovering" に指定します
-    - `--ckpt 500`: チェックポイント 500 からトレーニング済みのポリシーをロードします
+    - `--ckpt 300`: チェックポイント 300 からトレーニング済みのポリシーをロードします
     - `--record`: 評価を記録し、ドローンのパフォーマンスのビデオを保存します
 
 2. **結果の可視化**  
