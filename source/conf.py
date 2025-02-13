@@ -32,7 +32,7 @@ extensions = [
     "sphinx_subfigure",
     "sphinxcontrib.video",
     "sphinx_togglebutton",
-    "sphinx_design"
+    "sphinx_design",
 ]
 
 # https://myst-parser.readthedocs.io/en/latest/syntax/optional.html
@@ -75,16 +75,16 @@ html_context = {
     "github_repo": "genesis-doc",
     "github_version": "main",
     "conf_py_path": "/source/",
-    "doc_path": "/source"
+    "doc_path": "/source",
 }
 html_css_files = [
-    'css/custom.css',
+    "css/custom.css",
 ]
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 ### Autodoc configurations ###
 autodoc_typehints = "signature"
 autodoc_typehints_description_target = "all"
-autodoc_default_flags = ['members', 'show-inheritance', 'undoc-members']
+autodoc_default_flags = ["members", "show-inheritance", "undoc-members"]
 autodoc_member_order = "bysource"
 autosummary_generate = True
