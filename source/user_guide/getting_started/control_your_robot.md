@@ -42,7 +42,7 @@ franka = scene.add_entity(
 scene.build()
 ```
 
-This robot arm will fall down due to gravity, if we don't give it any actuation force. Genesis has a built-in PD controller that takes as input target joint position or velocity. You can also directly set torque/force applied to each joint.
+This robot arm will fall down due to gravity, if we don't give it any actuation force. Genesis has a built-in PD controller ([proportional–integral–derivative controller](https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller) ) that takes as input target joint position or velocity. You can also directly set torque/force applied to each joint.
 
 In the context of robotic simulation, `joint` and `dof` (degree-of-freedom) are two related but different concepts. Since we are dealing with a Franka arm, which has 7 revolute joints in the arm and 2 prismatic joints in its gripper, all the joints have 1 dof only, leading to a 9-dof articulated body. In a more general case, there will be joint types such as free joint (6 dofs) or ball joint (3 dofs) that have more than one degrees of freedom. In general, you can think of each dof as a motor and can be controlled independently.
 
