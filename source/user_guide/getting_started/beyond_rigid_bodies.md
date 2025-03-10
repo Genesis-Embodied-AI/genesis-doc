@@ -311,6 +311,7 @@ for i in range(horizon):
 ```
 
 期待されるレンダリング結果：
+
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/pbd_cloth.mp4" type="video/mp4">
 </video>
