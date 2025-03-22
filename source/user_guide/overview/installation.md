@@ -1,6 +1,6 @@
 # 🛠️ Installation
 ## Prerequisites
-* **Python**: 3.9+
+* **Python**: >=3.10,<3.13
 * **OS**: Linux (*recommended*) / MacOS / Windows
 
 :::{note}
@@ -15,9 +15,9 @@ Supported features on various systems are as follows:
 | Linux   | Nvidia            | ✅             | ✅             | ✅               | ✅                 |
 |         | AMD               | ✅             | ✅             | ✅               | ✅                 |
 |         | Intel             | ✅             | ✅             | ✅               | ✅                 |
-| Windows | Nvidia            | ✅             | ✅             | ❌               | ❌                 |
-|         | AMD               | ✅             | ✅             | ❌               | ❌                 |
-|         | Intel             | ✅             | ✅             | ❌               | ❌                 |
+| Windows | Nvidia            | ✅             | ✅             | ✅               | ✅                 |
+|         | AMD               | ✅             | ✅             | ✅               | ✅                 |
+|         | Intel             | ✅             | ✅             | ✅               | ✅                 |
 | MacOS   | Apple Silicon     | ✅             | ✅             | ✅               | ✅                 |
 
 </div>
