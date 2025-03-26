@@ -35,6 +35,7 @@ getting_started/command_line_tools
 :maxdepth: 1
 
 advanced_topics/concepts
+advanced_topics/naming_and_variables
 advanced_topics/collision_contacts_forces
 advanced_topics/differentiable_simulation
 advanced_topics/collision_representation
