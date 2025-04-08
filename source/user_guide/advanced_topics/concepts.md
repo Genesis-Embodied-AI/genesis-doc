@@ -2,8 +2,6 @@
 
 ## Systematic Overview
 
-## Config System
-
 ## Data Indexing
 
 We have been recieving a lot of questions about how to partially manipulate a rigid entity like only controling or retrieving certain attributes. Thus, we figure it would be nice to write a more in-depth explaination on index access to data.

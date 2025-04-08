@@ -27,6 +27,7 @@ getting_started/locomotion
 getting_started/hover_env
 getting_started/soft_robots
 getting_started/command_line_tools
+getting_started/config_system
 ```
 
 
