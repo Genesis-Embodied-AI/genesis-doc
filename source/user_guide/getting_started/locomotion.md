@@ -1,6 +1,6 @@
 # 🦿 Training Locomotion Policies with RL
 
-Genesis supports parallel simulation, making it ideal for training reinforcement learning (RL) locomotion policies efficiently. In this tutorial, we will walk you through a complete training example for obtaining a basic locomotion policy that enables a Unitree Go2 Robot to walk. 
+Genesis supports parallel simulation, making it ideal for training reinforcement learning (RL) locomotion policies efficiently. In this tutorial, we will walk you through a complete training example for obtaining a basic locomotion policy that enables a Unitree Go2 Robot to walk.
 
 This is a simple and minimal example that demonstrates a very basic RL training pipeline in Genesis, and with the following example you will be able to obtain a quadruped locomotion policy that's deployable to a real robot very quickly.
 
@@ -50,14 +50,9 @@ Reward functions are critical for policy guidance. In this example, we use:
 - **similar_to_default**: Encourage the robot pose to be similar to the default pose
 
 ## Training
-At this stage, we have defined the environments. Now, we use the PPO implementation from rsl-rl to train the policy. Follow these installation steps:
+At this stage, we have defined the environments. Now, we use the PPO implementation from rsl-rl to train the policy. First, install all Python dependencies via `pip`:
 ```
-# Install rsl_rl.
-git clone https://github.com/leggedrobotics/rsl_rl
-cd rsl_rl && git checkout v1.0.2 && pip install -e .
-
-# Install tensorboard.
-pip install tensorboard
+pip install tensorboard rsl-rl-lib==2.2.4
 ```
 After installation, start training by running:
 ```

@@ -30,7 +30,7 @@ The `reset_idx` function resets the initial pose and state buffers of the specif
 #### Step
 The `step` function updates the environment state based on the actions taken by the policy. It includes the following steps:
 1. **Action Execution**.
-    The input action will be clipped to a valid range, rescaled, and applied as adjustments to the default hover propeller RPMs. 
+    The input action will be clipped to a valid range, rescaled, and applied as adjustments to the default hover propeller RPMs.
 2. **State Update**.
     Drone states, such as position, attitude, and velocities, are retrieved and stored in buffers.
 3. **Termination Checks**.
@@ -59,12 +59,8 @@ At this stage, we have defined the environments. To train the drone hovering pol
 1. **Install Dependencies**.
     Ensure you have installed all necessary dependencies, including Genesis and `rsl_rl`.
     ```bash
-    # Install rsl_rl.
-    git clone https://github.com/leggedrobotics/rsl_rl
-    cd rsl_rl && git checkout v1.0.2 && pip install -e .
-
-    # Install tensorboard.
-    pip install tensorboard
+    pip install --upgrade pip
+    pip install "tensorboard" "git+https://github.com/leggedrobotics/rsl_rl.git@v1.0.2"
     ```
 2. **Run Training Script**.
     Use the provided training script to start training the policy.
@@ -75,7 +71,7 @@ At this stage, we have defined the environments. To train the drone hovering pol
     - `-B 8192`: Sets the number of environments to 8192 for parallel training.
     - `--max_iterations 300`: Specifies the maximum number of training iterations to 300.
     - `-v`: Optional. Enables training with visualization.
-    
+
     To monitor the training process, launch TensorBoard:
     ```bash
     tensorboard --logdir logs
