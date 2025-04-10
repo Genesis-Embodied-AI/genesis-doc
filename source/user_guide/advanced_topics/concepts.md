@@ -1,6 +1,28 @@
 # 🧩 Concepts
 
-## Systematic Overview
+## Systemat Architecture Overview
+
+```{figure} ../../_static/images/overview.png
+```
+
+<!-- From an user perspective, building an environment using Genesis is to add `Entity` in `Scene`, where `Entity` is specified by
+- `Morph`: the geometry of the entity, e.g., primitive shapes or URDF.
+- `Material`: the material of the entity, e.g., elastic object, liquid, sand, etc. Material is associated with the underlying solvers, e.g., there is MPM liquid and SPH liquid, those demonstrate different behaviors.
+- `Surface`: the texture, rendering surface parameters etc
+
+Under the hood, the scene consists of a simulator that encapsulates,
+- `Solver`: the physics solver that handles the core physics engine with different methods like rigid, material point method (MPM), finite element method (FEM), etc.
+- `Coupler`: the bridge across solvers that handle forces and any interaction in between. -->
+
+From a user’s perspective, building an environment in Genesis involves adding `Entity` objects to a `Scene`. Each `Entity` is defined by:
+- `Morph`: the geometry of the entity, such as primitive shapes (e.g., cube, sphere) or articulated models (e.g., URDF, MJCF).
+- `Material`: the physical properties of the entity, such as elastic solids, liquids, or granular materials. The material type determines the underlying solver used—for example, both MPM and SPH can simulate liquids, but each exhibits different behaviors.
+- `Surface`: the visual and interaction-related surface properties, such as texture, roughness, or reflectivity.
+
+Behind the scenes, the `Scene` is powered by a `Simulator`, which includes:
+- `Solver`: the core physics solvers responsible for simulating different physical models, such as rigid body dynamics, Material Point Method (MPM), Finite Element Method (FEM), Position-Based Dynamics (PBD), and Smoothed Particle Hydrodynamics (SPH).
+- `Coupler`: a module that handles interactions between solvers, ensuring consistent force coupling and inter-entity dynamics.
+
 
 ## Data Indexing
 
