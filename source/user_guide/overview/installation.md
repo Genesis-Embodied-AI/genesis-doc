@@ -202,7 +202,9 @@ Even if the GPU appears accessible, your system might still default to CPU rende
    ```
    ✅ You should now only see `libEGL_nvidia.so.0`.
 
-4. **Ensure the NVIDIA EGL ICD config file exists**
+4. **(Optional – for edge cases)** Check if the NVIDIA EGL ICD config file exists
+
+In most cases, this file should already be present if your NVIDIA drivers are correctly installed. However, in some minimal or containerized environments (e.g., headless Docker images), you might need to manually create it if EGL initialization fails:
    ```bash
    cat /usr/share/glvnd/egl_vendor.d/10_nvidia.json
    ```
@@ -227,6 +229,8 @@ Even if the GPU appears accessible, your system might still default to CPU rende
    ```
 
 5. **Set global NVIDIA rendering environment variables**
+   
+Genesis tries EGL rendering by default, so in most environments you don’t need to manually set `PYOPENGL_PLATFORM`. However, setting these variables can help ensure stability in custom setups (e.g., Docker, headless servers):
 
    Add to `~/.bashrc` or `~/.zshrc`:
    ```bash
