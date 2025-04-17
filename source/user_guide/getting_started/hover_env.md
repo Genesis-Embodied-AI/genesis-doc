@@ -57,19 +57,19 @@ These reward functions are combined to provide comprehensive feedback to the pol
 ## Training
 At this stage, we have defined the environments. To train the drone hovering policy using PPO, follow these steps:
 1. **Install Dependencies**.
-    Ensure you have installed all necessary dependencies, including Genesis and `rsl_rl`.
+    First, ensure you have Genesis installed, then add all required Python dependencies using `pip`:
     ```bash
     pip install --upgrade pip
-    pip install "tensorboard" "git+https://github.com/leggedrobotics/rsl_rl.git@v1.0.2"
+    pip install tensorboard rsl-rl-lib==2.2.4
     ```
 2. **Run Training Script**.
     Use the provided training script to start training the policy.
     ```bash
-    python hover_train.py -e drone-hovering -B 8192 --max_iterations 300
+    python hover_train.py -e drone-hovering -B 8192 --max_iterations 301
     ```
     - `-e drone-hovering`: Specifies the experiment name as "drone-hovering".
     - `-B 8192`: Sets the number of environments to 8192 for parallel training.
-    - `--max_iterations 300`: Specifies the maximum number of training iterations to 300.
+    - `--max_iterations 301`: Specifies the maximum number of training iterations to 301.
     - `-v`: Optional. Enables training with visualization.
 
     To monitor the training process, launch TensorBoard:
