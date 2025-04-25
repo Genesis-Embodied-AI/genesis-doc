@@ -161,6 +161,8 @@ git submodule update --init --recursive
     ```
 ### 5. GPU Rendering Troubleshooting (Silent Fallback to CPU)
 
+> **Note:** The following steps are for Ubuntu only. If you’re on another distribution, package names and workflow may be different.
+
 Sometimes, when using `cam.render()` or viewer-related functions in Genesis, rendering becomes extremely slow.  
 This is **not a Genesis issue**. Genesis relies on PyRender and EGL for GPU-based offscreen rendering. If your system isn’t correctly set up to use `libnvidia-egl`, it may **silently fall back to MESA (CPU) rendering**, severely affecting performance.
 
