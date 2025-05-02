@@ -27,7 +27,6 @@ pygltflib
 mujoco
 pycollada
 opencv-python
-lxml
 tetgen
 screeninfo
 PyGEL3D
