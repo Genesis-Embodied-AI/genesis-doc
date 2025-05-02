@@ -61,14 +61,10 @@ Genesis は並列シミュレーションをサポートしており、強化学
 
 ## トレーニング
 
-ここまでで環境を定義しました。次に、`rsl-rl` の PPO 実装を使用してポリシーをトレーニングします。以下のインストール手順に従ってください：
+ここまでで環境を定義しました。次に、`rsl-rl` の PPO 実装を使用してポリシーをトレーニングします。`pip` 経由で Python の依存関係をインストールしてください：
 ```
-# rsl_rl をインストール
-git clone https://github.com/leggedrobotics/rsl_rl
-cd rsl_rl && git checkout v1.0.2 && pip install -e .
-
-# tensorboard をインストール
-pip install tensorboard
+# tensorboard と rsl_rl をインストール
+pip install tensorboard rsl-rl-lib==2.2.4
 ```
 
 インストール後、以下のコマンドでトレーニングを開始します：

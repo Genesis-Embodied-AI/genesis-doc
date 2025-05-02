@@ -70,27 +70,24 @@ Genesis は並列シミュレーションをサポートしており、強化学
 ここまでで環境を定義しました。次に、`rsl-rl` の PPO 実装を使用してドローンホバリングポリシーをトレーニングします。以下のインストール手順に従ってください：
 
 1. **依存関係のインストール**
-    必要な依存関係（Genesis と `rsl_rl` を含む）がインストールされていることを確認してください。
+    Genesis がインストールされていることを確認し、`pip` を使用して必要な Python の依存関係をインストールします。
 
     ```bash
-    # rsl_rl をインストール
-    git clone https://github.com/leggedrobotics/rsl_rl
-    cd rsl_rl && git checkout v1.0.2 && pip install -e .
-
-    # tensorboard をインストール
-    pip install tensorboard
+    # tensorboard と rsl_rl をインストール
+    pip install --upgrade pip
+    pip install tensorboard rsl-rl-lib==2.2.4
     ```
 
 2. **トレーニングスクリプトの実行**.
     インストール後、以下のコマンドでトレーニングを開始します：
 
     ```bash
-    python hover_train.py -e drone-hovering -B 8192 --max_iterations 300
+    python hover_train.py -e drone-hovering -B 8192 --max_iterations 301
     ```
 
     - `-e drone-hovering`: 実験名を "drone-hovering" に指定します
     - `-B 8192`: 並列トレーニングの環境数を 8192 に設定します
-    - `--max_iterations 300`: 最大トレーニング反復回数を 300 に指定します
+    - `--max_iterations 301`: 最大トレーニング反復回数を 301 に指定します
     - `-v`: オプション。可視化を有効にしてトレーニングを行います
 
     トレーニングプロセスをモニターするには、TensorBoard を起動します：
