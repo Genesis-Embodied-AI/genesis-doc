@@ -1,4 +1,4 @@
-# `gs.RigidLink`
+# `RigidLink`
 
 ```{eval-rst}  
 .. autoclass:: genesis.engine.entities.rigid_entity.rigid_link.RigidLink

@@ -4,7 +4,8 @@
 :titlesonly:
 
 scene/index
-camera/index
 entity/index
+material/index
+sensor/index
 options/index
 ```
