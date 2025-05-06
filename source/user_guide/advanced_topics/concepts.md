@@ -55,4 +55,22 @@ We provide some concrete examples in the following for better understanding,
 
 ## Direct Access to Data Field
 
-## Data Structure of Rigid Entities
+Normally, we do not encourage users to directly access the (Taichi) data field.
+Instead, users should mostly use the APIs in each entity, such as `RigidEntity.get_dofs_position`.
+However, if one would like to access to data field not supported via APIs and could not wait for the new API support, one could try a direct access of data field, which may be a quick and dirty (yet most likely inefficient) solution. Specifically, following the data indexing mechanism described in the previous section, suppose one would like to do
+```
+entity: RigidEntity = ...
+tgt = entity.get_dofs_position(...)
+```
+
+This is equivalent to
+```
+all_dofs_pos = entity.solver.dofs_state.pos.to_torch()
+tgt = all_dofs_pos[:, entity.dof_start:entity.dof_end]  # the first dimension is the batch dimension
+```
+
+All entities are associated with a specific solver (except for hybrid entity).
+Each desired physical attribute is stored somewhere in the solver (e.g., dofs position here is stored as `dofs_state.pos` in the rigid solver).
+For more details of these mapping, you could check {doc}`Naming and Variables <naming_and_variables>`. 
+Also, all the data field in the solver follows a global indexing (for all entities) where you need `entity.*_start` and `entity.*_end` to only extract the data relevant with a specific entity.
+
