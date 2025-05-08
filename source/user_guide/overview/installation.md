@@ -159,3 +159,102 @@ git submodule update --init --recursive
     mv libstdc++.so.6 libstdc++.so.6.old
     ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 libstdc++.so.6
     ```
+### 5. GPU Rendering Troubleshooting (Silent Fallback to CPU)
+
+> **Note:** The following steps are for Ubuntu only. If you’re on another distribution, package names and workflow may be different.
+
+Sometimes, when using `cam.render()` or viewer-related functions in Genesis, rendering becomes extremely slow.  
+This is **not a Genesis issue**. Genesis relies on PyRender and EGL for GPU-based offscreen rendering. If your system isn’t correctly set up to use `libnvidia-egl`, it may **silently fall back to MESA (CPU) rendering**, severely affecting performance.
+
+Even if the GPU appears accessible, your system might still default to CPU rendering unless explicitly configured.
+
+---
+
+#### ✅ Ensure GPU Rendering is Active
+
+1. **Install NVIDIA GL libraries**
+   ```bash
+   sudo apt update && sudo apt install -y libnvidia-gl-525
+   ```
+
+2. **Check if EGL is pointing to the NVIDIA driver**
+   ```bash
+   ldconfig -p | grep EGL
+   ```
+   You should ideally see:
+   ```
+   libEGL_nvidia.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libEGL_nvidia.so.0
+   ```
+
+   ⚠️ You *may also see*:
+   ```
+   libEGL_mesa.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libEGL_mesa.so.0
+   ```
+
+   This is not always a problem — **some systems can handle both**.  
+   But if you're experiencing **slow rendering**, it's often best to remove Mesa.
+
+3. **(Optional but recommended)** Remove MESA to prevent fallback:
+   ```bash
+   sudo apt remove -y libegl-mesa0 libegl1-mesa libglx-mesa0
+   ```
+   Then recheck:
+   ```bash
+   ldconfig -p | grep EGL
+   ```
+   ✅ You should now only see `libEGL_nvidia.so.0`.
+
+4. **(Optional – for edge cases)** Check if the NVIDIA EGL ICD config file exists
+
+In most cases, this file should already be present if your NVIDIA drivers are correctly installed. However, in some minimal or containerized environments (e.g., headless Docker images), you might need to manually create it if EGL initialization fails:
+   ```bash
+   cat /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+   ```
+   Should contain:
+   ```json
+   {
+     "file_format_version" : "1.0.0",
+     "ICD" : {
+         "library_path" : "libEGL_nvidia.so.0"
+     }
+   }
+   ```
+
+   If not, create it:
+   ```bash
+   echo '{
+     "file_format_version" : "1.0.0",
+     "ICD" : {
+         "library_path" : "libEGL_nvidia.so.0"
+     }
+   }' | sudo tee /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+   ```
+
+5. **Set global NVIDIA rendering environment variables**
+   
+Genesis tries EGL rendering by default, so in most environments you don’t need to manually set `PYOPENGL_PLATFORM`. However, setting these variables can help ensure stability in custom setups (e.g., Docker, headless servers):
+
+   Add to `~/.bashrc` or `~/.zshrc`:
+   ```bash
+   export NVIDIA_DRIVER_CAPABILITIES=all
+   export PYOPENGL_PLATFORM=egl
+   ```
+
+   Reload:
+   ```bash
+   source ~/.bashrc  # or source ~/.zshrc
+   ```
+
+   Confirm:
+   ```python
+   import os
+   print("[DEBUG] Using OpenGL platform:", os.environ.get("PYOPENGL_PLATFORM"))
+   print("[DEBUG] NVIDIA capabilities:", os.environ.get("NVIDIA_DRIVER_CAPABILITIES"))
+   ```
+
+---
+
+✅ **Summary**:  
+Having both NVIDIA and MESA EGL libraries installed is sometimes okay — but if you're experiencing **silent fallback to CPU**, **remove MESA** and confirm that `libEGL_nvidia.so.0` is the only active one.
+
+---
