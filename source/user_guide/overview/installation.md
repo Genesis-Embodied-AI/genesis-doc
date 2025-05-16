@@ -34,10 +34,6 @@ Supported features on various systems are as follows:
 If you are using Genesis with CUDA, make sure appropriate nvidia-driver is installed on your machine.
 :::
 
-
-## (Optional) Motion planning
-Genesis integrated OMPL's motion planning functionalities and wraps it using a intuitive API for effortless motion planning. If you need the built-in motion planning capability, download pre-compiled OMPL wheel [here](https://github.com/ompl/ompl/releases/tag/prerelease), and then `pip install` it.
-
 ## (Optional) Surface reconstruction
 If you need fancy visuals for visualizing particle-based entities (fluids, deformables, etc.), you typically need to reconstruct the mesh surface using the internal particle-based representation. We provide two options for this purpose:
 
@@ -51,7 +47,6 @@ If you need fancy visuals for visualizing particle-based entities (fluids, defor
     source ~/.bashrc
     ```
 
-
 ## (Optional) Ray Tracing Renderer
 
 If you need photo-realistic visuals, Genesis has a built-in a ray-tracing (path-tracing) based renderer developped using [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain specific language designed for rendering.
@@ -61,7 +56,7 @@ The submodule LuisaRender is under `ext/LuisaRender`:
 ```bash
 git submodule update --init --recursive
 ```
-### 2. Dependencies 
+### 2. Dependencies
 
 #### 2.A: If you have sudo access. Preferred.
 **NB**: It seems that compilation only works on Ubuntu 20.04+, As vulkan 1.2+ is needed and 18.04 only supports 1.1, but we haven't fully checked this...
@@ -87,7 +82,7 @@ git submodule update --init --recursive
     - Download on https://developer.nvidia.com/cuda-12-1-0-download-archive
     - Install CUDA Toolkit.
     - Reboot.
-    
+
     ```bash
     # verify
     nvcc --version
@@ -149,7 +144,7 @@ git submodule update --init --recursive
         cmake --build build -j $(nproc)
         ```
         The `CONDA_INCLUDE_PATH` typically looks like: `/home/user/anaconda3/envs/genesis/include`
-        
+
 ### 4. FAQs
 - Assertion 'lerror’ failed: Failed to write to the process: Broken pipe:
   You may need to use CUDA of the same version as compiled.
@@ -159,12 +154,27 @@ git submodule update --init --recursive
     mv libstdc++.so.6 libstdc++.so.6.old
     ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 libstdc++.so.6
     ```
-### 5. GPU Rendering Troubleshooting (Silent Fallback to CPU)
 
-> **Note:** The following steps are for Ubuntu only. If you’re on another distribution, package names and workflow may be different.
+## Troubleshooting
 
-Sometimes, when using `cam.render()` or viewer-related functions in Genesis, rendering becomes extremely slow.  
-This is **not a Genesis issue**. Genesis relies on PyRender and EGL for GPU-based offscreen rendering. If your system isn’t correctly set up to use `libnvidia-egl`, it may **silently fall back to MESA (CPU) rendering**, severely affecting performance.
+### Import error
+
+Python would fail to (circular) import Genesis if the current directory is the source directory of Genesis. Traceback may look like this:
+    ```python
+    from . import _replay
+ImportError: cannot import name '_replay' from partially initialized module 'genesis.ext.fast_simplification' (most likely due to a circular import) (D:\A_New_software_anaconda\envs\genesisL\Lib\site-packages\genesis\ext\fast_simplification\__init__.py)
+    ```
+    or
+    ```python
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'genesis.ext.fast_simplification._replay'
+    ```
+This is likely due to Genesis being installed WITHOUT enabling editable mode, either from PyPI Package Index or from source. The obvious workaround is moving out of the source directory of Genesis before running Python. The long-term solution is simply switching to editable install mode: first uninstall Python package `genesis-world`, then run `pip install -e '.[render]'` inside the source directory of Genesis.
+
+### [Native Ubuntu] Slow Rendering (CPU aka. Software Fallback)
+
+Sometimes, when using `cam.render()` or viewer-related functions in Genesis, rendering becomes extremely slow. This is **not a Genesis issue**. Genesis relies on PyRender and EGL for GPU-based offscreen rendering. If your system isn’t correctly set up to use `libnvidia-egl`, it may **silently fall back to MESA (CPU) rendering**, severely affecting performance.
 
 Even if the GPU appears accessible, your system might still default to CPU rendering unless explicitly configured.
 
@@ -191,7 +201,7 @@ Even if the GPU appears accessible, your system might still default to CPU rende
    libEGL_mesa.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libEGL_mesa.so.0
    ```
 
-   This is not always a problem — **some systems can handle both**.  
+   This is not always a problem — **some systems can handle both**.
    But if you're experiencing **slow rendering**, it's often best to remove Mesa.
 
 3. **(Optional but recommended)** Remove MESA to prevent fallback:
@@ -207,31 +217,38 @@ Even if the GPU appears accessible, your system might still default to CPU rende
 4. **(Optional – for edge cases)** Check if the NVIDIA EGL ICD config file exists
 
 In most cases, this file should already be present if your NVIDIA drivers are correctly installed. However, in some minimal or containerized environments (e.g., headless Docker images), you might need to manually create it if EGL initialization fails:
-   ```bash
-   cat /usr/share/glvnd/egl_vendor.d/10_nvidia.json
-   ```
-   Should contain:
-   ```json
-   {
-     "file_format_version" : "1.0.0",
-     "ICD" : {
-         "library_path" : "libEGL_nvidia.so.0"
-     }
-   }
-   ```
+    ```bash
+    cat /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+    ```
+    Should contain:
+    ```json
+    {
+        "file_format_version" : "1.0.0",
+        "ICD" : {
+            "library_path" : "libEGL_nvidia.so.0"
+        }
+    }
+    ```
 
-   If not, create it:
-   ```bash
-   echo '{
-     "file_format_version" : "1.0.0",
-     "ICD" : {
-         "library_path" : "libEGL_nvidia.so.0"
-     }
-   }' | sudo tee /usr/share/glvnd/egl_vendor.d/10_nvidia.json
-   ```
+If not, create it:
+    ```bash
+    bash -c 'cat > /usr/share/glvnd/egl_vendor.d/10_nvidia.json <<EOF
+    {
+        "file_format_version": "1.0.0",
+        "ICD": {
+            "library_path": "libEGL_nvidia.so.0"
+        }
+    }
+    EOF'
+    ```
+
+Similarly, some symlink may be missing for the CUDA runtime:
+    ```bash
+    ln -s /usr/lib/x86_64-linux-gnu/libcuda.so.1 /usr/lib/x86_64-linux-gnu/libcuda.so
+    ```
 
 5. **Set global NVIDIA rendering environment variables**
-   
+
 Genesis tries EGL rendering by default, so in most environments you don’t need to manually set `PYOPENGL_PLATFORM`. However, setting these variables can help ensure stability in custom setups (e.g., Docker, headless servers):
 
    Add to `~/.bashrc` or `~/.zshrc`:
@@ -252,9 +269,46 @@ Genesis tries EGL rendering by default, so in most environments you don’t need
    print("[DEBUG] NVIDIA capabilities:", os.environ.get("NVIDIA_DRIVER_CAPABILITIES"))
    ```
 
----
+### [Docker Container (Genesis image) on Windows 11 via WSL2] Black Rendering Window
 
-✅ **Summary**:  
-Having both NVIDIA and MESA EGL libraries installed is sometimes okay — but if you're experiencing **silent fallback to CPU**, **remove MESA** and confirm that `libEGL_nvidia.so.0` is the only active one.
+For machines with Nvidia GPU, make sure that NVIDIA Container Toolkit is installed. The official guide is available [here](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
 
----
+Some users may still be experiencing rendering issues on Windows when running Genesis inside a Docker container based on Genesis image. This is generally fixed by adding WSL libraries to Linux's search path for dynamic libraries, which is specified by the environment variable `LD_LIBRARY_PATH`, i.e.:
+    ```bash
+    docker run --gpus all --rm -it \
+    -e DISPLAY=$DISPLAY \
+    -e LD_LIBRARY_PATH=/usr/lib/wsl/lib \
+    -v /tmp/.X11-unix/:/tmp/.X11-unix \
+    -v $PWD:/workspace \
+    genesis
+    ```
+
+### [Ubuntu VM on Windows 11 via WSL2] OpenGL error
+
+For machines with Nvidia GPU, try to force GPU-accelerated rendering by exporting the following environment variables inside the Ubuntu VM:
+    ```bash
+    export LIBGL_ALWAYS_INDIRECT=0
+    export GALLIUM_DRIVER=d3d12
+    export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA
+    ```
+
+If it does not work, try installing the latest version of OSMesa:
+    ```bash
+    sudo add-apt-repository ppa:kisak/kisak-mesa
+    sudo apt update
+    sudo apt upgrade
+    ```
+Then, only enforce direct rendering:
+    ```bash
+    export LIBGL_ALWAYS_INDIRECT=0
+    ```
+
+At the point, `glxinfo` mesa utility can be used to determine which OpenGL vendor is being used by default, i.e.:
+    ```bash
+    glxinfo -B
+    ```
+
+As a last resort, one can force CPU (aka. software) rendering using OSMesa if necessary as follows:
+    ```bash
+    export LIBGL_ALWAYS_SOFTWARE=1
+    ```
