@@ -162,13 +162,13 @@ git submodule update --init --recursive
 Python would fail to (circular) import Genesis if the current directory is the source directory of Genesis. Traceback may look like this:
     ```python
     from . import _replay
-ImportError: cannot import name '_replay' from partially initialized module 'genesis.ext.fast_simplification' (most likely due to a circular import) (D:\A_New_software_anaconda\envs\genesisL\Lib\site-packages\genesis\ext\fast_simplification\__init__.py)
+    ImportError: cannot import name '_replay' from partially initialized module 'genesis.ext.fast_simplification' (most likely due to a circular import) ([...]\site-packages\genesis\ext\fast_simplification\__init__.py)
     ```
     or
     ```python
     return _bootstrap._gcd_import(name[level:], package, level)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-ModuleNotFoundError: No module named 'genesis.ext.fast_simplification._replay'
+    ModuleNotFoundError: No module named 'genesis.ext.fast_simplification._replay'
     ```
 This is likely due to Genesis being installed WITHOUT enabling editable mode, either from PyPI Package Index or from source. The obvious workaround is moving out of the source directory of Genesis before running Python. The long-term solution is simply switching to editable install mode: first uninstall Python package `genesis-world`, then run `pip install -e '.[render]'` inside the source directory of Genesis.
 
@@ -216,7 +216,7 @@ Even if the GPU appears accessible, your system might still default to CPU rende
 
 4. **(Optional – for edge cases)** Check if the NVIDIA EGL ICD config file exists
 
-In most cases, this file should already be present if your NVIDIA drivers are correctly installed. However, in some minimal or containerized environments (e.g., headless Docker images), you might need to manually create it if EGL initialization fails:
+    In most cases, this file should already be present if your NVIDIA drivers are correctly installed. However, in some minimal or containerized environments (e.g., headless Docker images), you might need to manually create it if EGL initialization fails:
     ```bash
     cat /usr/share/glvnd/egl_vendor.d/10_nvidia.json
     ```
@@ -230,7 +230,7 @@ In most cases, this file should already be present if your NVIDIA drivers are co
     }
     ```
 
-If not, create it:
+    If not, create it:
     ```bash
     bash -c 'cat > /usr/share/glvnd/egl_vendor.d/10_nvidia.json <<EOF
     {
@@ -242,7 +242,7 @@ If not, create it:
     EOF'
     ```
 
-Similarly, some symlink may be missing for the CUDA runtime:
+    Similarly, some symlink may be missing for the CUDA runtime:
     ```bash
     ln -s /usr/lib/x86_64-linux-gnu/libcuda.so.1 /usr/lib/x86_64-linux-gnu/libcuda.so
     ```
@@ -271,9 +271,9 @@ Genesis tries EGL rendering by default, so in most environments you don’t need
 
 ### [Docker Container (Genesis image) on Windows 11 via WSL2] Black Rendering Window
 
-For machines with Nvidia GPU, make sure that NVIDIA Container Toolkit is installed. The official guide is available [here](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
+    For machines with Nvidia GPU, make sure that NVIDIA Container Toolkit is installed. The official guide is available [here](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
 
-Some users may still be experiencing rendering issues on Windows when running Genesis inside a Docker container based on Genesis image. This is generally fixed by adding WSL libraries to Linux's search path for dynamic libraries, which is specified by the environment variable `LD_LIBRARY_PATH`, i.e.:
+    Some users may still be experiencing rendering issues on Windows when running Genesis inside a Docker container based on Genesis image. This is generally fixed by adding WSL libraries to Linux's search path for dynamic libraries, which is specified by the environment variable `LD_LIBRARY_PATH`, i.e.:
     ```bash
     docker run --gpus all --rm -it \
     -e DISPLAY=$DISPLAY \
@@ -285,30 +285,30 @@ Some users may still be experiencing rendering issues on Windows when running Ge
 
 ### [Ubuntu VM on Windows 11 via WSL2] OpenGL error
 
-For machines with Nvidia GPU, try to force GPU-accelerated rendering by exporting the following environment variables inside the Ubuntu VM:
+    For machines with Nvidia GPU, try to force GPU-accelerated rendering by exporting the following environment variables inside the Ubuntu VM:
     ```bash
     export LIBGL_ALWAYS_INDIRECT=0
     export GALLIUM_DRIVER=d3d12
     export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA
     ```
 
-If it does not work, try installing the latest version of OSMesa:
+    If it does not work, try installing the latest version of OSMesa:
     ```bash
     sudo add-apt-repository ppa:kisak/kisak-mesa
     sudo apt update
     sudo apt upgrade
     ```
-Then, only enforce direct rendering:
+    Then, only enforce direct rendering:
     ```bash
     export LIBGL_ALWAYS_INDIRECT=0
     ```
 
-At the point, `glxinfo` mesa utility can be used to determine which OpenGL vendor is being used by default, i.e.:
+    At the point, `glxinfo` mesa utility can be used to determine which OpenGL vendor is being used by default, i.e.:
     ```bash
     glxinfo -B
     ```
 
-As a last resort, one can force CPU (aka. software) rendering using OSMesa if necessary as follows:
+    As a last resort, one can force CPU (aka. software) rendering using OSMesa if necessary as follows:
     ```bash
     export LIBGL_ALWAYS_SOFTWARE=1
     ```
