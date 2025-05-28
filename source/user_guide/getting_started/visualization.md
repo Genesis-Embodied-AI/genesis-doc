@@ -167,7 +167,7 @@ Get submodules, specifically `genesis/ext/LuisaRender`.
 git submodule update --init --recursive
 pip install -e ".[render]"
 ```
-Install/upgrad g++ and gcc (to) version 11.
+Install/upgrad g++ and gcc (to) version >= 11.
 ```bash
 sudo apt install build-essential manpages-dev software-properties-common
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -179,7 +179,7 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110
 g++ --version
 gcc --version
 ```
-Install cmake. We use snap instead of apt because we need its version >= 3.26. However, remember to use the correct cmake. You may have `/usr/local/bin/cmake` but the snap installed package is at `/snap/bin/cmake` (or `/usr/bin/snap`). Please double check the order of binary path via `echo $PATH`.
+Install CMake if your local version does not meet the required version. We use `snap` instead of `apt` because we need CMake version >= 3.26. However, remember to use the correct cmake. You may have `/usr/local/bin/cmake` but the `snap` installed package is at `/snap/bin/cmake` (or `/usr/bin/snap`). Please double check the order of binary path via `echo $PATH`.
 ```bash
 sudo snap install cmake --classic
 cmake --version
@@ -187,14 +187,23 @@ cmake --version
 Install dependencies,
 ```bash
 sudo apt install libvulkan-dev # Vulkan
-sudo apt-get install zlib1g-dev # zlib
 sudo apt-get install libx11-dev # X11
 sudo apt-get install xorg-dev libglu1-mesa-dev # RandR headers
+sudo apt-get install zlib1g-dev # zlib
 ```
-Build `LuisaRender`. Remember to use the correct cmake.
+
+If you do not have sudo, the following commands also install the required dependencies in your conda environments:
+```bash
+conda install -c conda-forge gcc=11.4 gxx=11.4 
+conda install -c conda-forge cmake=3.26.1
+conda install -c conda-forge vulkan-tools vulkan-headers xorg-xproto # Vulkan, X11 & RandR
+conda install -c conda-forge zlib # zlib
+```
+
+Build `LuisaRender`. Remember to use the correct cmake. By default, we use OptiX denoiser (For CUDA backend only). If you need OIDN denoiser, append `-D LUISA_COMPUTE_DOWNLOAD_OIDN=ON`.
 ```bash
 cd genesis/ext/LuisaRender
-cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON # remember to check python version
+cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON -D LUISA_COMPUTE_ENABLE_GUI=OFF -D LUISA_RENDER_BUILD_TESTS=OFF # remember to check python version
 cmake --build build -j $(nproc)
 ```
 
@@ -211,7 +220,9 @@ You should be able to get
 
 
 ### FAQ
-- Pybind error when doing `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON`,
+- Installed libraries still undetected when running `cmake -S . -B build`,
+    You can manually instruct CMake to detect the dependencies by explicitly setting options such as `XXX_INCLUDE_DIR`, e.g., `ZLIB_INCLUDE_DIR=/path/to/include`. For conda environments, `XXX_INCLUDE_DIR` typically follows the format `/home/user/anaconda3/envs/genesis/include`.
+- Pybind error when doing `cmake -S . -B build`,
     ```bash
     CMake Error at src/apps/CMakeLists.txt:12 (find_package):
     By not providing "Findpybind11.cmake" in CMAKE_MODULE_PATH this project has
@@ -225,7 +236,7 @@ You should be able to get
         pybind11-config.cmake
     ```
     You probably forget to do `pip install -e ".[render]"`. Alternatively, you can simply do `pip install "pybind11[global]"`.
-- CUDA runtime compilation error when doing `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON`,
+- CUDA runtime compilation error when running `cmake -S . -B build`,
     ```bash
     /usr/bin/ld: CMakeFiles/luisa-cuda-nvrtc-standalone-compiler.dir/cuda_nvrtc_compiler.cpp.o: in function `main':
     cuda_nvrtc_compiler.cpp:(.text.startup+0x173): undefined reference to `nvrtcGetOptiXIRSize'
@@ -277,7 +288,7 @@ You should be able to get
     ```bash
     rm -r build
     ```
-- Compiler error at `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON`,
+- C/CXX Compiler error at `cmake -S . -B build`,
     ```bash
     CMake Error at /snap/cmake/1435/share/cmake-3.31/Modules/CMakeDetermineCCompiler.cmake:49 (message):
     Could not find compiler set in environment variable CC:
@@ -308,3 +319,4 @@ You should be able to get
     mv libstdc++.so.6 libstdc++.so.6.old
     ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 libstdc++.so.6
     ```
+- Assertion 'lerror’ failed: Failed to write to the process: Broken pipe: You may need to use CUDA of the same version as compiled.
