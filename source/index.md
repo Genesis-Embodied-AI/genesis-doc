@@ -66,7 +66,7 @@ Genesis致力于建设开放透明的生态系统，欢迎机器人和计算机�
 
 如果您的研究使用了Genesis，请引用：
 
-```bibtex
+```
 @misc{Genesis,
   author = {Genesis Authors},
   title = {Genesis: A Generative and Universal Physics Engine for Robotics and Beyond},
