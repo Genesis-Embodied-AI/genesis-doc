@@ -68,6 +68,7 @@ Genesisプロジェクトの目標は、ロボティクスとコンピュータ�
 
 研究でGenesisを利用した場合、引用いただけるとありがたいです。現在技術レポートを作成中で、公開されるまでは以下として引用をお願いします：
 
+```
 @misc{Genesis,
   author = {Genesis Authors},
   title = {Genesis: A Generative and Universal Physics Engine for Robotics and Beyond},
@@ -75,6 +76,7 @@ Genesisプロジェクトの目標は、ロボティクスとコンピュータ�
   year = {2024},
   url = {https://github.com/Genesis-Embodied-AI/Genesis}
 }
+```
 
 ```{toctree}
 :maxdepth: 1
