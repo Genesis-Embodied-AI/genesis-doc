@@ -186,9 +186,8 @@ cmake --version
 ```
 Install dependencies,
 ```bash
-sudo apt install libvulkan-dev # Vulkan
-sudo apt-get install libx11-dev # X11
-sudo apt-get install xorg-dev libglu1-mesa-dev # RandR headers
+sudo apt install libvulkan-dev xorg-dev # Vulkan, X11 & RandR
+sudo apt-get install uuid-dev # UUID 
 sudo apt-get install zlib1g-dev # zlib
 ```
 
@@ -197,6 +196,7 @@ If you do not have sudo, the following commands also install the required depend
 conda install -c conda-forge gcc=11.4 gxx=11.4 
 conda install -c conda-forge cmake=3.26.1
 conda install -c conda-forge vulkan-tools vulkan-headers xorg-xproto # Vulkan, X11 & RandR
+conda install -c conda-forge libuuid # UUID
 conda install -c conda-forge zlib # zlib
 ```
 
