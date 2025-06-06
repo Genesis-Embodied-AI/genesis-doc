@@ -119,5 +119,5 @@ Running the above script on a desktop with RTX 4090 and 14900K gives you a futur
 ```
 
 :::{tip}
-**FPS logging:** By default, genesis logger will display real-time simulation speed in the terminal. You can disable this behavior by setting `show_FPS=False` when creating the scene.
+**FPS logging:** By default, genesis logger will display real-time simulation speed in the terminal. You can disable this behavior by setting `scene.profiling_options.show_FPS=False` when creating the scene.
 :::
