@@ -25,6 +25,7 @@ getting_started/beyond_rigid_bodies
 getting_started/interactive_debugging
 getting_started/locomotion
 getting_started/hover_env
+getting_started/terrain
 getting_started/soft_robots
 getting_started/command_line_tools
 getting_started/config_system
@@ -42,6 +43,7 @@ advanced_topics/collision_representation
 advanced_topics/sparse_computation
 advanced_topics/differentiable_simulation
 advanced_topics/solvers_and_coupling
+advanced_topics/rigid_constraint_model
 ```
 
 <!-- advanced_topics/drone -->

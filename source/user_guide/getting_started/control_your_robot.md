@@ -280,3 +280,71 @@ for i in range(1250):
 
     scene.step()
 ```
+
+## Pick & Place with a Suction Cup
+
+In many industrial settings robots pick objects using a suction pad that behaves like an "instant" rigid grasp.  In Genesis you can reproduce the same behaviour by temporarily welding two rigid bodies together.
+
+The *rigid solver* inside the scene gives you direct access to this functionality through
+`add_weld_constraint()` and `delete_weld_constraint()`.  The API takes two numpy arrays that list the
+link indices to be attached / detached.
+
+Below is a minimal example that moves the Franka end-effector above a small cube, welds the two bodies together (imitating suction), transports the cube to another pose and finally releases it again.
+
+```python
+import numpy as np
+import genesis as gs
+
+# --- (scene and robot creation omitted, identical to the sections above) ---
+
+# Retrieve some commonly used handles
+rigid        = scene.sim.rigid_solver          # low-level rigid body solver
+end_effector = franka.get_link("hand")        # Franka gripper frame
+cube_link    = cube.get_link("box_baselink")   # the link we want to pick
+
+################ Reach pre-grasp pose ################
+q_pregrasp = franka.inverse_kinematics(
+    link = end_effector,
+    pos  = np.array([0.65, 0.0, 0.13]),  # just above the cube
+    quat = np.array([0, 1, 0, 0]),        # down-facing orientation
+)
+franka.control_dofs_position(q_pregrasp[:-2], np.arange(7))  # arm joints only
+for _ in range(50):
+    scene.step()
+
+################ Attach (activate suction) ################
+link_cube   = np.array([cube_link.idx],   dtype=gs.np_int)
+link_franka = np.array([end_effector.idx], dtype=gs.np_int)
+rigid.add_weld_constraint(link_cube, link_franka)
+
+################ Lift and transport ################
+q_lift = franka.inverse_kinematics(
+    link = end_effector,
+    pos  = np.array([0.65, 0.0, 0.28]),  # lift up
+    quat = np.array([0, 1, 0, 0]),
+)
+franka.control_dofs_position(q_lift[:-2], np.arange(7))
+for _ in range(50):
+    scene.step()
+
+q_place = franka.inverse_kinematics(
+    link = end_effector,
+    pos  = np.array([0.4, 0.2, 0.18]),  # target place pose
+    quat = np.array([0, 1, 0, 0]),
+)
+franka.control_dofs_position(q_place[:-2], np.arange(7))
+for _ in range(100):
+    scene.step()
+
+################ Detach (release suction) ################
+rigid.delete_weld_constraint(link_cube, link_franka)
+for _ in range(400):
+    scene.step()
+```
+
+A few remarks:
+1. The suction pad is modelled as an *ideal* weld — no compliance or force limit is enforced.  If you need a more physical behaviour you can instead create a `gs.constraints.DampedSpring` or control the gripper fingers.
+2. Link indices are **scene-global**, therefore we wrap them in a single-element numpy array to satisfy the API contract.
+3. You can attach or detach multiple objects at once by passing arrays with more than one index.
+
+With just two lines of code you can now pick and place arbitrary objects with suction!  Feel free to integrate this snippet into your own control pipeline.
