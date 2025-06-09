@@ -1,6 +1,6 @@
 # 🧩 Physics Models of Genesis Solvers
 
-This page gives a compact **theoretical overview** of the physical models implemented by Genesis' continuum and discrete solvers.  The emphasis is on *which equations are being solved and how*, rather than on the Python API.  For coupling theory see the dedicated *Solvers & Coupling* chapter.
+This page gives a compact overview of the physical models implemented by Genesis' continuum and discrete solvers.  The emphasis is on *which equations are being solved and how*, rather than on the Python API. For coupling theory see the dedicated *Solvers & Coupling* chapter.
 
 ---
 

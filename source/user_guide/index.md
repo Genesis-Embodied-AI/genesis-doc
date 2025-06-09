@@ -44,6 +44,8 @@ advanced_topics/sparse_computation
 advanced_topics/differentiable_simulation
 advanced_topics/solvers_and_coupling
 advanced_topics/rigid_constraint_model
+advanced_topics/nonrigid_models
+advanced_topics/support_field
 ```
 
 <!-- advanced_topics/drone -->

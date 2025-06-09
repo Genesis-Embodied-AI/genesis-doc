@@ -2,22 +2,17 @@
 
 Genesis provides a highly-efficient, feature-rich collision detection and contact generation pipeline for rigid bodies.  The Python implementation lives in `genesis/engine/solvers/rigid/collider_decomp.py`.  This page gives a *conceptual* overview of the algorithmic building blocks so that you can understand, extend or debug the code.
 
-> **Scope.**  The focus is on rigid–rigid interactions.  Soft-body / particle collisions rely on different solvers and are documented elsewhere.
+> **Scope.**  The focus is on rigid–rigid interactions.  Soft-body / particle collisions rely on different solvers are in other files like `genesis/engine/coupler.py`.
 
 ---
 
 ## Pipeline Overview
 
-``{figure} ../../_static/images/collision_pipeline.png
-:alt: Collision pipeline
-:width: 750px
-``
-
 The whole procedure can be seen as three successive stages:
 
 1. **AABB Update** – update world–space Axis-Aligned Bounding Boxes for every geometry.
-2. **Broad Phase (Sweep-and-Prune)** – quickly reject obviously non-intersecting pairs and output *possible* collision pairs.
-3. **Narrow Phase** – robustly compute the actual contact manifold (normal, penetration depth, position, etc.) for every surviving pair.
+2. **Broad Phase (Sweep-and-Prune)** – quickly reject obviously non-intersecting geom pairs based AABB and output *possible* collision pairs.
+3. **Narrow Phase** – robustly compute the actual contact manifold (normal, penetration depth, position, etc.) for every surviving pair using primitive-spcific algoirithm, SDF, or MPR.
 
 `Collider` orchestrates all three stages through the public `detection()` method:
 
@@ -37,9 +32,6 @@ Why do we do this every frame?
 
 * Rigid bodies move ⇒ their bounding boxes change.
 * AABB overlap checks are the cornerstone of the broad phase.
-
-!!! tip "Numerical stability"
-    AABBs are expanded by a small margin internally to keep objects from tunnelling due to floating-point errors.
 
 ---
 
@@ -125,7 +117,7 @@ To improve temporal coherence we cache, for every geometry pair, the ID of the p
 
 ## Hibernation
 
-When the *sleeping bodies* feature is enabled, contacts belonging exclusively to hibernated bodies are preserved but not re-evaluated every frame (`n_contacts_hibernated`).  This drastically reduces GPU work for scenes with large static backgrounds.
+When this feature is enabled, contacts belonging exclusively to hibernated bodies are preserved but not re-evaluated every frame (`n_contacts_hibernated`).  This drastically reduces GPU work for scenes with large static backgrounds.
 
 ---
 
@@ -135,7 +127,7 @@ When the *sleeping bodies* feature is enabled, contacts belonging exclusively to
 |--------|---------|--------|
 | `RigidSolver._max_collision_pairs` | 4096 | upper bound on broad-phase pairs (per environment) |
 | `Collider._mc_perturbation` | `1e-2` rad | perturbation angle for multi-contact search |
-| `Collider._mc_tolerance`    | `1e-2` m   | duplicate-contact rejection radius |
+| `Collider._mc_tolerance`    | `1e-2` of AABB size  | duplicate-contact rejection radius |
 | `Collider._mpr_to_sdf_overlap_ratio` | `0.5` | threshold to switch from MPR to SDF when one shape encloses the other |
 
 ---
@@ -143,5 +135,3 @@ When the *sleeping bodies* feature is enabled, contacts belonging exclusively to
 ## Further Reading
 
 * {doc}`Support Field <support_field>` – offline acceleration structure for support-mapping shapes.
-* [Minkowski Portal Refinement – Gino van den Bergen 2005](https://caseymuratori.com/blog_0003) (original paper).
-* *Real-Time Collision Detection* – Christer Ericson, 2004.
