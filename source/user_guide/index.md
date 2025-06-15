@@ -39,8 +39,6 @@ getting_started/config_system
 advanced_topics/concepts
 advanced_topics/naming_and_variables
 advanced_topics/collision_contacts_forces
-advanced_topics/collision_representation
-advanced_topics/sparse_computation
 advanced_topics/differentiable_simulation
 advanced_topics/solvers_and_coupling
 advanced_topics/rigid_constraint_model
