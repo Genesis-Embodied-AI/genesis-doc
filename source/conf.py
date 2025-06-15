@@ -1,8 +1,8 @@
 import os
-import genesis as gs
+# import genesis as gs
 
-
-__version__ = gs.__version__
+# -__version__ = gs.__version__
+__version__ = "0.2.1"
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -36,7 +36,7 @@ extensions = [
 ]
 
 # https://myst-parser.readthedocs.io/en/latest/syntax/optional.html
-myst_enable_extensions = ["colon_fence", "dollarmath"]
+myst_enable_extensions = ["colon_fence", "dollarmath", "amsmath", "dollarmath"]
 # https://github.com/executablebooks/MyST-Parser/issues/519#issuecomment-1037239655
 myst_heading_anchors = 4
 

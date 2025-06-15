@@ -8,20 +8,15 @@ This page gives a compact overview of the physical models implemented by Genesis
 
 **Purpose.** Fast smoke / gas simulation on a fixed grid.
 
-**Governing equations** – incompressible Navier–Stokes
+**Governing equations** – incompressible Navier–Stokes.
 
-\[\begin{aligned}
-\frac{\partial \mathbf u}{\partial t} + (\mathbf u\!\cdot\!\nabla)\,\mathbf u &= -\frac{1}{\rho}\,\nabla p + \nu\,\nabla^{2}\!\mathbf u + \mathbf f,\\[3pt]
-\nabla\!\cdot\!\mathbf u &= 0.
-\end{aligned}\]
-
-**Algorithm** – Jos Stam's *Stable Fluids* (semi-Lagrangian advection + projection):
+**Algorithm** – Jos Stam's *Stable Fluids*:
 
 1. **Advection** – velocities are back-traced with third-order RK and interpolated (`backtrace` + `trilerp`).  Numerically unconditionally stable.
 2. **External impulses** – jet sources inject momentum after advection.
 3. **Viscosity / decay** – optional exponential damping term.
-4. **Pressure projection** – solve Poisson \(\nabla^{2}p = \rho\,\nabla\!\cdot\!\mathbf u^*\) by Jacobi iteration (`pressure_jacobi`), then set
-   \[\mathbf u^{n+1} = \mathbf u^{*} - \frac{\Delta t}{\rho}\,\nabla p.\]
+4. **Pressure projection** – solve Poisson by Jacobi iteration (`pressure_jacobi`).
+
 5. **Boundary conditions** – zero-normal velocity enforced by mirroring components at solid faces.
 
 Because all steps are explicit or diagonally implicit the method is extremely robust at large time-steps and suitable for real-time effects.
@@ -32,16 +27,16 @@ Because all steps are explicit or diagonally implicit the method is extremely ro
 
 **Purpose.** Unified simulation of solids, liquids and granular media using particles + background grid.
 
-**Core idea.**  The continuum momentum equation is evaluated on an Eulerian grid while material history (deformation gradient \(\mathbf F\), plastic strain, etc.) is stored on Lagrangian particles.
+**Core idea.**  The continuum momentum equation is evaluated on an Eulerian grid while material history (deformation gradient, plastic strain, etc.) is stored on Lagrangian particles.
 
 ### 2.1 Update sequence (APIC / CPIC variant)
 
 | Phase | Description |
 |-------|-------------|
-| P2G | Transfer mass \(m\_p\) and momentum \(m\_p\,\mathbf v\_p\) to neighbour grid nodes with B-spline weights; add stress contribution \(-\Delta t\,V\_p\,4\,\text{inv\_dx}^2\,\boldsymbol\sigma\_p\). |
+| P2G | Transfer mass and momentum to neighbour grid nodes with B-spline weights; add stress contribution. |
 | Grid solve | Divide by mass to obtain velocities, apply gravity & boundary collisions. |
-| G2P | Interpolate grid velocity back, update affine matrix \(\mathbf C\_p\) and position. |
-| Polar-SVD | Decompose tentative \(\mathbf F\_{tmp}\) into \(\mathbf U\,\mathbf S\,\mathbf V^T\); material law returns new \(\mathbf F, J\_p, \sigma\). |
+| G2P | Interpolate grid velocity back, update affine matrix and position. |
+| Polar-SVD | Decompose deformation graident; material law returns new deformation gradient. |
 
 ### 2.2 Constitutive models
 
@@ -52,8 +47,6 @@ Genesis ships several analytic stress functions:
 * **Weakly compressible liquid** (WC fluid)
 * **Anisotropic muscle** adding active fibre stress
 
-All share the form \(\boldsymbol\sigma = \frac{\partial\psi}{\partial\mathbf F}\,\mathbf F^{T}/J\).
-
 ---
 
 ## 3. Finite Element Method Solver (`FEMSolver`)
@@ -63,17 +56,19 @@ All share the form \(\boldsymbol\sigma = \frac{\partial\psi}{\partial\mathbf F}\
 ### 3.1 Energy formulation
 
 Total potential energy
-\[ \Pi(\mathbf x) = \sum_{e} V_{e}\,\psi(\mathbf F\_e) - \sum_{i} m_{i}\,\mathbf g\!\cdot\!\mathbf x\_i. \]
+
+$$ \Pi(\mathbf x) = \sum_{e} V_{e}\,\psi(\mathbf F_e) - \sum_{i} m_{i}\,\mathbf g\!\cdot\!\mathbf x_i. $$
+
 The first variation yields the internal force; the second variation gives the element stiffness.
 
 ### 3.2 Implicit backward Euler
 
-Given current state \((\mathbf x^n, \mathbf v^n)\) solve for \(\mathbf x^{n+1}\) by Newton–Raphson:
+Given current state $(\mathbf x^n, \mathbf v^n)$ solve for $\mathbf x^{n+1}$ by Newton–Raphson:
 
-\[ \mathbf r(\mathbf x) = \frac{m}{\Delta t^{2}}(\mathbf x - \hat{\mathbf x}) + \frac{\partial \Pi}{\partial \mathbf x} = 0,\]
-where \(\hat{\mathbf x} = \mathbf x^{n} + \Delta t\,\mathbf v^{n}\) is the inertial prediction.
+$$ \mathbf r(\mathbf x) = \frac{m}{\Delta t^{2}}(\mathbf x - \hat{\mathbf x}) + \frac{\partial \Pi}{\partial \mathbf x} = 0,$$
+where $\hat{\mathbf x} = \mathbf x^{n} + \Delta t\,\mathbf v^{n}$ is the inertial prediction.
 
-Each Newton step solves \(\mathbf H\,\delta \mathbf x = -\mathbf r\) with PCG; \(\mathbf H\) is the consistent stiffness + mass matrix.  A block-Jacobi inverse of per-vertex 3×3 blocks is used as preconditioner.  Line-search (Armijo back-tracking) guarantees energy decrease.
+Each Newton step solves $\mathbf H\,\delta \mathbf x = -\mathbf r$ with PCG; $\mathbf H$ is the consistent stiffness + mass matrix.  A block-Jacobi inverse of per-vertex 3×3 blocks is used as preconditioner.  Line-search (Armijo back-tracking) guarantees energy decrease.
 
 ---
 
@@ -83,11 +78,13 @@ Each Newton step solves \(\mathbf H\,\delta \mathbf x = -\mathbf r\) with PCG; \
 
 ### 4.1 XPBD integration cycle
 
-1. **Predict** – explicit Euler: \(\mathbf v^{*}\!=\!\mathbf v + \Delta t\,\mathbf f/m\) and \(\mathbf x^{*}\!=\!\mathbf x + \Delta t\,\mathbf v^{*}\).
+1. **Predict** – explicit Euler: $\mathbf v^{*}\!=\!\mathbf v + \Delta t\,\mathbf f/m$ and $\mathbf x^{*}\!=\!\mathbf x + \Delta t\,\mathbf v^{*}$.
 2. **Project constraints** – iterate over edges, tetrahedra, SPH density etc.
-   For each constraint \(C(\mathbf x)\!=\!0\) solve for Lagrange multiplier λ
-   \[ \Delta\mathbf x = -\frac{C + \alpha\,\lambda^{old}}{\sum w_i\,|\nabla\!C_i|^{2}+\alpha}\,\nabla\!C, \quad \alpha = \frac{\text{compliance}}{\Delta t^{2}}. \]
-3. **Update velocities** – \(\mathbf v = (\mathbf x^{new}-\mathbf x^{old})/\Delta t\).
+   For each constraint $C(\mathbf x)\!=\!0$ solve for Lagrange multiplier λ
+   
+   $$ \Delta\mathbf x = -\frac{C + \alpha\,\lambda^{old}}{\sum w_i\,|\nabla\!C_i|^{2}+\alpha}\,\nabla\!C, \quad \alpha = \frac{\text{compliance}}{\Delta t^{2}}. $$
+
+3. **Update velocities** – $\mathbf v = (\mathbf x^{new}-\mathbf x^{old})/\Delta t$.
 
 ### 4.2 Supported constraints
 
@@ -104,17 +101,18 @@ Each Newton step solves \(\mathbf H\,\delta \mathbf x = -\mathbf r\) with PCG; \
 
 ### 5.1 Kernels
 
-Cubic spline kernel \(W(r,h)\) and gradient \(\nabla W\) with support radius \(h=\) `_support_radius`.
+Cubic spline kernel $W(r,h)$ and gradient $\nabla W$ with support radius $h=$ `_support_radius`.
 
 ### 5.2 Weakly Compressible SPH (WCSPH)
 
-* Equation of state: \(p_i = k\bigl[(\rho_i/\rho_0)^{\gamma}-1\bigr]\).
+* Equation of state: $p_i = k\bigl[(\rho_i/\rho_0)^{\gamma}-1\bigr]$.
 * Momentum equation:
-  \[ \frac{d\mathbf v_i}{dt} = -\sum_j m_j \left( \frac{p_i}{\rho_i^2} + \frac{p_j}{\rho_j^2} \right) \nabla W_{ij} + \mathbf g + \mathbf f_{visc} + \mathbf f_{surf}. \]
+  
+  $$ \frac{d\mathbf v_i}{dt} = -\sum_j m_j \left( \frac{p_i}{\rho_i^2} + \frac{p_j}{\rho_j^2} \right) \nabla W_{ij} + \mathbf g + \mathbf f_{visc} + \mathbf f_{surf}. $$
 
 ### 5.3 Divergence-free SPH (DFSPH)
 
-* Splits solve into **divergence pass** (enforce \(\nabla\!\cdot\mathbf v = 0\)) and **density pass** (enforce \(\rho\!=\!\rho_0\)).
+* Splits solve into **divergence pass** (enforce $\nabla\!\cdot\mathbf v = 0$) and **density pass** (enforce $\rho\!=\!\rho_0$).
 * Both passes iteratively compute per-particle pressure coefficient κ with Jacobi iterations using the *DFSPh factor* field.
 * Ensures incompressibility with bigger time-steps than WCSPH.
 
@@ -128,5 +126,3 @@ Cubic spline kernel \(W(r,h)\) and gradient \(\nabla W\) with support radius \(h
 * Macklin, M. et al. "Position Based Fluids", SIGGRAPH 2013.
 * Bender, J. et al. "Position Based Dynamics", 2014.
 * Bavo et al. "Divergence-Free SPH", Eurographics 2015.
-
-*Last updated: {{ date }}* 

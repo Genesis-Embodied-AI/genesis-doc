@@ -8,64 +8,35 @@ Genesis follows a **quadratic penalty formulation** very similar to that used by
 
 Let
 
-* **q** – joint configuration (generalised positions)
-* **\(\dot q\)** – generalised velocities
-* **a = \ddot q** – the unknown **generalised accelerations** to be solved for each sub-step
-* **M(q)** – joint-space mass matrix (positive definite)
-* **\tau\_ext** – all external joint forces **already known** (actuation, gravity, hydrodynamics …)
-* **J c = 0** – a *stack* of kinematic constraints linearised in acceleration space
-* **D** – diagonal matrix of *softness* / *impedance* parameters per constraint
-* **a\_ref** – reference accelerations that try to restore penetrations or satisfy motors
+* $q$ – joint configuration (generalised positions)
+* **\dot q** – generalised velocities
+* $a = \ddot q$ – the unknown **generalised accelerations** to be solved for each sub-step
+* $M(q)$ – joint-space mass matrix (positive definite)
+* $\tau_{ext}$ – all external joint forces **already known** (actuation, gravity, hydrodynamics …)
+* $J $ – a *stack* of kinematic constraints linearised in acceleration space
+* $D$ – diagonal matrix of *softness* / *impedance* parameters per constraint
+* $a_{ref}$ – reference accelerations that try to restore penetrations or satisfy motors
 
 We seek the acceleration that minimises the **quadratic cost**
 
-\[
-    \frac12 (M a \,{-}\, \tau\_{ext})^{\!T} (a \,{-}\, a^{\text{prev}}) 
+$$
+    \frac12 (M a \,{-}\, \tau_{ext})^{\!T} (a \,{-}\, a^{\text{prev}}) 
     \;{+}\;
-    \frac12 (J a \,{-}\, a\_{ref})^{\!T} D (J a \,{-}\, a\_{ref})
-\]
+    \frac12 (J a \,{-}\, a_{ref})^{\!T} D (J a \,{-}\, a_{ref})
+$$
 
-subject to inequality constraints that keep contact impulses *repulsive* and friction forces inside the Coulomb cone.  Setting the gradient of this functional to zero yields the *Karush-Kuhn-Tucker* system usually written as
-
-\[
-    \begin{bmatrix}
-        M & J^T \\
-        J & -D^{-1}
-    \end{bmatrix}
-    \begin{bmatrix}
-        a \\
-        \lambda
-    \end{bmatrix}
-    =
-    \begin{bmatrix}
-        \tau\_{ext} \\
-        a\_{ref}
-    \end{bmatrix}
-    ,
-\]
-
-where **λ** are the Lagrange multipliers (constraint forces).
-
-Because **D** is diagonal and positive, the lower-right block is an inexpensive *soft* approximation of the true complementarity conditions, allowing us to solve the system with smooth optimisation techniques rather than a full LCP.
 
 ---
 
 ## 2. Contact & friction model
 
-For every **contact pair** Genesis creates *five* constraints:
+For every **contact pair** Genesis creates four constraints, which are the basis of the friction pyramid. Mathematically each direction **tᵢ** is
 
-1. **One normal constraint** to keep bodies apart.
-2. **Four tangential constraints** that approximate the Coulomb friction cone by a **pyramid** (two orthonormal directions **d₁**, **d₂** and both their negations).
-
-Mathematically each tangential direction **tᵢ** is
-
-\[
+$$
     \mathbf t\_i = \pm d_1\,\mu - \mathbf n \quad\text{or}\quad \pm d_2\,\mu - \mathbf n ,
-\]
+$$
 
-so that a positive multiplier on **tᵢ** produces a force that lies *inside* the cone \(|\mathbf f_t| \le \mu f_n\).  A diagonal entry **Dᵢ** proportional to the combined inverse mass gives the familiar *soft-constraint* behaviour where larger *imp* (implicitness) values lead to stiffer contacts.
-
-Because all directions are linear the contact block contributes a **rank-5 outer product** \(J^T D J\) to the Newton Hessian.
+so that a positive multiplier on **tᵢ** produces a force that lies *inside* the cone $|\mathbf f_t| \le \mu f_n$.  A diagonal entry **Dᵢ** proportional to the combined inverse mass gives the familiar *soft-constraint* behaviour where larger *imp* (implicitness) values lead to stiffer contacts.
 
 ---
 
@@ -73,15 +44,15 @@ Because all directions are linear the contact block contributes a **rank-5 outer
 
 Revolute and prismatic joints optionally carry a **lower** and **upper** position limit.  Whenever the signed distance to a limit becomes negative
 
-\[ \phi = q - q\_{min} < 0 \quad\text{or}\quad \phi = q\_{max} - q < 0 \]
+$$ \phi = q - q_{min} < 0 \quad\text{or}\quad \phi = q_{max} - q < 0 $$
 
 a *single* 1-DOF constraint is spawned with Jacobian
 
-\[ J = \pm 1 \]
+$$ J = \pm 1 $$
 
 and reference acceleration
 
-\[ a\_{ref} = k\,\phi + c \,\dot q, \]
+$$ a_{ref} = k\,\phi + c \,\dot q, $$
 
 obtained from the scalar `sol_params` (spring-damper style softness).  The diagonal entry of **D** once again scales with the inverse joint inertia.
 
@@ -129,11 +100,9 @@ Warm-starting is supported by initialising from the previous sub-step's smoothed
 
 ## 6. Practical implications
 
-* **Stability** – because constraints are *implicit* in acceleration space the model handles large time-steps robustly, similar to MuJoCo.
+* **Stability** – because constraints are *implicit* in acceleration space the model handles larger time-steps, similar to MuJoCo.
 * **Friction anisotropy** – replacing the cone by a pyramid introduces slight anisotropy.  Increasing the number of directions would reduce this but cost more.
-* **Softness** – tuning `imp` lets you trade constraint stiffness against numerical conditioning.  Values near 1 are stiff but may slow convergence.
-* **Choosing a solver** – use *CG* for scenes with thousands of DOFs or when memory is tight; switch to *Newton* when you need very high accuracy or when the DOF count is moderate (<200).
+* **Softness** – tuning `imp` and `timeconst` lets you trade constraint stiffness against numerical conditioning.  Values near 1 are stiff but may slow convergence.
+* **Choosing a solver** – use *CG* for scenes with thousands of DOFs or when memory is tight; switch to *Newton* when you need very high accuracy or when the DOF count is moderate (<100).
 
 ---
-
-*Last updated: {{ date }}* 

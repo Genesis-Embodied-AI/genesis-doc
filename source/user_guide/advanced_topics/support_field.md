@@ -1,4 +1,4 @@
-# 🚀 Support Field – Pre-computed Support Mapping
+# 🚀 Support Field 
 
 Collision detection for convex shapes in Genesis relies heavily on *support functions*.  Every iteration of the Minkowski Portal Refinement (MPR) algorithm asks questions of the form:
 
@@ -12,7 +12,7 @@ A naïve implementation has to iterate over all vertices every time – wasteful
 
 1. **Uniform Direction Grid**  –  The sphere is discretised into `support_res × support_res` directions using longitude/latitude (`θ`, `ϕ`).  By default `support_res = 180`, giving ≈32 k sample directions.
 2. **Offline Projection**      –  For each direction we project *all* vertices and remember the index with the largest dot-product.  The resulting arrays are:
-   * `support_v   ∈ ℝ^{N_dir×3}` – the actual vertex positions in *object space*.
+   * `support_v ∈ ℝ^{N_dir×3}` – the actual vertex positions in *object space*.
    * `support_vid ∈ ℕ^{N_dir}`   – original vertex indices (useful to warm-start SDF queries).
    * `support_cell_start[i_g]`   – prefix-sum offset into the flattened arrays per geometry.
 3. **Taichi Fields** – The arrays are copied into GPU-resident Taichi fields so that kernels can access them without host round-trips.
@@ -47,8 +47,7 @@ The above gives you the extreme point in world-space for any query direction in 
 ## Limitations & Future Work
 
 * The direction grid is isotropic but not adaptive – features smaller than the angular cell size may map to the wrong vertex.
-* For extremely high-poly meshes a BVH might become more memory-efficient.
-* The current implementation uses single precision on GPU even when the solver runs in double – an option to switch would be trivial.
+* Preprocessing and memory consumption would be expensive if the number of geometry is large in a scene.
 
 ---
 
