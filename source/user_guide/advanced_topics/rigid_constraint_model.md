@@ -1,4 +1,4 @@
-# 🔗 Rigid-Body Constraint Model
+# 🔗 Rigid Collision Resolution
 
 Genesis follows a **quadratic penalty formulation** very similar to that used by [MuJoCo](https://mujoco.readthedocs.io/) for enforcing rigid–body constraints.  This document summarises the mathematics and physical interpretation of the model.
 

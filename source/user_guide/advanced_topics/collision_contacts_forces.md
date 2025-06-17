@@ -1,4 +1,4 @@
-# 💥 Collision, Contacts & Forces
+# 💥 Rigid Collision Detection
 
 Genesis provides a highly-efficient, feature-rich collision detection and contact generation pipeline for rigid bodies.  The Python implementation lives in `genesis/engine/solvers/rigid/collider_decomp.py`.  This page gives a *conceptual* overview of the algorithmic building blocks so that you can understand, extend or debug the code.
 
