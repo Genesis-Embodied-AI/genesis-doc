@@ -208,3 +208,21 @@ Genesis tries EGL rendering by default, so in most environments you don’t need
     ```bash
     export LIBGL_ALWAYS_SOFTWARE=1
     ```
+
+### [Ubuntu VM on Windows 11 via WSL2] Taichi and Genesis do not find cudalib.so and falls back to CPU
+
+After installing Pytorch and Genesis, Taichi falls back to CPU, while torch initalizes okay on CUDA.
+
+Symptoms: 
+
+- running `python -c "import torch; print(torch.zeros((3,), device='cuda'))"` outputs `tensor([0., 0., 0.], device='cuda:0')`
+- but running `python -c "import taichi as ti; ti.init(arch=ti.gpu)"` outputs something like
+    ```
+    [W 06/18/25 12:47:56.784 14507] [cuda_driver.cpp:load_lib@36] libcuda.so lib not found.
+    [Taichi] Starting on arch=vulkan
+    ```
+
+Fix:
+
+- check if libcuda.so and other cuda libraries are in the lib folder with `ls /usr/lib/wsl/lib/`
+- if so, update the library path with `export LD_LIBRARY_PATH=/usr/lib/wsl/lib:$LD_LIBRARY_PATH`
