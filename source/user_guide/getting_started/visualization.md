@@ -293,9 +293,9 @@ Images will be generated in `img_output`
 
 2. To use ray tracer, change the `use_rasterizer=False` in `single_franka_batch_render.py`
 ```
-        renderer = gs.options.renderers.BatchRenderer(
-            use_rasterizer=True,
-        )
+renderer = gs.options.renderers.BatchRenderer(
+    use_rasterizer=True,
+)
 ```
 
 ### Training
