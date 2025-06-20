@@ -108,7 +108,7 @@ In addition, for training locomotion tasks, we support various types of built-in
 We support loading from external files with different formats including :
 - `gs.morphs.MJCF`: mujoco `.xml` robot configuration files
 - `gs.morphs.URDF`: robot description files that end with `.urdf` (Unified Robotics Description Format)
-- `gs.morphs.Mesh`: non-articulated mesh assets, supporting extensions including: `*.obj`, `*.ply`, `*.stl`, `*.glb`, `*.gltf`
+- `gs.morphs.Mesh`: non-articulated mesh assets, supporting extensions including: `*.obj`, `*.ply`, `*.stl`, `*.glb`, `*.gltf`, `*.usd`
 
 
 When loading from external files, you need to specify the file location using the `file` parameter. When parsing this, we support both *absolute* and *relative* file path. Note that since genesis also comes with an internal asset directory (`genesis/assets`), so if a relative path is used, we search not only relative path with respect to your current working directory, but also under `genesis/assets`. Therefore, in this example, we will retrieve the franka model from: `genesis/assets/xml/franka_emika_panda/panda.xml`.

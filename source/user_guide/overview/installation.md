@@ -34,7 +34,7 @@ Supported features on various systems are as follows:
 If you are using Genesis with CUDA, make sure appropriate nvidia-driver is installed on your machine.
 :::
 
-## (Optional) Surface reconstruction
+## (Optional) Surface Reconstruction
 If you need fancy visuals for visualizing particle-based entities (fluids, deformables, etc.), you typically need to reconstruct the mesh surface using the internal particle-based representation. We provide two options for this purpose:
 
 1. [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf), a state-of-the-art surface reconstruction method for achieving this:
@@ -50,6 +50,16 @@ If you need fancy visuals for visualizing particle-based entities (fluids, defor
 ## (Optional) Ray Tracing Renderer
 
 If you need photo-realistic visuals, Genesis has a built-in a ray-tracing (path-tracing) based renderer developped using [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain specific language designed for rendering. See [Visualization & Rendering](../getting_started/visualization.md) for setup.
+
+## (Optional) USD Assets 
+
+If you need load USD assets as `gs.morphs.Mesh` into Genesis scene, you need to install the dependencies through:
+```bash
+pip install -e .[usd]
+# Omniverse kit is used for USD material baking. Only available for Python 3.10 and GPU backend now.
+# If USD baking is disabled, Genesis only parses materials of "UsdPreviewSurface".
+pip install --extra-index-url https://pypi.nvidia.com/ omniverse-kit
+```
 
 ## Troubleshooting
 
