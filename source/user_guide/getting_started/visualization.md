@@ -252,10 +252,6 @@ Install CMake if your local version does not meet the required version. We use `
 sudo snap install cmake --classic
 cmake --version
 ```
-Install dependencies,
-```bash
-sudo apt install libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev mesa-common-dev
-```
 
 If you do not have sudo, the following commands also install the required dependencies in your conda environments:
 ```bash
