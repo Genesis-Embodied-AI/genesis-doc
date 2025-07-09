@@ -92,7 +92,8 @@ contacts (`_n_contacts_per_pair = 5`) are stored per pair.
 #### 3.1.2. MPR
 
 MPR is another contact detection algorithm widely adopted in physics engines. It shares most of the advantages of GJK,
-and is robust for deep penetration. However, it does not give separation distance when the geometries are not colliding.
+and is robust for deep penetration. However, it does not give separation distance when the geometries are not colliding,
+and could be susceptible to numerical errors and degeneracies as it is not verified as much as GJK in many implementations.
 
 In Genesis, MPR is improved with a signed-distance-field fall-back when there is a deep penetration.
 
