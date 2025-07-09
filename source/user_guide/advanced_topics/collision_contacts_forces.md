@@ -11,8 +11,8 @@ Genesis provides a highly-efficient, feature-rich collision detection and contac
 The whole procedure can be seen as three successive stages:
 
 1. **AABB Update** – update world–space Axis-Aligned Bounding Boxes for every geometry.
-2. **Broad Phase (Sweep-and-Prune)** – quickly reject obviously non-intersecting geom pairs based AABB and output *possible* collision pairs.
-3. **Narrow Phase** – robustly compute the actual contact manifold (normal, penetration depth, position, etc.) for every surviving pair using primitive-spcific algoirithm, SDF, or MPR.
+2. **Broad Phase (Sweep-and-Prune)** – quickly reject obviously non-intersecting geom pairs based on AABB and output *possible* collision pairs.
+3. **Narrow Phase** – robustly compute the actual contact manifold (normal, penetration depth, position, etc.) for every surviving pair using primitive-spcific algoirithm, SDF, MPR, or GJK.
 
 `Collider` orchestrates all three stages through the public `detection()` method:
 
@@ -57,25 +57,48 @@ The surviving pairs are stored in `broad_collision_pairs` and `n_broad_pairs`.
 
 ## 3&nbsp;· Narrow Phase – Contact Manifold Generation
 
-The narrow phase is split into three specialised kernels:
+The narrow phase is split into four specialised kernels:
 
 | Kernel | When it runs | Purpose |
 |--------|--------------|---------|
-| `_func_narrow_phase_terrain` | at least one geometry is a *height-field terrain* | generate multiple contact points per supporting cell.
-| `_func_narrow_phase` | convex–convex & plane–anything | Default path using **MPR** (Minkowski Portal Refinement) with fall-back to signed-distance-field queries.
-| `_func_narrow_phase_nonconvex_nonterrain` | at least one geometry is **non-convex** | Handles mesh ↔ convex or mesh ↔ mesh collisions via SDF vertex/edge sampling.
+| `_func_narrow_phase_convex_vs_convex` | general convex–convex & plane-convex | Default path using **MPR** (Minkowski Portal Refinement) with fall-back to signed-distance-field queries. Use **GJK** algorithm when `use_gjk_collision` option in `RigidOptions` is set to be `True`.
+| `_func_narrow_phase_convex_specializations` | plane-box & box-box | Specialized handlers for a pair of convex geometries that have analytic solutions.
+| `_func_narrow_phase_any_vs_terrain` | at least one geometry is a *height-field terrain* | Generate multiple contact points per supporting cell.
+| `_func_narrow_phase_nonconvex_vs_nonterrain` | at least one geometry is **non-convex** | Handles mesh ↔ convex or mesh ↔ mesh collisions via SDF vertex/edge sampling.
 
-### 3.1&nbsp; Convex–Convex via MPR
+### 3.1&nbsp; Convex–Convex 
 
-MPR is favoured because it is:
+#### 3.1.1. GJK
 
-* Robust for deep penetration.
+GJK, along with EPA, is a widely used contact detection algorithm in many physics engines, as it has following advantages:
+
 * Runs entirely on the GPU thanks to branch-free support-mapping primitives.
 * Requires only a *support function* per shape – no face adjacency or feature cache.
+* Gives seperation distance when the geometries are not in contact.
+* Verified numerical robustness in many implementations.
+
+In Genesis, it is enabled when `use_gjk_collision` option in `RigidOptions` is set to be `True`. Also, Genesis enhances 
+the robustness of GJK with following measures.
+
+* Thorough degeneracy check on simplex and polytope during runtime.
+* Robust face normal estimation.
+* Robust lower and upper bound estimation on the penetration depth.
 
 Genesis accelerates support queries with a **pre-computed Support Field** (see {doc}`Support Field <support_field>`).
 
-Multi-contact generation is enabled by *small pose perturbations* around the first contact normal.  At most five contacts (`_n_contacts_per_pair = 5`) are stored per pair.
+Multi-contact generation is enabled by *small pose perturbations* around the first contact normal.  At most five 
+contacts (`_n_contacts_per_pair = 5`) are stored per pair.
+
+#### 3.1.2. MPR
+
+MPR is another contact detection algorithm widely adopted in physics engines. Even though it shares most of the advantages 
+of GJK, it does not give separation distance when the geometries are not colliding, and could be susceptible to numerical 
+errors and degeneracies as it is not verified as much as GJK in many implementations.
+
+In Genesis, MPR is improved with a signed-distance-field fall-back when there is a deep penetration.
+
+As GJK, Genesis accelerates support queries of MPR with a pre-computed Support Field, and detect multiple contacts with
+small pose perturbations around the first contact normal. Thus, at most five contacts (`_n_contacts_per_pair = 5`) are stored per pair.
 
 ### 3.2&nbsp; Non-convex Objects
 
