@@ -68,30 +68,35 @@ The narrow phase is split into four specialised kernels:
 
 ### 3.1&nbsp; Convex–Convex 
 
-#### 3.1.1. MPR
-
-MPR is favoured because it is:
-
-* Robust for deep penetration.
-* Runs entirely on the GPU thanks to branch-free support-mapping primitives.
-* Requires only a *support function* per shape – no face adjacency or feature cache.
-
-Genesis accelerates support queries with a **pre-computed Support Field** (see {doc}`Support Field <support_field>`).
-
-Multi-contact generation is enabled by *small pose perturbations* around the first contact normal.  At most five contacts (`_n_contacts_per_pair = 5`) are stored per pair.
-
 #### 3.1.1. GJK
 
-GJK shares the same advantages of MPR, and thus is widely used in physics engines. In Genesis, it is enabled
-when `use_gjk_collision` option in `RigidOptions` is set to be `True`.
+GJK, along with EPA, is a widely used contact detection algorithm in many physics engines, as it has following advantages:
 
-Genesis enhances the robustness of GJK with following measures.
+* Runs entirely on the GPU thanks to branch-free support-mapping primitives.
+* Requires only a *support function* per shape – no face adjacency or feature cache.
+* Gives seperation distance when the geometries are not in contact.
+* Verified numerical robustness in many implementations.
+
+In Genesis, it is enabled when `use_gjk_collision` option in `RigidOptions` is set to be `True`. Also, Genesis enhances 
+the robustness of GJK with following measures.
 
 * Thorough degeneracy check on simplex and polytope during runtime.
 * Robust face normal estimation.
 * Robust lower and upper bound estimation on the penetration depth.
 
-As MPR, Genesis accelerates support queries with a pre-computed Support Field, and detect multiple contacts with
+Genesis accelerates support queries with a **pre-computed Support Field** (see {doc}`Support Field <support_field>`).
+
+Multi-contact generation is enabled by *small pose perturbations* around the first contact normal.  At most five 
+contacts (`_n_contacts_per_pair = 5`) are stored per pair.
+
+#### 3.1.2. MPR
+
+MPR is another contact detection algorithm widely adopted in physics engines. It shares most of the advantages of GJK,
+and is robust for deep penetration. However, it does not give separation distance when the geometries are not colliding.
+
+In Genesis, MPR is improved with a signed-distance-field fall-back when there is a deep penetration.
+
+As GJK, Genesis accelerates support queries of MPR with a pre-computed Support Field, and detect multiple contacts with
 small pose perturbations around the first contact normal. Thus, at most five contacts (`_n_contacts_per_pair = 5`) are stored per pair.
 
 ### 3.2&nbsp; Non-convex Objects
