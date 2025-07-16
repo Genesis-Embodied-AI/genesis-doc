@@ -59,6 +59,9 @@ pip install -e .[usd]
 # Omniverse kit is used for USD material baking. Only available for Python 3.10 and GPU backend now.
 # If USD baking is disabled, Genesis only parses materials of "UsdPreviewSurface".
 pip install --extra-index-url https://pypi.nvidia.com/ omniverse-kit
+# To use USD baking, you should set environment variable `OMNI_KIT_ACCEPT_EULA` to accept the EULA.
+# This is a one-time operation, if accepted, it will not ask again.
+export OMNI_KIT_ACCEPT_EULA=yes
 ```
 
 ## Troubleshooting
