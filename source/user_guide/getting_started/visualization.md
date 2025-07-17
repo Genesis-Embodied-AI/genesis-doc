@@ -233,31 +233,9 @@ Get submodules, specifically `genesis/ext/gs-madrona`.
 git submodule update --init --recursive
 ```
 
-### Setup build environment
-
-Install/upgrade g++ and gcc (to) version >= 11.
-```bash
-sudo apt install build-essential manpages-dev software-properties-common
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-sudo apt update && sudo apt install gcc-11 g++-11
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 110
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110
-
-# verify version
-g++ --version
-gcc --version
-```
-Install CMake if your local version does not meet the required version. We use `snap` instead of `apt` because we need CMake version >= 3.26. However, remember to use the correct cmake. You may have `/usr/local/bin/cmake` but the `snap` installed package is at `/snap/bin/cmake` (or `/usr/bin/snap`). Please double check the order of binary path via `echo $PATH`.
-```bash
-sudo snap install cmake --classic
-cmake --version
-```
-
-If you do not have sudo, the following commands also install the required dependencies in your conda environments:
-```bash
-conda install -c conda-forge gcc=11.4 gxx=11.4 
-conda install -c conda-forge cmake=3.26.1
-conda install -c conda-forge vulkan-tools vulkan-headers xorg-xproto # Vulkan, X11 & RandR
+### Setup build environment (Ubuntu only)
+**OS requirement:** Ubuntu 22.04 or higher
+sudo apt install vulkan-tools vulkan-headers
 ```
 
 ### Build gs-madrona
