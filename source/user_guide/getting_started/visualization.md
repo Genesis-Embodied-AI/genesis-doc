@@ -218,9 +218,9 @@ You should be able to get
 ```{figure} ../../_static/images/raytracing_demo.png
 ```
 
-## Batch rendering with Madrona
+## Batch rendering with gs-madrona
 
-Genesis provides a high-throughput batch rendering backend powered with Madrona. You can easily switch to using this backend by setting `renderer=gs.renderers.BatchRenderer(use_rasterizer=True/False)`
+Genesis provides a high-throughput batch rendering backend via gs-madrona. You can easily switch to gs-madrona backend by setting `renderer=gs.renderers.BatchRenderer(use_rasterizer=True/False)`
 
 ### Setup repo
 
@@ -235,7 +235,7 @@ git submodule update --init --recursive
 
 ### Setup build environment
 
-Install/upgrad g++ and gcc (to) version >= 11.
+Install/upgrade g++ and gcc (to) version >= 11.
 ```bash
 sudo apt install build-essential manpages-dev software-properties-common
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -260,7 +260,7 @@ conda install -c conda-forge cmake=3.26.1
 conda install -c conda-forge vulkan-tools vulkan-headers xorg-xproto # Vulkan, X11 & RandR
 ```
 
-### Build Madrona
+### Build gs-madrona
 1. Install the following libraries:
 `sudo apt install libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev mesa-common-dev`
 
@@ -290,14 +290,8 @@ Images will be generated in `img_output`
 2. To use ray tracer, change the `use_rasterizer=False` in `single_franka_batch_render.py`
 ```
 renderer = gs.options.renderers.BatchRenderer(
-    use_rasterizer=True,
+    use_rasterizer=False,
 )
-```
-
-### Training
-1. In `Genesis`, run
-```
-python examples/rigid/batch_render_with_ppo.py
 ```
 
 ### FAQ
