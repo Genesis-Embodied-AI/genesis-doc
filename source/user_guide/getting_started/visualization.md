@@ -218,6 +218,60 @@ You should be able to get
 ```{figure} ../../_static/images/raytracing_demo.png
 ```
 
+## Batch rendering with gs-madrona
+
+Genesis provides a high-throughput batch rendering backend via gs-madrona. You can easily switch to gs-madrona backend by setting `renderer=gs.renderers.BatchRenderer(use_rasterizer=True/False)`
+
+### Setup repo
+
+Tested on
+- Ubuntu 22.04, CUDA 12.8, python 3.10
+
+Get submodules, specifically `genesis/ext/gs-madrona`.
+```bash
+# inside Genesis/
+git submodule update --init --recursive
+```
+
+### Setup build environment (Ubuntu only)
+**OS requirement:** Ubuntu 22.04 or higher
+```bash
+sudo apt install vulkan-tools vulkan-headers
+```
+
+### Build gs-madrona
+1. Install the following libraries:
+`sudo apt install x11proto-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev mesa-common-dev`
+
+2. Install **CUDA Toolkit** by following the [official instructions](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_network). 
+This page provides the instructions to install the latest CUDA Toolkit, but please make sure to make changes to the install instructions to install the same version that is being used by the currently installed pytorch, otherwise you may encounter NVRTC JIT compiling issue.
+
+3. Build & Install
+```sh
+cd genesis/ext/gs-madrona
+mkdir build
+cd build
+cmake ..
+make -j
+cd ..
+pip install -e .
+cd ..
+```
+
+### Render
+1. In `Genesis`, run
+```
+python examples/rigid/single_franka_batch_render.py
+```
+
+Images will be generated in `img_output`
+
+2. To use ray tracer, change the `use_rasterizer=False` in `single_franka_batch_render.py`
+```
+renderer = gs.options.renderers.BatchRenderer(
+    use_rasterizer=False,
+)
+```
 
 ### FAQ
 - Installed libraries still undetected when running `cmake -S . -B build`,
