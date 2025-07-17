@@ -235,6 +235,7 @@ git submodule update --init --recursive
 
 ### Setup build environment (Ubuntu only)
 **OS requirement:** Ubuntu 22.04 or higher
+```bash
 sudo apt install vulkan-tools vulkan-headers
 ```
 
