@@ -22,6 +22,7 @@ getting_started/parallel_simulation
 getting_started/inverse_kinematics_motion_planning
 getting_started/advanced_ik
 getting_started/beyond_rigid_bodies
+getting_started/sensors
 getting_started/interactive_debugging
 getting_started/locomotion
 getting_started/hover_env
