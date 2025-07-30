@@ -222,70 +222,32 @@ You should be able to get
 
 Genesis provides a high-throughput batch rendering backend via gs-madrona. You can easily switch to gs-madrona backend by setting `renderer=gs.renderers.BatchRenderer(use_rasterizer=True/False)`
 
-### Setup repo
+### Pre-requisite
+Please first install the latest version of Genesis to date following the [official README instructions](https://github.com/Genesis-Embodied-AI/Genesis#quick-installation).
 
-Tested on
-- Ubuntu 22.04, CUDA 12.8, python 3.10
-
-Get submodules, specifically `genesis/ext/gs-madrona`.
-```bash
-# inside Genesis/
-git submodule update --init --recursive
-```
-
-### Setup build environment
-
-Install/upgrade g++ and gcc (to) version >= 11.
-```bash
-sudo apt install build-essential manpages-dev software-properties-common
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-sudo apt update && sudo apt install gcc-11 g++-11
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 110
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110
-
-# verify version
-g++ --version
-gcc --version
-```
-Install CMake if your local version does not meet the required version. We use `snap` instead of `apt` because we need CMake version >= 3.26. However, remember to use the correct cmake. You may have `/usr/local/bin/cmake` but the `snap` installed package is at `/snap/bin/cmake` (or `/usr/bin/snap`). Please double check the order of binary path via `echo $PATH`.
-```bash
-sudo snap install cmake --classic
-cmake --version
-```
-
-If you do not have sudo, the following commands also install the required dependencies in your conda environments:
-```bash
-conda install -c conda-forge gcc=11.4 gxx=11.4 
-conda install -c conda-forge cmake=3.26.1
-conda install -c conda-forge vulkan-tools vulkan-headers xorg-xproto # Vulkan, X11 & RandR
-```
-
-### Build gs-madrona
-1. Install the following libraries:
-`sudo apt install libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev mesa-common-dev`
-
-2. Install **CUDA Toolkit** by following the [official instructions](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_network). 
-This page provides the instructions to install the latest CUDA Toolkit, but please make sure to make changes to the install instructions to install the same version that is being used by the currently installed pytorch, otherwise you may encounter NVRTC JIT compiling issue.
-
-3. Build & Install
+### Easy install (x86 only)
+Pre-compiled binary wheels for Python>=3.10 are available on PyPI. They can be installed using any Python package manager (e.g. `uv` or `pip`):
 ```sh
-cd genesis/ext/gs-madrona
-mkdir build
-cd build
-cmake ..
-make -j
-cd ..
-pip install -e .
-cd ..
+pip install gs-madrona
 ```
 
-### Render
-1. In `Genesis`, run
-```
-python examples/rigid/single_franka_batch_render.py
+### Build from source
+```sh
+pip install .
 ```
 
-Images will be generated in `img_output`
+### Testing (Optional)
+1. Clone Genesis Simulator repository if not already done
+```sh
+git clone https://github.com/Genesis-Embodied-AI/Genesis.git
+```
+
+2. Run the following example script provided with Genesis
+```sh
+python Genesis/examples/rigid/single_franka_batch_render.py
+```
+
+All the generated images will be stored in the current directory under `./image_output`.
 
 2. To use ray tracer, change the `use_rasterizer=False` in `single_franka_batch_render.py`
 ```
