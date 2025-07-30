@@ -218,6 +218,43 @@ You should be able to get
 ```{figure} ../../_static/images/raytracing_demo.png
 ```
 
+## Batch rendering with gs-madrona
+
+Genesis provides a high-throughput batch rendering backend via gs-madrona. You can easily switch to gs-madrona backend by setting `renderer=gs.renderers.BatchRenderer(use_rasterizer=True/False)`
+
+### Pre-requisite
+Please first install the latest version of Genesis to date following the [official README instructions](https://github.com/Genesis-Embodied-AI/Genesis#quick-installation).
+
+### Easy install (x86 only)
+Pre-compiled binary wheels for Python>=3.10 are available on PyPI. They can be installed using any Python package manager (e.g. `uv` or `pip`):
+```sh
+pip install gs-madrona
+```
+
+### Build from source
+```sh
+pip install .
+```
+
+### Testing (Optional)
+1. Clone Genesis Simulator repository if not already done
+```sh
+git clone https://github.com/Genesis-Embodied-AI/Genesis.git
+```
+
+2. Run the following example script provided with Genesis
+```sh
+python Genesis/examples/rigid/single_franka_batch_render.py
+```
+
+All the generated images will be stored in the current directory under `./image_output`.
+
+2. To use ray tracer, change the `use_rasterizer=False` in `single_franka_batch_render.py`
+```
+renderer = gs.options.renderers.BatchRenderer(
+    use_rasterizer=False,
+)
+```
 
 ### FAQ
 - Installed libraries still undetected when running `cmake -S . -B build`,
