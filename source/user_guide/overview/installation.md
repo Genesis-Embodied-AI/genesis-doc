@@ -1,6 +1,6 @@
 # 🛠️ Installation
 ## Prerequisites
-* **Python**: >=3.10,<3.13
+* **Python**: >=3.10,<3.14
 * **OS**: Linux (*recommended*) / MacOS / Windows
 
 :::{note}
@@ -35,13 +35,7 @@ If you are using Genesis with CUDA, make sure appropriate nvidia-driver is insta
 :::
 
 ## (Optional) Surface Reconstruction
-If you need fancy visuals for visualizing particle-based entities (fluids, deformables, etc.), you typically need to reconstruct the mesh surface using the internal particle-based representation. We provide two options for this purpose:
-
-1. [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf), a state-of-the-art surface reconstruction method for achieving this:
-    ```bash
-    cargo install splashsurf
-    ```
-2. ParticleMesher, our own openVDB-based surface reconstruction tool (faster but with not as smooth):
+If you need fancy visuals for visualizing particle-based entities (fluids, deformables, etc.), you typically need to reconstruct the mesh surface using the internal particle-based representation. For this purpose, [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf), a state-of-the-art surface reconstruction, is supported out-of-the-box. Alternatively, we also provide `ParticleMesher`, our own openVDB-based surface reconstruction tool, which is faster but lower quantity:
     ```bash
     echo "export LD_LIBRARY_PATH=${PWD}/ext/ParticleMesher/ParticleMesherPy:$LD_LIBRARY_PATH" >> ~/.bashrc
     source ~/.bashrc
@@ -68,18 +62,7 @@ export OMNI_KIT_ACCEPT_EULA=yes
 
 ### Import error
 
-Python would fail to (circular) import Genesis if the current directory is the source directory of Genesis. Traceback may look like this:
-    ```python
-    from . import _replay
-    ImportError: cannot import name '_replay' from partially initialized module 'genesis.ext.fast_simplification' (most likely due to a circular import) ([...]\site-packages\genesis\ext\fast_simplification\__init__.py)
-    ```
-    or
-    ```python
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ModuleNotFoundError: No module named 'genesis.ext.fast_simplification._replay'
-    ```
-This is likely due to Genesis being installed WITHOUT enabling editable mode, either from PyPI Package Index or from source. The obvious workaround is moving out of the source directory of Genesis before running Python. The long-term solution is simply switching to editable install mode: first uninstall Python package `genesis-world`, then run `pip install -e '.[render]'` inside the source directory of Genesis.
+Python would fail to (circular) import Genesis if the current directory is the source directory of Genesis. This is likely due to Genesis being installed WITHOUT enabling editable mode, either from PyPI Package Index or from source. The obvious workaround is moving out of the source directory of Genesis before running Python. The long-term solution is simply switching to editable install mode: first uninstall Python package `genesis-world`, then run `pip install -e '.[render]'` inside the source directory of Genesis.
 
 ### [Native Ubuntu] Slow Rendering (CPU aka. Software Fallback)
 
