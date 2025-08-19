@@ -130,23 +130,23 @@ We can add "recorders" to any sensor to automatically read and process data with
 
 #### Real-time Data Visualization
 
-Using `LivePlot`, we can visualize the sensor data while the simulation is running.
+Using `PyQtGraphPlotter`, we can visualize the sensor data while the simulation is running.
 Make sure to install [PyQtGraph](https://www.pyqtgraph.org) (`pip install pyqtgraph`)!
 
 ```python
-from genesis.sensors.data_handlers import LivePlot
+from genesis.sensors.data_handlers import PyQtGraphPlotter
 
 ...
 # before scene.build()
 
 imu.add_recorder(
-    handler=LivePlot(title="IMU Accelerometer Measured Data", labels=["acc_x", "acc_y", "acc_z"]),
+    handler=PyQtGraphPlotter(title="IMU Accelerometer Measured Data", labels=["acc_x", "acc_y", "acc_z"]),
     rec_options=gs.options.RecordingOptions(
         preprocess_func=lambda data, ground_truth_data: data["lin_acc"],
     ),
 )
 imu.add_recorder(
-    handler=LivePlot(title="IMU Accelerometer Ground Truth Data", labels=["acc_x", "acc_y", "acc_z"]),
+    handler=PyQtGraphPlotter(title="IMU Accelerometer Ground Truth Data", labels=["acc_x", "acc_y", "acc_z"]),
     rec_options=gs.options.RecordingOptions(
         preprocess_func=lambda data, ground_truth_data: ground_truth_data["lin_acc"],
     ),
