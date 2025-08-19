@@ -1,179 +1,161 @@
-# 🖐️ Sensors
+# 🖲️ Sensors
 
 Robots need sensors to observe the world around them.
 In Genesis, sensors extract information from the scene, computing values using the state of the scene but not affecting the scene itself.
-All sensors have a `read()` function that returns the sensor data.
+All sensors have a `read()` method that returns the measured sensor data and `read_ground_truth()` which returns the ground truth data.
 
-Currently only Camera and rigid tactile sensors are supported, but soft tactile and distance (LiDAR) sensors are coming soon!
+Currently only IMU and rigid tactile sensors are supported, but soft tactile and distance (LiDAR) sensors are coming soon!
 
-## Tactile Hand Example
+## IMU Example
 
-In this tutorial, we'll walk through how to set up tactile sensors on an Allegro robotic hand. We'll add `RigidContactForceGridSensor` to each fingertip to detect contact forces when the hand interacts with objects.
+In this tutorial, we'll walk through how to set up an Inertial Measurement Unit (IMU) sensor on a robotic arm's end-effector. The IMU will measure linear acceleration and angular velocity as the robot traces a circular path, and we'll visualize the data in real-time with realistic noise parameters.
 
-The full example script is available at `examples/sensors/tactile/tactile_fingertips.py`.
+The full example script is available at `examples/sensors/imu.py`.
 
 ### Scene Setup
 
-First, let's create our simulation scene and load the robotic hand:
+First, let's create our simulation scene and load the robotic arm:
 
 ```python
 import genesis as gs
 import numpy as np
 
-gs.init(backend=gs.gpu, logging_level=None)
+gs.init(backend=gs.gpu)
 
-########################## scene setup ##########################
-scene = gs.Scene()
-
-scene.add_entity(gs.morphs.Plane())
-
-# define which fingertips we want to add sensors to
-sensorized_link_names = [
-    "index_3_tip",
-    "middle_3_tip",
-    "ring_3_tip",
-    "thumb_3_tip",
-]
-
-# load the hand .urdf
-hand = scene.add_entity(
-    morph=gs.morphs.URDF(
-        file="allegro_hand/allegro_hand_right_glb.urdf",
-        pos=(0.0, 0.0, 0.1),
-        euler=(0.0, -90.0, 180.0),
-        fixed=True,  # Fix the base so the whole hand doesn't flop on the ground
-        links_to_keep=sensorized_link_names,  # Make sure the links we want to sensorize aren't merged
+########################## create a scene ##########################
+scene = gs.Scene(
+    viewer_options=gs.options.ViewerOptions(
+        camera_pos=(3.5, 0.0, 2.5),
+        camera_lookat=(0.0, 0.0, 0.5),
+        camera_fov=40,
     ),
-    material=gs.materials.Rigid(),
+    sim_options=gs.options.SimOptions(
+        dt=0.01,
+    ),
+    show_viewer=True,
 )
 
-# Some arbitrary objects to interact with the hand: spheres arranged in a circle
-pos_radius = 0.06
-for i in range(10):
-    scene.add_entity(
-        gs.morphs.Sphere(
-            pos=(pos_radius * np.cos(i * np.pi / 5) + 0.02, pos_radius * np.sin(i * np.pi / 5), 0.3 + 0.04 * i),
-            radius=0.02,
-        ),
-        surface=gs.surfaces.Default(
-            color=(0.0, 1.0, 1.0, 0.5),
-        ),
+########################## entities ##########################
+scene.add_entity(gs.morphs.Plane())
+franka = scene.add_entity(
+    gs.morphs.MJCF(file="xml/franka_emika_panda/panda.xml"),
+)
+end_effector = franka.get_link("hand")
+motors_dof = np.arange(7)
+```
+
+Here we set up a basic scene with a Franka robotic arm. The camera is positioned to give us a good view of the robot's workspace, and we identify the end-effector link where we'll attach our IMU sensor.
+
+### Adding the IMU Sensor
+
+We "attach" the IMU sensor onto the entity at the end effector by specifying the `entity_idx` and `link_idx_local`.
+
+```python
+imu = scene.add_sensor(
+    gs.sensors.IMUOptions(
+        entity_idx=franka.idx,
+        link_idx_local=end_effector.idx_local,
+        # sensor characteristics
+        acc_axes_skew=(0.0, 0.01, 0.02),
+        gyro_axes_skew=(0.03, 0.04, 0.05),
+        acc_noise_std=(0.01, 0.01, 0.01),
+        gyro_noise_std=(0.01, 0.01, 0.01),
+        acc_bias_drift_std=(0.001, 0.001, 0.001),
+        gyro_bias_drift_std=(0.001, 0.001, 0.001),
+        delay=0.01,
+        jitter=0.01,
+        interpolate_for_delay=True,
     )
-```
-
-Here we load a robotic hand and specify which fingertip links we want to attach sensors to.
-The `links_to_keep` parameter ensures that the links will not be merged when the URDF is parsed. (Links that are attached with fixed joints are merged to optimize the simulator.)
-
-The small spheres positioned in a circle above the hand will fall down and create contact forces when they hit the fingertips.
-
-
-### Adding the Sensors
-
-```python
-########################## add sensors ##########################
-sensors = []
-for link in hand.links:
-    if link.name in sensorized_link_names:
-        sensor = RigidContactForceGridSensor(entity=hand, link_idx=link.idx, grid_size=(2, 2, 2))
-        sensors.append(sensor)
-
-cam = scene.add_camera(
-    res=(1280, 960),
-    pos=(0.5, 0.7, 0.7),
-    lookat=(0.0, 0.0, 0.1),
-    fov=20,
-    GUI=args.vis,
 )
 ```
 
-The `RigidContactForceGridSensor` takes three parameters:
-- A rigid entity (our hand)
-- The specific link index (fingertip link)
-- The grid dimensions `(2, 2, 2)` specifies the resolution (grid size) of the sensor.
+The `IMUOptions` also has options to configure the following sensor characteristics:
+- `acc_axes_skew` and `gyro_axes_skew` simulate sensor misalignment
+- `acc_noise_std` and `gyro_noise_std` add Gaussian noise to measurements
+- `acc_bias_drift_std` and `gyro_bias_drift_std` simulate gradual sensor drift over time
+- `delay` and `jitter` introduce timing realism
+- `interpolate_for_delay` smooths delayed measurements
 
-Now let's position the hand and run the simulation:
+### Motion Control and Simulation
 
-```python
-########################## build ##########################
-scene.build(n_envs=args.n_envs)
-
-dofs_position = [0.1, 0, -0.1, 0.7, 0.6, 0.6, 0.6, 1.0, 0.65, 0.65, 0.65, 1.0, 0.6, 0.6, 0.6, 0.7]
-if args.n_envs > 0:
-    dofs_position = [dofs_position] * args.n_envs
-hand.set_dofs_position(np.array(dofs_position))
-
-max_observed_force_magnitude = 0.0
-for _ in tqdm(range(steps), total=steps):
-    scene.step()
-
-    for sensor in sensors:
-        grid_forces = sensor.read()  # data shape: [n_envs, grid_x, grid_y, grid_z, 3] where 3 is for force xyz
-        grid_force_magnitudes = np.linalg.norm(grid_forces, axis=-1)
-        max_observed_force_magnitude = max(max_observed_force_magnitude, np.max(grid_force_magnitudes))
-```
-
-Each sensor returns force data with shape `(n_envs, grid_x, grid_y, grid_z, 3)`, where the last dimension contains the 3D force vector `[fx, fy, fz]` at each grid cell.
-
-### Visualization
-
-Curious how it looks?
-Using the force data read by the sensor at each step and applying some transformations, we can visualize the forces the fingertips are feeling!
-
-<video preload="auto" controls="True" width="100%">
-<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/tactile_fingertips.mp4" type="video/mp4">
-</video>
-
-The function `visualize_grid_sensor()` is provided in the full example script, but we don't recommend its usage outside of this demo because it is very inefficient.
-
-Instead, the sensor data can be collected for post-processing outside of the simulation!
-
-## Data Recording
-
-Genesis provides tools to automatically record sensor data.
-
-`SensorDataRecorder` can record multiple sensors at varying rates and save the collected data at once.
+Now let's build the scene and create circular motion to generate interesting IMU readings:
 
 ```python
-from genesis.sensors import SensorDataRecorder, RecordingOptions, NPZFileWriter, VideoFileWriter
-...
+########################## build and control ##########################
+scene.build()
 
-data_recorder = SensorDataRecorder(step_dt=dt)  # step_dt should match simulation dt
-data_recorder.add_sensor(cam, VideoFileWriter(filename="video.mp4", fps=1/dt))  # fps=1/dt for real-time video speed
-data_recorder.add_sensor(sensor, NPZFileWriter(filename="sensor_data.npz"))
+franka.set_dofs_kp(np.array([4500, 4500, 3500, 3500, 2000, 2000, 2000, 100, 100]))
+franka.set_dofs_kv(np.array([450, 450, 350, 350, 200, 200, 200, 10, 10]))
 
-# Run simulation and automatically record all sensor data
-data_recorder.start_recording()
+# Create a circular path for end effector to follow
+circle_center = np.array([0.4, 0.0, 0.5])
+circle_radius = 0.15
+rate = 2 / 180 * np.pi  # Angular velocity in radians per step
+
+def control_franka_circle_path(i):
+    pos = circle_center + np.array([np.cos(i * rate), np.sin(i * rate), 0]) * circle_radius
+    qpos = franka.inverse_kinematics(
+        link=end_effector,
+        pos=pos,
+        quat=np.array([0, 1, 0, 0]),  # Keep orientation fixed
+    )
+    franka.control_dofs_position(qpos[:-2], motors_dof)
+    scene.draw_debug_sphere(pos, radius=0.01, color=(1.0, 0.0, 0.0, 0.5))  # Visualize target
+
+# Run simulation
 for i in range(1000):
     scene.step()
-    data_recorder.step()  # calls read() on each sensor depending on its associated RecordingOptions
-
-data_recorder.stop_recording()
+    control_franka_circle_path(i)
 ```
 
-By default, sensor data is read every step.
-You can specify `RecordingOptions` to adjust the sampling rate.
+The robot traces a horizontal circle while maintaining a fixed orientation. The circular motion creates centripetal acceleration that the IMU will detect, along with any gravitational effects based on the sensor's orientation.
+
+After building the scene, you can access both measured and ground truth IMU data:
 
 ```python
-data_recorder.add_sensor(
-    sensor,
-    RecordingOptions(
-        handler=NPZFileWriter(filename="sensor_data.npz"),
-        hz=60
-    )
+# Access sensor readings
+print("Ground truth data:")
+print(imu.read_ground_truth())
+print("Measured data:")
+print(imu.read())
+```
+
+The IMU returns data in a dictionary format with keys:
+- `"lin_acc"`: Linear acceleration in m/s² (3D vector)
+- `"ang_vel"`: Angular velocity in rad/s (3D vector)
+
+### Data Recording
+
+We can add "recorders" to any sensor to automatically read and process data without slowing down the simulation. This can be used to stream or save formatted data to a file, or visualize the data live!
+
+#### Real-time Data Visualization
+
+Using `LivePlot`, we can visualize the sensor data while the simulation is running.
+Make sure to install [PyQtGraph](https://www.pyqtgraph.org) (`pip install pyqtgraph`)!
+
+```python
+from genesis.sensors.data_handlers import LivePlot
+
+...
+# before scene.build()
+
+imu.add_recorder(
+    handler=LivePlot(title="IMU Accelerometer Measured Data", labels=["acc_x", "acc_y", "acc_z"]),
+    rec_options=gs.options.RecordingOptions(
+        preprocess_func=lambda data, ground_truth_data: data["lin_acc"],
+    ),
 )
+imu.add_recorder(
+    handler=LivePlot(title="IMU Accelerometer Ground Truth Data", labels=["acc_x", "acc_y", "acc_z"]),
+    rec_options=gs.options.RecordingOptions(
+        preprocess_func=lambda data, ground_truth_data: ground_truth_data["lin_acc"],
+    ),
+)
+imu.start_recording()
 ```
 
-You may also define custom data handlers.
-```python
-from genesis.sensors import DataHandler
+This sets up two live plots: one showing the noisy measured accelerometer data and another showing the ground truth values. The `preprocess_func` extracts just the linear acceleration data from the full IMU readings which contain both accelerometer and gyroscope data.
 
-class CustomDataHandler(DataHandler):
-    def initialize(self):
-        ...
-
-    def process(self, data):
-        ...
-
-    def cleanup(self):
-        ...
-```
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/imu.mp4" type="video/mp4">
+</video>
