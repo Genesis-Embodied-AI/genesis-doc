@@ -15,7 +15,7 @@ sphinx-togglebutton
 sphinx_design
 psutil
 scikit-image
-taichi == 1.7.2
+gstaichi
 pydantic == 2.7.1
 numpy == 1.26.4
 six
