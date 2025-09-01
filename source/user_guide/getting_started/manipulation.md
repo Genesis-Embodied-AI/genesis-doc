@@ -6,7 +6,7 @@ This example demonstrates robotic manipulation using a **two-stage training para
 
 The environment is assembled using the following components
 
-* **Robot:** A Franka Emika Panda manipulator with parallel-jaw gripper.
+* **Robot:** A Franka Panda manipulator with parallel-jaw gripper.
 * **Object:** A box with randomized position and orientation.
 * **Cameras:** Two stereo RGB cameras (left and right) positioned in front of the scene.
 * **Observations:**
@@ -29,10 +29,10 @@ python examples/manipulation/grasp_train.py --stage=rl
 ```
 To monitor the training process, launch TensorBoard:
 ```
-tensorboard --logdir logs
+tensorboard --logdir=logs
 ```
-You should see a training curve similar to this:
-```{figure} ../../_static/images/locomotio_curve.png
+The final training curve for the reward will look like the following
+```{figure} ../../_static/images/manipulation_curve.png
 ```
 
 * **Inputs:** Privileged state observations (no images).
@@ -51,11 +51,9 @@ The second stage trains a **vision-conditioned student policy** by imitating the
   * Shared stereo CNN encoder.
   * Feature fusion network.
   * Two heads:
-
     * **Action head:** Predicts manipulation actions.
     * **Pose head:** Auxiliary task to predict object pose (xyz + quaternion).
 * **Training:**
-
   * Loss = Action MSE + Pose loss (position MSE + quaternion distance).
   * Data collected online with teacher supervision (DAgger-style corrections).
 * **Observations:** Stereo RGB images and robot pose.
@@ -72,27 +70,35 @@ python examples/manipulation/grasp_train.py --stage=bc
 
 Policies can be evaluated in simulation with or without visualization:
 
-* **Teacher Policy (RL):**
+* **Teacher Policy (MLP):**
 
-  * Use privileged states.
-  * Evaluate grasp success rate and lifting stability.
   
 ```python
-python examples/manipulation/grasp_eval.py --stage rl
+python examples/manipulation/grasp_eval.py --stage==rl
 ```
-  
-* **Student Policy (IL):**
 
-  * Use only stereo RGB inputs.
-  * Measure action accuracy, pose prediction error, and task success rate.
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/manipulation_rl.mp4" type="video/mp4">
+</video>
   
+* **Student Policy (CNN+MLP):**
+
+```python
+python examples/manipulation/grasp_eval.py --stage=bc --record
+```
+
+The vision-based policy observes the environment through a stereo camera which is rendered via Mandrona render.
+  
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/manipulation_stereo.mp4" type="video/mp4">
+</video>
   
 ```python
 python examples/manipulation/grasp_eval.py --stage bc
 ```
 * **Logging & Monitoring:**
 
-  * Training metrics logged to TensorBoard (`logs/exp_name_stage/`).
+  * Training metrics logged to TensorBoard (`logs/grasp_rl/` or `logs/grasp_bc/`).
   * Checkpoints saved periodically for both RL and BC stages.
 
 Together, this evaluation validates the two-stage pipeline: a teacher policy that learns efficiently with full information, and a student policy that achieves robust vision-based manipulation through imitation.
