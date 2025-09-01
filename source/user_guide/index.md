@@ -26,6 +26,7 @@ getting_started/sensors
 getting_started/interactive_debugging
 getting_started/locomotion
 getting_started/hover_env
+getting_started/manipulation
 getting_started/terrain
 getting_started/soft_robots
 getting_started/command_line_tools
