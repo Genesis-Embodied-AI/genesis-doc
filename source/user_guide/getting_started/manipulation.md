@@ -1,104 +1,133 @@
 # ✍️ Manipulation with Two-Stage Training
 
-This example demonstrates robotic manipulation using a **two-stage training paradigm** that combines **reinforcement learning (RL)** and **imitation learning (IL)**. The central idea is to first train a **privileged teacher policy** using full state information, and then distill that knowledge into a **vision-based student policy** that relies on camera observations and robot states (optional). 
+This example demonstrates robotic manipulation using a **two-stage training paradigm** that combines **reinforcement learning (RL)** and **imitation learning (IL)**. The central idea is to first train a **privileged teacher policy** using full state information, and then distill that knowledge into a **vision-based student policy** that relies on camera observations (and optionally robot proprioception).
+This approach enables efficient learning in simulation while bridging the gap toward real-world deployment where privileged states are unavailable.
+
+---
 
 ## Environment Overview
 
-The environment is assembled using the following components
+The manipulation environment is composed of the following elements:
 
-* **Robot:** A Franka Panda manipulator with parallel-jaw gripper.
-* **Object:** A box with randomized position and orientation.
-* **Cameras:** Two stereo RGB cameras (left and right) positioned in front of the scene.
+* **Robot:** A 7-DoF Franka Panda arm with a parallel-jaw gripper.
+* **Object:** A box with randomized initial position and orientation, ensuring diverse training scenarios.
+* **Cameras:** Two stereo RGB cameras (left and right) facing the manipulation scene. Here, we use [Madrona Enginer](https://madrona-engine.github.io/) for batch rendering. 
 * **Observations:**
-  * Privileged state: end-effector pose, object pose.
-  * Vision state: stereo RGB images.
-* **Actions:** 6-DoF delta end-effector pose (position + orientation).
-* **Rewards:** To simplify the reward formulation, we primarily use a **keypoint alignment** reward, which specifies poses between the gripper and object. This is the only reward uesd for aligning the robot's end-effector to a goal pose best for picking up the objects.
 
-## RL Training
+  * **Privileged state:** End-effector pose and object pose (used only during teacher training).
+  * **Vision state:** Stereo RGB images (used by the student policy).
+* **Actions:** 6-DoF delta end-effector pose commands (3D position + orientation).
+* **Rewards:** A **keypoint alignment** reward is used. This defines reference keypoints between the gripper and the object, encouraging the gripper to align to a graspable pose.
 
-In the first stage, we train a teacher policy using **Proximal Policy Optimization (PPO)** from the \[RSL-RL library].
+  * This formulation avoids dense shaping terms and directly encodes task success.
+  * Only this reward is required for the policy to learn goal reaching.
 
-First, install all Python dependencies via `pip`:
-```
+---
+
+## RL Training (Stage 1: Teacher Policy)
+
+In the first stage, we train a teacher policy using **Proximal Policy Optimization (PPO)** from the [RSL-RL library](https://github.com/leggedrobotics/rsl_rl).
+
+**Setup:**
+
+```bash
 pip install tensorboard rsl-rl-lib==2.2.4
 ```
-After installation, start training by running:
-```
+
+**Training:**
+
+```bash
 python examples/manipulation/grasp_train.py --stage=rl
 ```
-To monitor the training process, launch TensorBoard:
-```
+
+**Monitoring:**
+
+```bash
 tensorboard --logdir=logs
 ```
-The final training curve for the reward will look like the following
+
+The reward learning curve looks like the following if the training is successful:
+
 ```{figure} ../../_static/images/manipulation_curve.png
 ```
 
-* **Inputs:** Privileged state observations (no images).
-* **Outputs:** End-effector action commands. 
-* **Parallel Environments:** Large batches (e.g., 1024–4096 envs) for fast sample throughput.
-* **Rewards:** Keypoint alignment ensures the gripper approaches and stabilizes on the object.
-* **Outcome:** An MLP policy that can perform the task given groundtruth state informations.
+**Key details:**
 
-The teacher’s role is to generate reliable demonstration data for the next stage.
+* **Inputs:** Privileged state (no images).
+* **Outputs:** End-effector action commands.
+* **Parallelization:** Large vectorized rollouts (e.g., 1024–4096 envs) for fast throughput.
+* **Reward design:** Keypoint alignment suffices to produce consistent grasping behavior.
+* **Outcome:** A lightweight MLP policy that learns stable grasping given ground-truth state information.
 
-## Imitation Learning
+The teacher policy serves as the demonstration source for the next stage.
 
-The second stage trains a **vision-conditioned student policy** by imitating the RL teacher.
+---
 
-* **Model:**
-  * Shared stereo CNN encoder.
-  * Feature fusion network.
-  * Two heads:
-    * **Action head:** Predicts manipulation actions.
-    * **Pose head:** Auxiliary task to predict object pose (xyz + quaternion).
-* **Training:**
-  * Loss = Action MSE + Pose loss (position MSE + quaternion distance).
-  * Data collected online with teacher supervision (DAgger-style corrections).
-* **Observations:** Stereo RGB images and robot pose.
-* **Outcome:** A vision-only policy that generalizes from demonstrations.
+## Imitation Learning (Stage 2: Student Policy)
 
-This stage bridges the gap between simulation privilege and realistic perception.
+The second stage trains a **vision-conditioned student policy** that imitates the RL teacher.
 
-After getting a teacher policy using RL, we can start training a student policy (vision-based) by running:
-```
+**Architecture:**
+
+* **Encoder:** Shared stereo CNN encoder extracts visual features.
+* **Fusion network:** Merges image features with optional robot proprioception.
+* **Heads:**
+  * **Action head:** Predicts 6-DoF manipulation actions.
+  * **Pose head:** Auxiliary task to predict object pose (xyz + quaternion).
+
+**Training Objective:**
+
+* **Loss:**
+  * Action MSE (student vs teacher).
+  * Pose loss = position MSE + quaternion distance.
+* **Data Collection:** Teacher provides online supervision, optionally with **DAgger-style corrections** to mitigate covariate shift.
+
+**Outcome:** A vision-only policy capable of generalizing grasping behavior without access to privileged states.
+
+**Run training:**
+
+```bash
 python examples/manipulation/grasp_train.py --stage=bc
 ```
 
+---
+
 ## Evaluation
 
-Policies can be evaluated in simulation with or without visualization:
+Both teacher and student policies can be evaluated in simulation (with or without visualization).
 
 * **Teacher Policy (MLP):**
 
-  
-```python
-python examples/manipulation/grasp_eval.py --stage==rl
+```bash
+python examples/manipulation/grasp_eval.py --stage=rl
 ```
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/manipulation_rl.mp4" type="video/mp4">
 </video>
-  
+
 * **Student Policy (CNN+MLP):**
 
-```python
+```bash
 python examples/manipulation/grasp_eval.py --stage=bc --record
 ```
 
-The vision-based policy observes the environment through a stereo camera which is rendered via Mandrona render.
-  
-<video preload="auto" controls="True" width="100%">
-<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/manipulation_stereo.mp4" type="video/mp4">
-</video>
-  
-```python
-python examples/manipulation/grasp_eval.py --stage bc
-```
-* **Logging & Monitoring:**
+The student observes the environment via stereo cameras rendered with Mandrona. <video preload="auto" controls="True" width="100%"> <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/manipulation_stereo.mp4" type="video/mp4"> </video>
 
-  * Training metrics logged to TensorBoard (`logs/grasp_rl/` or `logs/grasp_bc/`).
-  * Checkpoints saved periodically for both RL and BC stages.
 
-Together, this evaluation validates the two-stage pipeline: a teacher policy that learns efficiently with full information, and a student policy that achieves robust vision-based manipulation through imitation.
+**Logging & Monitoring:**
+
+* Metrics recorded in TensorBoard (`logs/grasp_rl/` or `logs/grasp_bc/`).
+* Periodic checkpoints for both RL and BC stages.
+
+---
+
+## Summary
+
+This two-stage pipeline illustrates a practical strategy for robotic manipulation:
+
+1. **Teacher policy (RL):** Efficient learning with full information.
+2. **Student policy (IL):** Vision-based control distilled from demonstrations.
+
+The result is a policy that is both sample-efficient in training and robust to realistic perception inputs.
+
