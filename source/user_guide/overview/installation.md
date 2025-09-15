@@ -36,10 +36,10 @@ If you are using Genesis with CUDA, make sure appropriate nvidia-driver is insta
 
 ## (Optional) Surface Reconstruction
 If you need fancy visuals for visualizing particle-based entities (fluids, deformables, etc.), you typically need to reconstruct the mesh surface using the internal particle-based representation. For this purpose, [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf), a state-of-the-art surface reconstruction, is supported out-of-the-box. Alternatively, we also provide `ParticleMesher`, our own openVDB-based surface reconstruction tool, which is faster but lower quantity:
-    ```bash
-    echo "export LD_LIBRARY_PATH=${PWD}/ext/ParticleMesher/ParticleMesherPy:$LD_LIBRARY_PATH" >> ~/.bashrc
-    source ~/.bashrc
-    ```
+```bash
+echo "export LD_LIBRARY_PATH=${PWD}/ext/ParticleMesher/ParticleMesherPy:$LD_LIBRARY_PATH" >> ~/.bashrc
+source ~/.bashrc
+```
 
 ## (Optional) Ray Tracing Renderer
 
@@ -212,7 +212,7 @@ After installing Pytorch and Genesis, Taichi falls back to CPU, while torch init
 Symptoms: 
 
 - running `python -c "import torch; print(torch.zeros((3,), device='cuda'))"` outputs `tensor([0., 0., 0.], device='cuda:0')`
-- but running `python -c "import taichi as ti; ti.init(arch=ti.gpu)"` outputs something like
+- but running `python -c "import gstaichi as ti; ti.init(arch=ti.gpu)"` outputs something like
     ```
     [W 06/18/25 12:47:56.784 14507] [cuda_driver.cpp:load_lib@36] libcuda.so lib not found.
     [Taichi] Starting on arch=vulkan

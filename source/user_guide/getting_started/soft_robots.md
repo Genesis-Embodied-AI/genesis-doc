@@ -10,12 +10,12 @@ import genesis as gs
 
 
 ########################## init ##########################
-gs.init(seed=0, precision='32', logging_level='debug')
+gs.init(seed=0, precision='32', logging_level='info')
 
 ########################## create a scene ##########################
-dt = 5e-4
 scene = gs.Scene(
     sim_options=gs.options.SimOptions(
+        dt = 5e-4,
         substeps=10,
         gravity=(0, 0, 0),
     ),
@@ -25,12 +25,11 @@ scene = gs.Scene(
         camera_fov=40,
     ),
     mpm_options=gs.options.MPMOptions(
-        dt=dt,
         lower_bound=(-1.0, -1.0, -0.2),
         upper_bound=( 1.0,  1.0,  1.0),
     ),
     fem_options=gs.options.FEMOptions(
-        dt=dt,
+        damping=45.0,
     ),
     vis_options=gs.options.VisOptions(
         show_world_frame=False,
@@ -179,12 +178,12 @@ import genesis as gs
 
 
 ########################## init ##########################
-gs.init(seed=0, precision='32', logging_level='debug')
+gs.init(seed=0, precision='32', logging_level='info')
 
 ######################## create a scene ##########################
-dt = 3e-3
 scene = gs.Scene(
     sim_options=gs.options.SimOptions(
+        dt=3e-3,
         substeps=10,
     ),
     viewer_options= gs.options.ViewerOptions(
@@ -193,13 +192,11 @@ scene = gs.Scene(
         camera_fov=40,
     ),
     rigid_options=gs.options.RigidOptions(
-        dt=dt,
         gravity=(0, 0, -9.8),
         enable_collision=True,
         enable_self_collision=False,
     ),
     mpm_options=gs.options.MPMOptions(
-        dt=dt,
         lower_bound=( 0.0,  0.0, -0.2),
         upper_bound=( 1.0,  1.0,  1.0),
         gravity=(0, 0, 0), # mimic gravity compensation
