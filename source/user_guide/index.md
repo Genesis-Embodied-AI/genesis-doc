@@ -16,6 +16,7 @@ overview/mission
 :maxdepth: 1
 
 getting_started/hello_genesis
+getting_started/conventions
 getting_started/visualization
 getting_started/control_your_robot
 getting_started/parallel_simulation
