@@ -1,4 +1,4 @@
-# 📝 Misc Guidelines
+# 📝 Guidelines
 
 (I will keep updating this)
 - Use genesis.tensor whenever possible. Note that when we pass genesis tensor to taichi kernels, call tensor.assert_contiguous() to check whether it's contiguous, since taichi only support contiguous external tensor.
@@ -63,11 +63,11 @@
             - offset value for its own children. e.g. a `geom` only stores `idx_offset_*` for `vert`, `face`, and `edge`.
     - root vs base
         - `root` is a more natural name as we use a tree structure for the links, while `base` is more informative from user's perspective
-        - Let's use `root` link inernally, and `base` link for docs etc.
+        - Let's use `root` link internally, and `base` link for docs etc.
     - root pose vs q (current design subject to possible change)
         - for both arm and single mesh, its pos and euler specified when loaded is its root pose, and q will be w.r.t to this
     - control interface
-        - root pos should be merged with joint pos of the first (fixed) joint, which connectes world to the first link
+        - root pose should be merged with joint pose of the first (fixed) joint, which connects world to the first link
         - if we want to control something, we will command velocity
             - thus, if it’s a free joint, it’s ok. We will override velocity
             - if it’s a fixed joint, there’s no dof for it, so we cannot control it

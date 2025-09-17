@@ -12,7 +12,7 @@ import numpy as np
 import genesis as gs
 
 ########################## init ##########################
-gs.init(seed=0, precision='32', logging_level='debug')
+gs.init(seed=0, precision='32', logging_level='info')
 
 ########################## create a scene ##########################
 scene = gs.Scene(
