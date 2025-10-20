@@ -60,7 +60,42 @@ export OMNI_KIT_ACCEPT_EULA=yes
 
 ## Troubleshooting
 
-### Import error
+### Import Error
+
+#### 'Genesis hasn't been initialized'
+
+Genesis is not initialized, trying to import any engine-related submodule will raise an exception, e.g.;
+```python
+Traceback (most recent call last):
+  File "/home/jeremy/Downloads/Genesis_Jeremy/examples/./init_error.py", line 3, in <module>
+    from genesis.engine.entities import RigidEntity
+  File "/home/jeremy/.pyenv/versions/spider-genesis/lib/python3.11/site-packages/genesis/engine/entities/__init__.py", line 1, in <module>
+    from .avatar_entity import AvatarEntity
+  File "/home/jeremy/.pyenv/versions/spider-genesis/lib/python3.11/site-packages/genesis/engine/entities/avatar_entity/__init__.py", line 1, in <module>
+    from .avatar_entity import AvatarEntity
+  File "/home/jeremy/.pyenv/versions/spider-genesis/lib/python3.11/site-packages/genesis/engine/entities/avatar_entity/avatar_entity.py", line 6, in <module>
+    from ..rigid_entity import RigidEntity
+  File "/home/jeremy/.pyenv/versions/spider-genesis/lib/python3.11/site-packages/genesis/engine/entities/rigid_entity/__init__.py", line 1, in <module>
+    from .rigid_entity import RigidEntity
+  File "/home/jeremy/.pyenv/versions/spider-genesis/lib/python3.11/site-packages/genesis/engine/entities/rigid_entity/rigid_entity.py", line 14, in <module>
+    from genesis.utils import array_class
+  File "/home/jeremy/.pyenv/versions/spider-genesis/lib/python3.11/site-packages/genesis/utils/array_class.py", line 13, in <module>
+    gs.raise_exception("Genesis hasn't been initialized. Did you call `gs.init()`?")
+  File "/home/jeremy/.pyenv/versions/spider-genesis/lib/python3.11/site-packages/genesis/utils/misc.py", line 42, in raise_exception
+    raise gs.GenesisException(msg)
+genesis.GenesisException: Genesis hasn't been initialized. Did you call `gs.init()`?
+```
+
+This error is bug but expected. Any engine-related submodules must be imported after initializing Genesis to have the opportunity to configure low-level GsTaichi features such as fast cache mechanism or Gstaichi dynamic array mode. In practice, this limitation should not be a blocker for anybody, because engine-related classes are not meant to be instantiated manually. Still, it may be convenient to import them for type checking. If so, just use typing checking guard, e.g.:
+```python
+from typing import TYPE_CHECKING
+
+import genesis as gs
+if TYPE_CHECKING:
+    from genesis.engine.entities.drone_entity import DroneEntity
+```
+
+#### Circular Import Error
 
 Python would fail to (circular) import Genesis if the current directory is the source directory of Genesis. This is likely due to Genesis being installed WITHOUT enabling editable mode, either from PyPI Package Index or from source. The obvious workaround is moving out of the source directory of Genesis before running Python. The long-term solution is simply switching to editable install mode: first uninstall Python package `genesis-world`, then run `pip install -e '.[render]'` inside the source directory of Genesis.
 

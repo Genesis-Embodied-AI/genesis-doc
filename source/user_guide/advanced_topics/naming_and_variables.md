@@ -86,7 +86,6 @@ For links,
         cd_vel=gs.ti_vec3,            # com-based velocity (linear)
         root_COM=gs.ti_vec3,          # center of mass of the root link's subtree
         mass_sum=gs.ti_float,         # total mass of the subtree rooted at this link
-        COM=gs.ti_vec3,               # local center of mass of this link
         mass_shift=gs.ti_float,       # mass shift
         i_pos_shift=gs.ti_vec3,       # inertia position shift
         cfrc_flat_ang=gs.ti_vec3,     # com-based interaction force (angular)
@@ -215,7 +214,7 @@ For particles,
 * Static particle information (`particles_info`)
     ```python
     ti.types.struct(
-        mat_idx=gs.ti_int,            # material id
+        material_idx=gs.ti_int,       # material id
         mass=gs.ti_float,             # mass
         default_Jp=gs.ti_float,       # default volume ratio
         free=gs.ti_int,               # whether the particle is free; non-free particles behave as boundary conditions
@@ -291,7 +290,7 @@ For elements,
         mu=gs.ti_float,              # lame parameters (1)
         lam=gs.ti_float,             # lame parameters (2)
         mass_scaled=gs.ti_float,     # scaled element mass. The real mass is mass_scaled / self._vol_scale
-        mat_idx=gs.ti_int,           # material model index
+        material_idx=gs.ti_int,      # material model index
         B=gs.ti_mat3,                # the inverse of the undeformed shape matrix
         muscle_group=gs.ti_int,      # muscle/actuator group
         muscle_direction=gs.ti_vec3, # muscle/actuator direction
@@ -355,7 +354,7 @@ For particles,
         mass=gs.ti_float,                 # mass
         pos_rest=gs.ti_vec3,              # rest position
         rho_rest=gs.ti_float,             # rest density
-        mat_type=gs.ti_int,               # material type
+        material_type=gs.ti_int,          # material type
         mu_s=gs.ti_float,                 # static friction coefficient
         mu_k=gs.ti_float,                 # dynamic friction coefficient
         air_resistance=gs.ti_float,       # coefficient of drag / damping due to air
