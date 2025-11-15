@@ -48,7 +48,7 @@ scene.build(n_envs=B, env_spacing=(1.0, 1.0))
 # control all the robots
 franka.control_dofs_position(
     torch.tile(
-        torch.tensor([0, 0, 0, -1.0, 0, 0, 0, 0.02, 0.02], device=gs.device), (B, 1)
+        torch.tensor([0, 0, 0, -1.0, 0, 1.0, 0, 0.02, 0.02], device=gs.device), (B, 1)
     ),
 )
 
@@ -106,7 +106,7 @@ scene.build(n_envs=30000)
 # control all the robots
 franka.control_dofs_position(
     torch.tile(
-        torch.tensor([0, 0, 0, -1.0, 0, 0, 0, 0.02, 0.02], device=gs.device), (30000, 1)
+        torch.tensor([0, 0, 0, -1.0, 0, 1.0, 0, 0.02, 0.02], device=gs.device), (30000, 1)
     ),
 )
 
