@@ -2,15 +2,47 @@
 
 Robots need sensors to observe the world around them.
 In Genesis, sensors extract information from the scene, computing values using the state of the scene but not affecting the scene itself.
-All sensors have a `read()` method that returns the measured sensor data and `read_ground_truth()` which returns the ground truth data.
 
-Currently only IMU and rigid tactile sensors are supported, but soft tactile and distance (LiDAR) sensors are coming soon!
+Sensors can be created with `scene.add_sensor(sensor_options)` and read with `sensor.read()` or `sensor.read_ground_truth()`.
+```python
+scene = ...
+
+# 1. Add sensors to the scene
+sensor = scene.add_sensor(
+    gs.sensors.Contact(
+        ...,
+        draw_debug=True, # visualize the sensor data in the scene viewer
+    )
+)
+
+# 2. Build the scene
+scene.build()
+
+for _ in range(1000):
+    scene.step()
+
+    # 3. Read data from sensors
+    measured_data = sensor.read()
+    ground_truth_data = sensor.read_ground_truth()
+```
+
+Currently supported sensors:
+- `IMU` (accelerometer and gyroscope)
+- `Contact` (boolean per rigid link)
+- `ContactForce` (xyz force per rigid link)
+- `Raycaster`
+  - `Lidar`
+  - `DepthCamera`
+<!-- - `RGBCamera` -->
+
+Example usage of sensors can be found under `examples/sensors/`.
+
 
 ## IMU Example
 
 In this tutorial, we'll walk through how to set up an Inertial Measurement Unit (IMU) sensor on a robotic arm's end-effector. The IMU will measure linear acceleration and angular velocity as the robot traces a circular path, and we'll visualize the data in real-time with realistic noise parameters.
 
-The full example script is available at `examples/sensors/imu.py`.
+The full example script is available at `examples/sensors/imu_franka.py`.
 
 ### Scene Setup
 
@@ -41,7 +73,7 @@ franka = scene.add_entity(
     gs.morphs.MJCF(file="xml/franka_emika_panda/panda.xml"),
 )
 end_effector = franka.get_link("hand")
-motors_dof = np.arange(7)
+motors_dof = (0, 1, 2, 3, 4, 5, 6)
 ```
 
 Here we set up a basic scene with a Franka robotic arm. The camera is positioned to give us a good view of the robot's workspace, and we identify the end-effector link where we'll attach our IMU sensor.
@@ -52,29 +84,33 @@ We "attach" the IMU sensor onto the entity at the end effector by specifying the
 
 ```python
 imu = scene.add_sensor(
-    gs.sensors.IMUOptions(
+    gs.sensors.IMU(
         entity_idx=franka.idx,
         link_idx_local=end_effector.idx_local,
+        pos_offset=(0.0, 0.0, 0.15),
         # sensor characteristics
         acc_axes_skew=(0.0, 0.01, 0.02),
         gyro_axes_skew=(0.03, 0.04, 0.05),
-        acc_noise_std=(0.01, 0.01, 0.01),
-        gyro_noise_std=(0.01, 0.01, 0.01),
-        acc_bias_drift_std=(0.001, 0.001, 0.001),
-        gyro_bias_drift_std=(0.001, 0.001, 0.001),
+        acc_noise=(0.01, 0.01, 0.01),
+        gyro_noise=(0.01, 0.01, 0.01),
+        acc_random_walk=(0.001, 0.001, 0.001),
+        gyro_random_walk=(0.001, 0.001, 0.001),
         delay=0.01,
         jitter=0.01,
-        interpolate_for_delay=True,
+        interpolate=True,
+        draw_debug=True,
     )
 )
 ```
 
-The `IMUOptions` also has options to configure the following sensor characteristics:
+The `gs.sensors.IMU` constructor has options to configure the following sensor characteristics:
+- `pos_offset` specifies the sensor's position relative to the link frame
 - `acc_axes_skew` and `gyro_axes_skew` simulate sensor misalignment
-- `acc_noise_std` and `gyro_noise_std` add Gaussian noise to measurements
-- `acc_bias_drift_std` and `gyro_bias_drift_std` simulate gradual sensor drift over time
+- `acc_noise` and `gyro_noise` add Gaussian noise to measurements
+- `acc_random_walk` and `gyro_random_walk` simulate gradual sensor drift over time
 - `delay` and `jitter` introduce timing realism
-- `interpolate_for_delay` smooths delayed measurements
+- `interpolate` smooths delayed measurements
+- `draw_debug` visualizes the sensor frame in the viewer
 
 ### Motion Control and Simulation
 
@@ -90,7 +126,7 @@ franka.set_dofs_kv(np.array([450, 450, 350, 350, 200, 200, 200, 10, 10]))
 # Create a circular path for end effector to follow
 circle_center = np.array([0.4, 0.0, 0.5])
 circle_radius = 0.15
-rate = 2 / 180 * np.pi  # Angular velocity in radians per step
+rate = np.deg2rad(2.0)  # Angular velocity in radians per step
 
 def control_franka_circle_path(i):
     pos = circle_center + np.array([np.cos(i * rate), np.sin(i * rate), 0]) * circle_radius
@@ -120,42 +156,63 @@ print("Measured data:")
 print(imu.read())
 ```
 
-The IMU returns data in a dictionary format with keys:
-- `"lin_acc"`: Linear acceleration in m/s² (3D vector)
-- `"ang_vel"`: Angular velocity in rad/s (3D vector)
-
-### Data Recording
-
-We can add "recorders" to any sensor to automatically read and process data without slowing down the simulation. This can be used to stream or save formatted data to a file, or visualize the data live!
-
-#### Real-time Data Visualization
-
-Using `PyQtGraphPlotter`, we can visualize the sensor data while the simulation is running.
-Make sure to install [PyQtGraph](https://www.pyqtgraph.org) (`pip install pyqtgraph`)!
-
-```python
-from genesis.sensors.data_handlers import PyQtGraphPlotter
-
-...
-# before scene.build()
-
-imu.add_recorder(
-    handler=PyQtGraphPlotter(title="IMU Accelerometer Measured Data", labels=["acc_x", "acc_y", "acc_z"]),
-    rec_options=gs.options.RecordingOptions(
-        preprocess_func=lambda data, ground_truth_data: data["lin_acc"],
-    ),
-)
-imu.add_recorder(
-    handler=PyQtGraphPlotter(title="IMU Accelerometer Ground Truth Data", labels=["acc_x", "acc_y", "acc_z"]),
-    rec_options=gs.options.RecordingOptions(
-        preprocess_func=lambda data, ground_truth_data: ground_truth_data["lin_acc"],
-    ),
-)
-imu.start_recording()
-```
-
-This sets up two live plots: one showing the noisy measured accelerometer data and another showing the ground truth values. The `preprocess_func` extracts just the linear acceleration data from the full IMU readings which contain both accelerometer and gyroscope data.
+The IMU returns data as a **named tuple** with fields:
+- `lin_acc`: Linear acceleration in m/s² (3D vector)
+- `ang_vel`: Angular velocity in rad/s (3D vector)
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/imu.mp4" type="video/mp4">
+</video>
+
+## Contact Sensors
+
+The contact sensors retrieve contact information per rigid link from the rigid solver.
+`Contact` sensor will return a boolean, and `ContactForce` returns the net force vector in the local frame of the associated rigid link.
+<!-- NOTE: Untested with other solver couplings -->
+
+The full example script is available at `examples/sensors/contact_force_go2.py` (add flag `--force` to use force sensor).
+
+```{figure} ../../_static/images/contact_force_sensor.png
+```
+
+## Raycaster Sensors: Lidar and Depth Camera
+
+The `Raycaster` sensor measures distance by casting rays into the scene and detecting intersections with geometry.
+The number of rays and ray directions can be specified with a `RaycastPattern`.
+`SphericalPattern` supports Lidar-like specification of field of view and angular resolution, and `GridPattern` casts rays from a plane. `DepthCamera` sensors provide the `read_image()` function which formats the raycast information as a depth image. See the API reference for details on the available options.
+
+```python
+lidar = scene.add_sensor(
+    gs.sensors.Lidar(
+        pattern=gs.sensors.Spherical(),
+        entity_idx=robot.idx, # attach to a rigid entity
+        pos_offset=(0.3, 0.0, 0.1) # offset from attached entity
+        return_world_frame=True, # whether to return points in world frame or local frame
+    )
+)
+
+depth_camera = scene.add_sensor(
+    gs.sensors.DepthCamera(
+        pattern=gs.sensors.DepthCameraPattern(
+            res=(480, 360), # image resolution in width, height
+            fov_horizontal=90, # field of view in degrees
+            fov_vertical=40,
+        ),
+    )
+)
+
+...
+
+lidar.read() # returns a NamedTuple containing points and distances
+depth_camera.read_image() # returns tensor of distances as shape (height, width) 
+
+```
+
+An example script which demonstrates a raycaster sensor mounted on a robot is available at `examples/sensors/lidar_teleop.py`.
+Set the flag `--pattern` to `spherical` for a Lidar like pattern, `grid` for planar grid pattern, and `depth` for depth camera.
+
+Here's what running `python examples/sensors/lidar_teleop.py --pattern depth` looks like:
+
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/depth_camera.mp4" type="video/mp4">
 </video>
