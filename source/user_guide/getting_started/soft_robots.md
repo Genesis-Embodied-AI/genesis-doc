@@ -227,10 +227,10 @@ robot = scene.add_entity(
         fixed=True,
     ),
     material=gs.materials.Hybrid(
-        mat_rigid=gs.materials.Rigid(
+        material_rigid=gs.materials.Rigid(
             gravity_compensation=1.,
         ),
-        mat_soft=gs.materials.MPM.Muscle( # 允许设置组
+        material_soft=gs.materials.MPM.Muscle( # 允许设置组
             E=1e4,
             nu=0.45,
             rho=1000.,
