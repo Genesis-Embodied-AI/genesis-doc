@@ -236,10 +236,10 @@ robot = scene.add_entity(
         fixed=True, # 固定されたロボット
     ),
     material=gs.materials.Hybrid(
-        mat_rigid=gs.materials.Rigid(
+        material_rigid=gs.materials.Rigid(
             gravity_compensation=1., # 重力補償
         ),
-        mat_soft=gs.materials.MPM.Muscle( # 筋肉グループの設定を有効化
+        material_soft=gs.materials.MPM.Muscle( # 筋肉グループの設定を有効化
             E=1e4,
             nu=0.45,
             rho=1000.,
