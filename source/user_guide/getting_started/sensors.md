@@ -89,8 +89,8 @@ imu = scene.add_sensor(
         link_idx_local=end_effector.idx_local,
         pos_offset=(0.0, 0.0, 0.15),
         # sensor characteristics
-        acc_axes_skew=(0.0, 0.01, 0.02),
-        gyro_axes_skew=(0.03, 0.04, 0.05),
+        acc_cross_axis_coupling=(0.0, 0.01, 0.02),
+        gyro_cross_axis_coupling=(0.03, 0.04, 0.05),
         acc_noise=(0.01, 0.01, 0.01),
         gyro_noise=(0.01, 0.01, 0.01),
         acc_random_walk=(0.001, 0.001, 0.001),
@@ -105,7 +105,7 @@ imu = scene.add_sensor(
 
 The `gs.sensors.IMU` constructor has options to configure the following sensor characteristics:
 - `pos_offset` specifies the sensor's position relative to the link frame
-- `acc_axes_skew` and `gyro_axes_skew` simulate sensor misalignment
+- `acc_cross_axis_coupling` and `gyro_cross_axis_coupling` simulate sensor misalignment
 - `acc_noise` and `gyro_noise` add Gaussian noise to measurements
 - `acc_random_walk` and `gyro_random_walk` simulate gradual sensor drift over time
 - `delay` and `jitter` introduce timing realism
@@ -204,7 +204,7 @@ depth_camera = scene.add_sensor(
 ...
 
 lidar.read() # returns a NamedTuple containing points and distances
-depth_camera.read_image() # returns tensor of distances as shape (height, width) 
+depth_camera.read_image() # returns tensor of distances as shape (height, width)
 
 ```
 

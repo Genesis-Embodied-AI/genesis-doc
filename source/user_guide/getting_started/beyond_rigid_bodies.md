@@ -78,7 +78,7 @@ Once you run this successfully, you will see the water drops and spreads over th
 
 You can get the real-time particle positions by:
 ```
-particles = liquid.get_particles()
+particles = liquid.get_particles_pos()
 ```
 
 **Changing the liquid properties:** You can also play with the physical properties of the liquid. For example, you can increase its viscosity (`mu`) and surface tension (`gamma`):
@@ -139,7 +139,7 @@ for i in range(horizon):
     scene.step()
 
 # get particle positions
-particles = liquid.get_particles()
+particles = liquid.get_particles_pos()
 ```
 
 ## Deformable object simulation using MPM Solver <a id="mpm"></a>
@@ -273,7 +273,7 @@ cloth_1 = scene.add_entity(
     morph=gs.morphs.Mesh(
         file='meshes/cloth.obj',
         scale=2.0,
-        pos=(0, 0, 0.5), 
+        pos=(0, 0, 0.5),
         euler=(0.0, 0, 0.0),
     ),
     surface=gs.surfaces.Default(
@@ -287,7 +287,7 @@ cloth_2 = scene.add_entity(
     morph=gs.morphs.Mesh(
         file='meshes/cloth.obj',
         scale=2.0,
-        pos=(0, 0, 1.0), 
+        pos=(0, 0, 1.0),
         euler=(0.0, 0, 0.0),
     ),
     surface=gs.surfaces.Default(
@@ -303,12 +303,11 @@ scene.build()
 Then, let's fix the corners (particles) we want. To do this, we provide a handy tool to locate a particle using a location in the cartesian space:
 ```python
 
-cloth_1.fix_particle(cloth_1.find_closest_particle((-1, -1, 1.0)))
-cloth_1.fix_particle(cloth_1.find_closest_particle((1, 1, 1.0)))
-cloth_1.fix_particle(cloth_1.find_closest_particle((-1, 1, 1.0)))
-cloth_1.fix_particle(cloth_1.find_closest_particle((1, -1, 1.0)))
-
-cloth_2.fix_particle(cloth_2.find_closest_particle((-1, -1, 1.0)))
+cloth_1.fix_particles(cloth_1.find_closest_particle((-1, -1, 1.0)))
+cloth_1.fix_particles(cloth_1.find_closest_particle((1, 1, 1.0)))
+cloth_1.fix_particles(cloth_1.find_closest_particle((-1, 1, 1.0)))
+cloth_1.fix_particles(cloth_1.find_closest_particle((1, -1, 1.0)))
+cloth_2.fix_particles(cloth_2.find_closest_particle((-1, -1, 1.0)))
 
 horizon = 1000
 for i in range(horizon):
