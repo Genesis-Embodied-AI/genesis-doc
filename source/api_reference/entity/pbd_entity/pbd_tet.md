@@ -1,5 +1,58 @@
 # `PBDTetEntity`
 
+`PBDTetEntity` 是 PBD 系统中的四面体实体，用于模拟体积物体，如软组织、弹性体和其他具有体积特性的三维物体。它基于四面体网格构建，支持体积约束和其他三维物理约束。
+
+## 功能说明
+
+该类提供了创建和管理体积物体的功能，支持设置物体的材料属性、形态参数和物理约束，如拉伸约束、弯曲约束、体积约束和碰撞约束。
+
+## 主要属性
+
+| 属性名称 | 描述 |
+|---------|------|
+| `idx` | 实体在场景中的唯一索引 |
+| `uid` | 实体的唯一标识符 |
+| `scene` | 实体所属的场景对象 |
+| `sim` | 模拟器对象 |
+| `solver` | PBD 求解器对象 |
+| `material` | 实体的材料属性 |
+| `morph` | 实体的形态参数 |
+| `surface` | 实体的表面属性 |
+| `mesh` | 实体的网格数据 |
+| `vmesh` | 实体的可视化网格 |
+| `is_built` | 实体是否已构建完成 |
+| `particle_start` | 实体粒子在全局粒子缓冲区中的起始索引 |
+| `particle_end` | 实体粒子在全局粒子缓冲区中的结束索引 |
+| `n_particles` | 实体包含的粒子数量 |
+| `particle_size` | 粒子的大小 |
+| `edges` | 实体的边数据 |
+| `n_edges` | 实体包含的边数量 |
+
+## 代码示例
+
+```python
+import genesis as gs
+
+# 初始化 Genesis
+gs.init()
+
+# 创建场景
+scene = gs.Scene()
+
+# 创建四面体实体（例如一个简单的球体）
+sphere_entity = scene.create_tet_entity(
+    radius=1.0,                   # 球体半径
+    resolution=10,                # 球体分辨率
+    pos=[0, 0, 2],                # 球体中心位置
+    particle_size=0.05,           # 粒子大小
+    is_fixed=False                # 是否固定
+)
+
+# 获取实体信息
+print(f"球体粒子数量: {sphere_entity.n_particles}")
+print(f"球体边数量: {sphere_entity.n_edges}")
+```
+
 ```{eval-rst}  
 .. autoclass:: genesis.engine.entities.pbd_entity.PBDTetEntity
     :members:
