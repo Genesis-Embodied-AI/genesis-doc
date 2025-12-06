@@ -26,30 +26,6 @@
 | `n_particles` | 实体包含的粒子数量 |
 | `particle_size` | 粒子的大小 |
 
-## 代码示例
-
-```python
-import genesis as gs
-
-# 初始化 Genesis
-gs.init()
-
-# 创建场景
-scene = gs.Scene()
-
-# 创建粒子实体
-particle_entity = scene.create_particle_entity(
-    positions=[[0, 0, 0], [1, 0, 0], [0, 1, 0]],  # 三个粒子的初始位置
-    masses=[1.0, 1.0, 1.0],                         # 粒子质量
-    particle_size=0.1                              # 粒子大小
-)
-
-# 获取粒子信息
-print(f"粒子数量: {particle_entity.n_particles}")
-print(f"粒子起始索引: {particle_entity.particle_start}")
-print(f"粒子结束索引: {particle_entity.particle_end}")
-```
-
 ```{eval-rst}  
 .. autoclass:: genesis.engine.entities.pbd_entity.PBDParticleEntity
     :members:

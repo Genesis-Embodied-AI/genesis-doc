@@ -26,35 +26,6 @@
 | `n_particles` | 实体包含的粒子数量 |
 | `particle_size` | 粒子的大小 |
 
-## 代码示例
-
-```python
-import genesis as gs
-import numpy as np
-
-# 初始化 Genesis
-gs.init()
-
-# 创建场景
-scene = gs.Scene()
-
-# 生成随机粒子位置
-n_particles = 100
-positions = np.random.rand(n_particles, 3) * 2 - 1  # 随机分布在 [-1, 1] 立方体中
-positions[:, 2] += 2  # 提升到地面以上
-
-# 创建自由粒子实体
-free_particle_entity = scene.create_free_particle_entity(
-    positions=positions.tolist(),  # 粒子初始位置
-    masses=[0.1] * n_particles,    # 每个粒子的质量
-    particle_size=0.05             # 粒子大小
-)
-
-# 获取粒子信息
-print(f"自由粒子数量: {free_particle_entity.n_particles}")
-print(f"粒子大小: {free_particle_entity.particle_size}")
-```
-
 ```{eval-rst}  
 .. autoclass:: genesis.engine.entities.pbd_entity.PBDFreeParticleEntity
     :members:

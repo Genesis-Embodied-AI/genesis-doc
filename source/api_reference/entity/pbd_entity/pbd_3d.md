@@ -31,32 +31,6 @@
 | `edges` | 实体的边数据 |
 | `n_edges` | 实体包含的边数量 |
 
-## 代码示例
-
-```python
-import genesis as gs
-
-# 初始化 Genesis
-gs.init()
-
-# 创建场景
-scene = gs.Scene()
-
-# 创建 3D 柔性物体（例如一个简单的立方体）
-cube_entity = scene.create_3d_entity(
-    dimensions=[1.0, 1.0, 1.0],  # 立方体尺寸
-    segments=[5, 5, 5],           # 每个维度的段数
-    pos=[0, 0, 2],                 # 立方体中心位置
-    particle_size=0.05,            # 粒子大小
-    is_fixed=False                 # 是否固定
-)
-
-# 获取实体信息
-print(f"立方体粒子数量: {cube_entity.n_particles}")
-print(f"立方体元素数量: {cube_entity.n_elems}")
-print(f"立方体边数量: {cube_entity.n_edges}")
-```
-
 ```{eval-rst}  
 .. autoclass:: genesis.engine.entities.pbd_entity.PBD3DEntity
     :members:

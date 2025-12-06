@@ -28,30 +28,6 @@
 | `edges` | 实体的边数据 |
 | `n_edges` | 实体包含的边数量 |
 
-## 代码示例
-
-```python
-import genesis as gs
-
-# 初始化 Genesis
-gs.init()
-
-# 创建场景
-scene = gs.Scene()
-
-# 创建四面体实体（例如一个简单的球体）
-sphere_entity = scene.create_tet_entity(
-    radius=1.0,                   # 球体半径
-    resolution=10,                # 球体分辨率
-    pos=[0, 0, 2],                # 球体中心位置
-    particle_size=0.05,           # 粒子大小
-    is_fixed=False                # 是否固定
-)
-
-# 获取实体信息
-print(f"球体粒子数量: {sphere_entity.n_particles}")
-print(f"球体边数量: {sphere_entity.n_edges}")
-```
 
 ```{eval-rst}  
 .. autoclass:: genesis.engine.entities.pbd_entity.PBDTetEntity

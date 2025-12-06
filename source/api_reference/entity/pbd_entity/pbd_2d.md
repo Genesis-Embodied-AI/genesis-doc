@@ -29,34 +29,6 @@
 | `elem_end` | 实体元素在全局元素缓冲区中的结束索引 |
 | `n_elems` | 实体包含的元素数量 |
 
-## 代码示例
-
-```python
-import genesis as gs
-
-# 初始化 Genesis
-gs.init()
-
-# 创建场景
-scene = gs.Scene()
-
-# 创建 2D 布料实体
-cloth_entity = scene.create_2d_entity(
-    width=2.0,           # 布料宽度
-    height=2.0,          # 布料高度
-    segments_x=20,       # X 方向的段数
-    segments_y=20,       # Y 方向的段数
-    pos=[0, 0, 2],       # 布料中心位置
-    particle_size=0.05,  # 粒子大小
-    is_fixed_top=True    # 固定顶部边缘
-)
-
-# 获取实体信息
-print(f"布料粒子数量: {cloth_entity.n_particles}")
-print(f"布料元素数量: {cloth_entity.n_elems}")
-print(f"布料是否固定顶部: {cloth_entity.is_fixed_top}")
-```
-
 ```{eval-rst}  
 .. autoclass:: genesis.engine.entities.pbd_entity.PBD2DEntity
     :members:
