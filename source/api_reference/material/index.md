@@ -10,5 +10,4 @@ mpm/index
 fem/index
 pbd/index
 sph/index
-hybrid
 ```

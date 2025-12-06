@@ -37,47 +37,6 @@
 | `is_built` | `bool` | 实体是否已构建完成 |
 | `solver` | `object` | 关联的求解器对象 |
 
-## 代码示例
-
-```python
-import genesis
-from genesis import World, RigidEntity
-
-# 创建一个新的世界
-world = World()
-
-# 创建一个简单的刚体实体
-rigid_entity = RigidEntity(
-    world=world,
-    name="cube",
-    link_params=[
-        {
-            "name": "base",
-            "geoms": [
-                {
-                    "type": "box",
-                    "size": [0.5, 0.5, 0.5],
-                    "pos": [0, 0, 0],
-                    "material": "default"
-                }
-            ]
-        }
-    ]
-)
-
-# 初始化世界
-world.init()
-
-# 获取实体的基本信息
-print(f"Entity name: {rigid_entity.name}")
-print(f"Number of links: {rigid_entity.n_links}")
-print(f"Number of joints: {rigid_entity.n_joints}")
-
-# 运行模拟
-for _ in range(100):
-    world.step()
-```
-
 ```{eval-rst}
 .. autoclass:: genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity
     :members:
