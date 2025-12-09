@@ -6,6 +6,7 @@ This covers rigid-bodied or deformable objects, liquid, etc., simulated with dif
 ```{toctree}
 :maxdepth: 2
 
+base_entity
 rigid_entity/index
 avatar_entity/index
 mpm_entity
@@ -15,6 +16,7 @@ sph_entity
 hybrid_entity
 emitter
 drone_entity
-tool
+particle_entity
+tool_entity/index
 sf
 ```
