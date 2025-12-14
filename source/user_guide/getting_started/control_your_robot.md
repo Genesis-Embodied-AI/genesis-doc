@@ -295,7 +295,18 @@ Below is a minimal example that moves the Franka end-effector above a small cube
 import numpy as np
 import genesis as gs
 
-# --- (scene and robot creation omitted, identical to the sections above) ---
+#---(scene creation) -----identical to above section
+#-----(Add plane)------identical to section above
+
+# Add a cube entity to the scene
+cube = scene.add_entity(
+    gs.morphs.Box(
+        size = (0.08, 0.08, 0.08),
+        pos  = (0.65, 0.0, 0.13),
+    )
+)
+
+# --- (robot creation omitted, identical to the sections above) ---
 
 # Retrieve some commonly used handles
 rigid        = scene.sim.rigid_solver          # low-level rigid body solver
