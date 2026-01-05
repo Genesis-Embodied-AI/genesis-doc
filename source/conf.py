@@ -6,6 +6,9 @@ if os.path.isdir(os.path.join(_local_repo_root, "genesis")):
     sys.path.insert(0, _local_repo_root)
 import genesis as gs
 
+# We need to initialize Genesis before we can import any of it's classes to document
+gs.init(backend=gs.cpu)
+
 __version__ = gs.__version__
 # Configuration file for the Sphinx documentation builder.
 #
