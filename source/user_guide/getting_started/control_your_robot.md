@@ -295,8 +295,7 @@ Below is a minimal example that moves the Franka end-effector above a small cube
 import numpy as np
 import genesis as gs
 
-#---(scene creation) -----identical to above section
-#-----(Add plane)------identical to section above
+# --- (scene and robot creation omitted, identical to the sections above) ---
 
 # Add a cube entity to the scene
 cube = scene.add_entity(
@@ -306,25 +305,23 @@ cube = scene.add_entity(
     )
 )
 
-# --- (robot creation omitted, identical to the sections above) ---
-
 # Retrieve some commonly used handles
-rigid        = scene.sim.rigid_solver          # low-level rigid body solver
-end_effector = franka.get_link("hand")        # Franka gripper frame
-cube_link    = cube.get_link("box_baselink")   # the link we want to pick
+rigid        = scene.sim.rigid_solver   # low-level rigid body solver
+end_effector = franka.get_link("hand")  # Franka gripper frame
+cube_link    = cube.base_link           # the link we want to pick
 
 ################ Reach pre-grasp pose ################
 q_pregrasp = franka.inverse_kinematics(
     link = end_effector,
     pos  = np.array([0.65, 0.0, 0.13]),  # just above the cube
-    quat = np.array([0, 1, 0, 0]),        # down-facing orientation
+    quat = np.array([0, 1, 0, 0]),       # down-facing orientation
 )
 franka.control_dofs_position(q_pregrasp[:-2], np.arange(7))  # arm joints only
 for _ in range(50):
     scene.step()
 
 ################ Attach (activate suction) ################
-link_cube   = np.array([cube_link.idx],   dtype=gs.np_int)
+link_cube   = np.array([cube_link.idx],    dtype=gs.np_int)
 link_franka = np.array([end_effector.idx], dtype=gs.np_int)
 rigid.add_weld_constraint(link_cube, link_franka)
 
