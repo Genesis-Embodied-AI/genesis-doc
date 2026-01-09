@@ -1,4 +1,4 @@
-# Conventions
+# 📐 Conventions
 
 This page outlines the coordinate system and mathematical conventions used throughout Genesis.
 
