@@ -40,6 +40,7 @@ getting_started/soft_robots
 getting_started/hybrid_entity
 getting_started/emitters
 getting_started/surfaces_textures
+getting_started/usd_import
 getting_started/domain_randomization
 getting_started/miscellaneous
 getting_started/config_system
