@@ -221,4 +221,4 @@ The following are some examples of stage tree structures that can be correctly r
 - Explore [inverse kinematics](inverse_kinematics_motion_planning.md) for USD-loaded robots
 - Check out [parallel simulation](parallel_simulation.md) for training with USD assets
 - See the [API reference](../../api_reference/options/morph/file_morph/file_morph.md) for detailed USD morph options
-
+- See the [conventions](../conventions.md) for more details on the coordinate system and mathematical conventions used throughout Genesis.
