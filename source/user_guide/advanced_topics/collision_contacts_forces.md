@@ -66,7 +66,7 @@ The narrow phase is split into four specialised kernels:
 | `_func_narrow_phase_any_vs_terrain` | at least one geometry is a *height-field terrain* | Generate multiple contact points per supporting cell.
 | `_func_narrow_phase_nonconvex_vs_nonterrain` | at least one geometry is **non-convex** | Handles mesh ↔ convex or mesh ↔ mesh collisions via SDF vertex/edge sampling.
 
-### 3.1&nbsp; Convex–Convex 
+### 3.1&nbsp; Convex–Convex
 
 #### 3.1.1. GJK
 
@@ -77,7 +77,7 @@ GJK, along with EPA, is a widely used contact detection algorithm in many physic
 * Gives seperation distance when the geometries are not in contact.
 * Verified numerical robustness in many implementations.
 
-In Genesis, it is enabled when `use_gjk_collision` option in `RigidOptions` is set to be `True`. Also, Genesis enhances 
+In Genesis, it is enabled when `use_gjk_collision` option in `RigidOptions` is set to be `True`. Also, Genesis enhances
 the robustness of GJK with following measures.
 
 * Thorough degeneracy check on simplex and polytope during runtime.
@@ -86,13 +86,13 @@ the robustness of GJK with following measures.
 
 Genesis accelerates support queries with a **pre-computed Support Field** (see {doc}`Support Field <support_field>`).
 
-Multi-contact generation is enabled by *small pose perturbations* around the first contact normal.  At most five 
+Multi-contact generation is enabled by *small pose perturbations* around the first contact normal.  At most five
 contacts (`_n_contacts_per_pair = 5`) are stored per pair.
 
 #### 3.1.2. MPR
 
-MPR is another contact detection algorithm widely adopted in physics engines. Even though it shares most of the advantages 
-of GJK, it does not give separation distance when the geometries are not colliding, and could be susceptible to numerical 
+MPR is another contact detection algorithm widely adopted in physics engines. Even though it shares most of the advantages
+of GJK, it does not give separation distance when the geometries are not colliding, and could be susceptible to numerical
 errors and degeneracies as it is not verified as much as GJK in many implementations.
 
 In Genesis, MPR is improved with a signed-distance-field fall-back when there is a deep penetration.
@@ -151,7 +151,7 @@ When this feature is enabled, contacts belonging exclusively to hibernated bodie
 | `RigidSolver._max_collision_pairs` | 4096 | upper bound on broad-phase pairs (per environment) |
 | `Collider._mc_perturbation` | `1e-2` rad | perturbation angle for multi-contact search |
 | `Collider._mc_tolerance`    | `1e-2` of AABB size  | duplicate-contact rejection radius |
-| `Collider._mpr_to_sdf_overlap_ratio` | `0.5` | threshold to switch from MPR to SDF when one shape encloses the other |
+| `Collider._mpr_to_gjk_overlap_ratio` | `0.5` | threshold to switch from MPR to SDF when one shape encloses the other |
 
 ---
 

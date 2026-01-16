@@ -45,7 +45,7 @@ source ~/.bashrc
 
 If you need photo-realistic visuals, Genesis has a built-in a ray-tracing (path-tracing) based renderer developped using [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain specific language designed for rendering. See [Visualization & Rendering](../getting_started/visualization.md) for setup.
 
-## (Optional) USD Assets 
+## (Optional) USD Assets
 
 If you need load USD assets as `gs.morphs.Mesh` into Genesis scene, you need to install the dependencies through:
 ```bash
@@ -69,14 +69,6 @@ Genesis is not initialized, trying to import any engine-related submodule will r
 Traceback (most recent call last):
   File "/home/jeremy/Downloads/Genesis_Jeremy/examples/./init_error.py", line 3, in <module>
     from genesis.engine.entities import RigidEntity
-  File "/home/jeremy/.pyenv/versions/spider-genesis/lib/python3.11/site-packages/genesis/engine/entities/__init__.py", line 1, in <module>
-    from .avatar_entity import AvatarEntity
-  File "/home/jeremy/.pyenv/versions/spider-genesis/lib/python3.11/site-packages/genesis/engine/entities/avatar_entity/__init__.py", line 1, in <module>
-    from .avatar_entity import AvatarEntity
-  File "/home/jeremy/.pyenv/versions/spider-genesis/lib/python3.11/site-packages/genesis/engine/entities/avatar_entity/avatar_entity.py", line 6, in <module>
-    from ..rigid_entity import RigidEntity
-  File "/home/jeremy/.pyenv/versions/spider-genesis/lib/python3.11/site-packages/genesis/engine/entities/rigid_entity/__init__.py", line 1, in <module>
-    from .rigid_entity import RigidEntity
   File "/home/jeremy/.pyenv/versions/spider-genesis/lib/python3.11/site-packages/genesis/engine/entities/rigid_entity/rigid_entity.py", line 14, in <module>
     from genesis.utils import array_class
   File "/home/jeremy/.pyenv/versions/spider-genesis/lib/python3.11/site-packages/genesis/utils/array_class.py", line 13, in <module>
@@ -244,7 +236,7 @@ Genesis tries EGL rendering by default, so in most environments you don’t need
 
 After installing Pytorch and Genesis, Taichi falls back to CPU, while torch initalizes okay on CUDA.
 
-Symptoms: 
+Symptoms:
 
 - running `python -c "import torch; print(torch.zeros((3,), device='cuda'))"` outputs `tensor([0., 0., 0.], device='cuda:0')`
 - but running `python -c "import gstaichi as ti; ti.init(arch=ti.gpu)"` outputs something like

@@ -5,7 +5,6 @@ This covers rigid-bodied or deformable objects, liquid, etc., simulated with dif
 
 ```{toctree}
 rigid_entity/index
-avatar_entity/index
 mpm_entity
 fem_entity
 pbd_entity/index

@@ -5,7 +5,6 @@ You could find the physical properties and their corresponding values here such 
 
 ```{toctree}
 rigid
-avatar
 mpm/index
 fem/index
 pbd/index
