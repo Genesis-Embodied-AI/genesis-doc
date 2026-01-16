@@ -14,7 +14,6 @@
     - all different entities are added via the same `scene.add_entity()`
 - default solver order (for code consistency)
     - rigid
-    - avatar
     - mpm
     - sph
     - pbd
@@ -24,7 +23,7 @@
     - quaternion: `[w, x, y, z]`
     - euler
         - user input: we use extrinsic x-y-z, in `degree`, as this is more intuitive
-            - interpretation: we use `scipy.Rotation`'s `xyz` ordering.
+            - interpretation: it follows `scipy.Rotation`'s `xyz` ordering.
         - internal xyz:
             - euler is defined differently in various sources
             - in our case, we use xyz to refer to the intrinsic rotation in order x-y-z, same as mujoco. Note that this aligns with others, e.f. dof force and position.

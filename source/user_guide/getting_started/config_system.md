@@ -19,7 +19,6 @@ scene = gs.Scene(
     # solvers
     tool_options=ToolOptions(...),
     rigid_options=RigidOptions(...),
-    avatar_options=AvatarOptions(...),
     mpm_options=MPMOptions(...),
     sph_options=SPHOptions(...),
     fem_options=FEMOptions(...),
@@ -63,7 +62,6 @@ Defined in [genesis/options/solvers.py](https://github.com/Genesis-Embodied-AI/G
 
 Solvers are the cores behind specific physical models. Each solver encapsulates a simulation algorithm for a particular material or system—rigid bodies, fluids, deformables, etc. Users can enable or disable solvers depending on the scenario.
 - `RigidOptions`: Rigid body dynamics with contact, collision, and constraints.
-- `AvatarOptions`: Simulation of animated characters.
 - `MPMOptions`: Material Point Method solver for elastic, plastic, granular, fluidic materials.
 - `SPHOptions`: Smoothed Particle Hydrodynamics solver for fluids and granular flows.
 - `FEMOptions`: Finite Element Method solver for elastic material.
@@ -105,7 +103,6 @@ Defined in [genesis/options/morphs.py](https://github.com/Genesis-Embodied-AI/Ge
 
 Materials define how an object responds to physical forces. This includes stiffness, friction, elasticity, damping, and solver-specific material parameters. The material also determines how an entity interacts with other objects and solvers.
 - `Rigid`: Rigid-bodied and articulated.
-    - `Avatar`: Abstraction for avatar / animated characters.
 - `MPM`: Material Point Method.
     - `Elastic`
     - `ElastoPlastic`
