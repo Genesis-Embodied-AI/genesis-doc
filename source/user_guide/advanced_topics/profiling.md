@@ -56,6 +56,7 @@ if profiler is not None:
     - `warmup` not sure if needs to be non-0, but I put 3, just in case
     - `active` ⇒ 1 is generally enough, and will reduce memory used. You can experiment with larger values if you wish, of course
     - `repeat` should be 1 in general: run the sequence of steps once, then stop profiling
+    - see official documentation [PyTorch profiler schedule documentation](https://docs.pytorch.org/docs/stable/profiler.html#torch.profiler.schedule)
 - for cpu code, both pyspy and pytorch profiler will give a hierarchical flame graph style view
     - however, the step() ‘wait’ functionality means you’ll skip all the initialization stuff at the start, that you’re not interested in, and the ‘active’ functionality means you’ll get consistent times
     - also, pytorch profiler shows the actual sequence of calls, rather than the statistically sampled distribution (I think)
