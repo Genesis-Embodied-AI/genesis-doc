@@ -95,3 +95,5 @@ def k1(... previous args, times: ti.types.NDArray[ti.i64, 1]:
       times[Time.UpdateConstraint, it] = end - start
   start = end
 ```
+
+For an example of processing the results, see [genesis/examples/speed_benchmark/timers.py](genesis/examples/speed_benchmark/timers.py).
