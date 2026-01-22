@@ -57,7 +57,9 @@ if self.profiler is not None:
 
 ## Within gstaichi kernels
 
-Create an enum with the things you will want to measure, e.g.:
+Torch profiler records the time spend in CUDA kernels, not gstaichi kernels. This is already one level deeper than what you could do with a CPU-only profiler (e.g. pyspy) + sync. But if you want to go deeper and profile code blocks inside individual GPU kernels per GPU-thread (block actually), you can use clock_counter for this.
+
+First, create an enum with the things you will want to measure, e.g.:
 
 ```bash
 from enum import IntEnum
