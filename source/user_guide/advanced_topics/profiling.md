@@ -43,7 +43,7 @@ Add pytorch profiler to the code, e.g.:
 - for gpu code, you don’t directly get any sort of hierarchy
     - you do however have very precise duration of each kernel launch time and duration
     - and you can clearly see any non-hidden kernel launch overhead, which is visible as white gaps between each kernel
-    - if you do want a correspondance/alignment with the python-side code hierarchy, you can modify the code to call `sync()`, just before each step
+    - if you do want to see the gpu kernels aligned with the python-side hierarchical view, which can help with understanding what the gpu kernel relates to, you can modify the code to call `sync()`, just before each step
         - this will add some latency (e.g. 2x slower, for example)
         - but means you can trust the alignment between the python hierarchical view and the gpu kernel view
 
