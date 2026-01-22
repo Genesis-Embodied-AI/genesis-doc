@@ -4,48 +4,28 @@
 
 Add pytorch profiler to the code, e.g.:
 
-```bash
-parser.add_argument(
-    "--profile", action="store_true", default=False,
-    help="Enable PyTorch profiling"
-)
-[...]
-
-profiler = None
-if args.profile:
-    warmup={args.profile_warmup}, "
-                    f"active={args.profile_active}, repeat={args.profile_repeat}")
-
-    profiler_dir = os.path.join(en.log_dir, "profiler")
-    os.makedirs(profiler_dir, exist_ok=True)
-
+```python
     schedule=torch.profiler.schedule(
         wait=80,
         warmup=3,
         active=1,
         repeat=1
     )
-    print('schedule', schedule)
-    profiler = torch.profiler.profile(
+    with torch.profiler.profile(
         activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
         schedule=schedule,
         record_shapes=False,
         profile_memory=False,
         with_stack=True,
         with_flops=False,
-    )
-    profiler.__enter__()  # Start the profiler context
-```
-
-- within the code you wish to profile, call `profiler.step()` at regular times
-- after running the code, dump the trace as a chrome trace:
-
-```bash
-if profiler is not None:
-    profiler.__exit__(None, None, None)  # Exit the profiler context
+    ) as profiler:
+        for _ in range(steps):
+            profiler.step()
+    # note that this must be OUTSIDE of the context manager
     profiler.export_chrome_trace("trace.json")
 ```
-- open the trace in http://ui.perfetto.dev/
+- within the code you wish to profile, call `profiler.step()` at regular times
+- after running, open the trace in http://ui.perfetto.dev/
 
 **Notes:**
 
