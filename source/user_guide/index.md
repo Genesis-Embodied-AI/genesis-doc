@@ -63,6 +63,7 @@ advanced_topics/support_field
 advanced_topics/checkpoints
 advanced_topics/mesh_processing
 advanced_topics/multi_gpu
+advanced_topics/profiling
 ```
 
 <!-- advanced_topics/drone -->
