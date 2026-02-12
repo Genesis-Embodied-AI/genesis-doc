@@ -107,5 +107,5 @@ obj_y = scene.add_entity(
 
 After import, the morph will have a **imported_as_zup** flag that allows to know if a correction was done on the meshes:
 ```python
-obj_y.morph.metadata["imported_as_zup"]
+obj_y.vgeoms[0].mesh.metadata["imported_as_zup"]
 ```

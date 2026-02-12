@@ -132,7 +132,7 @@ For joints,
     ```python
     ti.types.struct(
         stiffness=gs.ti_float,        # stiffness of the DoF
-        sol_params=gs.ti_vec7,        # constraint solver ()
+        sol_params=gs.ti_vec7,        # constraint solver
         invweight=gs.ti_float,        # inverse mass
         armature=gs.ti_float,         # dof armature inertia/mass 
         damping=gs.ti_float,          # damping coefficient

@@ -29,7 +29,7 @@ The first step is to import genesis and initialize it:
 import genesis as gs
 gs.init(backend=gs.cpu)
 ```
-- **Backend device**: Genesis is designed to be cross-platform, meaning that it supports various backend devices. Here we are using `gs.cpu`. If you need GPU-accelerated [parallel simulation](parallel_simulation.md), you can switch to other backends such as `gs.cuda`, `gs.vulkan` or `gs.metal`. You can also use `gs.gpu` as a shortcut, and genesis will select a backend based on your system (e.g. `gs.cuda` if CUDA is available, and `gs.metal` for Apple Silicon devices).
+- **Backend device**: Genesis is designed to be cross-platform, meaning that it supports various backend devices. Here we are using `gs.cpu`. If you need GPU-accelerated [parallel simulation](parallel_simulation.md), you can switch to other backends such as `gs.cuda`, `gs.amdgpu` or `gs.metal`. You can also use `gs.gpu` as a shortcut, and genesis will select a backend based on your system (e.g. `gs.cuda` if CUDA is available, and `gs.metal` for Apple Silicon devices).
 - **Precision level**: By default, genesis uses f32 precision. You can change to f64 if you want a higher precision level by setting `precision='64'`.
 - **Logging level**: Once genesis is initialized, you will see logger output on your terminal detailing your system info and genesis-related info like its current version. You can suppress logger output by setting `logging_level` to `'warning'`.
 - **Color scheme**: The default color theme used by genesis logger is optimized for dark background terminal, i.e. `theme='dark'`. You can change to `'light'` if you are using a terminal with a light background, or simply use `'dumb'` if you are a black-and-white person.
