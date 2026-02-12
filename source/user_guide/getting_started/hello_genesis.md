@@ -1,8 +1,8 @@
-# 👋🏻 Hello, Genesis
+# 👋🏻 你好，Genesis
 
 ```{figure} ../../_static/images/hello_genesis.png
 ```
-In this tutorial, we will go through a basic example that loads a single Franka arm and then let it fall freely onto the floor, and use this example to illustrate the core steps for creating a simulation experiment in genesis, and some basic concepts:
+在本教程中，我们将通过一个基本示例来演示：加载单个 Franka 机械臂，让它自由落到地板上，并使用这个示例来说明在 Genesis 中创建仿真实验的核心步骤以及一些基本概念：
 
 ```python
 import genesis as gs
@@ -19,22 +19,22 @@ scene.build()
 for i in range(1000):
     scene.step()
 ```
-This is the **complete code script**! Such an example only takes <10 lines of code, and already encapsulates all the necessary steps needed for creating a simulation experiment using genesis. 
+这是**完整的代码脚本**！这样一个示例仅需不到 10 行代码，就已经包含了使用 Genesis 创建仿真实验所需的全部必要步骤。
 
-You can stop here and start exploring genesis if you want, but if you are patient enough, let's go through it step by step together:
+如果你愿意，现在就可以停止阅读，开始探索 Genesis。但如果你有足够的耐心，让我们一起一步一步地了解它：
 
-#### Initialization
-The first step is to import genesis and initialize it:
+#### 初始化
+第一步是导入 Genesis 并初始化它：
 ```
 import genesis as gs
 gs.init(backend=gs.cpu)
 ```
-- **Backend device**: Genesis is designed to be cross-platform, meaning that it supports various backend devices. Here we are using `gs.cpu`. If you need GPU-accelerated [parallel simulation](parallel_simulation.md), you can switch to other backends such as `gs.cuda`, `gs.vulkan` or `gs.metal`. You can also use `gs.gpu` as a shortcut, and genesis will select a backend based on your system (e.g. `gs.cuda` if CUDA is available, and `gs.metal` for Apple Silicon devices).
-- **Precision level**: By default, genesis uses f32 precision. You can change to f64 if you want a higher precision level by setting `precision='64'`.
-- **Logging level**: Once genesis is initialized, you will see logger output on your terminal detailing your system info and genesis-related info like its current version. You can suppress logger output by setting `logging_level` to `'warning'`.
-- **Color scheme**: The default color theme used by genesis logger is optimized for dark background terminal, i.e. `theme='dark'`. You can change to `'light'` if you are using a terminal with a light background, or simply use `'dumb'` if you are a black-and-white person.
+- **后端设备（Backend device）**：Genesis 设计为跨平台，支持各种后端设备。这里我们使用 `gs.cpu`。如果你需要 GPU 加速的[并行仿真](parallel_simulation.md)，可以切换到其他后端，如 `gs.cuda`、`gs.vulkan` 或 `gs.metal`。你也可以使用 `gs.gpu` 作为快捷方式，Genesis 会根据你的系统选择合适的后端（例如，如果有 CUDA 可用则选择 `gs.cuda`，对于 Apple Silicon 设备则选择 `gs.metal`）。
+- **精度级别（Precision level）**：默认情况下，Genesis 使用 f32 精度。如果需要更高的精度，可以通过设置 `precision='64'` 切换到 f64。
+- **日志级别（Logging level）**：Genesis 初始化后，你会在终端看到日志输出，详细说明系统信息和 Genesis 相关信息，如当前版本。你可以通过将 `logging_level` 设置为 `'warning'` 来抑制日志输出。
+- **配色方案（Color scheme）**：Genesis 日志使用的默认配色主题针对深色背景终端进行了优化，即 `theme='dark'`。如果你使用的是浅色背景的终端，可以切换到 `'light'`，或者如果你只喜欢黑白配色，可以直接使用 `'dumb'`。
 
-A more detailed example of an `gs.init()` call would look like this:
+一个更详细的 `gs.init()` 调用示例如下：
 ```python
 gs.init(
     seed                = None,
@@ -48,14 +48,14 @@ gs.init(
 )
 ```
 
-#### Create a scene
-All the objects, robots, cameras, etc. in genesis are placed in a genesis `Scene`:
+#### 创建场景
+Genesis 中的所有对象、机器人、相机等都放置在一个 Genesis `Scene` 中：
 ```python
 scene = gs.Scene()
 ```
-A scene wraps a `simulator` object, which handles all the underlying physics solvers, and a `visualizer` object, which manages visualization-related concepts. For more details and APIs, see [`Scene`](../../api_reference/scene/scene.md).
+一个场景包装了一个 `simulator` 对象，它处理所有底层的物理求解器，以及一个 `visualizer` 对象，它管理与可视化相关的概念。有关更多详细信息和 API，请参阅 [`Scene`](../../api_reference/scene/scene.md)。
 
-When creating a scene, there's various physics solver parameters you can configure. A slightly more complex example would be:
+创建场景时，你可以配置各种物理求解器参数。一个稍微复杂一点的例子是：
 ```python
 scene = gs.Scene(
     sim_options=gs.options.SimOptions(
@@ -70,75 +70,75 @@ scene = gs.Scene(
     ),
 )
 ```
-This example sets simulation `dt` to be 0.01s for each step, configures gravity, and sets the initial camera pose for the interactive viewer.
+这个示例将仿真 `dt` 设置为每步 0.01 秒，配置了重力，并为交互式查看器设置了初始相机姿态。
 
 
-#### Load objects into the scene
-In this example, we load one plane and one franka arm into the scene:
+#### 将对象加载到场景中
+在这个示例中，我们将一个平面和一个 Franka 机械臂加载到场景中：
 ```python
 plane = scene.add_entity(gs.morphs.Plane())
 franka = scene.add_entity(
     gs.morphs.MJCF(file='xml/franka_emika_panda/panda.xml'),
 )
 ```
-In genesis, all the objects and robots are represented as [`Entity`](../../api_reference/entity/index.md). Genesis is designed to be fully object-oriented, so you will be able to interact with these entity objects through their methods directly, instead of using a handle or a global id assigned to them.
-The first parameter for `add_entity` is [`morph`](../../api_reference/options/morph/index.md). A morph in Genesis is a hybrid concept, encapsulating both the geometry and pose information of an entity. By using different morphs, you can instantiate genesis entities from shape primitives, meshes, URDF, MJCF, Terrain, or soft robot description files.
+在 Genesis 中，所有对象和机器人都表示为 [`Entity`](../../api_reference/entity/index.md)。Genesis 设计为完全面向对象，因此你可以直接通过这些实体对象的方法与它们交互，而不是使用分配给它们的句柄或全局 ID。
+`add_entity` 的第一个参数是 [`morph`](../../api_reference/options/morph/index.md)。在 Genesis 中，morph 是一个混合概念，封装了实体的几何和姿态信息。通过使用不同的 morph，你可以从形状基元、网格、URDF、MJCF、地形或软体机器人描述文件实例化 Genesis 实体。
 
-When creating the morph, you can additionally specify its position, orientation, size, etc. For orientation, a morph accepts either `euler` (scipy extrinsic x-y-z convention) or `quat` (w-x-y-z convention). One example would be:
+创建 morph 时，你可以额外指定其位置、方向、大小等。对于方向，morph 接受 `euler`（scipy 外旋 x-y-z 约定）或 `quat`（w-x-y-z 约定）。一个示例是：
 ```python
 franka = scene.add_entity(
     gs.morphs.MJCF(
         file  = 'xml/franka_emika_panda/panda.xml',
         pos   = (0, 0, 0),
-        euler = (0, 0, 90), # we follow scipy's extrinsic x-y-z rotation convention, in degrees,
-        # quat  = (1.0, 0.0, 0.0, 0.0), # we use w-x-y-z convention for quaternions,
+        euler = (0, 0, 90), # 我们遵循 scipy 的外旋 x-y-z 旋转约定，以度为单位
+        # quat  = (1.0, 0.0, 0.0, 0.0), # 我们使用 w-x-y-z 约定表示四元数
         scale = 1.0,
     ),
 )
 ```
 
-We currently support different types of shape primitives including:
+我们目前支持不同类型的形状基元，包括：
 - `gs.morphs.Plane`
 - `gs.morphs.Box`
 - `gs.morphs.Cylinder`
 - `gs.morphs.Sphere`
 
-In addition, for training locomotion tasks, we support various types of built-in terrains as well as terrains initialized from user-given height maps via `gs.morphs.Terrain`, which we will cover in the following tutorials.
+此外，对于训练运动任务，我们还支持各种内置地形以及通过 `gs.morphs.Terrain` 从用户给定的高度图初始化的地形，这将在后面的教程中介绍。
 
-We support loading from external files with different formats including :
-- `gs.morphs.MJCF`: mujoco `.xml` robot configuration files
-- `gs.morphs.URDF`: robot description files that end with `.urdf` (Unified Robotics Description Format)
-- `gs.morphs.USD`: Universal Scene Description files (`.usd`, `.usda`, `.usdc`, `.usdz`) for loading complex scenes with articulated robots and rigid objects. See the [USD Import tutorial](usd_import.md) for detailed information.
-- `gs.morphs.Mesh`: non-articulated mesh assets, supporting extensions including: `*.obj`, `*.ply`, `*.stl`, `*.glb`, `*.gltf`
+我们支持从不同格式的外部文件加载，包括：
+- `gs.morphs.MJCF`：Mujoco `.xml` 机器人配置文件
+- `gs.morphs.URDF`：以 `.urdf` 结尾的机器人描述文件（统一机器人描述格式）
+- `gs.morphs.USD`：通用场景描述文件（`.usd`, `.usda`, `.usdc`, `.usdz`），用于加载包含关节机器人和刚体的复杂场景。详细信息请参阅 [USD 导入教程](usd_import.md)。
+- `gs.morphs.Mesh`：非关节网格资产，支持的扩展名包括：`*.obj`, `*.ply`, `*.stl`, `*.glb`, `*.gltf`
 
 
-When loading from external files, you need to specify the file location using the `file` parameter. When parsing this, we support both *absolute* and *relative* file path. Note that since genesis also comes with an internal asset directory (`genesis/assets`), so if a relative path is used, we search not only relative path with respect to your current working directory, but also under `genesis/assets`. Therefore, in this example, we will retrieve the franka model from: `genesis/assets/xml/franka_emika_panda/panda.xml`.
+从外部文件加载时，你需要使用 `file` 参数指定文件位置。在解析时，我们支持*绝对*和*相对*文件路径。注意，由于 Genesis 还带有一个内部资产目录（`genesis/assets`），如果使用相对路径，我们不仅会搜索相对于当前工作目录的路径，还会在 `genesis/assets` 下搜索。因此，在这个示例中，我们将从以下位置获取 Franka 模型：`genesis/assets/xml/franka_emika_panda/panda.xml`。
 
 :::{note}
-During genesis's development, we have tried to support as many file extensions as we can, including support for loading their associated textures for rendering. If you would like us to support any other file types not listed above, or if you find your texture is not being loaded or rendered correctly, feel free to submit a feature request!
+在 Genesis 的开发过程中，我们尝试支持尽可能多的文件扩展名，包括支持加载它们关联的纹理以进行渲染。如果你希望我们支持上面未列出的任何其他文件类型，或者发现你的纹理未正确加载或渲染，请随时提交功能请求！
 :::
 
-If you want to load a Franka arm using an external **URDF** file, you can simply change the morph to `gs.morphs.URDF(file='urdf/panda_bullet/panda.urdf', fixed=True)`. Note that unlike MJCF file which already specifies the joint type connecting the robot's base link and the `world`, URDF file doesn't come with this information. Therefore, by default, the base link of a URDF robot tree is disconnected from the `world` (or more precisely, connected to `world` via a `free` 6-dof joint). Therefore, we need to additionally specify `fixed=True` for `morphs.URDF` and `morphs.Mesh` if we want the base link to be fixed.
+如果你想使用外部 **URDF** 文件加载 Franka 机械臂，只需将 morph 更改为 `gs.morphs.URDF(file='urdf/panda_bullet/panda.urdf', fixed=True)`。注意，与 MJCF 文件已经指定了机器人基座连杆与 `world` 之间的关节类型不同，URDF 文件不包含此信息。因此，默认情况下，URDF 机器人树的基座连杆与 `world` 断开连接（或者更准确地说，通过 `free` 6 自由度关节与 `world` 连接）。因此，如果我们希望基座连杆固定，需要额外为 `morphs.URDF` 和 `morphs.Mesh` 指定 `fixed=True`。
 
 
-#### Build the scene and start simulating
+#### 构建场景并开始仿真
 ```Python
 scene.build()
 for i in range(1000):
     scene.step()
 ```
-Now that everything has been added, we can start the simulation. Note that we now need to ***build*** the scene first by calling `scene.build()`. This is because genesis uses just-in-time (JIT) technology to compile GPU kernels on the fly for each run, so we need an explicit step to initiate this process, which puts everything in place, allocates device memory, and creates underlying data fields for simulation.
+现在一切都已添加完毕，我们可以开始仿真了。注意，我们现在需要先调用 `scene.build()` 来***构建***场景。这是因为 Genesis 使用即时（JIT）技术为每次运行动态编译 GPU 内核，因此我们需要一个显式的步骤来启动这个过程，将一切放置到位、分配设备内存并为仿真创建底层数据字段。
 
-Once the scene is built, an interactive viewer will pop up to visualize the scene. The viewer comes with various keyboard shortcuts for video recording, screenshot, switching between different visualization modes, etc. We will discuss more details on visualization later in this tutorial.
+场景构建后，一个交互式查看器将弹出以可视化场景。查看器带有各种键盘快捷键，用于视频录制、截图、在不同可视化模式之间切换等。我们将在本教程后面讨论更多关于可视化的细节。
 
 
 :::{note}
-**Kernel compilation and caching**
+**内核编译和缓存**
 
-Due to the nature of JIT, each time you create a scene with a new configuration (i.e. different robot types, different number of objects, etc. that involves size change of the internal data structure), genesis needs to re-compile the GPU kernels on the fly. Genesis supports auto-caching of compiled kernels: after the first run (as long as it exits normally or is killed via `ctrl + c`, **not** `ctrl + \`), if the scene configuration stays the same, we will load from cached kernels from previous runs to speed up the scene creation process.
+由于 JIT 的特性，每次创建具有新配置的场景时（即不同的机器人类型、不同数量的对象等涉及内部数据结构大小变化的情况），Genesis 需要动态重新编译 GPU 内核。Genesis 支持自动缓存编译的内核：在第一次运行后（只要正常退出或通过 `ctrl + c` 终止，**不是** `ctrl + \`），如果场景配置保持不变，我们将从先前运行的缓存内核中加载，以加快场景创建过程。
 
-We are actively working on optimizing this compilation step by adding techniques like parallel compilation and faster kernel serialization, so we expect to greatly speed up the speed of this step in future releases.
+我们正在积极通过添加并行编译和更快的内核序列化等技术来优化这个编译步骤，因此我们期望在未来版本中大大加快这一步骤的速度。
 :::
 
 
-Now we have walked through the whole example. Next, let's dive into genesis's visualization system, and play with the viewer and add some cameras.
+现在我们已经了解了整个示例。接下来，让我们深入了解 Genesis 的可视化系统，玩玩查看器并添加一些相机。

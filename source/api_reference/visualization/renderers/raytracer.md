@@ -1,17 +1,17 @@
 # Raytracer
 
-The `Raytracer` provides photorealistic rendering using path tracing. It's designed for generating high-quality images and videos.
+`Raytracer` 使用路径追踪提供照片级真实感渲染。它专为生成高质量图像和视频而设计。
 
-## Overview
+## 概述
 
-The Raytracer offers:
+Raytracer 提供：
 
-- **Photorealistic quality**: Global illumination, reflections, refractions
-- **Physical accuracy**: Correct light transport simulation
-- **Advanced materials**: PBR materials, subsurface scattering
-- **Denoising**: AI-based denoising for faster convergence
+- **照片级真实感质量**：全局照明、反射、折射
+- **物理准确性**：正确的光传输仿真
+- **高级材质**：PBR 材质、次表面散射
+- **降噪**：基于 AI 的降噪以加速收敛
 
-## Quick Start
+## 快速开始
 
 ```python
 import genesis as gs
@@ -19,7 +19,7 @@ import genesis as gs
 gs.init()
 scene = gs.Scene()
 
-# Add entities with materials
+# 添加带材质的实体
 plane = scene.add_entity(
     gs.morphs.Plane(),
     surface=gs.surfaces.Plastic(),
@@ -31,34 +31,34 @@ box = scene.add_entity(
 
 scene.build()
 
-# Add raytracer camera
+# 添加 raytracer 相机
 cam = scene.add_camera(
     res=(1920, 1080),
     pos=(3, 0, 2),
     lookat=(0, 0, 0.5),
     fov=40,
-    spp=256,        # Samples per pixel
-    denoise=True,   # Enable denoising
+    spp=256,        # 每像素采样数
+    denoise=True,   # 启用降噪
 )
 
-# Render high-quality image
+# 渲染高质量图像
 scene.step()
 rgb = cam.render(rgb=True)
 ```
 
-## Configuration
+## 配置
 
-Key parameters for raytracer cameras:
+Raytracer 相机的关键参数：
 
-| Parameter | Description | Default |
+| 参数 | 描述 | 默认值 |
 |-----------|-------------|---------|
-| `spp` | Samples per pixel (higher = less noise) | 256 |
-| `denoise` | Enable AI denoising | False |
-| `model` | Camera model (`pinhole` or `thinlens`) | `pinhole` |
-| `aperture` | Aperture for depth of field | 0.0 |
-| `focus_dist` | Focus distance | Auto |
+| `spp` | 每像素采样数（越高 = 噪点越少） | 256 |
+| `denoise` | 启用 AI 降噪 | False |
+| `model` | 相机模型（`pinhole` 或 `thinlens`） | `pinhole` |
+| `aperture` | 景深光圈 | 0.0 |
+| `focus_dist` | 对焦距离 | 自动 |
 
-## Thin Lens (Depth of Field)
+## Thin Lens（景深）
 
 ```python
 cam = scene.add_camera(
@@ -66,24 +66,24 @@ cam = scene.add_camera(
     pos=(3, 0, 2),
     lookat=(0, 0, 0.5),
     model="thinlens",
-    aperture=0.1,      # Larger = more blur
-    focus_dist=3.0,    # Distance to focus plane
+    aperture=0.1,      # 越大 = 越模糊
+    focus_dist=3.0,    # 到焦平面的距离
     spp=512,
 )
 ```
 
-## Materials for Raytracing
+## 光线追踪材质
 
-The raytracer supports advanced surface materials:
+Raytracer 支持高级表面材质：
 
-- **Plastic**: Diffuse with optional roughness
-- **Metal**: Reflective metallic surfaces (Gold, Copper, Iron, etc.)
-- **Glass**: Transparent/refractive materials
-- **Emission**: Light-emitting surfaces
+- **Plastic**：带可选粗糙度的漫反射
+- **Metal**：反射性金属表面（金、铜、铁等）
+- **Glass**：透明/折射材质
+- **Emission**：发光表面
 
-See {doc}`/api_reference/options/surface/index` for all surface types.
+查看 {doc}`/api_reference/options/surface/index` 了解所有表面类型。
 
-## API Reference
+## API 参考
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.raytracer.Raytracer
@@ -92,8 +92,8 @@ See {doc}`/api_reference/options/surface/index` for all surface types.
    :show-inheritance:
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`rasterizer` - Fast rasterization renderer
-- {doc}`/api_reference/options/surface/index` - Surface materials
-- {doc}`/api_reference/options/renderer/raytracer` - Raytracer options
+- {doc}`rasterizer` - 快速光栅化渲染器
+- {doc}`/api_reference/options/surface/index` - 表面材质
+- {doc}`/api_reference/options/renderer/raytracer` - Raytracer 选项

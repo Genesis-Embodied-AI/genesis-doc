@@ -1,19 +1,19 @@
 # RecorderManager
 
-The `RecorderManager` coordinates multiple recorders, handling their lifecycle and data distribution.
+`RecorderManager` 协调多个 recorders，管理它们的生命周期和数据分发。
 
-## Overview
+## 概述
 
-The RecorderManager:
+RecorderManager:
 
-- Manages a collection of recorders
-- Dispatches data to appropriate recorders
-- Handles start/stop of recording sessions
-- Coordinates build and cleanup phases
+- 管理 recorders 集合
+- 将数据分派到适当的 recorders
+- 处理录制会话的启动/停止
+- 协调构建和清理阶段
 
-## Usage
+## 用法
 
-The RecorderManager is typically accessed through the Scene:
+RecorderManager 通常通过 Scene 访问：
 
 ```python
 import genesis as gs
@@ -44,7 +44,7 @@ for i in range(1000):
 scene.stop_recording()
 ```
 
-## Recording Controls
+## 录制控制
 
 ```python
 # Start recording all registered recorders
@@ -61,7 +61,7 @@ scene.stop_recording()
 scene.stop_recording(save_to="output.mp4")
 ```
 
-## API Reference
+## API 参考
 
 ```{eval-rst}
 .. autoclass:: genesis.recorders.recorder_manager.RecorderManager
@@ -70,7 +70,7 @@ scene.stop_recording(save_to="output.mp4")
    :show-inheritance:
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`recorder` - Base recorder class
-- {doc}`/api_reference/scene/scene` - Scene recording methods
+- {doc}`recorder` - 基 recorder 类
+- {doc}`/api_reference/scene/scene` - Scene 录制方法

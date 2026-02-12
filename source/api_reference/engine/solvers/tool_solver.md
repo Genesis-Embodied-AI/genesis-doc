@@ -1,16 +1,16 @@
 # ToolSolver
 
-The `ToolSolver` handles kinematic tools and end-effectors that interact with other physics objects.
+`ToolSolver` 用于处理与其他物理对象交互的运动学工具和末端执行器。
 
-## Overview
+## 概述
 
-The Tool solver provides:
+Tool solver 提供以下功能：
 
-- Kinematic motion control
-- Collision with other solvers (MPM, FEM, etc.)
-- Tool-object interaction
+- Kinematic motion control (运动学运动控制)
+- Collision with other solvers (MPM, FEM, etc.) (与其他 solvers 的碰撞，如 MPM、FEM 等)
+- Tool-object interaction (工具-对象交互)
 
-## Usage
+## 使用方法
 
 ```python
 import genesis as gs
@@ -35,26 +35,26 @@ for i in range(1000):
     scene.step()
 ```
 
-## Configuration
+## 配置
 
-Key options in `ToolOptions`:
+`ToolOptions` 中的关键选项：
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `collision_margin` | float | Collision detection margin |
+| `collision_margin` | float | Collision detection margin (碰撞检测边距) |
 
-## Interaction with Other Solvers
+## 与其他 Solvers 的交互
 
-Tools can interact with:
+Tools 可以与以下对象交互：
 
-- MPM particles
-- FEM elements
-- PBD particles/cloth
-- SPH fluids
+- MPM particles (MPM 粒子)
+- FEM elements (FEM 元素)
+- PBD particles/cloth (PBD 粒子/布料)
+- SPH fluids (SPH 流体)
 
-The coupling is handled automatically by the coupler system.
+耦合由 coupler 系统自动处理。
 
-## See Also
+## 另请参阅
 
-- {doc}`/api_reference/engine/couplers/index` - Coupling with other solvers
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/tool_options` - Full options
+- {doc}`/api_reference/engine/couplers/index` - 与其他 solvers 的耦合
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/tool_options` - 完整选项

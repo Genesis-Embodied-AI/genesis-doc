@@ -1,4 +1,4 @@
-# Emission
+# 自发光 (Emission)
 
 ```{toctree}
 :maxdepth: 2

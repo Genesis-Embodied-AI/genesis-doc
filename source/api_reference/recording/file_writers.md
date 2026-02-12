@@ -1,18 +1,18 @@
 # File Writers
 
-Genesis provides file writers for exporting simulation data to various formats.
+Genesis 提供文件写入器，用于将仿真数据导出到各种格式。
 
-## Available Writers
+## 可用的 Writers
 
 | Writer | Format | Description |
 |--------|--------|-------------|
-| `CSVFileWriter` | `.csv` | Tabular data export |
-| `NPZFileWriter` | `.npz` | NumPy compressed arrays |
-| `VideoFileWriter` | `.mp4` | Video from camera/viewer |
+| `CSVFileWriter` | `.csv` | 表格数据导出 |
+| `NPZFileWriter` | `.npz` | NumPy 压缩数组 |
+| `VideoFileWriter` | `.mp4` | 来自相机/视窗的视频 |
 
 ## CSVFile
 
-Export data as comma-separated values:
+将数据导出为逗号分隔值：
 
 ```python
 import genesis as gs
@@ -42,7 +42,7 @@ scene.stop_recording()
 
 ## NPZFile
 
-Export data as NumPy compressed archive:
+将数据导出为 NumPy 压缩归档：
 
 ```python
 scene.start_recording(
@@ -68,7 +68,7 @@ positions = data["pos"]
 
 ## VideoFile
 
-Record video from cameras or viewer:
+从相机或视窗录制视频：
 
 ```python
 cam = scene.add_camera(
@@ -89,24 +89,24 @@ for i in range(300):
 scene.stop_recording()
 ```
 
-## Configuration Options
+## 配置选项
 
-### Common Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `filepath` | str | Required | Output file path |
-| `hz` | float | None | Recording frequency |
-| `async_mode` | bool | False | Background processing |
-
-### VideoFileWriter Options
+### 通用选项
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `fps` | int | 30 | Video frame rate |
-| `codec` | str | "libx264" | Video codec |
+| `filepath` | str | Required | 输出文件路径 |
+| `hz` | float | None | 录制频率 |
+| `async_mode` | bool | False | 后台处理 |
 
-## API Reference
+### VideoFileWriter 选项
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `fps` | int | 30 | 视频帧率 |
+| `codec` | str | "libx264" | 视频编解码器 |
+
+## API 参考
 
 ```{eval-rst}
 .. automodule:: genesis.recorders.file_writers
@@ -115,7 +115,7 @@ scene.stop_recording()
    :show-inheritance:
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`index` - Recording overview
-- {doc}`plotters` - Real-time visualization
+- {doc}`index` - 录制概述
+- {doc}`plotters` - 实时可视化

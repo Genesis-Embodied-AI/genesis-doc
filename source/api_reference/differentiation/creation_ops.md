@@ -1,14 +1,14 @@
-# Creation Operations
+# 创建操作
 
-Functions for creating Genesis tensors that are compatible with differentiable simulation.
+用于创建与可微分仿真兼容的 Genesis tensors 的函数。
 
-## Overview
+## 概述
 
-When working with differentiable simulation, use these functions to create tensors that properly integrate with the gradient system.
+在使用可微分仿真时，使用这些函数创建与梯度系统正确集成的 tensors。
 
-## Creating Tensors
+## 创建 Tensors
 
-### From Python Values
+### 从 Python 值创建
 
 ```python
 import genesis as gs
@@ -16,10 +16,10 @@ import torch
 
 gs.init()
 
-# Create tensor on correct device
+# 在正确的设备上创建 tensor
 tensor = torch.tensor([1.0, 2.0, 3.0], device=gs.device, dtype=gs.tc_float)
 
-# With gradient tracking
+# 启用梯度追踪
 tensor = torch.tensor(
     [1.0, 2.0, 3.0],
     device=gs.device,
@@ -28,43 +28,43 @@ tensor = torch.tensor(
 )
 ```
 
-### Zeros/Ones
+### 零/一 Tensors
 
 ```python
-# Create zero tensor
+# 创建零 tensor
 zeros = torch.zeros(10, device=gs.device, dtype=gs.tc_float)
 
-# Create ones tensor
+# 创建一 tensor
 ones = torch.ones(10, device=gs.device, dtype=gs.tc_float)
 
-# With gradient tracking
+# 启用梯度追踪
 zeros_grad = torch.zeros(10, device=gs.device, dtype=gs.tc_float, requires_grad=True)
 ```
 
-### Random Tensors
+### 随机 Tensors
 
 ```python
-# Random uniform [0, 1)
+# 随机均匀分布 [0, 1)
 rand = torch.rand(10, device=gs.device, dtype=gs.tc_float)
 
-# Random normal
+# 随机正态分布
 randn = torch.randn(10, device=gs.device, dtype=gs.tc_float)
 ```
 
-## Converting to Genesis Tensors
+## 转换为 Genesis Tensors
 
-Standard PyTorch tensors become Genesis tensors when combined with scene state:
+标准 PyTorch tensors 在与 scene state 结合时会变成 Genesis tensors：
 
 ```python
-# Standard PyTorch tensor
+# 标准 PyTorch tensor
 external = torch.tensor([1.0, 2.0, 3.0], device=gs.device, requires_grad=True)
 
-# Combine with scene state -> Genesis tensor
+# 与 scene state 结合 -> Genesis tensor
 pos = robot.get_pos()
-combined = pos + external  # Result is Genesis tensor
+combined = pos + external  # 结果是 Genesis tensor
 ```
 
-## API Reference
+## API 参考
 
 ```{eval-rst}
 .. automodule:: genesis.grad.creation_ops
@@ -72,7 +72,7 @@ combined = pos + external  # Result is Genesis tensor
    :undoc-members:
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`tensor` - Genesis Tensor class
-- {doc}`index` - Differentiable simulation overview
+- {doc}`tensor` - Genesis Tensor 类
+- {doc}`index` - 可微分仿真概述

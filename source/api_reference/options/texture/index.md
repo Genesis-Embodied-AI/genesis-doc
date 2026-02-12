@@ -1,4 +1,4 @@
-# Texture
+# 纹理
 
 ```{toctree}
 :maxdepth: 2

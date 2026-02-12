@@ -1,4 +1,4 @@
-# MPM
+# MPM（材料点法）
 
 ```{toctree}
 elastic

@@ -1,17 +1,17 @@
 # Recorder
 
-The `Recorder` class is the base class for all recording functionality in Genesis. It provides the interface for capturing and processing simulation data.
+`Recorder` 类是 Genesis 中所有录制功能的基类。它提供了捕获和处理仿真数据的接口。
 
-## Overview
+## 概述
 
 Recorders:
 
-- Capture data at specified frequencies
-- Process data synchronously or asynchronously
-- Support building/cleanup lifecycle
-- Can be reset between episodes
+- 以指定频率捕获数据
+- 支持同步或异步处理数据
+- 支持构建/清理生命周期
+- 可在 episode 之间重置
 
-## Creating Custom Recorders
+## 创建自定义 Recorders
 
 ```python
 import genesis as gs
@@ -41,15 +41,15 @@ class MyRecorder(Recorder):
         self.data_buffer = []
 ```
 
-## Lifecycle
+## 生命周期
 
-1. **`__init__`**: Configure recorder options
-2. **`build()`**: Initialize resources (called when scene builds)
-3. **`process(data, time)`**: Handle each data sample (called during recording)
-4. **`cleanup()`**: Finalize and release resources (called when recording stops)
-5. **`reset()`**: Reset state for new episode
+1. **`__init__`**: 配置 recorder 选项
+2. **`build()`**: 初始化资源（在 scene 构建时调用）
+3. **`process(data, time)`**: 处理每个数据样本（在录制期间调用）
+4. **`cleanup()`**: 完成并释放资源（在录制停止时调用）
+5. **`reset()`**: 为新 episode 重置状态
 
-## API Reference
+## API 参考
 
 ```{eval-rst}
 .. autoclass:: genesis.recorders.base_recorder.Recorder
@@ -58,8 +58,8 @@ class MyRecorder(Recorder):
    :show-inheritance:
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`recorder_manager` - Managing multiple recorders
-- {doc}`file_writers` - Built-in file writers
-- {doc}`plotters` - Built-in plotters
+- {doc}`recorder_manager` - 管理多个 recorders
+- {doc}`file_writers` - 内置文件写入器
+- {doc}`plotters` - 内置绘图器

@@ -1,7 +1,7 @@
 # Entity
 
-An `Entity` object is the abstraction of everything that requires physics simulation (except for rendering) in a scene.
-This covers rigid-bodied or deformable objects, liquid, etc., simulated with different physics solvers such as MPM, PBD, etc.
+`Entity` 对象是场景中所有需要物理仿真（除了渲染）的事物的抽象。
+这包括刚体或可变形物体、液体等，使用不同的物理 solvers（如 MPM、PBD 等）进行仿真。
 
 ```{toctree}
 rigid_entity/index

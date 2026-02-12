@@ -1,21 +1,21 @@
 # Sensors
 
-Genesis provides a variety of sensors for perceiving the simulation state. Sensors are attached to entities and provide data such as visual observations, force measurements, and inertial readings.
+Genesis 提供多种传感器用于感知仿真状态。Sensors 附加到 entities 上，提供视觉观测、力测量和惯性读数等数据。
 
-## Overview
+## 概览
 
-Available sensor types:
+可用的传感器类型：
 
-| Sensor | Description | Use Case |
+| Sensor | 描述 | 使用场景 |
 |--------|-------------|----------|
-| **Camera** | Visual observations (RGB, depth, segmentation) | Vision-based control |
-| **ContactForceSensor** | Force/torque at contact points | Manipulation, grasping |
-| **IMUSensor** | Accelerometer and gyroscope readings | Robot state estimation |
-| **RaycasterSensor** | Ray-based distance measurements | LIDAR, proximity sensing |
+| **Camera** | 视觉观测（RGB、深度、分割） | 基于视觉的控制 |
+| **ContactForceSensor** | 接触点的力/力矩 | 操作、抓取 |
+| **IMUSensor** | 加速度计和陀螺仪读数 | 机器人状态估计 |
+| **RaycasterSensor** | 基于射线的距离测量 | LIDAR、接近感应 |
 
-## Quick Start
+## 快速开始
 
-### Adding Sensors
+### 添加 Sensors
 
 ```python
 import genesis as gs
@@ -24,17 +24,17 @@ gs.init()
 scene = gs.Scene()
 robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 
-# Camera sensor (via add_camera)
+# Camera sensor（通过 add_camera）
 cam = scene.add_camera(
     res=(640, 480),
     pos=(3, 0, 2),
     lookat=(0, 0, 0.5),
 )
 
-# Build scene first
+# 首先 build scene
 scene.build()
 
-# Contact force sensor on end-effector
+# 在末端执行器上的接触力 sensor
 contact_sensor = scene.add_sensor(
     gs.sensors.ContactForce(
         link=robot.get_link("end_effector"),
@@ -49,7 +49,7 @@ imu = scene.add_sensor(
 )
 ```
 
-### Reading Sensor Data
+### 读取 Sensor 数据
 
 ```python
 scene.step()
@@ -58,7 +58,7 @@ scene.step()
 rgb = cam.render(rgb=True)
 depth = cam.render(depth=True)
 
-# Contact force
+# 接触力
 force = contact_sensor.get_data()
 
 # IMU
@@ -67,7 +67,7 @@ acceleration = imu_data.linear_acceleration
 angular_velocity = imu_data.angular_velocity
 ```
 
-## Sensor Types
+## Sensor 类型
 
 ```{toctree}
 :titlesonly:
@@ -78,7 +78,7 @@ imu
 raycaster
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`/api_reference/visualization/index` - Visualization system
-- {doc}`/api_reference/entity/index` - Adding sensors to entities
+- {doc}`/api_reference/visualization/index` - 可视化系统
+- {doc}`/api_reference/entity/index` - 向 entities 添加 sensors

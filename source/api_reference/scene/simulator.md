@@ -1,4 +1,4 @@
-# `Simulator`
+# `仿真器 (Simulator)`
 
 ```{eval-rst}  
 .. autoclass:: genesis.engine.simulator.Simulator

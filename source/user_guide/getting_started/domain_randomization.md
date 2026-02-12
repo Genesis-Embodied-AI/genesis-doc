@@ -1,10 +1,10 @@
-# 🎲 Domain Randomization
+# 🎲 域随机化
 
-Randomize physics and visual properties for robust RL training.
+随机化物理和视觉属性以实现鲁棒的强化学习训练。
 
-## Physics Randomization
+## 物理随机化
 
-Apply after `scene.build()`:
+在 `scene.build()` 之后应用：
 
 ```python
 import genesis as gs
@@ -12,46 +12,46 @@ import torch
 
 scene.build(n_envs=64)
 
-# Friction randomization
+# 摩擦随机化
 robot.set_friction_ratio(
     friction_ratio=0.5 + torch.rand(scene.n_envs, robot.n_links),
     links_idx_local=range(robot.n_links),
 )
 
-# Mass randomization
+# 质量随机化
 robot.set_mass_shift(
     mass_shift=-0.5 + torch.rand(scene.n_envs, robot.n_links),
     links_idx_local=range(robot.n_links),
 )
 
-# Center of mass randomization
+# 质心随机化
 robot.set_COM_shift(
     com_shift=-0.05 + 0.1 * torch.rand(scene.n_envs, robot.n_links, 3),
     links_idx_local=range(robot.n_links),
 )
 ```
 
-## Control Parameter Randomization
+## 控制参数随机化
 
 ```python
 import numpy as np
 
-# Per-environment stiffness (Kp)
+# 每环境的刚度 (Kp)
 kp_values = 4000 + 1000 * np.random.rand(scene.n_envs, robot.n_dofs)
 robot.set_dofs_kp(kp_values, motors_dof)
 
-# Per-environment damping (Kv)
+# 每环境的阻尼 (Kv)
 kv_values = 400 + 100 * np.random.rand(scene.n_envs, robot.n_dofs)
 robot.set_dofs_kv(kv_values, motors_dof)
 ```
 
-## Object Position Randomization (Per-Episode)
+## 物体位置随机化（每回合）
 
 ```python
 def reset_idx(self, envs_idx):
     num_reset = len(envs_idx)
 
-    # Random object position
+    # 随机物体位置
     random_x = torch.rand(num_reset, device=gs.device) * 0.4 + 0.2
     random_y = (torch.rand(num_reset, device=gs.device) - 0.5) * 0.5
     random_z = torch.ones(num_reset, device=gs.device) * 0.025
@@ -60,14 +60,14 @@ def reset_idx(self, envs_idx):
     self.object.set_pos(random_pos, envs_idx=envs_idx)
 ```
 
-## Command Randomization
+## 指令随机化
 
 ```python
 def gs_rand(lower, upper, shape):
-    """Uniform random in [lower, upper]"""
+    """在 [lower, upper] 范围内的均匀随机"""
     return (upper - lower) * torch.rand(shape, device=gs.device) + lower
 
-# Randomize velocity commands
+# 随机化速度指令
 commands = gs_rand(
     lower=torch.tensor([-1.0, -0.5, -0.5]),
     upper=torch.tensor([1.0, 0.5, 0.5]),
@@ -75,20 +75,20 @@ commands = gs_rand(
 )
 ```
 
-## Available Methods
+## 可用方法
 
-| Method | Shape | Description |
+| 方法 | 形状 | 描述 |
 |--------|-------|-------------|
-| `set_friction_ratio` | (n_envs, n_links) | Friction scaling |
-| `set_mass_shift` | (n_envs, n_links) | Mass offset |
-| `set_COM_shift` | (n_envs, n_links, 3) | COM offset |
-| `set_dofs_kp` | (n_envs, n_dofs) | Position gain |
-| `set_dofs_kv` | (n_envs, n_dofs) | Velocity gain |
-| `set_dofs_armature` | (n_envs, n_dofs) | Motor inertia |
+| `set_friction_ratio` | (n_envs, n_links) | 摩擦缩放 |
+| `set_mass_shift` | (n_envs, n_links) | 质量偏移 |
+| `set_COM_shift` | (n_envs, n_links, 3) | 质心偏移 |
+| `set_dofs_kp` | (n_envs, n_dofs) | 位置增益 |
+| `set_dofs_kv` | (n_envs, n_dofs) | 速度增益 |
+| `set_dofs_armature` | (n_envs, n_dofs) | 电机惯量 |
 
-## Required Options
+## 所需选项
 
-Enable batching for physics randomization:
+为物理随机化启用批处理：
 
 ```python
 scene = gs.Scene(
@@ -99,9 +99,9 @@ scene = gs.Scene(
 )
 ```
 
-## Best Practices
+## 最佳实践
 
-1. Apply physics DR once after `scene.build()`
-2. Apply position/command DR at each episode reset
-3. Use `envs_idx` parameter for selective randomization
-4. Ensure tensor shapes match `(n_envs, ...)`
+1. 在 `scene.build()` 后应用一次物理 DR
+2. 在每个回合重置时应用位置/指令 DR
+3. 使用 `envs_idx` 参数进行选择性随机化
+4. 确保张量形状匹配 `(n_envs, ...)`

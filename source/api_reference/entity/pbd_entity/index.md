@@ -1,4 +1,4 @@
-# PBDEntity
+# PBDEntity（基于位置的动力学实体）
 
 ```{toctree}
 pbd_particle

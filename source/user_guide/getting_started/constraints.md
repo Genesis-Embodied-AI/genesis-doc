@@ -1,12 +1,12 @@
-# 🔒 Constraints
+# 🔒 约束
 
-Genesis supports runtime constraints for manipulation tasks like suction grasping.
+Genesis 支持用于操作任务（如吸盘抓取）的运行时约束。
 
-## Weld Constraints
+## Weld 约束
 
-Weld constraints rigidly attach two links together (6 DOF constraint).
+Weld 约束将两个 link 刚性连接在一起（6 DOF 约束）。
 
-### Adding a Weld Constraint
+### 添加 Weld 约束
 
 ```python
 import genesis as gs
@@ -17,87 +17,87 @@ franka = scene.add_entity(gs.morphs.MJCF(file="franka.xml"))
 cube = scene.add_entity(gs.morphs.Box(pos=(0.65, 0, 0.02), size=(0.04, 0.04, 0.04)))
 scene.build()
 
-# Get link handles
+# 获取 link 句柄
 rigid = scene.sim.rigid_solver
 end_effector = franka.get_link("hand")
 cube_link = cube.base_link
 
-# Create constraint arrays
+# 创建约束数组
 link_cube = np.array([cube_link.idx], dtype=gs.np_int)
 link_franka = np.array([end_effector.idx], dtype=gs.np_int)
 
-# Add weld constraint (suction engages)
+# 添加 weld 约束（吸盘接合）
 rigid.add_weld_constraint(link_cube, link_franka)
 ```
 
-### Removing a Weld Constraint
+### 移除 Weld 约束
 
 ```python
-# Release object
+# 释放物体
 rigid.delete_weld_constraint(link_cube, link_franka)
 ```
 
-## Suction Cup Example
+## 吸盘示例
 
 ```python
-# Move to object
+# 移动到物体
 qpos = franka.inverse_kinematics(link=end_effector, pos=np.array([0.65, 0.0, 0.13]))
 franka.control_dofs_position(qpos[:-2], motors_dof)
 for _ in range(50):
     scene.step()
 
-# Attach (suction on)
+# 连接（吸盘开启）
 rigid.add_weld_constraint(link_cube, link_franka)
 
-# Lift
+# 抬起
 qpos = franka.inverse_kinematics(link=end_effector, pos=np.array([0.65, 0.0, 0.28]))
 franka.control_dofs_position(qpos[:-2], motors_dof)
 for _ in range(100):
     scene.step()
 
-# Place
+# 放置
 qpos = franka.inverse_kinematics(link=end_effector, pos=np.array([0.4, 0.2, 0.13]))
 franka.control_dofs_position(qpos[:-2], motors_dof)
 for _ in range(100):
     scene.step()
 
-# Release (suction off)
+# 释放（吸盘关闭）
 rigid.delete_weld_constraint(link_cube, link_franka)
 ```
 
-## Multi-Environment Constraints
+## 多环境约束
 
 ```python
 scene.build(n_envs=4)
 
-# Add constraint to specific environments
+# 向特定环境添加约束
 rigid.add_weld_constraint(link_cube, link_franka, envs_idx=(0, 1, 2))
 
-# Delete from subset
+# 从子集删除
 rigid.delete_weld_constraint(link_cube, link_franka, envs_idx=(0, 1))
 ```
 
-## Connect Constraints
+## Connect 约束
 
-Connect constraints enforce position-only coincidence (3 DOF), allowing relative rotation.
+Connect 约束强制执行仅位置重合（3 DOF），允许相对旋转。
 
 ```xml
-<!-- In MJCF/URDF -->
+<!-- 在 MJCF/URDF 中 -->
 <equality>
     <connect name="ball_joint" body1="link_1" body2="link_2" anchor="0 0 1" />
 </equality>
 ```
 
-## Query Active Constraints
+## 查询活动约束
 
 ```python
 constraints = rigid.get_weld_constraints()
-print(constraints)  # Active constraint pairs
+print(constraints)  # 活动约束对
 ```
 
-## Constraint Properties
+## 约束属性
 
-- **Weld**: Full 6-DOF constraint (translation + rotation)
-- **Connect**: 3-DOF constraint (translation only)
-- **Instant**: No force limits or compliance
-- **Runtime**: Can be added/removed dynamically
+- **Weld**: 完整 6-DOF 约束（平移 + 旋转）
+- **Connect**: 3-DOF 约束（仅平移）
+- **即时**: 无受力限制或顺应性
+- **运行时**: 可以动态添加/移除

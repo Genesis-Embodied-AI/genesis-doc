@@ -1,4 +1,4 @@
-# `RigidEntity`
+# `RigidEntity`（刚体实体）
 
 ```{eval-rst}  
 .. autoclass:: genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity

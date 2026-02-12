@@ -1,19 +1,19 @@
 # Visualizer
 
-The `Visualizer` class is the main orchestrator for all visualization and rendering in Genesis. It manages the viewer, cameras, and renderer backends.
+`Visualizer` 类是 Genesis 中所有可视化和渲染的主控制器。它管理 viewer、相机和渲染器后端。
 
-## Overview
+## 概述
 
-The Visualizer is automatically created when you create a `Scene` and is responsible for:
+当你创建 `Scene` 时，Visualizer 会自动创建，并负责：
 
-- Managing the interactive `Viewer` window
-- Coordinating multiple `Camera` instances
-- Handling renderer backends (Rasterizer, Raytracer, BatchRenderer)
-- Synchronizing render state with simulation
+- 管理交互式 `Viewer` 窗口
+- 协调多个 `Camera` 实例
+- 处理渲染器后端（Rasterizer、Raytracer、BatchRenderer）
+- 将渲染状态与仿真同步
 
-## Access
+## 访问方式
 
-The Visualizer is accessed through the scene:
+通过 scene 访问 Visualizer：
 
 ```python
 import genesis as gs
@@ -22,19 +22,19 @@ gs.init()
 scene = gs.Scene(show_viewer=True)
 scene.build()
 
-# Access the visualizer
+# 访问 visualizer
 visualizer = scene.visualizer
 
-# Update the visualization
+# 更新可视化
 visualizer.update()
 ```
 
-## Common Operations
+## 常用操作
 
-### Adding Cameras
+### 添加相机
 
 ```python
-# Add a camera for rendering
+# 添加用于渲染的相机
 cam = scene.add_camera(
     res=(1280, 720),
     pos=(3, 0, 2),
@@ -43,28 +43,28 @@ cam = scene.add_camera(
 )
 ```
 
-### Updating the View
+### 更新视图
 
 ```python
-# Update visualization each step
+# 每步更新可视化
 for i in range(1000):
     scene.step()
     scene.visualizer.update()
 ```
 
-### Controlling the Viewer
+### 控制 Viewer
 
 ```python
-# Access the interactive viewer
+# 访问交互式 viewer
 viewer = scene.visualizer.viewer
 
-# Check if viewer is active
+# 检查 viewer 是否处于活动状态
 if scene.visualizer.viewer is not None:
-    # Viewer operations available
+    # 可进行 viewer 操作
     pass
 ```
 
-## API Reference
+## API 参考
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.Visualizer
@@ -73,8 +73,8 @@ if scene.visualizer.viewer is not None:
    :show-inheritance:
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`viewer` - Interactive viewer for real-time visualization
-- {doc}`renderers/index` - Renderer backends
-- {doc}`cameras/index` - Camera sensors
+- {doc}`viewer` - 用于实时可视化的交互式 viewer
+- {doc}`renderers/index` - 渲染器后端
+- {doc}`cameras/index` - 相机传感器

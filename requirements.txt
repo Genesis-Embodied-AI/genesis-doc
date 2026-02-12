@@ -1,40 +1,15 @@
 sphinx==6.2.1
 sphinx-autobuild
 pydata_sphinx_theme
-# For spelling
+# 拼写检查
 sphinxcontrib.spelling
-# Type hints support
+# 类型提示支持
 sphinx-autodoc-typehints
-# Copy button for code snippets
+# 代码片段复制按钮
 sphinx_copybutton
-# Markdown parser
+# Markdown 解析器
 myst-parser
 sphinx-subfigure
 sphinxcontrib-video
 sphinx-togglebutton
 sphinx_design
-psutil
-scikit-image
-gstaichi
-pydantic == 2.7.1
-numpy == 1.26.4
-six
-PyOpenGL
-freetype-py
-pyglet
-libigl
-pygltflib
-mujoco
-pycollada
-opencv-python
-tetgen
-screeninfo
-PyGEL3D
-moviepy
-numba
-pymeshlab
-pymeshfix
-genesis-world
-torch
-PyOpenGL
-PyOpenGL_accelerate

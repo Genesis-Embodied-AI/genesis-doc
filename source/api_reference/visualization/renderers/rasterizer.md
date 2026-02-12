@@ -1,17 +1,17 @@
 # Rasterizer
 
-The `Rasterizer` provides fast GPU-accelerated rendering using OpenGL. It's the default renderer for real-time visualization and is suitable for training reinforcement learning agents.
+`Rasterizer` 使用 OpenGL 提供快速的 GPU 加速渲染。它是实时可视化的默认渲染器，适用于训练强化学习智能体。
 
-## Overview
+## 概述
 
-The Rasterizer offers:
+Rasterizer 提供：
 
-- **High performance**: 1000+ FPS for simple scenes
-- **GPU acceleration**: Leverages OpenGL for rendering
-- **Multiple outputs**: RGB, depth, segmentation, normals
-- **Multi-environment support**: Efficient batched rendering
+- **高性能**：简单场景下可达 1000+ FPS
+- **GPU 加速**：利用 OpenGL 进行渲染
+- **多种输出**：RGB、深度、分割、法线
+- **多环境支持**：高效的批处理渲染
 
-## Quick Start
+## 快速开始
 
 ```python
 import genesis as gs
@@ -19,13 +19,13 @@ import genesis as gs
 gs.init()
 scene = gs.Scene()
 
-# Add entities
+# 添加实体
 scene.add_entity(gs.morphs.Plane())
 robot = scene.add_entity(gs.morphs.URDF(file="path/to/robot.urdf"))
 
 scene.build()
 
-# Add rasterizer camera (default)
+# 添加 rasterizer 相机（默认）
 cam = scene.add_camera(
     res=(640, 480),
     pos=(3, 0, 2),
@@ -33,7 +33,7 @@ cam = scene.add_camera(
     fov=40,
 )
 
-# Render images
+# 渲染图像
 for i in range(100):
     scene.step()
 
@@ -42,26 +42,26 @@ for i in range(100):
     segmentation = cam.render(segmentation=True)
 ```
 
-## Configuration
+## 配置
 
-The Rasterizer is configured through `RasterizerOptions`:
+通过 `RasterizerOptions` 配置 Rasterizer：
 
 ```python
 rasterizer_options = gs.options.RasterizerOptions(
-    env_separate_rigid=True,   # Separate rendering per environment
+    env_separate_rigid=True,   # 每个环境单独渲染
 )
 ```
 
-## Output Types
+## 输出类型
 
-| Output | Type | Description |
+| 输出 | 类型 | 描述 |
 |--------|------|-------------|
-| `rgb` | `np.ndarray` (H, W, 3) | RGB color image |
-| `depth` | `np.ndarray` (H, W) | Depth values in meters |
-| `segmentation` | `np.ndarray` (H, W) | Entity/link segmentation IDs |
-| `normal` | `np.ndarray` (H, W, 3) | Surface normals |
+| `rgb` | `np.ndarray` (H, W, 3) | RGB 彩色图像 |
+| `depth` | `np.ndarray` (H, W) | 以米为单位的深度值 |
+| `segmentation` | `np.ndarray` (H, W) | 实体/连杆分割 ID |
+| `normal` | `np.ndarray` (H, W, 3) | 表面法线 |
 
-## API Reference
+## API 参考
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.rasterizer.Rasterizer
@@ -70,8 +70,8 @@ rasterizer_options = gs.options.RasterizerOptions(
    :show-inheritance:
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`raytracer` - Photorealistic ray tracing renderer
-- {doc}`batch_renderer` - High-throughput parallel renderer
-- {doc}`/api_reference/options/renderer/rasterizer` - Rasterizer options
+- {doc}`raytracer` - 照片级真实感光线追踪渲染器
+- {doc}`batch_renderer` - 高吞吐量并行渲染器
+- {doc}`/api_reference/options/renderer/rasterizer` - Rasterizer 选项

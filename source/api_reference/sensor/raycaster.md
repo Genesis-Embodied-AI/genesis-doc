@@ -1,17 +1,17 @@
-# Raycaster Sensor
+# 射线投射传感器
 
-The `RaycasterSensor` provides ray-based distance measurements, useful for LIDAR simulation, proximity sensing, and obstacle detection.
+`RaycasterSensor` 提供基于射线的距离测量，可用于 LIDAR 仿真、接近传感和障碍物检测。
 
-## Overview
+## 概述
 
-The Raycaster sensor:
+射线投射传感器：
 
-- Casts rays from a link's frame into the scene
-- Returns distances to intersecting geometry
-- Supports configurable ray patterns (linear, planar, custom)
-- Efficiently uses GPU-accelerated BVH traversal
+- 从连杆的坐标系向场景中投射射线
+- 返回与几何体相交的距离
+- 支持可配置的射线模式（线性、平面、自定义）
+- 使用 GPU 加速的 BVH 遍历高效计算
 
-## Usage
+## 用法
 
 ```python
 import genesis as gs
@@ -19,48 +19,48 @@ import genesis as gs
 gs.init()
 scene = gs.Scene()
 robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
-scene.add_entity(gs.morphs.Box(pos=(2, 0, 0.5)))  # Obstacle
+scene.add_entity(gs.morphs.Box(pos=(2, 0, 0.5)))  # 障碍物
 scene.build()
 
-# Add raycaster sensor (using Lidar options)
+# 添加射线投射传感器（使用 Lidar 选项）
 lidar = scene.add_sensor(
     gs.sensors.Lidar(
         link=robot.get_link("sensor_link"),
     )
 )
 
-# Simulation loop
+# 仿真循环
 for i in range(100):
     scene.step()
 
-    # Get range data
-    ranges = lidar.get_data()  # (n_rays,) array of distances
+    # 获取距离数据
+    ranges = lidar.get_data()  # (n_rays,) 距离数组
     print(f"Min range: {ranges.min():.2f} m")
 ```
 
-## Configuration
+## 配置
 
 ```python
 gs.sensors.Raycaster(
-    link=link,              # RigidLink to attach sensor to
-    n_rays=360,             # Number of rays to cast
-    min_range=0.1,          # Minimum detection range (m)
-    max_range=10.0,         # Maximum detection range (m)
-    pattern="circular",     # Ray pattern type
+    link=link,              # 附加传感器的 RigidLink
+    n_rays=360,             # 投射的射线数量
+    min_range=0.1,          # 最小检测范围 (m)
+    max_range=10.0,         # 最大检测范围 (m)
+    pattern="circular",     # 射线模式类型
 
-    # Angular range (for circular/linear patterns)
-    fov_horizontal=360.0,   # Horizontal field of view (degrees)
-    fov_vertical=0.0,       # Vertical field of view (degrees)
+    # 角度范围（用于圆形/线性模式）
+    fov_horizontal=360.0,   # 水平视场角 (度)
+    fov_vertical=0.0,       # 垂直视场角 (度)
 
-    # Position offset from link frame
+    # 相对于连杆坐标系的位置偏移
     offset_pos=(0, 0, 0),
     offset_quat=(0, 0, 0, 1),
 )
 ```
 
-## Ray Patterns
+## 射线模式
 
-### Circular (2D LIDAR)
+### 圆形（2D LIDAR）
 
 ```python
 lidar_2d = robot.add_sensor(
@@ -73,13 +73,13 @@ lidar_2d = robot.add_sensor(
 )
 ```
 
-### Planar (3D LIDAR)
+### 平面（3D LIDAR）
 
 ```python
 lidar_3d = robot.add_sensor(
     gs.sensors.Raycaster(
         link=base,
-        n_rays=16 * 360,  # 16 vertical layers
+        n_rays=16 * 360,  # 16 个垂直层
         pattern="planar",
         fov_horizontal=360.0,
         fov_vertical=30.0,
@@ -87,17 +87,17 @@ lidar_3d = robot.add_sensor(
 )
 ```
 
-### Custom Pattern
+### 自定义模式
 
 ```python
 import numpy as np
 
-# Define custom ray directions
+# 定义自定义射线方向
 rays = np.array([
-    [1, 0, 0],    # Forward
-    [0, 1, 0],    # Left
-    [-1, 0, 0],   # Back
-    [0, -1, 0],   # Right
+    [1, 0, 0],    # 前方
+    [0, 1, 0],    # 左方
+    [-1, 0, 0],   # 后方
+    [0, -1, 0],   # 右方
 ])
 
 sensor = robot.add_sensor(
@@ -108,22 +108,22 @@ sensor = robot.add_sensor(
 )
 ```
 
-## Output Format
+## 输出格式
 
-| Output | Shape | Description |
+| 输出 | 形状 | 描述 |
 |--------|-------|-------------|
-| `ranges` | `(n_rays,)` | Distance to intersection (max_range if no hit) |
-| `hits` | `(n_rays,)` | Boolean mask of valid intersections |
+| `ranges` | `(n_rays,)` | 到交点的距离（无碰撞时为 max_range） |
+| `hits` | `(n_rays,)` | 有效相交的布尔掩码 |
 
-## Performance
+## 性能
 
-The Raycaster uses a GPU-accelerated Linear BVH (LBVH) for efficient ray-scene intersection:
+Raycaster 使用 GPU 加速的线性 BVH（LBVH）进行高效的射线-场景相交计算：
 
-- Scales well with scene complexity
-- Efficient for hundreds to thousands of rays
-- Batched across parallel environments
+- 随场景复杂度扩展良好
+- 可高效处理数百至数千条射线
+- 在并行环境中批处理
 
-## API Reference
+## API 参考
 
 ```{eval-rst}
 .. autoclass:: genesis.engine.sensors.RaycasterSensor
@@ -132,7 +132,7 @@ The Raycaster uses a GPU-accelerated Linear BVH (LBVH) for efficient ray-scene i
    :show-inheritance:
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`index` - Sensor overview
-- {doc}`camera` - Visual sensing
+- {doc}`index` - 传感器概述
+- {doc}`camera` - 视觉传感

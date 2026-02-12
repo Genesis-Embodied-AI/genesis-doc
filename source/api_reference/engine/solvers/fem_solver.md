@@ -1,24 +1,24 @@
 # FEMSolver
 
-The `FEMSolver` implements the Finite Element Method for simulating deformable solids with high accuracy.
+`FEMSolver` 实现了 Finite Element Method (FEM，有限元法)，用于高精度仿真可变形固体。
 
-## Overview
+## 概述
 
-The FEM solver:
+FEM solver：
 
-- Uses tetrahedral mesh elements
-- Supports various constitutive models
-- Handles large deformations (geometric nonlinearity)
-- GPU-accelerated assembly and solve
+- Uses tetrahedral mesh elements (使用四面体网格元素)
+- Supports various constitutive models (支持多种本构模型)
+- Handles large deformations (geometric nonlinearity) (处理大变形，几何非线性)
+- GPU-accelerated assembly and solve (GPU 加速的组装和求解)
 
-## Supported Materials
+## 支持的材料
 
 | Material | Description |
 |----------|-------------|
-| `FEM.Elastic` | Linear/nonlinear elasticity |
-| `FEM.Muscle` | Active muscle contraction |
+| `FEM.Elastic` | Linear/nonlinear elasticity (线性/非线性弹性) |
+| `FEM.Muscle` | Active muscle contraction (主动肌肉收缩) |
 
-## Usage
+## 使用方法
 
 ```python
 import genesis as gs
@@ -47,30 +47,30 @@ for i in range(1000):
     scene.step()
 ```
 
-## Configuration
+## 配置
 
-Key options in `FEMOptions`:
+`FEMOptions` 中的关键选项：
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `dt` | float | Internal timestep |
-| `damping` | float | Rayleigh damping coefficient |
-| `iterations` | int | Solver iterations |
+| `dt` | float | Internal timestep (内部时间步长) |
+| `damping` | float | Rayleigh damping coefficient (瑞利阻尼系数) |
+| `iterations` | int | Solver iterations (求解器迭代次数) |
 
-## Boundary Conditions
+## 边界条件
 
-Apply fixed boundary conditions:
+应用固定的边界条件：
 
 ```python
-# Fix bottom vertices
+# Fix bottom vertices (固定底部顶点)
 soft_body.fix_vertices(z_min=0.01)
 
-# Apply external forces
+# Apply external forces (施加外力)
 soft_body.apply_force(vertex_ids, force_vector)
 ```
 
-## See Also
+## 另请参阅
 
 - {doc}`/api_reference/entity/fem_entity` - FEMEntity
-- {doc}`/api_reference/material/fem/index` - FEM materials
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/fem_options` - Full options
+- {doc}`/api_reference/material/fem/index` - FEM 材料
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/fem_options` - 完整选项

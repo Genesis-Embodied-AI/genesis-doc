@@ -1,8 +1,8 @@
-# 💾 Checkpoints
+# 💾 检查点 (Checkpoints)
 
-Genesis provides state save/load functionality for training resumption and episode resets.
+Genesis 提供状态保存/加载功能，用于训练恢复和回合重置。
 
-## Basic Save/Load
+## 基本保存/加载
 
 ```python
 import genesis as gs
@@ -11,39 +11,39 @@ scene = gs.Scene()
 robot = scene.add_entity(gs.morphs.MJCF(file="franka.xml"))
 scene.build()
 
-# Simulate
+# 模拟
 for _ in range(100):
     scene.step()
 
-# Save checkpoint
+# 保存检查点
 scene.save_checkpoint("checkpoint.pkl")
 
-# Load in new scene
+# 在新场景中加载
 scene2 = gs.Scene()
 robot2 = scene2.add_entity(gs.morphs.MJCF(file="franka.xml"))
 scene2.build()
 scene2.load_checkpoint("checkpoint.pkl")
 ```
 
-## State Objects
+## 状态对象
 
 ```python
-# Get current state (in-memory)
+# 获取当前状态（内存中）
 state = scene.get_state()
 
-# Reset to initial state
+# 重置到初始状态
 scene.reset()
 
-# Reset to custom state
+# 重置到自定义状态
 scene.reset(state=state)
 ```
 
-## RL Episode Resets
+## RL 回合重置
 
 ```python
 scene.build(n_envs=N)
 
-# Snapshot initial state
+# 快照初始状态
 init_state = scene.get_state()
 
 for episode in range(num_episodes):
@@ -53,32 +53,32 @@ for episode in range(num_episodes):
         scene.step()
         obs, reward, done = get_observations()
 
-        # Reset environments where episode ended
+        # 重置回合结束的环境
         if done.any():
             done_envs = torch.where(done)[0].tolist()
             scene.reset(state=init_state, envs_idx=done_envs)
 ```
 
-## Selective Environment Reset
+## 选择性环境重置
 
 ```python
 scene.build(n_envs=16)
 
-# Reset all environments
+# 重置所有环境
 scene.reset()
 
-# Reset specific environments
+# 重置特定环境
 scene.reset(envs_idx=[0, 2, 5])
 
-# Reset with custom state for specific envs
+# 为特定环境重置自定义状态
 scene.reset(state=init_state, envs_idx=[1, 3, 7])
 ```
 
-## State Contents
+## 状态内容
 
-The `SimState` object contains:
+`SimState` 对象包含：
 
-| Solver | State Variables |
+| 求解器 | 状态变量 |
 |--------|-----------------|
 | Rigid | `qpos`, `dofs_vel`, `links_pos`, `links_quat` |
 | MPM | `pos`, `vel`, `C`, `F`, `Jp`, `active` |
@@ -86,15 +86,15 @@ The `SimState` object contains:
 | PBD | `pos`, `vel`, `free` |
 | FEM | `pos`, `vel`, `active` |
 
-## Checkpoint File Format
+## 检查点文件格式
 
-Checkpoints are pickled dictionaries:
+检查点是 pickled 字典：
 
 ```python
 {
     "timestamp": time.time(),
     "step_index": scene.t,
-    "arrays": {  # Numpy arrays keyed by solver/field
+    "arrays": {  # 按键为求解器/字段的 Numpy 数组
         "RigidSolver.qpos": np.array(...),
         "MPMSolver.pos": np.array(...),
         ...
@@ -102,22 +102,22 @@ Checkpoints are pickled dictionaries:
 }
 ```
 
-## Serialization for Transfer
+## 传输序列化
 
 ```python
-# Make state serializable (detach from graph)
+# 使状态可序列化（从图中分离）
 state = scene.get_state()
 state_serializable = state.serializable()
 
-# Now safe to pickle
+# 现在可以安全地 pickle
 import pickle
 with open("state.pkl", "wb") as f:
     pickle.dump(state_serializable, f)
 ```
 
-## Important Notes
+## 重要说明
 
-- Checkpoints require compatible scene configuration (same entities, solver options)
-- 32-bit precision may lose ~2e-6 accuracy between save/load
-- Use `envs_idx` parameter for efficient partial resets
-- `scene.t` stores the simulation step count
+- 检查点需要兼容的场景配置（相同的实体、求解器选项）
+- 32 位精度在保存/加载之间可能损失 ~2e-6 的精度
+- 使用 `envs_idx` 参数进行高效的部分重置
+- `scene.t` 存储模拟步数

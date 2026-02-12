@@ -1,8 +1,8 @@
 # Options
-An `Options` object is a group of parameters for setting a specific component in the scene.
+`Options` 对象是一组用于设置场景中特定组件的参数。
 
 :::{tip}
-We build multiple classes based on this concept throughout Genesis, such as `gs.options.SimOptions`, `gs.morphs`, `gs.renderers`, `gs.surfaces`, and `gs.textures`. Note that many of them, although inheriting from `Options`, are accessible directly under the `gs` namespace for convenience.
+我们在整个 Genesis 中基于这个概念构建了多个类，例如 `gs.options.SimOptions`、`gs.morphs`、`gs.renderers`、`gs.surfaces` 和 `gs.textures`。注意，其中许多类虽然继承自 `Options`，但为了方便起见，可以直接在 `gs` 命名空间下访问。
 
 :::
 

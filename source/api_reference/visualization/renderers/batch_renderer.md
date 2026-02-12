@@ -1,77 +1,77 @@
 # BatchRenderer
 
-The `BatchRenderer` provides high-throughput parallel rendering optimized for large-scale reinforcement learning training with many parallel environments.
+`BatchRenderer` 提供高吞吐量的并行渲染，针对大规模强化学习训练中的许多并行环境进行优化。
 
-## Overview
+## 概述
 
-The BatchRenderer is designed for:
+BatchRenderer 专为以下场景设计：
 
-- **Maximum throughput**: Optimized for rendering thousands of environments
-- **Parallel execution**: Native support for batched simulation
-- **RL training**: Efficient observation generation for policy learning
-- **GPU acceleration**: Full GPU pipeline for minimal CPU overhead
+- **最大吞吐量**：针对渲染数千个环境进行优化
+- **并行执行**：原生支持批处理仿真
+- **RL 训练**：高效的策略学习观测生成
+- **GPU 加速**：完整的 GPU 流水线，最小化 CPU 开销
 
-## Quick Start
+## 快速开始
 
 ```python
 import genesis as gs
 
 gs.init()
 
-# Create scene with multiple environments
+# 创建具有多个环境的场景
 scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
 robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 
-# Build with parallel environments
+# 使用并行环境构建
 scene.build(n_envs=1024)
 
-# Add batch renderer camera
+# 添加 batch renderer 相机
 cam = scene.add_camera(
     res=(84, 84),
     pos=(2, 0, 1),
     lookat=(0, 0, 0.5),
 )
 
-# Training loop
+# 训练循环
 for step in range(10000):
-    # Get batched observations
-    obs = cam.render(rgb=True)  # Shape: (n_envs, H, W, 3)
+    # 获取批处理观测
+    obs = cam.render(rgb=True)  # 形状：(n_envs, H, W, 3)
 
-    # Policy inference...
+    # 策略推理...
     actions = policy(obs)
 
-    # Step all environments
+    # 执行所有环境步骤
     scene.step()
 ```
 
-## Configuration
+## 配置
 
-The BatchRenderer is configured through `BatchRendererOptions`:
+通过 `BatchRendererOptions` 配置 BatchRenderer：
 
 ```python
 batch_options = gs.options.BatchRendererOptions(
-    # Configuration options
+    # 配置选项
 )
 ```
 
-## Output Format
+## 输出格式
 
-With `n_envs > 1`, camera outputs are batched:
+当 `n_envs > 1` 时，相机输出是批处理的：
 
-| Output | Shape | Description |
+| 输出 | 形状 | 描述 |
 |--------|-------|-------------|
-| `rgb` | `(n_envs, H, W, 3)` | Batched RGB images |
-| `depth` | `(n_envs, H, W)` | Batched depth maps |
-| `segmentation` | `(n_envs, H, W)` | Batched segmentation |
+| `rgb` | `(n_envs, H, W, 3)` | 批处理 RGB 图像 |
+| `depth` | `(n_envs, H, W)` | 批处理深度图 |
+| `segmentation` | `(n_envs, H, W)` | 批处理分割 |
 
-## Performance Tips
+## 性能提示
 
-1. **Resolution**: Use smaller resolutions (64x64 or 84x84) for RL
-2. **Render frequency**: Render only when needed, not every step
-3. **GPU memory**: Monitor VRAM usage with many environments
+1. **分辨率**：对于 RL 使用较小的分辨率（64x64 或 84x84）
+2. **渲染频率**：仅在需要时渲染，而不是每步都渲染
+3. **GPU 内存**：监控使用大量环境时的显存使用
 
-## API Reference
+## API 参考
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.batch_renderer.BatchRenderer
@@ -80,7 +80,7 @@ With `n_envs > 1`, camera outputs are batched:
    :show-inheritance:
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`rasterizer` - Standard rasterization renderer
-- {doc}`/api_reference/options/renderer/batchrenderer` - BatchRenderer options
+- {doc}`rasterizer` - 标准光栅化渲染器
+- {doc}`/api_reference/options/renderer/batchrenderer` - BatchRenderer 选项

@@ -1,21 +1,21 @@
-# 🎬 Batch Renderer
+# 🎬 批量渲染器
 
-The BatchRenderer uses Madrona GPU batch rendering for high-throughput multi-environment simulations.
+BatchRenderer 使用 Madrona GPU 批量渲染技术，实现高吞吐量的多环境模拟。
 
-## Installation
+## 安装
 
 ```bash
 pip install gs-madrona
 ```
 
-**Requirements:** Linux x86-64, NVIDIA CUDA, Python >= 3.10
+**要求：** Linux x86-64, NVIDIA CUDA, Python >= 3.10
 
-## Basic Setup
+## 基本设置
 
 ```python
 import genesis as gs
 
-gs.init(backend=gs.cuda)  # CUDA required
+gs.init(backend=gs.cuda)  # 需要 CUDA
 
 scene = gs.Scene(
     renderer=gs.renderers.BatchRenderer(use_rasterizer=True),
@@ -24,31 +24,31 @@ scene = gs.Scene(
 plane = scene.add_entity(gs.morphs.Plane())
 robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 
-# All batch cameras must have identical resolution
+# 所有批量相机必须具有相同的分辨率
 cam1 = scene.add_camera(res=(256, 256), pos=(2, 0, 1), lookat=(0, 0, 0.5))
 cam2 = scene.add_camera(res=(256, 256), pos=(0, 2, 1), lookat=(0, 0, 0.5))
 
 scene.build(n_envs=128)
 ```
 
-## Rendering
+## 渲染
 
 ```python
 for step in range(1000):
     scene.step()
 
-    # Render single camera
+    # 渲染单个相机
     rgb, depth, seg, normal = cam1.render(
         rgb=True, depth=True, segmentation=True, normal=True
     )
-    # Shape: (n_envs, H, W, C)
+    # 形状: (n_envs, H, W, C)
 
-    # Or render all cameras at once
+    # 或一次性渲染所有相机
     all_rgb = scene.render_all_cameras(rgb=True)
-    # Shape: (n_cameras, n_envs, H, W, 3)
+    # 形状: (n_cameras, n_envs, H, W, 3)
 ```
 
-## Camera Sensor API
+## 相机传感器 API
 
 ```python
 camera = scene.add_sensor(
@@ -71,10 +71,10 @@ camera = scene.add_sensor(
 
 scene.build(n_envs=64)
 
-data = camera.read()  # Returns CameraData with .rgb tensor
+data = camera.read()  # 返回包含 .rgb tensor 的 CameraData
 ```
 
-## Lighting
+## 光照
 
 ```python
 scene.add_light(
@@ -87,24 +87,24 @@ scene.add_light(
 )
 ```
 
-## Segmentation
+## 分割
 
 ```python
 scene = gs.Scene(
     renderer=gs.renderers.BatchRenderer(),
     vis_options=gs.options.VisOptions(
-        segmentation_level="link",  # "entity", "link", or "geom"
+        segmentation_level="link",  # "entity", "link", 或 "geom"
     ),
 )
 
-# After rendering
+# 渲染后
 _, _, seg, _ = camera.render(segmentation=True)
 colored = scene.visualizer.colorize_seg_idxc_arr(seg)
 ```
 
-## Performance Tips
+## 性能提示
 
-- Use identical resolution for all cameras
-- Prefer `use_rasterizer=True` for speed
-- Batch render all cameras with `scene.render_all_cameras()`
-- Typical setup: 256x256 resolution with 128-256 environments
+- 所有相机使用相同的分辨率
+- 推荐使用 `use_rasterizer=True` 以获得更高速度
+- 使用 `scene.render_all_cameras()` 批量渲染所有相机
+- 典型设置：256x256 分辨率，128-256 个环境

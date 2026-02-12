@@ -1,72 +1,72 @@
 # 🚀 Support Field 
 
-Collision detection for convex shapes in Genesis relies heavily on *support functions*.  Every iteration of the Minkowski Portal Refinement (MPR) algorithm asks questions of the form:
+Genesis 中凸体形状的碰撞检测严重依赖*支持函数*。Minkowski Portal Refinement (MPR) 算法的每次迭代都会询问以下形式的问题：
 
-> _"Given a direction **d**, which vertex of the shape has the maximum dot-product **v·d**?"_
+> _"给定方向 **d**，哪个顶点具有最大的点积 **v·d**？"_
 
-A naïve implementation has to iterate over all vertices every time – wasteful for models containing thousands of points.  To avoid this, Genesis pre-computes a **Support Field** for every convex geometry during scene initialisation.  The implementation lives in `genesis/engine/solvers/rigid/support_field_decomp.py`.
+一个朴素实现每次都必须遍历所有顶点——对于包含数千个点的模型来说是浪费的。为了避免这种情况，Genesis 在场景初始化期间为每个凸体几何体预计算一个 **Support Field**。实现位于 `genesis/engine/solvers/rigid/support_field_decomp.py`。
 
 ---
 
-## How It Works
+## 工作原理
 
-1. **Uniform Direction Grid**  –  The sphere is discretised into `support_res × support_res` directions using longitude/latitude (`θ`, `ϕ`).  By default `support_res = 180`, giving ≈32 k sample directions.
-2. **Offline Projection**      –  For each direction we project *all* vertices and remember the index with the largest dot-product.  The resulting arrays are:
-   * `support_v ∈ ℝ^{N_dir×3}` – the actual vertex positions in *object space*.
-   * `support_vid ∈ ℕ^{N_dir}`   – original vertex indices (useful to warm-start SDF queries).
-   * `support_cell_start[i_g]`   – prefix-sum offset into the flattened arrays per geometry.
-3. **Taichi Fields** – The arrays are copied into GPU-resident Taichi fields so that kernels can access them without host round-trips.
+1. **均匀方向网格**  –  使用经度/纬度 (`θ`, `ϕ`) 将球面离散为 `support_res × support_res` 个方向。默认 `support_res = 180`，产生约 32 k 个采样方向。
+2. **离线投影**      –  对于每个方向，我们投影*所有*顶点并记住具有最大点积的索引。结果数组为：
+   * `support_v ∈ ℝ^{N_dir×3}` – *对象空间*中的实际顶点位置。
+   * `support_vid ∈ ℕ^{N_dir}`   – 原始顶点索引（用于热启动 SDF 查询）。
+   * `support_cell_start[i_g]`   – 每个几何体扁平数组的前缀和偏移量。
+3. **Taichi Fields** – 数组被复制到 GPU 驻留的 Taichi 字段中，以便内核无需主机往返即可访问它们。
 
 ```python
 v_ws, idx = support_field._func_support_world(dir_ws, i_geom, i_batch)
 ```
 
-The above gives you the extreme point in world-space for any query direction in **O(1)**.
+以上以 **O(1)** 给出任何查询方向的世界空间极值点。
 
 ---
 
-## Data Layout
+## 数据布局
 
-| Field | Shape | Description |
+| 字段 | 形状 | 描述 |
 |-------|-------|-------------|
-| `support_v`         | `(N_cells, 3)` | vertex positions (float32/64) |
-| `support_vid`       | `(N_cells,)`   | corresponding vertex index (int32) |
-| `support_cell_start`| `(n_geoms,)`   | offset into flattened arrays |
+| `support_v`         | `(N_cells, 3)` | 顶点位置 (float32/64) |
+| `support_vid`       | `(N_cells,)`   | 对应的顶点索引 (int32) |
+| `support_cell_start`| `(n_geoms,)`   | 扁平数组的偏移量 |
 
-!!! info "Memory footprint"
-    With the default resolution each convex shape uses ≈ 32 k × (3 × 4 + 4) = 416 kB.  For collections of small primitives this is significantly cheaper than building a BVH per shape.
-
----
-
-## Advantages
-
-* **Constant-time look-ups** during MPR ⇒ fewer diverging branches on the GPU.
-* **GPU friendly** – the support field is a simple SOA array, no complex pointer chasing.
-* **Works for *any* convex mesh** – no need for canonical-axes or bounding boxes.
-
-## Limitations & Future Work
-
-* The direction grid is isotropic but not adaptive – features smaller than the angular cell size may map to the wrong vertex.
-* Preprocessing and memory consumption would be expensive if the number of geometry is large in a scene.
+!!! info "内存占用"
+    使用默认分辨率，每个凸体形状使用约 32 k × (3 × 4 + 4) = 416 kB。对于小基元的集合，这比为每个形状构建 BVH 便宜得多。
 
 ---
 
-## API Summary
+## 优点
+
+* **恒定时间查找** 在 MPR 期间 ⇒ GPU 上更少的分支发散。
+* **GPU 友好** – Support Field 是一个简单的 SOA 数组，没有复杂的指针追踪。
+* **适用于*任何*凸网格** – 无需标准轴或边界框。
+
+## 限制与未来工作
+
+* 方向网格是各向同性但非自适应的 – 小于角单元大小的特征可能映射到错误的顶点。
+* 如果场景中几何体数量很大，预处理和内存消耗会很昂贵。
+
+---
+
+## API 摘要
 
 ```python
 from genesis.engine.solvers.rigid.rigid_solver_decomp import RigidSolver
 solver   = RigidSolver(...)
-s_field  = solver.collider._mpr._support  # internal handle
+s_field  = solver.collider._mpr._support  # 内部句柄
 
 v_ws, idx = s_field._func_support_world(dir_ws, i_geom, i_env)
 ```
 
-`v_ws` is the *world-space* support point while `idx` is the vertex ID in the original mesh (global index).
+`v_ws` 是*世界空间*支持点，而 `idx` 是原始网格中的顶点 ID（全局索引）。
 
 ---
 
-## Relation to Collision Pipeline
+## 与碰撞管线的关系
 
-The Support Field is an **acceleration structure** exclusively used by the *convex–convex* narrow phase.  Other collision paths – SDF, terrain, plane–box – bypass it because they either rely on analytical support functions or distance fields.
+Support Field 是一个**加速结构**，专门被*凸体-凸体*精阶段使用。其他碰撞路径 – SDF、地形、平面-盒体 – 绕过它，因为它们要么依赖解析支持函数，要么依赖距离场。
 
-For details on how MPR integrates this structure see {doc}`Collision, Contacts & Forces <collision_contacts_forces>`. 
+有关 MPR 如何集成此结构的详细信息，请参见 {doc}`碰撞、接触与力 <collision_contacts_forces>`。

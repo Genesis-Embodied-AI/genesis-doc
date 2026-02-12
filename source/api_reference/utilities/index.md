@@ -1,52 +1,52 @@
-# Utilities & Helpers
+# 工具与辅助函数
 
-Genesis provides various utility functions, constants, and helper classes for common operations.
+Genesis 提供各种 utility 函数、常量和辅助类用于常见操作。
 
-## Overview
+## 概览
 
-This section covers:
+本节涵盖：
 
-- **Constants**: Enums for joint types, geometry types, backends
-- **Device utilities**: Platform detection, device selection
-- **Tensor utilities**: Array/tensor conversions
-- **Geometry utilities**: Transform operations
-- **File I/O**: Path utilities, URDF/MJCF parsing
+- **Constants**: Joint 类型、几何类型、后端的枚举
+- **Device utilities**: 平台检测、设备选择
+- **Tensor utilities**: 数组/tensor 转换
+- **Geometry utilities**: 变换操作
+- **File I/O**: 路径工具、URDF/MJCF 解析
 
-## Quick Reference
+## 快速参考
 
-### Initialization
+### 初始化
 
 ```python
 import genesis as gs
 
-# Initialize with default settings
+# 使用默认设置初始化
 gs.init()
 
-# Initialize with specific backend
-gs.init(backend=gs.cpu)      # CPU backend
-gs.init(backend=gs.gpu)      # GPU backend (CUDA/Metal)
+# 使用特定后端初始化
+gs.init(backend=gs.cpu)      # CPU 后端
+gs.init(backend=gs.gpu)      # GPU 后端（CUDA/Metal）
 
-# With custom settings
+# 使用自定义设置
 gs.init(
-    seed=42,              # Random seed
-    precision="32",       # Float precision
-    debug=False,          # Debug mode
+    seed=42,              # 随机种子
+    precision="32",       # 浮点精度
+    debug=False,          # 调试模式
     backend=gs.gpu,
 )
 ```
 
-### Global Variables
+### 全局变量
 
-After `gs.init()`, these globals are available:
+`gs.init()` 后，以下全局变量可用：
 
-| Variable | Description |
+| 变量 | 描述 |
 |----------|-------------|
-| `gs.platform` | Platform string ("Linux", "macOS", etc.) |
-| `gs.device` | PyTorch device |
-| `gs.backend` | Active backend enum |
-| `gs.EPS` | Numerical epsilon |
+| `gs.platform` | 平台字符串（"Linux"、"macOS" 等） |
+| `gs.device` | PyTorch 设备 |
+| `gs.backend` | 活动后端枚举 |
+| `gs.EPS` | 数值 epsilon |
 
-## Components
+## 组件
 
 ```{toctree}
 :titlesonly:
@@ -58,6 +58,6 @@ geometry
 file_io
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`/api_reference/options/index` - Configuration options
+- {doc}`/api_reference/options/index` - 配置选项

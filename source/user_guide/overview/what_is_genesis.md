@@ -1,20 +1,20 @@
-# 💡 What is Genesis
+# 💡 Genesis 是什么
 
 ```{figure} ../../_static/images/teaser.png
 ```
 
-Genesis is a physics platform designed for general purpose *Robotics/Embodied AI/Physical AI* applications. It is simultaneously multiple things:
+Genesis 是一个为通用*机器人/具身智能/物理智能*应用设计的物理平台。它同时是多个方面的综合体：
 
-1. A **universal physics engine** re-built from the ground up, capable of simulating a wide range of materials and physical phenomena.
-2. A **lightweight**, **ultra-fast**, **pythonic**, and **user-friendly** robotics simulation platform.
-3. A powerful and fast **photo-realistic rendering system**.
-4. A **generative data engine** that transforms user-prompted natural language description into various modalities of data.
+1. 一个从零开始重建的**通用物理引擎**，能够模拟各种材料和物理现象。
+2. 一个**轻量级**、**超高速**、**Pythonic**且**用户友好**的机器人仿真平台。
+3. 一个强大而快速的**照片级真实感渲染系统**。
+4. 一个**生成式数据引擎**，可将用户提示的自然语言描述转换为各种模态的数据。
 
-Powered by a universal physics engine re-designed and re-built from the ground up, Genesis integrates various physics solvers and their coupling into a unified framework. This core physics engine is further enhanced by a generative agent framework that operates at an upper level, aiming towards fully **automated data generation** for robotics and beyond.
-Currently, we are open-sourcing the underlying physics engine and the simulation platform. The generative framework will be released in the near future.
+Genesis 基于一个从零开始重新设计和构建的通用物理引擎，将各种物理求解器及其耦合集成到一个统一的框架中。这个核心物理引擎进一步由一个在上层运行的生成式智能体框架增强，旨在实现机器人及其他领域完全**自动化的数据生成**。
+目前，我们正在开源底层物理引擎和仿真平台。生成式框架将在不久的将来发布。
 
-Genesis is built and will continuously evolve with the following ***long-term missions***:
+Genesis 的构建和持续发展遵循以下***长期使命***：
 
-1. **Lowering the barrier** to using physics simulations and making robotics research accessible to everyone. (See our [commitment](https://genesis-world.readthedocs.io/en/latest/user_guide/overview/mission.html))
-2. **Unifying a wide spectrum of state-of-the-art physics solvers** into a single framework, allowing re-creating the whole physical world in a virtual realm with the highest possible physical, visual and sensory fidelity, using the most advanced simulation techniques.
-3. **Minimizing human effort** in collecting and generating data for robotics and other domains, letting the data flywheel spin on its own.
+1. **降低**使用物理仿真的门槛，让机器人研究对每个人都触手可及。（参见我们的[承诺](https://genesis-world.readthedocs.io/en/latest/user_guide/overview/mission.html)）
+2. 将**广泛的最先进物理求解器**统一到一个框架中，使用最先进的仿真技术，以最高的物理、视觉和感官保真度在虚拟世界中重现整个物理世界。
+3. **最小化**在收集和生成机器人及其他领域数据方面的人力投入，让数据飞轮自主运转。

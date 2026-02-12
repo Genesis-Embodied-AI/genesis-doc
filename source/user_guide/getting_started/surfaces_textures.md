@@ -1,20 +1,20 @@
-# 🎨 Surfaces and Textures
+# 🎨 表面与纹理
 
-Genesis provides material and texture configuration for rendering.
+Genesis 为渲染提供材质和纹理配置。
 
-## Surface Types
+## 表面类型
 
-| Surface | Description |
+| 表面 | 描述 |
 |---------|-------------|
-| `Rough` | Matte, non-reflective (roughness=1.0) |
-| `Smooth` | Polished plastic (roughness=0.1) |
-| `Reflective` | Highly reflective (roughness=0.01) |
-| `Glass` | Transparent with refraction |
-| `Metal` | Metallic surfaces (Iron, Gold, etc.) |
-| `Water` | Water-like surface |
-| `Emission` | Light-emitting surface |
+| `Rough` | 哑光，无反光（roughness=1.0） |
+| `Smooth` | 抛光塑料（roughness=0.1） |
+| `Reflective` | 高反光（roughness=0.01） |
+| `Glass` | 带折射的透明材质 |
+| `Metal` | 金属表面（铁、金等） |
+| `Water` | 水状表面 |
+| `Emission` | 发光表面 |
 
-## Basic Usage
+## 基本用法
 
 ```python
 import genesis as gs
@@ -25,64 +25,64 @@ scene.add_entity(
 )
 ```
 
-## Surface Properties
+## 表面属性
 
 ```python
 gs.surfaces.Smooth(
-    color=(1.0, 1.0, 1.0),    # RGB (0-1)
-    roughness=0.1,            # 0=mirror, 1=matte
-    metallic=0.0,             # 0=dielectric, 1=metal
-    opacity=1.0,              # Transparency
-    emissive=(0.0, 0.0, 0.0), # Self-illumination
-    ior=1.5,                  # Index of refraction
+    color=(1.0, 1.0, 1.0),    # RGB（0-1）
+    roughness=0.1,            # 0=镜面，1=哑光
+    metallic=0.0,             # 0=介电质，1=金属
+    opacity=1.0,              # 透明度
+    emissive=(0.0, 0.0, 0.0), # 自发光
+    ior=1.5,                  # 折射率
 )
 ```
 
-## Metallic Surfaces
+## 金属表面
 
 ```python
-# Predefined metals
+# 预定义金属
 gs.surfaces.Iron()
 gs.surfaces.Gold()
 gs.surfaces.Copper()
 gs.surfaces.Aluminium()
 
-# Custom metal
+# 自定义金属
 gs.surfaces.Metal(metal_type="gold", roughness=0.15)
 ```
 
-## Transparent Surfaces
+## 透明表面
 
 ```python
-# Glass
+# 玻璃
 gs.surfaces.Glass(
     color=(0.9, 0.9, 1.0, 0.7),  # RGBA
     roughness=0.1,
     ior=1.5,
 )
 
-# Water
+# 水
 gs.surfaces.Water()
 ```
 
-## Textures
+## 纹理
 
-### Color Texture
+### 颜色纹理
 
 ```python
 gs.textures.ColorTexture(color=(1.0, 0.0, 0.0))
 ```
 
-### Image Texture
+### 图像纹理
 
 ```python
 gs.textures.ImageTexture(
     image_path="textures/checker.png",
-    encoding="srgb",  # or "linear" for non-color data
+    encoding="srgb",  # 或 "linear" 用于非颜色数据
 )
 ```
 
-### Using Textures with Surfaces
+### 将纹理与表面结合使用
 
 ```python
 surface = gs.surfaces.Rough(
@@ -92,17 +92,17 @@ surface = gs.surfaces.Rough(
 )
 ```
 
-## Visualization Modes
+## 可视化模式
 
 ```python
-# Particle visualization (for fluids)
+# 粒子可视化（用于流体）
 gs.surfaces.Rough(color=(0.6, 0.8, 1.0), vis_mode="particle")
 
-# Surface reconstruction
+# 表面重建
 gs.surfaces.Glass(color=(0.7, 0.85, 1.0, 0.7), vis_mode="recon")
 ```
 
-## Environment Maps (Raytracer)
+## 环境贴图（光线追踪器）
 
 ```python
 scene = gs.Scene(

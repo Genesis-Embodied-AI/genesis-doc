@@ -1,17 +1,17 @@
 # SFSolver
 
-The `SFSolver` (String/Fiber) handles simulation of 1D structures like ropes, cables, and hair.
+`SFSolver` (String/Fiber，绳/纤维) 用于处理绳索、缆线和头发等一维结构的仿真。
 
-## Overview
+## 概述
 
-The SF solver simulates:
+SF solver 仿真：
 
-- Inextensible constraints
-- Bending resistance
-- Twist resistance
-- Contact with other objects
+- Inextensible constraints (不可伸长约束)
+- Bending resistance (弯曲阻力)
+- Twist resistance (扭转阻力)
+- Contact with other objects (与其他对象的接触)
 
-## Usage
+## 使用方法
 
 ```python
 import genesis as gs
@@ -38,15 +38,15 @@ for i in range(1000):
     scene.step()
 ```
 
-## Configuration
+## 配置
 
-Key options in `SFOptions`:
+`SFOptions` 中的关键选项：
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `iterations` | int | Constraint iterations |
-| `damping` | float | Velocity damping |
+| `iterations` | int | Constraint iterations (约束迭代次数) |
+| `damping` | float | Velocity damping (速度阻尼) |
 
-## See Also
+## 另请参阅
 
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/sf_options` - Full options
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/sf_options` - 完整选项

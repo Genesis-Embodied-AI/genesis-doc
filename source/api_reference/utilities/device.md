@@ -1,8 +1,8 @@
 # Device & Platform Utilities
 
-Functions for detecting and configuring the compute platform and device.
+用于检测和配置计算平台和设备的函数。
 
-## Platform Detection
+## 平台检测
 
 ```python
 import genesis as gs
@@ -16,7 +16,7 @@ gs.init()
 print(gs.platform)  # Same result
 ```
 
-## Device Information
+## 设备信息
 
 ```python
 import genesis as gs
@@ -32,9 +32,9 @@ backend = gs.backend
 print(backend)  # gs.cuda, gs.metal, gs.cpu, etc.
 ```
 
-## Backend Selection
+## Backend 选择
 
-### Automatic Selection
+### 自动选择
 
 ```python
 # GPU auto-selects based on platform
@@ -43,7 +43,7 @@ gs.init(backend=gs.gpu)
 # macOS -> Metal
 ```
 
-### Manual Selection
+### 手动选择
 
 ```python
 # Force specific backend
@@ -52,7 +52,7 @@ gs.init(backend=gs.metal)   # Apple Metal
 gs.init(backend=gs.cpu)     # CPU fallback
 ```
 
-## Random Seed
+## 随机种子
 
 ```python
 import genesis as gs
@@ -64,18 +64,18 @@ gs.init(seed=42)
 gs.set_random_seed(42)
 ```
 
-## Global Variables
+## 全局变量
 
-After `gs.init()`, these are available:
+`gs.init()` 后，以下变量可用：
 
 | Variable | Type | Description |
 |----------|------|-------------|
-| `gs.platform` | str | Platform: "Linux", "macOS", "Windows" |
-| `gs.device` | torch.device | PyTorch device for tensors |
-| `gs.backend` | gs.backend | Active compute backend |
-| `gs.EPS` | float | Numerical epsilon (e.g., 1e-15) |
+| `gs.platform` | str | 平台: "Linux", "macOS", "Windows" |
+| `gs.device` | torch.device | PyTorch 张量设备 |
+| `gs.backend` | gs.backend | 活动计算后端 |
+| `gs.EPS` | float | 数值 epsilon（例如，1e-15） |
 
-## Type Hints
+## 类型提示
 
 ```python
 # Taichi types
@@ -89,7 +89,7 @@ gs.tc_float  # PyTorch float dtype
 gs.tc_int    # PyTorch int dtype
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`constants` - Backend enums
-- {doc}`tensor_utils` - Tensor operations
+- {doc}`constants` - 后端枚举
+- {doc}`tensor_utils` - 张量操作

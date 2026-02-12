@@ -1,21 +1,21 @@
 import os
 import sys
-# Prefer local source: add monorepo root (two levels up) if it contains `genesis/`
+# 优先使用本地源码：如果上级目录包含 `genesis/`，则将其加入路径
 _local_repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
 if os.path.isdir(os.path.join(_local_repo_root, "genesis")):
     sys.path.insert(0, _local_repo_root)
 import genesis as gs
 
-# We need to initialize Genesis before we can import any of it's classes to document
+# 我们需要在导入任何 Genesis 类进行文档化之前先初始化 Genesis
 gs.init(backend=gs.cpu)
 
 __version__ = gs.__version__
-# Configuration file for the Sphinx documentation builder.
+# Sphinx 文档构建器的配置文件。
 #
-# For the full list of built-in configuration values, see the documentation:
+# 有关内置配置值的完整列表，请参阅文档：
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# -- Project information -----------------------------------------------------
+# -- 项目信息 -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "Genesis"
@@ -24,7 +24,7 @@ author = "Genesis Developers"
 release = __version__
 version = __version__
 
-# -- General configuration ---------------------------------------------------
+# -- 通用配置 ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
@@ -51,7 +51,7 @@ templates_path = ["_templates"]
 # exclude_patterns = ["user_guide/reference/_autosummary/*"]
 
 
-# -- Options for HTML output -------------------------------------------------
+# -- HTML 输出选项 -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "pydata_sphinx_theme"
@@ -89,7 +89,7 @@ html_css_files = [
 ]
 html_static_path = ["_static"]
 
-### Autodoc configurations ###
+### Autodoc 配置 ###
 autodoc_typehints = "signature"
 autodoc_typehints_description_target = "all"
 autodoc_default_flags = ["members", "show-inheritance", "undoc-members"]

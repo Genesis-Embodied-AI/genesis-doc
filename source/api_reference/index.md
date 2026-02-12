@@ -1,8 +1,8 @@
-# API Reference
+# API 参考
 
-This section provides comprehensive documentation for the Genesis API. The reference is organized by functionality to help you find the classes and functions you need.
+本节提供 Genesis API 的完整文档。参考文档按功能组织，帮助你找到所需的类和函数。
 
-## Core Components
+## 核心组件
 
 ```{toctree}
 :titlesonly:
@@ -12,7 +12,7 @@ scene/index
 entity/index
 ```
 
-## Visualization & Rendering
+## 可视化与渲染
 
 ```{toctree}
 :titlesonly:
@@ -21,7 +21,7 @@ entity/index
 visualization/index
 ```
 
-## Sensors & Perception
+## 传感器与感知
 
 ```{toctree}
 :titlesonly:
@@ -30,7 +30,7 @@ visualization/index
 sensor/index
 ```
 
-## Data Recording & Playback
+## 数据记录与回放
 
 ```{toctree}
 :titlesonly:
@@ -39,7 +39,7 @@ sensor/index
 recording/index
 ```
 
-## Physics Engine
+## 物理引擎
 
 ```{toctree}
 :titlesonly:
@@ -48,7 +48,7 @@ recording/index
 engine/index
 ```
 
-## Configuration & Options
+## 配置与选项
 
 ```{toctree}
 :titlesonly:
@@ -58,7 +58,7 @@ material/index
 options/index
 ```
 
-## Utilities & Helpers
+## 工具与辅助函数
 
 ```{toctree}
 :titlesonly:
@@ -67,7 +67,7 @@ options/index
 utilities/index
 ```
 
-## Differentiable Simulation
+## 可微分仿真
 
 ```{toctree}
 :titlesonly:

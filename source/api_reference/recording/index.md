@@ -1,19 +1,19 @@
-# Recording & Playback
+# 记录与回放
 
-Genesis provides a flexible recording system for capturing simulation data. This enables data logging, visualization, video generation, and analysis of simulation results.
+Genesis 提供灵活的记录系统用于捕获仿真数据。这支持数据日志记录、可视化、视频生成和仿真结果分析。
 
-## Overview
+## 概览
 
-The recording system consists of:
+记录系统包括：
 
-- **Recorder**: Base class for processing simulation data
-- **RecorderManager**: Coordinates multiple recorders
-- **FileWriters**: Export data to files (CSV, NPZ, Video)
-- **Plotters**: Real-time visualization of data
+- **Recorder**: 处理仿真数据的基类
+- **RecorderManager**: 协调多个 recorders
+- **FileWriters**: 将数据导出到文件（CSV、NPZ、Video）
+- **Plotters**: 数据的实时可视化
 
-## Quick Start
+## 快速开始
 
-### Recording Video
+### 录制视频
 
 ```python
 import genesis as gs
@@ -24,21 +24,21 @@ scene.add_entity(gs.morphs.Plane())
 scene.add_entity(gs.morphs.Box(pos=(0, 0, 1)))
 scene.build()
 
-# Start recording
+# 开始录制
 scene.start_recording()
 
 for i in range(200):
     scene.step()
     scene.visualizer.update()
 
-# Stop and save
+# 停止并保存
 scene.stop_recording(save_to="simulation.mp4")
 ```
 
-### Recording Custom Data
+### 录制自定义数据
 
 ```python
-# Define what data to record
+# 定义要记录的数据
 def get_robot_state():
     return {
         "position": robot.get_pos(),
@@ -46,12 +46,12 @@ def get_robot_state():
         "joint_positions": robot.get_qpos(),
     }
 
-# Start recording with recorder options
+# 使用 recorder 选项开始录制
 scene.start_recording(
     data_func=get_robot_state,
     rec_options=gs.recorders.NPZFile(
         filepath="robot_data.npz",
-        hz=100,  # Recording frequency
+        hz=100,  # 录制频率
     ),
 )
 
@@ -60,10 +60,10 @@ for i in range(1000):
 scene.stop_recording()
 ```
 
-### Real-time Plotting
+### 实时绘图
 
 ```python
-# Plot joint positions in real-time
+# 实时绘制 joint 位置
 scene.start_recording(
     data_func=lambda: robot.get_qpos(),
     rec_options=gs.recorders.MPLLinePlot(
@@ -76,7 +76,7 @@ for i in range(1000):
 scene.stop_recording()
 ```
 
-## Components
+## 组件
 
 ```{toctree}
 :titlesonly:
@@ -87,25 +87,25 @@ file_writers
 plotters
 ```
 
-## Recording Workflow
+## 录制工作流程
 
-1. **Define data function**: A callable that returns the data to record
-2. **Create recorder**: Instantiate a recorder (FileWriter, Plotter, etc.)
-3. **Add to scene**: Register the recorder with the scene
-4. **Start recording**: Begin data capture
-5. **Run simulation**: Execute simulation steps
-6. **Stop recording**: Finalize and save data
+1. **定义数据函数**: 返回要记录的数据的可调用对象
+2. **创建 recorder**: 实例化 recorder（FileWriter、Plotter 等）
+3. **添加到 scene**: 向 scene 注册 recorder
+4. **开始录制**: 开始数据捕获
+5. **运行仿真**: 执行仿真步
+6. **停止录制**: 完成并保存数据
 
-## Configuration
+## 配置
 
-All recorders share common options:
+所有 recorders 共享通用选项：
 
-| Option | Type | Description |
+| 选项 | 类型 | 描述 |
 |--------|------|-------------|
-| `hz` | float | Recording frequency (samples/second) |
-| `async_mode` | bool | Process data in background thread |
+| `hz` | float | 录制频率（采样/秒） |
+| `async_mode` | bool | 在后台线程中处理数据 |
 
-## See Also
+## 另请参阅
 
-- {doc}`/api_reference/visualization/index` - Visual output
-- {doc}`/api_reference/scene/index` - Scene management
+- {doc}`/api_reference/visualization/index` - 视觉输出
+- {doc}`/api_reference/scene/index` - Scene 管理

@@ -1,103 +1,110 @@
-# 🚁 Training Drone Hovering Policies with RL
+# 🚁 使用 RL 训练无人机悬停策略
 
-Genesis supports parallel simulation, making it ideal for training reinforcement learning (RL) drone hovering policies efficiently. In this tutorial, we will walk you through a complete training example for obtaining a basic hovering policy that enables a drone to maintain a stable hover position by reaching randomly generated target points.
+Genesis 支持并行模拟，非常适合高效地训练强化学习（RL）无人机悬停策略。在本教程中，我们将通过一个完整的训练示例，介绍如何获得一个基本的悬停策略，使无人机能够通过到达随机生成的目标点来保持稳定的悬停位置。
 
-This is a simple and minimal example that demonstrates a very basic RL training pipeline in Genesis, and with the following example you will be able to obtain a drone hovering policy that's deployable to a real drone very quickly.
+这是一个简单且最小的示例，演示了 Genesis 中非常基础的 RL 训练流程，通过以下示例，您将能够快速获得一个可部署到真实无人机的悬停策略。
 
-**Note**: This is *NOT* a comprehensive drone hovering policy training pipeline. It uses simplified reward terms to get you started easily, and does not exploit Genesis's speed on big batch sizes, so it only serves basic demonstration purposes.
+**注意**：这*不是*一个全面的无人机悬停策略训练流程。它使用简化的奖励项来让您轻松入门，并且没有利用 Genesis 在大批量上的速度优势，因此它仅用于基本演示目的。
 
-**Acknowledgement**: This tutorial is inspired by [Champion-level drone racing using deep reinforcement learning (Nature 2023)](https://www.nature.com/articles/s41586-023-06419-4.pdf).
+**致谢**：本教程的灵感来源于 [Champion-level drone racing using deep reinforcement learning (Nature 2023)](https://www.nature.com/articles/s41586-023-06419-4.pdf)。
 
-## Environment Overview
-We start by creating a gym-style environment (hover-env).
+## 环境概述
 
-#### Initialize
-The `__init__` function sets up the simulation environment with the following steps:
-1. **Control Frequency**.
-    The simulation runs at 100 Hz, providing a high-frequency control loop for the drone.
-2. **Scene Creation**.
-    A simulation scene is created, including the drone and a static plane.
-3. **Target Initialization**.
-    A random target point is initialized, which the drone will attempt to reach.
-4. **Reward Registration**.
-    Reward functions, defined in the configuration, are registered to guide the policy. These functions will be explained in the "Reward" section.
-5. **Buffer Initialization**.
-    Buffers are initialized to store environment states, observations, and rewards.
+我们首先创建一个 gym 风格的环境（hover-env）。
 
-#### Reset
-The `reset_idx` function resets the initial pose and state buffers of the specified environments. This ensures robots start from predefined configurations, crucial for consistent training.
+#### 初始化
 
-#### Step
-The `step` function updates the environment state based on the actions taken by the policy. It includes the following steps:
-1. **Action Execution**.
-    The input action will be clipped to a valid range, rescaled, and applied as adjustments to the default hover propeller RPMs.
-2. **State Update**.
-    Drone states, such as position, attitude, and velocities, are retrieved and stored in buffers.
-3. **Termination Checks**.
-    Terminated environments are reset automatically. Environments are terminated if
-    - Episode length exceeds the maximum allowed.
-    - The drone's pitch or roll angle exceeds a specified threshold.
-    - The drone's position exceeds specified boundaries.
-    - The drone is too close to the ground.
-4. **Reward Computation**.
-    Rewards are calculated based on the drone's performance in reaching the target point and maintaining stability.
-5. **Observation Computation**.
-    Observations are normalized and returned to the policy. Observations used for training include drone's position, attitude (quaternion), body linear velocity, body angular velocity and previous actions.
+`__init__` 函数通过以下步骤设置模拟环境：
+1. **控制频率**。
+    模拟以 100 Hz 运行，为无人机提供高频控制回路。
+2. **场景创建**。
+    创建模拟场景，包括无人机和一个静态平面。
+3. **目标初始化**。
+    初始化一个随机目标点，无人机将尝试到达该点。
+4. **奖励注册**。
+    奖励函数在配置中定义并注册以指导策略。这些函数将在"奖励"部分中解释。
+5. **缓冲区初始化**。
+    初始化缓冲区以存储环境状态、观测值和奖励。
 
-#### Reward
-In this example, we use the following reward functions to encourage the drone to reach the target point and maintain stability:
-- **target**: Encourages the drone to reach the randomly generated target points.
-- **smooth**: Encourages smooth actions and bridge the sim-to-real gap.
-- **yaw**: Encourages the drone to maintain a stable hover yaw.
-- **angular**: Encourages the drone to maintain low angular velocities.
-- **crash**: Penalizes the drone for crashing or deviating too far from the target.
+#### 重置
 
-These reward functions are combined to provide comprehensive feedback to the policy, guiding it to achieve stable and accurate hovering behavior.
+`reset_idx` 函数重置指定环境的初始姿态和状态缓冲区。这确保机器人从预定义配置开始，这对于一致的训练至关重要。
 
-## Training
-At this stage, we have defined the environments. To train the drone hovering policy using PPO, follow these steps:
-1. **Install Dependencies**.
-    First, ensure you have Genesis installed, then add all required Python dependencies using `pip`:
+#### 步骤
+
+`step` 函数根据策略采取的动作更新环境状态。它包括以下步骤：
+1. **动作执行**。
+    输入动作将被裁剪到有效范围，重新缩放，并作为调整应用于默认悬停螺旋桨 RPM。
+2. **状态更新**。
+    检索无人机状态（如位置、姿态和速度）并存储在缓冲区中。
+3. **终止检查**。
+    终止的环境会自动重置。环境在以下情况下终止：
+    - 回合长度超过允许的最大值。
+    - 无人机的俯仰或横滚角度超过指定阈值。
+    - 无人机的位置超过指定边界。
+    - 无人机离地面太近。
+4. **奖励计算**。
+    根据无人机在到达目标点和保持稳定方面的表现计算奖励。
+5. **观测计算**。
+    观测值被归一化并返回给策略。用于训练的观测值包括无人机的位置、姿态（四元数）、机体线速度、机体角速度和先前的动作。
+
+#### 奖励
+
+在此示例中，我们使用以下奖励函数来鼓励无人机到达目标点并保持稳定：
+- **target**: 鼓励无人机到达随机生成的目标点。
+- **smooth**: 鼓励平滑动作并缩小 sim-to-real 差距。
+- **yaw**: 鼓励无人机保持稳定的悬停偏航。
+- **angular**: 鼓励无人机保持低角速度。
+- **crash**: 惩罚无人机坠毁或偏离目标太远。
+
+这些奖励函数结合起来为策略提供全面的反馈，指导其实现稳定准确的悬停行为。
+
+## 训练
+
+在这个阶段，我们已经定义了环境。要使用 PPO 训练无人机悬停策略，请按照以下步骤操作：
+1. **安装依赖项**。
+    首先，确保您已安装 Genesis，然后使用 `pip` 添加所有必需的 Python 依赖项：
     ```bash
     pip install --upgrade pip
     pip install tensorboard rsl-rl-lib==2.2.4
     ```
-2. **Run Training Script**.
-    Use the provided training script to start training the policy.
+2. **运行训练脚本**。
+    使用提供的训练脚本开始训练策略。
     ```bash
     python hover_train.py -e drone-hovering -B 8192 --max_iterations 301
     ```
-    - `-e drone-hovering`: Specifies the experiment name as "drone-hovering".
-    - `-B 8192`: Sets the number of environments to 8192 for parallel training.
-    - `--max_iterations 301`: Specifies the maximum number of training iterations to 301.
-    - `-v`: Optional. Enables training with visualization.
+    - `-e drone-hovering`: 将实验名称指定为 "drone-hovering"。
+    - `-B 8192`: 将环境数量设置为 8192 以进行并行训练。
+    - `--max_iterations 301`: 将最大训练迭代次数指定为 301。
+    - `-v`: 可选。启用可视化训练。
 
-    To monitor the training process, launch TensorBoard:
+    要监控训练过程，启动 TensorBoard：
     ```bash
     tensorboard --logdir logs
     ```
-    You should see a training curve similar to this:
+    您应该看到类似这样的训练曲线：
     ```{figure} ../../_static/images/hover_curve.png
     ```
-    When training with visualization enabled, you will see:
+    当启用可视化进行训练时，您将看到：
     ```{figure} ../../_static/images/training.gif
     ```
 
-## Evaluation
-To evaluate the trained drone hovering policy, follow these steps:
-1. **Run Evaluation Script**.
-    Use the provided evaluation script to evaluate the trained policy.
+## 评估
+
+要评估训练好的无人机悬停策略，请按照以下步骤操作：
+1. **运行评估脚本**。
+    使用提供的评估脚本来评估训练好的策略。
     ```bash
     python hover_eval.py -e drone-hovering --ckpt 300 --record
     ```
-    - `-e drone-hovering`: Specifies the experiment name as "drone-hovering".
-    - `--ckpt 300`: Loads the trained policy from checkpoint 300.
-    - `--record`: Records the evaluation and saves a video of the drone's performance.
-2. **Visualize Results**.
-    The evaluation script will visualize the drone's performance and save a video if the `--record` flag is set.
+    - `-e drone-hovering`: 将实验名称指定为 "drone-hovering"。
+    - `--ckpt 300`: 从检查点 300 加载训练好的策略。
+    - `--record`: 记录评估并保存无人机表现的视频。
+2. **可视化结果**。
+    评估脚本将可视化无人机的表现，如果设置了 `--record` 标志，则保存视频。
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/hover_env.mp4" type="video/mp4">
 </video>
 
-By following this tutorial, you'll be able to train and evaluate a basic drone hovering policy using Genesis. Have fun and enjoy!
+通过遵循本教程，您将能够使用 Genesis 训练和评估一个基本的无人机悬停策略。玩得开心！

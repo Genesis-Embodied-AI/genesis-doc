@@ -1,16 +1,16 @@
-# Cameras
+# 相机（Cameras）
 
-Cameras in Genesis are sensors that capture visual information from the simulation. They can render RGB images, depth maps, segmentation masks, and other visual data.
+Genesis 中的相机是从仿真中捕获视觉信息的传感器。它们可以渲染 RGB 图像、深度图、分割掩码和其他视觉数据。
 
-## Overview
+## 概述
 
-Genesis provides a unified `Camera` class that works with different rendering backends:
+Genesis 提供了一个统一的 `Camera` 类，可与不同的渲染后端配合使用：
 
-- **Rasterizer cameras**: Fast rendering for real-time use
-- **Raytracer cameras**: Photorealistic rendering
-- **BatchRenderer cameras**: High-throughput parallel rendering
+- **Rasterizer 相机**：快速渲染，适用于实时使用
+- **Raytracer 相机**：照片级真实感渲染
+- **BatchRenderer 相机**：高吞吐量的并行渲染
 
-## Adding Cameras
+## 添加相机
 
 ```python
 import genesis as gs
@@ -20,50 +20,50 @@ scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
 scene.build()
 
-# Add a camera
+# 添加相机
 cam = scene.add_camera(
-    res=(1280, 720),       # Resolution (width, height)
-    pos=(3, 0, 2),         # Camera position
-    lookat=(0, 0, 0.5),    # Look-at target
-    fov=40,                # Field of view (degrees)
-    up=(0, 0, 1),          # Up vector
+    res=(1280, 720),       # 分辨率（宽，高）
+    pos=(3, 0, 2),         # 相机位置
+    lookat=(0, 0, 0.5),    # 目标点
+    fov=40,                # 视野角度（度）
+    up=(0, 0, 1),          # 向上向量
 )
 ```
 
-## Rendering Images
+## 渲染图像
 
 ```python
-# Step simulation
+# 执行仿真步骤
 scene.step()
 
-# Render different output types
-rgb = cam.render(rgb=True)                    # RGB image
-depth = cam.render(depth=True)                # Depth map
-segmentation = cam.render(segmentation=True)  # Segmentation
-normal = cam.render(normal=True)              # Surface normals
+# 渲染不同类型的输出
+rgb = cam.render(rgb=True)                    # RGB 图像
+depth = cam.render(depth=True)                # 深度图
+segmentation = cam.render(segmentation=True)  # 分割
+normal = cam.render(normal=True)              # 表面法线
 
-# Render multiple types at once
+# 同时渲染多种类型
 outputs = cam.render(rgb=True, depth=True)
 ```
 
-## Camera Parameters
+## 相机参数
 
-| Parameter | Type | Description |
+| 参数 | 类型 | 描述 |
 |-----------|------|-------------|
-| `res` | tuple (W, H) | Image resolution |
-| `pos` | tuple (x, y, z) | Camera position |
-| `lookat` | tuple (x, y, z) | Point camera looks at |
-| `up` | tuple (x, y, z) | Up direction |
-| `fov` | float | Vertical field of view (degrees) |
-| `model` | str | Camera model: `pinhole` or `thinlens` |
-| `spp` | int | Samples per pixel (raytracer only) |
-| `denoise` | bool | Enable denoising (raytracer only) |
+| `res` | tuple (W, H) | 图像分辨率 |
+| `pos` | tuple (x, y, z) | 相机位置 |
+| `lookat` | tuple (x, y, z) | 相机注视点 |
+| `up` | tuple (x, y, z) | 向上方向 |
+| `fov` | float | 垂直视野角度（度） |
+| `model` | str | 相机模型：`pinhole` 或 `thinlens` |
+| `spp` | int | 每像素采样数（仅 raytracer） |
+| `denoise` | bool | 启用降噪（仅 raytracer） |
 
-## Camera Models
+## 相机模型
 
-### Pinhole Camera (Default)
+### Pinhole 相机（默认）
 
-Standard perspective camera with infinite depth of field:
+具有无限景深的标准透视相机：
 
 ```python
 cam = scene.add_camera(
@@ -74,9 +74,9 @@ cam = scene.add_camera(
 )
 ```
 
-### Thin Lens Camera
+### Thin Lens 相机
 
-Physically-based camera with depth of field:
+具有景深的基于物理的相机：
 
 ```python
 cam = scene.add_camera(
@@ -84,25 +84,25 @@ cam = scene.add_camera(
     pos=(3, 0, 2),
     lookat=(0, 0, 0.5),
     model="thinlens",
-    aperture=0.1,       # Aperture size
-    focus_dist=3.0,     # Focus distance
+    aperture=0.1,       # 光圈大小
+    focus_dist=3.0,     # 对焦距离
 )
 ```
 
-## Dynamic Camera Control
+## 动态相机控制
 
 ```python
-# Update camera position during simulation
+# 在仿真过程中更新相机位置
 cam.set_pose(
     pos=(5, 0, 3),
     lookat=(0, 0, 0),
 )
 
-# Follow an entity
+# 跟随实体
 cam.follow_entity(robot, offset=(2, 0, 1))
 ```
 
-## Components
+## 组件
 
 ```{toctree}
 :titlesonly:
@@ -110,7 +110,7 @@ cam.follow_entity(robot, offset=(2, 0, 1))
 camera
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`/api_reference/visualization/renderers/index` - Rendering backends
-- {doc}`/api_reference/sensor/index` - Other sensor types
+- {doc}`/api_reference/visualization/renderers/index` - 渲染后端
+- {doc}`/api_reference/sensor/index` - 其他传感器类型

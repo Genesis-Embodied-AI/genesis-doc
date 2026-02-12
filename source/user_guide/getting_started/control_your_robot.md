@@ -1,8 +1,8 @@
-# 🕹️ Control Your Robot
+# 🕹️ 控制你的机器人
 
-Now that we have loaded an robot, let's go through a comprehensive example to show you how you can control your robot via various ways.
+现在我们已经加载了一个机器人，让我们通过一个完整的示例来展示你可以通过各种方式控制你的机器人。
 
-As usual, let's import genesis, create a scene, and load a franka robot:
+像往常一样，让我们导入 Genesis，创建一个场景，并加载一个 Franka 机器人：
 ```python
 import numpy as np
 import genesis as gs
@@ -29,7 +29,7 @@ plane = scene.add_entity(
     gs.morphs.Plane(),
 )
 
-# when loading an entity, you can specify its pose in the morph.
+# 加载实体时，你可以在 morph 中指定其姿态
 franka = scene.add_entity(
     gs.morphs.MJCF(
         file  = 'xml/franka_emika_panda/panda.xml',
@@ -42,11 +42,11 @@ franka = scene.add_entity(
 scene.build()
 ```
 
-This robot arm will fall down due to gravity, if we don't give it any actuation force. Genesis has a built-in PD controller ([proportional–integral–derivative controller](https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller) ) that takes as input target joint position or velocity. You can also directly set torque/force applied to each joint.
+如果我们不给它任何驱动力，这个机器人手臂会因重力而下落。Genesis 内置了一个 PD 控制器（[比例-积分-微分控制器](https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller)），它以目标关节位置或速度作为输入。你也可以直接设置施加到每个关节的扭矩/力。
 
-In the context of robotic simulation, `joint` and `dof` (degree-of-freedom) are two related but different concepts. Since we are dealing with a Franka arm, which has 7 revolute joints in the arm and 2 prismatic joints in its gripper, all the joints have 1 dof only, leading to a 9-dof articulated body. In a more general case, there will be joint types such as free joint (6 dofs) or ball joint (3 dofs) that have more than one degrees of freedom. In general, you can think of each dof as a motor and can be controlled independently.
+在机器人仿真领域，`joint`（关节）和 `dof`（自由度）是两个相关但不同的概念。由于我们处理的是 Franka 手臂，它有 7 个旋转关节在手臂上，2 个平移关节在夹爪上，所有关节都只有 1 个自由度，形成一个 9 自由度的关节体。在更一般的情况下，会有自由关节（6 自由度）或球关节（3 自由度）等具有多个自由度的关节类型。一般来说，你可以将每个自由度视为一个电机，可以独立控制。
 
-In order to know which joint (dof) to control, we need to map the joint names we (as a user) defined in the URDF/MJCF file to the actual dof index inside the simulator:
+为了知道要控制哪个关节（自由度），我们需要将我们在 URDF/MJCF 文件中定义的关节名称映射到仿真器内部的实际自由度索引：
 
 ```
 jnt_names = [
@@ -62,35 +62,35 @@ jnt_names = [
 ]
 dofs_idx = [franka.get_joint(name).dof_idx_local for name in jnt_names]
 ```
-Note that here we are using `.dof_idx_local` to obtain the local idx of the dof with respect to the robot entity itself. You can also use `joint.dof_idx` to access each joint's global dof index in the scene.
+注意这里我们使用 `.dof_idx_local` 来获取相对于机器人实体本身的自由度的局部索引。你也可以使用 `joint.dof_idx` 来访问每个关节在场景中的全局自由度索引。
 
-Next, we can set the control gains for each dof. These gains determine how big the actual control force will be, given a target joint position or velocity. Usually, these information will be parsed from the imported MJCF or URDF file, but it's always recommended to tune it manually or refer to a well-tuned value online.
+接下来，我们可以为每个自由度设置控制增益。这些增益决定了给定目标关节位置或速度时实际控制力的大小。通常，这些信息会从导入的 MJCF 或 URDF 文件中解析，但建议手动调整或参考网上调试良好的值。
 
 ```python
 ############ Optional: set control gains ############
-# set positional gains
+# 设置位置增益
 franka.set_dofs_kp(
     kp             = np.array([4500, 4500, 3500, 3500, 2000, 2000, 2000, 100, 100]),
     dofs_idx_local = dofs_idx,
 )
-# set velocity gains
+# 设置速度增益
 franka.set_dofs_kv(
     kv             = np.array([450, 450, 350, 350, 200, 200, 200, 10, 10]),
     dofs_idx_local = dofs_idx,
 )
-# set force range for safety
+# 为安全设置力的范围
 franka.set_dofs_force_range(
     lower          = np.array([-87, -87, -87, -87, -12, -12, -12, -100, -100]),
     upper          = np.array([ 87,  87,  87,  87,  12,  12,  12,  100,  100]),
     dofs_idx_local = dofs_idx,
 )
 ```
-Note that these APIs in general takes as input two sets of values: the actual value to be set, and the corresponding dofs indices. Most control-related APIs follow this convention.
+注意这些 API 通常接受两组输入：要设置的实际值和相应的自由度索引。大多数与控制相关的 API 都遵循此约定。
 
-Next, instead of using a physically-realistic PD controller, let's first see how we can manually set the configuration of the robot. These APIs can make sudden changes to the robot state without obeying physics:
+接下来，让我们先看看如何手动设置机器人的配置，而不是使用物理真实的 PD 控制器。这些 API 可以突然改变机器人状态而不遵守物理规律：
 
 ```python
-# Hard reset
+# 硬重置
 for i in range(150):
     if i < 50:
         franka.set_dofs_position(np.array([1, 1, 0, 0, 0, 0, 0, 0.04, 0.04]), dofs_idx)
@@ -101,11 +101,11 @@ for i in range(150):
 
     scene.step()
 ```
-If you have viewer turned on, you will see the robot changes state every 50 steps.
+如果你打开了查看器，你会看到机器人每 50 步改变一次状态。
 
-Next, let's try to control the robot using the built in PD controller. The API design in Genesis follows a structured pattern. We used `set_dofs_position` to hard set the dofs position. Now we simply changed `set_*` to `control_*` to use the controller counterpart APIs. Here we illustrate different ways for controlling the robot:
+接下来，让我们尝试使用内置的 PD 控制器来控制机器人。Genesis 中的 API 设计遵循结构化模式。我们使用 `set_dofs_position` 来硬设置自由度位置。现在我们将 `set_*` 更改为 `control_*` 以使用控制器对应的 API。这里我们演示控制机器人的不同方式：
 ```python
-# PD control
+# PD 控制
 for i in range(1250):
     if i == 0:
         franka.control_dofs_position(
@@ -123,7 +123,7 @@ for i in range(1250):
             dofs_idx,
         )
     elif i == 750:
-        # control first dof with velocity, and the rest with position
+        # 用速度控制第一个自由度，其余的用位置控制
         franka.control_dofs_position(
             np.array([0, 0, 0, 0, 0, 0, 0, 0, 0])[1:],
             dofs_idx[1:],
@@ -137,32 +137,32 @@ for i in range(1250):
             np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]),
             dofs_idx,
         )
-    # This is the control force computed based on the given control command
-    # If using force control, it's the same as the given control command
+    # 这是基于给定控制命令计算的控制力
+    # 如果使用力控制，它与给定的控制命令相同
     print('control force:', franka.get_dofs_control_force(dofs_idx))
 
-    # This is the actual force experienced by the dof
+    # 这是自由度实际受到的力
     print('internal force:', franka.get_dofs_force(dofs_idx))
 
     scene.step()
 ```
-Let's dive into it a bit:
-- from step 0 to 500, we are using position control to control all the dofs, and move the robot to 3 target positions sequentially. Note that for `control_*` APIs, once a target value is set, it will be stored internally and you don't need to send repetitive commands to the simulation in the following steps as long as your target stays the same.
-- at step 750, we demonstrate we can do hybrid control for different dofs: for the first dof (dof 0), we send a velocity command, while the rest still follows position control commands
-- at step 1000, we switch to torque (force) control and send a zero-force command to all the dofs, and the robot will again fall onto the floor due to gravity.
+让我们深入了解一下：
+- 从第 0 步到 500，我们使用位置控制来控制所有自由度，并按顺序将机器人移动到 3 个目标位置。注意，对于 `control_*` API，一旦设置了目标值，只要目标保持不变，你就不需要向仿真器在后续步骤中发送重复命令，它会内部存储。
+- 在第 750 步，我们演示了可以对不同的自由度进行混合控制：对于第一个自由度（dof 0），我们发送速度命令，而其余的仍然遵循位置控制命令
+- 在第 1000 步，我们切换到扭矩（力）控制并向所有自由度发送零力命令，机器人将再次落到地板上。
 
-At the end of each step, we print two types of forces: `get_dofs_control_force()` and `get_dofs_force()`.
-- `get_dofs_control_force()` returns the force applied by the controller. In case of position or velocity control, this is computed using the target command and the control gains. In case of force (torque) control, this is same as the input control command
-- `get_dofs_force()` returns the actual force experience by each dof, this is a combination of the force applied by the controller, and other internal forces such as collision force and coriolis force.
+在每一步结束时，我们打印两种类型的力：`get_dofs_control_force()` 和 `get_dofs_force()`。
+- `get_dofs_control_force()` 返回控制器施加的力。在位置或速度控制的情况下，这是使用目标命令和控制增益计算的。在力（扭矩）控制的情况下，这与输入的控制命令相同
+- `get_dofs_force()` 返回每个自由度实际受到的力，这是控制器施加的力与其他内部力（如碰撞力和科里奥利力）的组合。
 
-If everything goes right, this is what you should see:
+如果一切正常，这就是你应该看到的：
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/control_your_robot.mp4" type="video/mp4">
 </video>
 
 
-Here is the full code script covering everything discussed above:
+以下是涵盖上述所有内容的完整代码脚本：
 ```python
 import numpy as np
 
@@ -212,23 +212,20 @@ jnt_names = [
 dofs_idx = [franka.get_joint(name).dof_idx_local for name in jnt_names]
 
 ############ Optional: set control gains ############
-# set positional gains
+# 设置位置增益
 franka.set_dofs_kp(
-    kp             = np.array([4500, 4500, 3500, 3500, 2000, 2000, 2000, 100, 100]),
-    dofs_idx_local = dofs_idx,
+    np.array([4500, 4500, 3500, 3500, 2000, 2000, 2000, 100, 100]),
 )
-# set velocity gains
+# 设置速度增益
 franka.set_dofs_kv(
-    kv             = np.array([450, 450, 350, 350, 200, 200, 200, 10, 10]),
-    dofs_idx_local = dofs_idx,
+    np.array([450, 450, 350, 350, 200, 200, 200, 10, 10]),
 )
-# set force range for safety
+# 为安全设置力的范围
 franka.set_dofs_force_range(
-    lower          = np.array([-87, -87, -87, -87, -12, -12, -12, -100, -100]),
-    upper          = np.array([ 87,  87,  87,  87,  12,  12,  12,  100,  100]),
-    dofs_idx_local = dofs_idx,
+    np.array([-87, -87, -87, -87, -12, -12, -12, -100, -100]),
+    np.array([ 87,  87,  87,  87,  12,  12,  12,  100,  100]),
 )
-# Hard reset
+# 硬重置
 for i in range(150):
     if i < 50:
         franka.set_dofs_position(np.array([1, 1, 0, 0, 0, 0, 0, 0.04, 0.04]), dofs_idx)
@@ -239,7 +236,7 @@ for i in range(150):
 
     scene.step()
 
-# PD control
+# PD 控制
 for i in range(1250):
     if i == 0:
         franka.control_dofs_position(
@@ -257,7 +254,7 @@ for i in range(1250):
             dofs_idx,
         )
     elif i == 750:
-        # control first dof with velocity, and the rest with position
+        # 用速度控制第一个自由度，其余的用位置控制
         franka.control_dofs_position(
             np.array([0, 0, 0, 0, 0, 0, 0, 0, 0])[1:],
             dofs_idx[1:],
@@ -271,33 +268,31 @@ for i in range(1250):
             np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]),
             dofs_idx,
         )
-    # This is the control force computed based on the given control command
-    # If using force control, it's the same as the given control command
+    # 这是基于给定控制命令计算的控制力
+    # 如果使用力控制，它与给定的控制命令相同
     print('control force:', franka.get_dofs_control_force(dofs_idx))
 
-    # This is the actual force experienced by the dof
+    # 这是自由度实际受到的力
     print('internal force:', franka.get_dofs_force(dofs_idx))
 
     scene.step()
 ```
 
-## Pick & Place with a Suction Cup
+## 使用吸盘进行拾取和放置
 
-In many industrial settings robots pick objects using a suction pad that behaves like an "instant" rigid grasp.  In Genesis you can reproduce the same behaviour by temporarily welding two rigid bodies together.
+在许多工业环境中，机器人使用吸盘抓取物体，其行为类似于"即时"刚性抓取。在 Genesis 中，你可以通过暂时将两个刚体焊接在一起来重现相同的行为。
 
-The *rigid solver* inside the scene gives you direct access to this functionality through
-`add_weld_constraint()` and `delete_weld_constraint()`.  The API takes two numpy arrays that list the
-link indices to be attached / detached.
+场景中的*rigid solver*（刚体求解器）通过 `add_weld_constraint()` 和 `delete_weld_constraint()` 让你直接访问此功能。该 API 接受两个 numpy 数组，列出要连接/分离的连杆索引。
 
-Below is a minimal example that moves the Franka end-effector above a small cube, welds the two bodies together (imitating suction), transports the cube to another pose and finally releases it again.
+下面是一个最小示例，将 Franka 末端执行器移动到一个小立方体上方，将两个主体焊接在一起（模仿吸附），将立方体运送到另一个姿态，最后再次释放它。
 
 ```python
 import numpy as np
 import genesis as gs
 
-# --- (scene and robot creation omitted, identical to the sections above) ---
+# --- （场景和机器人创建省略，与上面的部分相同） ---
 
-# Add a cube entity to the scene
+# 向场景添加一个立方体实体
 cube = scene.add_entity(
     gs.morphs.Box(
         size = (0.08, 0.08, 0.08),
@@ -305,30 +300,30 @@ cube = scene.add_entity(
     )
 )
 
-# Retrieve some commonly used handles
-rigid        = scene.sim.rigid_solver   # low-level rigid body solver
-end_effector = franka.get_link("hand")  # Franka gripper frame
-cube_link    = cube.base_link           # the link we want to pick
+# 获取一些常用的句柄
+rigid        = scene.sim.rigid_solver   # 底层刚体求解器
+end_effector = franka.get_link("hand")  # Franka 夹爪坐标系
+cube_link    = cube.base_link           # 我们想要拾取的连杆
 
-################ Reach pre-grasp pose ################
+################ 到达预抓取姿态 ################
 q_pregrasp = franka.inverse_kinematics(
     link = end_effector,
-    pos  = np.array([0.65, 0.0, 0.13]),  # just above the cube
-    quat = np.array([0, 1, 0, 0]),       # down-facing orientation
+    pos  = np.array([0.65, 0.0, 0.13]),  # 刚好在立方体上方
+    quat = np.array([0, 1, 0, 0]),       # 朝下的方向
 )
-franka.control_dofs_position(q_pregrasp[:-2], np.arange(7))  # arm joints only
+franka.control_dofs_position(q_pregrasp[:-2], np.arange(7))  # 仅手臂关节
 for _ in range(50):
     scene.step()
 
-################ Attach (activate suction) ################
+################ 连接（激活吸附） ################
 link_cube   = np.array([cube_link.idx],    dtype=gs.np_int)
 link_franka = np.array([end_effector.idx], dtype=gs.np_int)
 rigid.add_weld_constraint(link_cube, link_franka)
 
-################ Lift and transport ################
+################ 抬起和运输 ################
 q_lift = franka.inverse_kinematics(
     link = end_effector,
-    pos  = np.array([0.65, 0.0, 0.28]),  # lift up
+    pos  = np.array([0.65, 0.0, 0.28]),  # 抬起
     quat = np.array([0, 1, 0, 0]),
 )
 franka.control_dofs_position(q_lift[:-2], np.arange(7))
@@ -337,22 +332,22 @@ for _ in range(50):
 
 q_place = franka.inverse_kinematics(
     link = end_effector,
-    pos  = np.array([0.4, 0.2, 0.18]),  # target place pose
+    pos  = np.array([0.4, 0.2, 0.18]),  # 目标放置姿态
     quat = np.array([0, 1, 0, 0]),
 )
 franka.control_dofs_position(q_place[:-2], np.arange(7))
 for _ in range(100):
     scene.step()
 
-################ Detach (release suction) ################
+################ 分离（释放吸附） ################
 rigid.delete_weld_constraint(link_cube, link_franka)
 for _ in range(400):
     scene.step()
 ```
 
-A few remarks:
-1. The suction pad is modelled as an *ideal* weld — no compliance or force limit is enforced.  If you need a more physical behaviour you can instead create a `gs.constraints.DampedSpring` or control the gripper fingers.
-2. Link indices are **scene-global**, therefore we wrap them in a single-element numpy array to satisfy the API contract.
-3. You can attach or detach multiple objects at once by passing arrays with more than one index.
+几点说明：
+1. 吸盘被建模为*理想的*焊接——不强制执行顺应性或力限制。如果你需要更物理真实的行为，你可以改为创建 `gs.constraints.DampedSpring` 或控制夹爪手指。
+2. 连杆索引是**场景全局的**，因此我们将它们包装在单元素 numpy 数组中以满足 API 约定。
+3. 你可以通过传递包含多个索引的数组来一次附加或分离多个对象。
 
-With just two lines of code you can now pick and place arbitrary objects with suction!  Feel free to integrate this snippet into your own control pipeline.
+只需两行代码，你现在就可以使用吸盘拾取和放置任意对象！请随意将此代码片段集成到你自己的控制流程中。

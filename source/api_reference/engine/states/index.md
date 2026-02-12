@@ -1,20 +1,20 @@
 # States
 
-States in Genesis hold the runtime data for physics simulation, including positions, velocities, forces, and other solver-specific variables.
+Genesis 中的 States 保存物理仿真的运行时数据，包括位置、速度、力以及其他 solver 特定的变量。
 
-## Overview
+## 概览
 
-Each solver maintains its own state:
+每个 solver 维护自己的 state：
 
-- **RigidState**: Link poses, joint positions/velocities
-- **MPMState**: Particle positions, velocities, deformation gradients
-- **FEMState**: Node positions, velocities
-- **PBDState**: Particle positions, velocities
-- **SPHState**: Particle positions, velocities, densities
+- **RigidState**: Link 位姿、joint 位置/速度
+- **MPMState**: 粒子位置、速度、变形梯度
+- **FEMState**: 节点位置、速度
+- **PBDState**: 粒子位置、速度
+- **SPHState**: 粒子位置、速度、密度
 
-## Accessing State
+## 访问 State
 
-States are accessed through entities or the simulator:
+States 通过 entities 或 simulator 访问：
 
 ```python
 import genesis as gs
@@ -24,54 +24,54 @@ scene = gs.Scene()
 robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 scene.build()
 
-# Access via entity
-positions = robot.get_qpos()      # Joint positions
-velocities = robot.get_qvel()     # Joint velocities
+# 通过 entity 访问
+positions = robot.get_qpos()      # Joint 位置
+velocities = robot.get_qvel()     # Joint 速度
 link_pos = robot.get_link("ee").get_pos()
 
-# Full state access (advanced)
+# 完整 state 访问（高级）
 rigid_solver = scene.sim.rigid_solver
-# ... direct solver state access
+# ... 直接访问 solver state
 ```
 
-## State for Parallel Environments
+## 并行环境的 State
 
-With `n_envs > 1`, states are batched:
+使用 `n_envs > 1` 时，states 是批量的：
 
 ```python
 scene.build(n_envs=16)
 
-# Batched state access
+# 批量 state 访问
 positions = robot.get_qpos()  # Shape: (n_envs, n_dofs)
 
-# Per-environment access
+# 按环境访问
 positions = robot.get_qpos(envs_idx=[0, 5, 10])
 ```
 
-## State Management
+## State 管理
 
-### Saving State
+### 保存 State
 
 ```python
 state = scene.get_state()
 ```
 
-### Restoring State
+### 恢复 State
 
 ```python
 scene.set_state(state)
 ```
 
-### Resetting
+### 重置
 
 ```python
-scene.reset()  # Reset all environments
-scene.reset(envs_idx=[0, 1, 2])  # Reset specific environments
+scene.reset()  # 重置所有环境
+scene.reset(envs_idx=[0, 1, 2])  # 重置特定环境
 ```
 
-## Gradient Tracking
+## 梯度追踪
 
-For differentiable simulation:
+用于可微分仿真：
 
 ```python
 scene = gs.Scene(
@@ -80,13 +80,13 @@ scene = gs.Scene(
     ),
 )
 
-# States now track gradients
+# States 现在追踪梯度
 scene.step()
 loss = compute_loss(robot.get_qpos())
 loss.backward()
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`/api_reference/differentiation/index` - Differentiable simulation
-- {doc}`/api_reference/scene/scene` - Scene state methods
+- {doc}`/api_reference/differentiation/index` - 可微分仿真
+- {doc}`/api_reference/scene/scene` - Scene state 方法

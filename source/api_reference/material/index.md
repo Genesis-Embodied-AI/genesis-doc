@@ -1,7 +1,7 @@
 # Material
 
-A `Material` object specifies the physical material of each entity.
-You could find the physical properties and their corresponding values here such as the stiffness of an object.
+`Material` 对象指定每个 entity 的物理材质。
+你可以在这里找到物理属性及其对应的值，例如物体的刚度。
 
 ```{toctree}
 rigid

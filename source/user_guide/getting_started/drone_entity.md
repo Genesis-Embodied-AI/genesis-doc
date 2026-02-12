@@ -1,8 +1,8 @@
-# 🚁 Drone Entity
+# 🚁 无人机实体
 
-Genesis provides specialized drone simulation with propeller physics and motor control.
+Genesis 提供专门的无人机模拟，包括螺旋桨物理和电机控制。
 
-## Creating a Drone
+## 创建无人机
 
 ```python
 import genesis as gs
@@ -27,69 +27,69 @@ drone = scene.add_entity(
 scene.build()
 ```
 
-## Drone Morph Options
+## 无人机 Morph 选项
 
 ```python
 gs.morphs.Drone(
-    file="urdf/drones/cf2x.urdf",  # URDF file path
-    model="CF2X",                   # Model: "CF2X", "CF2P", or "RACE"
-    pos=(0.0, 0.0, 0.5),           # Initial position
-    euler=(0.0, 0.0, 0.0),         # Initial orientation (degrees)
+    file="urdf/drones/cf2x.urdf",  # URDF 文件路径
+    model="CF2X",                   # 模型: "CF2X", "CF2P", 或 "RACE"
+    pos=(0.0, 0.0, 0.5),           # 初始位置
+    euler=(0.0, 0.0, 0.0),         # 初始方向 (度)
     propellers_link_name=('prop0_link', 'prop1_link', 'prop2_link', 'prop3_link'),
-    propellers_spin=(-1, 1, -1, 1), # Spin directions: 1=CCW, -1=CW
+    propellers_spin=(-1, 1, -1, 1), # 旋转方向: 1=逆时针, -1=顺时针
 )
 ```
 
-## Motor Control
+## 电机控制
 
-Control propellers via RPM (revolutions per minute):
+通过 RPM（每分钟转数）控制螺旋桨：
 
 ```python
-hover_rpm = 14475.8  # Approximate hover RPM for CF2X
+hover_rpm = 14475.8  # CF2X 的近似悬停 RPM
 max_rpm = 25000.0
 
 for step in range(1000):
-    # Set RPM for each propeller [front-left, front-right, back-left, back-right]
+    # 为每个螺旋桨设置 RPM [前左, 前右, 后左, 后右]
     rpms = np.array([hover_rpm, hover_rpm, hover_rpm, hover_rpm])
 
-    # Add differential thrust for motion
-    rpms[0] += 100  # Increase front-left
-    rpms[3] += 100  # Increase back-right
+    # 添加差动推力以实现运动
+    rpms[0] += 100  # 增加前左
+    rpms[3] += 100  # 增加后右
     rpms = np.clip(rpms, 0, max_rpm)
 
-    drone.set_propellels_rpm(rpms)  # Call ONCE per step
+    drone.set_propellels_rpm(rpms)  # 每步调用一次
     scene.step()
 ```
 
-**Important:** `set_propellels_rpm()` must be called exactly once per simulation step.
+**重要：** `set_propellels_rpm()` 必须在每个模拟步骤中恰好调用一次。
 
-## Physics Model
+## 物理模型
 
-- **Thrust:** `F = KF × RPM²` (vertical force per propeller)
-- **Torque:** `τ = KM × RPM² × spin_direction` (yaw moment)
-- **Control:**
-  - Differential thrust between propellers → translation
-  - Differential moment between pairs → rotation
+- **推力:** `F = KF × RPM²` (每个螺旋桨的垂直力)
+- **扭矩:** `τ = KM × RPM² × spin_direction` (偏航力矩)
+- **控制:**
+  - 螺旋桨之间的差动推力 → 平移
+  - 螺旋桨对之间的差动力矩 → 旋转
 
-## Multi-Environment
+## 多环境
 
 ```python
 scene.build(n_envs=32)
 
-# Control shape: (n_envs, n_propellers)
+# 控制形状: (n_envs, n_propellers)
 rpms = np.tile([hover_rpm] * 4, (32, 1))
 drone.set_propellels_rpm(rpms)
 ```
 
-## Available Models
+## 可用模型
 
-| Model | File | Description |
+| 模型 | 文件 | 描述 |
 |-------|------|-------------|
-| CF2X | `urdf/drones/cf2x.urdf` | Crazyflie 2.0 X-config |
+| CF2X | `urdf/drones/cf2x.urdf` | Crazyflie 2.0 X 配置 |
 | CF2P | `urdf/drones/cf2p.urdf` | Crazyflie 2.0 Plus |
-| RACE | `urdf/drones/racer.urdf` | Racing drone |
+| RACE | `urdf/drones/racer.urdf` | 竞速无人机 |
 
-## Example: Hover Control
+## 示例：悬停控制
 
 ```python
 import genesis as gs

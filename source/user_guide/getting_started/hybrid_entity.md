@@ -1,16 +1,16 @@
-# 🔗 Hybrid Entity
+# 🔗 混合实体
 
-HybridEntity combines rigid and soft body physics for simulating deformable robots with rigid skeletons.
+HybridEntity 结合了刚体和软体物理，用于模拟具有刚性骨骼的可变形机器人。
 
-## Overview
+## 概述
 
-A hybrid entity couples:
-- **Rigid component**: Skeleton/structure (from URDF)
-- **Soft component**: Deformable skin (MPM-based)
+混合实体耦合了：
+- **刚体组件**：骨骼/结构（来自 URDF）
+- **软体组件**：可变形皮肤（基于 MPM）
 
-Use cases: soft grippers, deformable robots, compliant manipulators.
+用例：软体夹爪、可变形机器人、柔顺机械臂。
 
-## Creating a Hybrid Entity
+## 创建混合实体
 
 ```python
 import genesis as gs
@@ -41,45 +41,45 @@ robot = scene.add_entity(
 scene.build()
 ```
 
-## Hybrid Material Options
+## 混合材质选项
 
 ```python
 gs.materials.Hybrid(
-    material_rigid=gs.materials.Rigid(),     # Rigid body material
-    material_soft=gs.materials.MPM.Muscle(), # Soft material (MPM only)
-    thickness=0.05,                          # Soft skin thickness
-    damping=1000.0,                          # Velocity damping
-    soft_dv_coef=0.01,                       # Rigid→soft velocity transfer
+    material_rigid=gs.materials.Rigid(),     # 刚体材质
+    material_soft=gs.materials.MPM.Muscle(), # 软体材质（仅 MPM）
+    thickness=0.05,                          # 软皮肤厚度
+    damping=1000.0,                          # 速度阻尼
+    soft_dv_coef=0.01,                       # 刚体→软体速度传递
 )
 ```
 
-## Control
+## 控制
 
-Control uses the rigid skeleton's DOFs:
+控制使用刚体骨骼的 DOF：
 
 ```python
 import numpy as np
 
 for step in range(1000):
-    # Sinusoidal joint control
+    # 正弦关节控制
     target_vel = [np.sin(step * 0.01)] * robot.n_dofs
     robot.control_dofs_velocity(target_vel)
     scene.step()
 ```
 
-## Accessing Components
+## 访问组件
 
 ```python
-robot.part_rigid   # RigidEntity (skeleton)
-robot.part_soft    # MPMEntity (skin)
-robot.n_dofs       # Number of DOFs
+robot.part_rigid   # RigidEntity（骨骼）
+robot.part_soft    # MPMEntity（皮肤）
+robot.n_dofs       # DOF 数量
 
-# State access
+# 状态访问
 robot.get_dofs_position()
 robot.get_dofs_velocity()
 ```
 
-## Example: Soft Gripper
+## 示例：软体夹爪
 
 ```python
 gripper = scene.add_entity(
@@ -92,22 +92,22 @@ gripper = scene.add_entity(
     ),
 )
 
-# Add object to grasp
+# 添加要抓取的对象
 ball = scene.add_entity(
     morph=gs.morphs.Sphere(pos=(0.5, 0.5, 0.1), radius=0.05),
 )
 
 scene.build()
 
-# Close gripper
+# 闭合夹爪
 for step in range(500):
     gripper.control_dofs_position([0.5] * gripper.n_dofs)
     scene.step()
 ```
 
-## From Mesh (Automatic Skeletonization)
+## 从网格创建（自动骨架化）
 
-Create hybrid entity from arbitrary mesh:
+从任意网格创建混合实体：
 
 ```python
 creature = scene.add_entity(
@@ -119,13 +119,13 @@ creature = scene.add_entity(
 )
 ```
 
-Genesis automatically:
-1. Extracts skeleton from mesh via skeletonization
-2. Creates rigid body from skeleton
-3. Maps soft particles to skeleton links
+Genesis 自动执行：
+1. 通过骨架化从网格提取骨骼
+2. 从骨骼创建刚体
+3. 将软体粒子映射到骨骼连杆
 
-## Notes
+## 注意事项
 
-- Soft material must be MPM-based (`gs.materials.MPM.*`)
-- Higher `damping` reduces oscillation
-- Requires `mpm_options` with appropriate bounds
+- 软体材质必须是基于 MPM 的（`gs.materials.MPM.*`）
+- 较高的 `damping` 可减少振荡
+- 需要具有适当边界的 `mpm_options`

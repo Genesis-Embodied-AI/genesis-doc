@@ -1,4 +1,4 @@
-# 📝 Parallelized RL Training
+# 📝 并行化 RL 训练
 
 
-Coming soon...
+敬请期待...

@@ -1,22 +1,22 @@
-# 🗂 Config System
+# 🗂 配置系统
 
-## Overview
+## 概述
 
-The Genesis simulation framework is built around a modular and extensible configuration system. This system allows users to flexibly compose and control different aspects of a simulation—ranging from low-level physics solvers to high-level rendering options—through structured configuration objects.
+Genesis 模拟框架围绕一个模块化和可扩展的配置系统构建。该系统允许用户通过结构化配置对象灵活地组合和控制模拟的不同方面——从低级物理求解器到高级渲染选项。
 
-To help you understand how these components work together, we start with a high-level template of how a Genesis scene is typically initialized. This template shows how simulation settings, solver options, and entity-level configurations are orchestrated.
+为了帮助你理解这些组件如何协同工作，我们从 Genesis 场景通常如何初始化的高级模板开始。此模板展示了如何编排模拟设置、求解器选项和实体级配置。
 
 ```python
-# Initializate Genesis
+# 初始化 Genesis
 gs.init(...)
 
-# Initialize scene
+# 初始化场景
 scene = gs.Scene(
-    # simulation & coupling
+    # 模拟与耦合
     sim_options=SimOptions(...),
     coupler_options=CouplerOptions(...),
 
-    # solvers
+    # 求解器
     tool_options=ToolOptions(...),
     rigid_options=RigidOptions(...),
     mpm_options=MPMOptions(...),
@@ -25,13 +25,13 @@ scene = gs.Scene(
     sf_options=SFOptions(...),
     pbd_options=PBDOptions(...),
 
-    # visualization & rendering
+    # 可视化与渲染
     vis_options=VisOptions(...),
     viewer_options=ViewerOptions(...),
     renderer=Rasterizer(...),
 )
 
-# Add entities
+# 添加实体
 scene.add_entity(
     morph=gs.morphs...,
     material=gs.materials...,
@@ -39,109 +39,109 @@ scene.add_entity(
 )
 ```
 
-As shown above, a scene in Genesis is defined by a combination of:
+如上所示，Genesis 中的场景由以下组合定义：
 
-- [Simulation & Coupling](#simulation--coupling): Defines global simulation parameters and how different solvers interact.
-- [Solvers](#solvers): Configure physical behaviors for different simulation methods (e.g., rigid bodies, fluids, cloth).
-- [Visualization & Rendering](#visualization--rendering): Customize runtime visualization and final rendering options.
-- For each entity added to the scene:
-    - [Morph](#morph): Defines the geometry or structure of the entity.
-    - [Material](#material): Specifies material properties relevant with the corresponding physics solver.
-    - [Surface](#surface): Controls visual appearance and surface rendering.
+- [模拟与耦合](#模拟--耦合)：定义全局模拟参数和不同求解器如何交互。
+- [求解器](#求解器)：为不同模拟方法（例如刚体、流体、布料）配置物理行为。
+- [可视化与渲染](#可视化--渲染)：自定义运行时可视化和最终渲染选项。
+- 对于添加到场景的每个实体：
+    - [Morph](#morph)：定义实体的几何或结构。
+    - [Material](#material)：指定与相应物理求解器相关的材质属性。
+    - [Surface](#surface)：控制视觉外观和表面渲染。
 
-## Simulation & Coupling
+## 模拟与耦合
 
-This configuration defines how the simulation is globally structured and how different physics solvers are coupled. These options control the "skeleton" of the simulation loop, e.g., time-stepping, stability, and solver interoperability.
+此配置定义了模拟的全局结构以及不同物理求解器如何耦合。这些选项控制模拟循环的"骨架"，例如时间步进、稳定性和求解器互操作性。
 
-- `SimOptions`: Sets global simulation parameters—time step size, gravity, damping, and numerical integrator.
-- `CouplerOptions`: Configures multi-physics interactions - for instance, how a rigid tool interacts with a soft deformable body or how a fluid flows through a porous material.
+- `SimOptions`：设置全局模拟参数——时间步长、重力、阻尼和数值积分器。
+- `CouplerOptions`：配置多物理场交互——例如，刚性工具如何与软可变形体交互，或流体如何流过多孔材料。
 
-Defined in [genesis/options/solvers.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/solvers.py).
+定义于 [genesis/options/solvers.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/solvers.py)。
 
-## Solvers
+## 求解器
 
-Solvers are the cores behind specific physical models. Each solver encapsulates a simulation algorithm for a particular material or system—rigid bodies, fluids, deformables, etc. Users can enable or disable solvers depending on the scenario.
-- `RigidOptions`: Rigid body dynamics with contact, collision, and constraints.
-- `MPMOptions`: Material Point Method solver for elastic, plastic, granular, fluidic materials.
-- `SPHOptions`: Smoothed Particle Hydrodynamics solver for fluids and granular flows.
-- `FEMOptions`: Finite Element Method solver for elastic material.
-- `SFOptions`: Stable Fluid solver for eulerian-based gaseous simulation.
-- `PBDOptions`: Position-Based Dynamics solver for cloth, volumetric deformable objects, liquid, and particles.
-- `ToolOptions`: A temporary setup. To be deprecated.
+求解器是特定物理模型的核心。每个求解器封装了特定材料或系统的模拟算法——刚体、流体、可变形体等。用户可以根据场景启用或禁用求解器。
+- `RigidOptions`：具有接触、碰撞和约束的刚体动力学。
+- `MPMOptions`：用于弹性、塑性、颗粒、流体材料的物质点法求解器。
+- `SPHOptions`：用于流体和颗粒流的平滑粒子流体动力学求解器。
+- `FEMOptions`：用于弹性材料的有限元法求解器。
+- `SFOptions`：用于基于欧拉的气体模拟的稳定流体求解器。
+- `PBDOptions`：用于布料、体积可变形对象、液体和粒子的基于位置的动力学求解器。
+- `ToolOptions`：临时设置。将被弃用。
 
-Defined in [genesis/options/solvers.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/solvers.py).
+定义于 [genesis/options/solvers.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/solvers.py)。
 
-## Visualization & Rendering
+## 可视化与渲染
 
-This configuration controls both the live visualization (useful during debugging and development) and the final rendered output (useful for demos, analysis, or media). It governs how users interact with and perceive the simulation visually.
-- `ViewerOptions`: Configure properties of the interactive viewer.
-- `VisOptions`: Configure visualization-related properties that are independent of the viewer or camera.
-- `Renderer` (Rasterizer or Raytracer): Defines the rendering backend, including lighting, shading, and post-processing effects. Support Rasterization or Raytracing.
+此配置控制实时可视化（在调试和开发期间有用）和最终渲染输出（用于演示、分析或媒体）。它控制用户如何与模拟进行视觉交互和感知。
+- `ViewerOptions`：配置交互式查看器的属性。
+- `VisOptions`：配置独立于查看器或相机的可视化相关属性。
+- `Renderer`（Rasterizer 或 Raytracer）：定义渲染后端，包括光照、着色和后处理效果。支持光栅化或光线追踪。
 
-Defined in [genesis/options/vis.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/vis.py) and [genesis/options/renderers.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/renderers.py).
+定义于 [genesis/options/vis.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/vis.py) 和 [genesis/options/renderers.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/renderers.py)。
 
 ## Morph
 
-Morphs define the shape and topology of an entity. This includes primitive geometries (e.g., spheres, boxes), structured assets (e.g., articulated arms). Morphs form the geometric foundation on which materials and physics operate.
-- `Primitive`: For all shape-primitive morphs.
-    - `Box`: Morph defined by a box shape.
-    - `Cylinder`: Morph defined by a cylinder shape.
-    - `Sphere`: Morph defined by a sphere shape.
-    - `Plane`: Morph defined by a plane shape.
-- `FileMorph`:
-    - `Mesh`: Morph loaded from a mesh file.
-        - `MeshSet`: A collection of meshes.
-    - `MJCF`: Morph loaded from a MJCF file. This morph only supports rigid entity.
-    - `URDF`: Morph loaded from a URDF file. This morph only supports rigid entity.
-    - `Drone`: Morph loaded from a URDF file for creating a drone entity.
-- `Terrain`: Morph for creating a rigid terrain.
-- `NoWhere`: Reserved for emitter. Internal use only.
+Morphs 定义实体的形状和拓扑结构。这包括基本几何体（例如球体、盒子）、结构化资源（例如关节臂）。Morphs 形成材质和物理操作的几何基础。
+- `Primitive`：所有形状基本体的 Morph。
+    - `Box`：由盒子形状定义的 Morph。
+    - `Cylinder`：由圆柱形状定义的 Morph。
+    - `Sphere`：由球体形状定义的 Morph。
+    - `Plane`：由平面形状定义的 Morph。
+- `FileMorph`：
+    - `Mesh`：从网格文件加载的 Morph。
+        - `MeshSet`：网格的集合。
+    - `MJCF`：从 MJCF 文件加载的 Morph。此 Morph 仅支持刚体实体。
+    - `URDF`：从 URDF 文件加载的 Morph。此 Morph 仅支持刚体实体。
+    - `Drone`：从 URDF 文件加载用于创建无人机实体的 Morph。
+- `Terrain`：用于创建刚性地形的 Morph。
+- `NoWhere`：为发射器保留。仅供内部使用。
 
-Defined in [genesis/options/morphs.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/morphs.py).
+定义于 [genesis/options/morphs.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/morphs.py)。
 
 ## Material
 
-Materials define how an object responds to physical forces. This includes stiffness, friction, elasticity, damping, and solver-specific material parameters. The material also determines how an entity interacts with other objects and solvers.
-- `Rigid`: Rigid-bodied and articulated.
-- `MPM`: Material Point Method.
+材质定义物体如何响应物理力。这包括刚度、摩擦、弹性、阻尼和求解器特定的材质参数。材质还决定实体如何与其他对象和求解器交互。
+- `Rigid`：刚体和关节体。
+- `MPM`：物质点法。
     - `Elastic`
     - `ElastoPlastic`
     - `Liquid`
     - `Muscle`
     - `Sand`
     - `Snow`
-- `FEM`: Finite Element Method.
+- `FEM`：有限元法。
     - `Elastic`
     - `Muscle`
-- `PBD`: Position Based Dynamics.
+- `PBD`：基于位置的动力学。
     - `Cloth`
     - `Elastic`
     - `Liquid`
     - `Particle`
-- `SF`: Stable Fluid.
+- `SF`：稳定流体。
     - `Smoke`
-- `Hybrid`: Rigid skeleton actuating soft skin.
-- `Tool`: Temporary and to be deprecated.
+- `Hybrid`：刚体骨骼驱动软皮肤。
+- `Tool`：临时且将被弃用。
 
-These can be found in [genesis/engine/materials](https://github.com/Genesis-Embodied-AI/Genesis/tree/main/genesis/engine/materials).
+这些可以在 [genesis/engine/materials](https://github.com/Genesis-Embodied-AI/Genesis/tree/main/genesis/engine/materials) 中找到。
 
 ## Surface
 
-Surfaces define how an entity appears visually. They include rendering properties like color, texture, reflectance, transparency, and more. Surfaces are the interface between an entity's internal structure and the renderer.
+表面定义实体的视觉外观。它们包括颜色、纹理、反射率、透明度等渲染属性。表面是实体内部结构和渲染器之间的接口。
 
-- `Default`: Basically `Plastic`.
-- `Plastic`: Plastic surface is the most basic type of surface.
-    - `Rough`: Shortcut for a rough surface with proper parameters.
-    - `Smooth`: Shortcut for a smooth surface with proper parameters.
-    - `Reflective`: For collision geometry with a grey color by default.
-    - `Collision`: Shortcut for a rough plastic surface with proper parameters.
+- `Default`：基本上是 `Plastic`。
+- `Plastic`：塑料表面是最基本的表面类型。
+    - `Rough`：具有适当参数的粗糙表面的快捷方式。
+    - `Smooth`：具有适当参数的平滑表面的快捷方式。
+    - `Reflective`：默认灰色的碰撞几何体快捷方式。
+    - `Collision`：具有适当参数的粗糙塑料表面的快捷方式。
 - `Metal`
-    - `Iron`: Shortcut for an metallic surface with `metal_type = 'iron'`.
-    - `Aluminium`: Shortcut for an metallic surface with `metal_type = 'aluminium'`.
-    - `Copper`: Shortcut for an metallic surface with `metal_type = 'copper'`.
-    - `Gold`: Shortcut for an metallic surface with `metal_type = 'gold'`.
+    - `Iron`：`metal_type = 'iron'` 的金属表面快捷方式。
+    - `Aluminium`：`metal_type = 'aluminium'` 的金属表面快捷方式。
+    - `Copper`：`metal_type = 'copper'` 的金属表面快捷方式。
+    - `Gold`：`metal_type = 'gold'` 的金属表面快捷方式。
 - `Glass`
-    - `Water`: Shortcut for a water surface (using Glass surface with proper values).
-- `Emission`: Emission surface. This surface emits light.
+    - `Water`：水表面的快捷方式（使用具有适当值的 Glass 表面）。
+- `Emission`：发光表面。此表面发射光。
 
-Defined in [genesis/options/surfaces.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/surfaces.py).
+定义于 [genesis/options/surfaces.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/surfaces.py)。

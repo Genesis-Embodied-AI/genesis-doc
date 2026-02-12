@@ -1,7 +1,7 @@
-# User Guide
+# 用户指南
 
 ```{toctree}
-:caption: Overview
+:caption: 概述
 :maxdepth: 1
 
 overview/what_is_genesis
@@ -12,7 +12,7 @@ overview/mission
 
 
 ```{toctree}
-:caption: Getting Started
+:caption: 入门指南
 :maxdepth: 1
 
 getting_started/hello_genesis
@@ -48,7 +48,7 @@ getting_started/config_system
 
 
 ```{toctree}
-:caption: Advanced Topics
+:caption: 高级主题
 :maxdepth: 1
 
 advanced_topics/concepts

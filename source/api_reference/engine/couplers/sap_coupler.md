@@ -1,16 +1,16 @@
 # SAPCoupler
 
-The `SAPCoupler` (Sweep and Prune) provides efficient spatial acceleration for multi-physics coupling.
+`SAPCoupler` (Sweep and Prune，扫描和剪枝) 为多物理场耦合提供高效的空间加速。
 
-## Overview
+## 概述
 
-The SAP coupler:
+SAP coupler：
 
-- Uses sweep-and-prune for broad-phase collision
-- Efficient for large numbers of objects
-- Reduces narrow-phase checks
+- Uses sweep-and-prune for broad-phase collision (使用扫描和剪枝进行粗粒度碰撞检测)
+- Efficient for large numbers of objects (对大量对象高效)
+- Reduces narrow-phase checks (减少细粒度检测)
 
-## Usage
+## 使用方法
 
 ```python
 import genesis as gs
@@ -21,7 +21,7 @@ scene = gs.Scene(
 )
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`index` - Coupler overview
-- {doc}`ipc_coupler` - IPC coupling
+- {doc}`index` - Coupler 概述
+- {doc}`ipc_coupler` - IPC 耦合

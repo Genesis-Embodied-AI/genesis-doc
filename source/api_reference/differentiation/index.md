@@ -1,17 +1,17 @@
-# Differentiable Simulation
+# 可微分仿真
 
-Genesis supports end-to-end differentiable physics simulation, enabling gradient-based optimization through the physics engine.
+Genesis 支持端到端可微分物理仿真，支持通过物理引擎进行基于梯度的优化。
 
-## Overview
+## 概述
 
-Differentiable simulation allows you to:
+可微分仿真允许你：
 
-- Compute gradients of simulation outputs with respect to inputs
-- Optimize control policies through physics
-- Learn physical parameters from observations
-- Backpropagate through multi-step trajectories
+- 计算仿真输出相对于输入的梯度
+- 通过物理优化控制策略
+- 从观测中学习物理参数
+- 通过多步轨迹进行反向传播
 
-## Quick Start
+## 快速开始
 
 ```python
 import genesis as gs
@@ -19,18 +19,18 @@ import torch
 
 gs.init()
 
-# Enable gradient tracking
+# 启用梯度追踪
 scene = gs.Scene(
     sim_options=gs.options.SimOptions(
         dt=0.01,
-        requires_grad=True,  # Enable differentiability
+        requires_grad=True,  # 启用可微分性
     ),
 )
 
 robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 scene.build()
 
-# Forward simulation
+# 正向仿真
 initial_pos = torch.tensor([0.0, 0.0, 0.0], requires_grad=True, device=gs.device)
 robot.set_dofs_position(initial_pos)
 
@@ -38,23 +38,23 @@ for i in range(100):
     robot.control_dofs_force(forces)
     scene.step()
 
-# Compute loss
+# 计算损失
 final_pos = robot.get_pos()
 target = torch.tensor([1.0, 0.0, 0.5], device=gs.device)
 loss = torch.nn.functional.mse_loss(final_pos, target)
 
-# Backward pass
+# 反向传播
 loss.backward()
 
-# Access gradients
+# 访问梯度
 print(initial_pos.grad)
 ```
 
-## Key Concepts
+## 核心概念
 
-### Enabling Gradients
+### 启用梯度
 
-Set `requires_grad=True` in `SimOptions`:
+在 `SimOptions` 中设置 `requires_grad=True`：
 
 ```python
 scene = gs.Scene(
@@ -66,36 +66,36 @@ scene = gs.Scene(
 
 ### Genesis Tensors
 
-Genesis uses custom tensors that extend PyTorch tensors:
+Genesis 使用扩展 PyTorch tensor 的自定义 tensor：
 
 ```python
-# State outputs are genesis tensors
+# 状态输出是 genesis tensors
 pos = robot.get_pos()  # genesis.grad.Tensor
 
-# Supports standard PyTorch operations
+# 支持标准 PyTorch 操作
 loss = (pos - target).pow(2).sum()
 
-# Backward automatically flows through simulation
+# 反向传播自动流经仿真
 loss.backward()
 ```
 
-### Gradient Flow
+### 梯度流
 
 ```
-Input (controls, initial state)
+输入（控制、初始状态）
     ↓
-Forward simulation (physics steps)
+正向仿真（物理步骤）
     ↓
-Output (final state, observations)
+输出（最终状态、观测）
     ↓
-Loss function
+损失函数
     ↓
-backward() propagates through simulation
+backward() 通过仿真传播
     ↓
-Input gradients available
+输入梯度可用
 ```
 
-## Components
+## 组件
 
 ```{toctree}
 :titlesonly:
@@ -104,7 +104,7 @@ tensor
 creation_ops
 ```
 
-## Example: Trajectory Optimization
+## 示例：轨迹优化
 
 ```python
 import genesis as gs
@@ -122,7 +122,7 @@ scene = gs.Scene(
 robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 scene.build()
 
-# Optimize control sequence
+# 优化控制序列
 n_steps = 100
 n_dofs = robot.n_dofs
 controls = torch.zeros(n_steps, n_dofs, requires_grad=True, device=gs.device)
@@ -133,16 +133,16 @@ target = torch.tensor([1.0, 0.0, 0.5], device=gs.device)
 for epoch in range(100):
     scene.reset()
 
-    # Forward simulation
+    # 正向仿真
     for t in range(n_steps):
         robot.control_dofs_force(controls[t])
         scene.step()
 
-    # Compute loss
+    # 计算损失
     final_pos = robot.get_pos()
     loss = torch.nn.functional.mse_loss(final_pos, target)
 
-    # Optimize
+    # 优化
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
@@ -150,13 +150,13 @@ for epoch in range(100):
     print(f"Epoch {epoch}: loss = {loss.item():.4f}")
 ```
 
-## Limitations
+## 局限性
 
-1. **Memory**: Multi-step trajectories require storing intermediate states
-2. **Not all operations differentiable**: Some collision operations may not have gradients
-3. **Numerical stability**: Long horizons may have gradient stability issues
+1. **内存**：多步轨迹需要存储中间状态
+2. **并非所有操作都可微分**：某些碰撞操作可能没有梯度
+3. **数值稳定性**：长时域可能存在梯度稳定性问题
 
-## See Also
+## 另请参阅
 
-- {doc}`tensor` - Genesis tensor class
-- {doc}`/api_reference/engine/states/index` - State management
+- {doc}`tensor` - Genesis tensor 类
+- {doc}`/api_reference/engine/states/index` - 状态管理

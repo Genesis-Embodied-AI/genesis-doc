@@ -1,23 +1,23 @@
-# 🔗 Rigid Collision Resolution
+# 🔗 刚体碰撞解析
 
-Genesis follows a **quadratic penalty formulation** very similar to that used by [MuJoCo](https://mujoco.readthedocs.io/) for enforcing rigid–body constraints.  This document summarises the mathematics and physical interpretation of the model.
+Genesis 遵循与 [MuJoCo](https://mujoco.readthedocs.io/) 非常相似的**二次惩罚公式**来强制执行刚体约束。本文档总结了该模型的数学原理和物理解释。
 
 ---
 
-## 1. General formulation
+## 1. 一般公式
 
-Let
+设
 
-* $q$ – joint configuration (generalised positions)
-* **\dot q** – generalised velocities
-* $a = \ddot q$ – the unknown **generalised accelerations** to be solved for each sub-step
-* $M(q)$ – joint-space mass matrix (positive definite)
-* $\tau_{ext}$ – all external joint forces **already known** (actuation, gravity, hydrodynamics …)
-* $J $ – a *stack* of kinematic constraints linearised in acceleration space
-* $D$ – diagonal matrix of *softness* / *impedance* parameters per constraint
-* $a_{ref}$ – reference accelerations that try to restore penetrations or satisfy motors
+* $q$ – 关节配置（广义位置）
+* **\dot q** – 广义速度
+* $a = \ddot q$ – 每个子步要求解的未知**广义加速度**
+* $M(q)$ – 关节空间质量矩阵（正定）
+* $\tau_{ext}$ – 所有已知的**外部关节力**（驱动、重力、流体动力学…）
+* $J $ – 在加速度空间中线性化的运动约束*堆栈*
+* $D$ – 每个约束的*柔软度* / *阻抗*参数对角矩阵
+* $a_{ref}$ – 试图恢复穿透或满足电机的参考加速度
 
-We seek the acceleration that minimises the **quadratic cost**
+我们寻求最小化**二次成本**的加速度
 
 $$
     \frac12 (M a \,{-}\, \tau_{ext})^{\!T} (a \,{-}\, a^{\text{prev}}) 
@@ -28,81 +28,81 @@ $$
 
 ---
 
-## 2. Contact & friction model
+## 2. 接触与摩擦模型
 
-For every **contact pair** Genesis creates four constraints, which are the basis of the friction pyramid. Mathematically each direction **tᵢ** is
+对于每个**接触对**，Genesis 创建四个约束，它们是摩擦金字塔的基础。数学上每个方向 **tᵢ** 是
 
 $$
-    \mathbf t\_i = \pm d_1\,\mu - \mathbf n \quad\text{or}\quad \pm d_2\,\mu - \mathbf n ,
+    \mathbf t\_i = \pm d_1\,\mu - \mathbf n \quad\text{或}\quad \pm d_2\,\mu - \mathbf n ,
 $$
 
-so that a positive multiplier on **tᵢ** produces a force that lies *inside* the cone $|\mathbf f_t| \le \mu f_n$.  A diagonal entry **Dᵢ** proportional to the combined inverse mass gives the familiar *soft-constraint* behaviour where larger *imp* (implicitness) values lead to stiffer contacts.
+因此 **tᵢ** 上的正乘数产生位于锥体 $|\mathbf f_t| \le \mu f_n$ *内部*的力。与组合逆质量成比例的对角项 **Dᵢ** 给出了熟悉的*软约束*行为，其中较大的 *imp*（隐式性）值导致更硬的接触。
 
 ---
 
-## 3. Joint limits (inequality constraints)
+## 3. 关节限制（不等式约束）
 
-Revolute and prismatic joints optionally carry a **lower** and **upper** position limit.  Whenever the signed distance to a limit becomes negative
+旋转和平移关节可选地带有**下限**和**上限**位置限制。每当到限制的带符号距离变为负数时
 
-$$ \phi = q - q_{min} < 0 \quad\text{or}\quad \phi = q_{max} - q < 0 $$
+$$ \phi = q - q_{min} < 0 \quad\text{或}\quad \phi = q_{max} - q < 0 $$
 
-a *single* 1-DOF constraint is spawned with Jacobian
+生成一个*单一*的 1-DOF 约束，其雅可比为
 
 $$ J = \pm 1 $$
 
-and reference acceleration
+和参考加速度
 
 $$ a_{ref} = k\,\phi + c \,\dot q, $$
 
-obtained from the scalar `sol_params` (spring-damper style softness).  The diagonal entry of **D** once again scales with the inverse joint inertia.
+从标量 `sol_params`（弹簧-阻尼器式柔软度）获得。**D** 的对角项再次随逆关节惯性缩放。
 
 ---
 
-## 4. Equality constraints
+## 4. 等式约束
 
-Genesis supports three kinds of **holonomic equalities**:
+Genesis 支持三种**完整等式**：
 
-| Type | DOF removed | Description |
+| 类型 | 移除的自由度 | 描述 |
 |------|-------------|-------------|
-| **Connect** | 3 | Enforces that two points on different bodies share the *same world position*.  Good for ball-and-socket joints. |
-| **Weld**    | 6 | Keeps two frames coincident in both translation **and** rotation (optionally scaled torque). |
-| **Polynomial joint** | 1 | Constrains one joint as a polynomial function of another (useful for complex mechanisms). |
+| **Connect** | 3 | 强制不同体上的两个点共享*相同的世界位置*。适合球窝关节。 |
+| **Weld**    | 6 | 保持两个坐标系在**平移和旋转**上都重合（可选缩放扭矩）。 |
+| **Polynomial joint** | 1 | 将一个关节约束为另一个关节的多项式函数（对复杂机构有用）。 |
 
-Each equality writes rows into **J** so that their *relative* translational / rotational velocity vanishes.  Softness and Baumgarte stabilisation again come from per-constraint `sol_params`.
+每个等式将行写入 **J**，使得它们的*相对*平移/旋转速度消失。柔软度和 Baumgarte 稳定再次来自每个约束的 `sol_params`。
 
 ---
 
-## 5. Solvers
+## 5. 求解器
 
-The solver class implements **two interchangeable algorithms**:
+求解器类实现**两种可互换算法**：
 
-### 5.1 Projected Conjugate Gradient (PCG)
+### 5.1 投影共轭梯度 (PCG)
 
-* Operates in the **reduced space** of accelerations.
-* Uses the *mass matrix* as pre-conditioner.
-* After each CG step a **back-tracking line search** (Armijo style) projects the new **J a** onto the feasible set (normal ≥0, friction cone).
-* Requires only **matrix-vector products**, making it memory-friendly and fast for scenes with many constraints.
+* 在加速度的**约化空间**中操作。
+* 使用*质量矩阵*作为预处理器。
+* 每个 CG 步骤后，**回溯线搜索**（Armijo 风格）将新的 **J a** 投影到可行集（法向 ≥0，摩擦锥）上。
+* 只需要**矩阵-向量乘积**，使其对具有许多约束的场景内存友好且快速。
 
 ### 5.2 Newton–Cholesky
 
-* Builds the **exact Hessian** \(H = M + J^T D J\).
-* A Cholesky factorisation (with incremental rank-1 updates) yields search directions.
-* Converges in very few steps (often 2-3) but is more expensive for large DOF counts.
+* 构建**精确 Hessian** \(H = M + J^T D J\)。
+* Cholesky 分解（带增量秩-1 更新）产生搜索方向。
+* 在非常少的步骤中收敛（通常 2-3 步），但对于大自由度计数更昂贵。
 
-Both variants share **identical line-search logic** implemented in `_func_linesearch` that chooses the step length \(\alpha\) minimising the quadratic model whilst respecting inequality activation/de-activation.  The algorithm stops when either
+两个变体共享在 `_func_linesearch` 中实现的**相同的线搜索逻辑**，选择步长 \(\alpha\) 最小化二次模型同时尊重不等式激活/去激活。算法停止当
 
-* the gradient norm \(|\nabla f|\) drops below `tolerance · mean_inertia · n_dofs`, or
-* the improvement of the cost function falls below the same threshold.
+* 梯度范数 $|\nabla f|$ 低于 `tolerance · mean_inertia · n_dofs`，或
+* 成本函数的改进低于相同的阈值。
 
-Warm-starting is supported by initialising from the previous sub-step's smoothed accelerations `acc_smooth`.
+通过从上一子步的平滑加速度 `acc_smooth` 初始化来支持热启动。
 
 ---
 
-## 6. Practical implications
+## 6. 实际影响
 
-* **Stability** – because constraints are *implicit* in acceleration space the model handles larger time-steps, similar to MuJoCo.
-* **Friction anisotropy** – replacing the cone by a pyramid introduces slight anisotropy.  Increasing the number of directions would reduce this but cost more.
-* **Softness** – tuning `imp` and `timeconst` lets you trade constraint stiffness against numerical conditioning.  Values near 1 are stiff but may slow convergence.
-* **Choosing a solver** – use *CG* for scenes with thousands of DOFs or when memory is tight; switch to *Newton* when you need very high accuracy or when the DOF count is moderate (<100).
+* **稳定性** – 因为约束在加速度空间中是*隐式*的，该模型可以处理更大的时间步长，类似于 MuJoCo。
+* **摩擦各向异性** – 用金字塔替换锥体会引入轻微的各向异性。增加方向数量会减少这一点但成本更高。
+* **柔软度** – 调整 `imp` 和 `timeconst` 可以让您在约束刚度与数值条件之间进行权衡。接近 1 的值较硬但可能减慢收敛。
+* **选择求解器** – 对具有数千个自由度的场景或内存紧张时使用 *CG*；当需要非常高的精度或自由度计数适中（<100）时切换到 *Newton*。
 
 ---

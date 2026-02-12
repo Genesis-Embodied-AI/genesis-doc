@@ -1,4 +1,4 @@
-# Metal
+# 金属
 
 ```{toctree}
 :maxdepth: 2

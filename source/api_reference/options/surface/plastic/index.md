@@ -1,4 +1,4 @@
-# Plastic
+# 塑料
 
 ```{toctree}
 :maxdepth: 2

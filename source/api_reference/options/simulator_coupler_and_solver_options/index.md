@@ -1,9 +1,9 @@
-# Simulator, Coupler & Solver Options
+# 仿真器、耦合器与求解器选项
 
-This configures the global simulator, all the solvers inside it, and the inter-solver coupler.
+此部分用于配置全局仿真器、其中的所有求解器以及求解器间的耦合器。
 
 :::{note}
-`SimOptions` specifies the global settings for the simulator. Some parameters exist both in `SimOptions` and `SolverOptions`. In this case, if such parameters are given in `SolverOptions`, it will override the one specified in `SimOptions` for this specific solver. For example, if `dt` is only given in `SimOptions`, it will be shared by all the solvers, but it's also possible to let a solver run at a different temporal speed by setting its own `dt` to be a different value.
+`SimOptions` 指定了仿真器的全局设置。某些参数同时存在于 `SimOptions` 和 `SolverOptions` 中。在这种情况下，如果在 `SolverOptions` 中指定了这些参数，则会覆盖 `SimOptions` 中指定的值，仅对该特定求解器生效。例如，如果仅在 `SimOptions` 中设置了 `dt`，则所有求解器将共享该时间步长；但也可以通过为特定求解器设置不同的 `dt` 值，使其以不同的时间速度运行。
 :::
 
 ```{toctree}

@@ -1,17 +1,17 @@
 # Camera
 
-The `Camera` class is the primary interface for visual sensing in Genesis. It provides a unified API for rendering images using different backends.
+`Camera` 类是 Genesis 中视觉感知的主要接口。它为使用不同后端渲染图像提供了统一的 API。
 
-## Overview
+## 概述
 
-A Camera can capture:
+相机可以捕获：
 
-- **RGB images**: Color renderings of the scene
-- **Depth maps**: Distance from camera to surfaces
-- **Segmentation**: Per-pixel entity/link identification
-- **Normals**: Surface normal vectors
+- **RGB 图像**：场景的彩色渲染
+- **深度图**：从相机到表面的距离
+- **分割**：逐像素的实体/连杆识别
+- **法线**：表面法向量
 
-## API Reference
+## API 参考
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.camera.Camera
@@ -20,9 +20,9 @@ A Camera can capture:
    :show-inheritance:
 ```
 
-## Examples
+## 示例
 
-### Basic Rendering
+### 基本渲染
 
 ```python
 import genesis as gs
@@ -44,39 +44,39 @@ rgb = cam.render(rgb=True)
 print(rgb.shape)  # (480, 640, 3)
 ```
 
-### Saving Images
+### 保存图像
 
 ```python
 import cv2
 
 rgb = cam.render(rgb=True)
-cv2.imwrite("output.png", rgb[..., ::-1])  # RGB to BGR for OpenCV
+cv2.imwrite("output.png", rgb[..., ::-1])  # RGB 转 BGR 以用于 OpenCV
 ```
 
-### Depth Visualization
+### 深度可视化
 
 ```python
 import numpy as np
 
 depth = cam.render(depth=True)
 
-# Normalize for visualization
+# 归一化以进行可视化
 depth_vis = (depth - depth.min()) / (depth.max() - depth.min())
 depth_vis = (depth_vis * 255).astype(np.uint8)
 ```
 
-### With GUI Display
+### 使用 GUI 显示
 
 ```python
 cam = scene.add_camera(
     res=(640, 480),
     pos=(3, 0, 2),
     lookat=(0, 0, 0.5),
-    GUI=True,  # Show in separate window
+    GUI=True,  # 在单独窗口中显示
 )
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`index` - Camera overview and parameters
-- {doc}`/api_reference/visualization/renderers/index` - Renderer backends
+- {doc}`index` - 相机概述和参数
+- {doc}`/api_reference/visualization/renderers/index` - 渲染器后端

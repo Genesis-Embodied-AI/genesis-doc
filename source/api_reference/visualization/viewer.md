@@ -1,25 +1,25 @@
 # Viewer
 
-The `Viewer` class provides an interactive window for real-time visualization of simulations. It allows users to navigate the scene with mouse controls, inspect objects, and control simulation playback.
+`Viewer` 类提供了一个交互式窗口，用于实时可视化仿真。用户可以通过鼠标控制来浏览场景、检查对象以及控制仿真播放。
 
-## Overview
+## 概述
 
-The Viewer is an optional component that provides:
+Viewer 是一个可选组件，提供以下功能：
 
-- Real-time 3D rendering of the simulation
-- Mouse-based camera navigation (orbit, pan, zoom)
-- Keyboard shortcuts for controlling simulation
-- Entity selection and highlighting
-- Render state visualization
+- 仿真的实时 3D 渲染
+- 基于鼠标的相机导航（轨道、平移、缩放）
+- 用于控制仿真的键盘快捷键
+- 实体选择和高亮显示
+- 渲染状态可视化
 
-## Quick Start
+## 快速开始
 
 ```python
 import genesis as gs
 
 gs.init()
 
-# Create scene with interactive viewer
+# 创建带有交互式 viewer 的场景
 scene = gs.Scene(
     show_viewer=True,
     viewer_options=gs.options.ViewerOptions(
@@ -34,54 +34,54 @@ scene.add_entity(gs.morphs.Plane())
 scene.add_entity(gs.morphs.Box(pos=(0, 0, 0.5)))
 scene.build()
 
-# Run with viewer
+# 在 viewer 中运行
 for i in range(1000):
     scene.step()
     scene.visualizer.update()
 ```
 
-## Camera Controls
+## 相机控制
 
-| Control | Action |
-|---------|--------|
-| Left Mouse + Drag | Orbit camera |
-| Right Mouse + Drag | Pan camera |
-| Scroll Wheel | Zoom in/out |
-| Middle Mouse + Drag | Zoom |
+| 控制方式 | 操作 |
+|---------|------|
+| 左键 + 拖动 | 轨道旋转相机 |
+| 右键 + 拖动 | 平移相机 |
+| 滚轮 | 放大/缩小 |
+| 中键 + 拖动 | 缩放 |
 
-## Keyboard Shortcuts
+## 键盘快捷键
 
-| Key | Action |
-|-----|--------|
-| Space | Pause/Resume simulation |
-| R | Reset camera to initial position |
-| Esc | Close viewer |
+| 按键 | 操作 |
+|-----|------|
+| Space | 暂停/恢复仿真 |
+| R | 重置相机到初始位置 |
+| Esc | 关闭 viewer |
 
-## Configuration
+## 配置
 
-The viewer is configured through `ViewerOptions`:
+通过 `ViewerOptions` 配置 viewer：
 
 ```python
 viewer_options = gs.options.ViewerOptions(
-    res=(1920, 1080),          # Resolution
-    camera_pos=(5, 0, 3),       # Initial camera position
-    camera_lookat=(0, 0, 0),    # Camera look-at point
-    camera_fov=45,              # Field of view
-    max_FPS=60,                 # Maximum frame rate
-    run_in_thread=True,         # Run viewer in separate thread
-    enable_interaction=True,    # Enable mouse/keyboard interaction
+    res=(1920, 1080),          # 分辨率
+    camera_pos=(5, 0, 3),       # 初始相机位置
+    camera_lookat=(0, 0, 0),    # 相机目标点
+    camera_fov=45,              # 视野角度
+    max_FPS=60,                 # 最大帧率
+    run_in_thread=True,         # 在单独线程中运行 viewer
+    enable_interaction=True,    # 启用鼠标/键盘交互
 )
 ```
 
-## Headless Mode
+## 无头模式（Headless Mode）
 
-For environments without a display (servers, CI), disable the viewer:
+对于没有显示环境的情况（服务器、CI），禁用 viewer：
 
 ```python
 scene = gs.Scene(show_viewer=False)
 ```
 
-## API Reference
+## API 参考
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.viewer.Viewer
@@ -90,7 +90,7 @@ scene = gs.Scene(show_viewer=False)
    :show-inheritance:
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`visualizer` - Main visualization orchestrator
-- {doc}`/api_reference/options/options` - ViewerOptions configuration
+- {doc}`visualizer` - 主可视化控制器
+- {doc}`/api_reference/options/options` - ViewerOptions 配置

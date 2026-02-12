@@ -1,82 +1,82 @@
-# 📦 Loading USD Scenes
+# 📦 加载 USD 场景
 
-Genesis supports loading complex scenes from Universal Scene Description (USD) files, enabling you to import articulated robots, rigid objects, and complete environments with proper physics properties and joint configurations. USD is an open-source framework developed by Pixar for describing, composing, simulating, and collaborating within 3D worlds.
+Genesis 支持从 Universal Scene Description (USD) 文件加载复杂场景，使你能够导入具有正确物理属性和关节配置的铰接机器人、刚体对象和完整环境。USD 是由 Pixar 开发的开源框架，用于在 3D 世界中进行描述、合成、模拟和协作。
 
-This tutorial will guide you through loading USD files in Genesis, configuring parsing options, and working with USD-based scenes. The parser is designed to work seamlessly with assets exported from popular tools like NVIDIA Isaac Sim, while also supporting standard USD physics schemas.
+本教程将指导你在 Genesis 中加载 USD 文件、配置解析选项以及使用基于 USD 的场景。该解析器设计为与从 NVIDIA Isaac Sim 等流行工具导出的资源无缝协作，同时支持标准 USD 物理模式。
 
-## Installation
+## 安装
 
-To load USD assets into Genesis scenes, install the required dependencies:
+要将 USD 资源加载到 Genesis 场景中，请安装所需的依赖项：
 
 ```bash
 pip install -e .[usd]
 ```
 
-### Optional: USD Material Baking
+### 可选：USD 材质烘焙
 
-For advanced material parsing beyond `UsdPreviewSurface`, you can optionally install Omniverse Kit for USD material baking. This feature is only available for Python 3.10 and 3.11 and GPU backend. (For Python 3.12, there is possibility that most of materials in the scene are baked successfully, but some will leave unbaked.)
+对于超越 `UsdPreviewSurface` 的高级材质解析，你可以选择性安装 Omniverse Kit 进行 USD 材质烘焙。此功能仅适用于 Python 3.10 和 3.11 以及 GPU 后端。（对于 Python 3.12，场景中大部分材质可能成功烘焙，但有些会保持未烘焙状态。）
 
 ```bash
 pip install --extra-index-url https://pypi.nvidia.com/ omniverse-kit
 export OMNI_KIT_ACCEPT_EULA=yes
 ```
 
-**Note:** The `OMNI_KIT_ACCEPT_EULA` environment variable must be set to accept the EULA. This is a one-time operation. Once set, it will not prompt again. If USD baking is disabled, Genesis will only parse materials of type `UsdPreviewSurface`.
+**注意：** 必须设置 `OMNI_KIT_ACCEPT_EULA` 环境变量以接受 EULA。这是一次性操作。一旦设置，将不会再次提示。如果禁用 USD 烘焙，Genesis 将仅解析 `UsdPreviewSurface` 类型的材质。
 
-If you encounter the Genesis warning "Baking process failed: ...", here are some troubleshooting tips:
+如果你遇到 Genesis 警告 "Baking process failed: ..."，以下是一些故障排除提示：
 
-- **EULA Acceptance**: The first launch may require accepting the Omniverse EULA. Accept it in runtime or set `OMNI_KIT_ACCEPT_EULA=yes` to accept it automatically.
+- **EULA 接受**：首次启动可能需要接受 Omniverse EULA。在运行时接受或设置 `OMNI_KIT_ACCEPT_EULA=yes` 自动接受。
 
-- **IOMMU Warning**: A window showing "IOMMU Enabled" warning may pop up on the first launch. Click "OK" promptly to avoid timeout.
+- **IOMMU 警告**：首次启动时可能会弹出显示 "IOMMU Enabled" 警告的窗口。及时点击 "OK" 以避免超时。
 
-- **Initial Installation**: The first launch may install additional dependencies, which can cause a timeout. Run your program again after installation completes; subsequent runs will not require installation.
+- **初始安装**：首次启动可能会安装额外的依赖项，这可能导致超时。安装完成后再次运行你的程序；后续运行将不需要安装。
 
-- **Multiple Python Environments**: If you have multiple Python environments (especially with different Python versions), Omniverse Kit extensions may conflict across environments. Remove the shared Omniverse extension folder (e.g., `~/.local/share/ov/data/ext` on Linux) and try again.
+- **多个 Python 环境**：如果你有多个 Python 环境（特别是不同 Python 版本），Omniverse Kit 扩展可能会跨环境冲突。删除共享的 Omniverse 扩展文件夹（例如 Linux 上的 `~/.local/share/ov/data/ext`）然后重试。
 
-## Overview
+## 概述
 
-Genesis's USD parser supports the following features:
+Genesis 的 USD 解析器支持以下功能：
 
-### Joint Types
+### 关节类型
 
-- **Revolute Joints** (`UsdPhysics.RevoluteJoint`): Rotational joints with angular limits
-- **Prismatic Joints** (`UsdPhysics.PrismaticJoint`): Linear/sliding joints with distance limits
-- **Spherical Joints** (`UsdPhysics.SphericalJoint`): Ball joints with 3 rotational degrees of freedom
-- **Fixed Joints** (`UsdPhysics.FixedJoint`): Rigid connections between links
-- **Free Joints** (`UsdPhysics.Joint` with type "PhysicsJoint"): 6-DOF joints with full translational and rotational freedom
+- **旋转关节** (`UsdPhysics.RevoluteJoint`)：具有角度限制的旋转关节
+- **滑动关节** (`UsdPhysics.PrismaticJoint`)：具有距离限制的线性/滑动关节
+- **球形关节** (`UsdPhysics.SphericalJoint`)：具有 3 个旋转自由度的球关节
+- **固定关节** (`UsdPhysics.FixedJoint`)：连杆之间的刚性连接
+- **自由关节** (`UsdPhysics.Joint`，类型为 "PhysicsJoint")：具有完整平移和旋转自由度的 6-DOF 关节
 
-### Physics Properties
+### 物理属性
 
-- **Joint limits** (lower/upper bounds): Supported for revolute and prismatic joints
-- **Joint friction** (`dofs_frictionloss`): Supported for revolute, prismatic, and spherical joints
-- **Joint armature** (`dofs_armature`): Supported for revolute, prismatic, and spherical joints
-- **Joint stiffness** (`dofs_stiffness`): Passive property supported for revolute and prismatic joints
-- **Joint damping** (`dofs_damping`): Passive property supported for revolute and prismatic joints
-- **Drive API** (`dofs_kp`, `dofs_kv`, `dofs_force_range`): PD control parameters supported for revolute, prismatic, and spherical joints
+- **关节限制**（下限/上限）：支持旋转和滑动关节
+- **关节摩擦** (`dofs_frictionloss`)：支持旋转、滑动和球形关节
+- **关节惯量** (`dofs_armature`)：支持旋转、滑动和球形关节
+- **关节刚度** (`dofs_stiffness`)：支持旋转和滑动关节的被动属性
+- **关节阻尼** (`dofs_damping`)：支持旋转和滑动关节的被动属性
+- **驱动 API** (`dofs_kp`, `dofs_kv`, `dofs_force_range`)：支持旋转、滑动和球形关节的 PD 控制参数
 
-### Geometry
+### 几何体
 
-- **Visual geometries**: Parsed from USD geometry prims matching visual patterns
-- **Collision geometries**: Parsed from USD geometry prims matching collision patterns
+- **视觉几何体**：从匹配视觉模式的 USD 几何体 prim 解析
+- **碰撞几何体**：从匹配碰撞模式的 USD 几何体 prim 解析
 
-### Materials and Rendering
+### 材质与渲染
 
-- **UsdPreviewSurface**: Fully supported with diffuse color, opacity, metallic, roughness, emissive, normal maps, and IOR
-- **Material baking**: Optional support via Omniverse Kit for complex materials beyond **UsdPreviewSurface**
-- **Display colors**: Fallback to `displayColor` when materials are not available
+- **UsdPreviewSurface**：完全支持漫反射颜色、不透明度、金属度、粗糙度、自发光、法线贴图和 IOR
+- **材质烘焙**：通过 Omniverse Kit 可选支持超越 **UsdPreviewSurface** 的复杂材质
+- **显示颜色**：当材质不可用时回退到 `displayColor`
 
-## Basic Example
+## 基本示例
 
-Let's start with a simple example that loads a USD file containing an articulated object:
+让我们从一个简单的示例开始，加载包含铰接对象的 USD 文件：
 
 ```python
 import genesis as gs
 from huggingface_hub import snapshot_download
 
-# Initialize Genesis
+# 初始化 Genesis
 gs.init(backend=gs.cpu)
 
-# Create a scene
+# 创建场景
 scene = gs.Scene(
     viewer_options=gs.options.ViewerOptions(
         camera_pos=(3.5, 0.0, 2.5),
@@ -86,7 +86,7 @@ scene = gs.Scene(
     show_viewer=True,
 )
 
-# Download a USD asset (example from Genesis assets)
+# 下载 USD 资源（Genesis 资源的示例）
 asset_path = snapshot_download(
     repo_type="dataset",
     repo_id="Genesis-Intelligence/assets",
@@ -95,41 +95,41 @@ asset_path = snapshot_download(
     max_workers=1,
 )
 
-# Load the USD stage
+# 加载 USD stage
 entities = scene.add_stage(
     morph=gs.morphs.USD(
         file=f"{asset_path}/usd/Refrigerator055/Refrigerator055.usd",
     ),
 )
 
-# Build and simulate
+# 构建并模拟
 scene.build()
 ```
 
-USD files can contain multiple rigid entities (articulations and rigid bodies) in a single file. Genesis provides two methods for loading USD:
+USD 文件可以在单个文件中包含多个刚体实体（关节体和刚体）。Genesis 提供两种加载 USD 的方法：
 
-- **`scene.add_stage()`**: Automatically discovers and loads **all** rigid entities in the USD file. This is the recommended method for loading complete USD scenes with multiple entities.
+- **`scene.add_stage()`**：自动发现并加载 USD 文件中的**所有**刚体实体。这是加载具有多个实体的完整 USD 场景的推荐方法。
 
-- **`scene.add_entity()`**: Loads a **single** entity from the USD file. If `prim_path` is not specified, it uses the USD stage's default prim. Set `prim_path` to target a specific prim in the stage.
+- **`scene.add_entity()`**：从 USD 文件加载**单个**实体。如果未指定 `prim_path`，则使用 USD stage 的默认 prim。设置 `prim_path` 以定位 stage 中的特定 prim。
 
-## USD Morph Configuration
+## USD Morph 配置
 
-The `gs.morphs.USD` class provides extensive configuration options for controlling how USD files are parsed:
+`gs.morphs.USD` 类提供了广泛的配置选项来控制 USD 文件的解析方式：
 
-### Joint Dynamics Configuration
+### 关节动力学配置
 
-Genesis can parse joint properties from USD attributes. 
+Genesis 可以从 USD 属性解析关节属性。
 
-Because some joint physics properties are not part of the USD standard, Genesis provides default attribute name candidates that accommodate well-established exporters, notably Isaac Sim, which uses custom attributes like `physxJoint:jointFriction` and `physxLimit:angular:stiffness`.
+由于某些关节物理属性不是 USD 标准的一部分，Genesis 提供了默认的属性名称候选，以适应成熟的导出器，特别是 Isaac Sim，它使用自定义属性如 `physxJoint:jointFriction` 和 `physxLimit:angular:stiffness`。
 
-For example, the following code configures the attribute name candidates for joint friction. The parser will try these candidates in order and use the first one that is found.
+例如，以下代码配置关节摩擦的属性名称候选。解析器将按顺序尝试这些候选，并使用找到的第一个。
 
 ```python
 gs.morphs.USD(
     file="robot.usd",
-    # Joint friction attributes (tried in order)
+    # 关节摩擦属性（按顺序尝试）
     joint_friction_attr_candidates=[
-        "physxJoint:jointFriction",  # Isaac Sim compatibility
+        "physxJoint:jointFriction",  # Isaac Sim 兼容性
         "physics:jointFriction",
         "jointFriction",
         "friction",
@@ -137,54 +137,54 @@ gs.morphs.USD(
 )
 ```
 
-Supported attributes are listed in the following table:
+支持的属性列在下表中：
 
-| Genesis Attribute Name | Source / Default Attribute Name Candidates | Description |
+| Genesis 属性名称 | 来源 / 默认属性名称候选 | 描述 |
 |----------------|-------------|-------------|
-| `dofs_frictionloss` | `["physxJoint:jointFriction", "physics:jointFriction", "jointFriction", "friction"]` | Joint friction (passive property) |
-| `dofs_armature` | `["physxJoint:armature", "physics:armature", "armature"]` | Joint armature (passive property) |
-| `dofs_kp` | `"physics:stiffness"` | PD control proportional gain (kp) - from DriveAPI |
-| `dofs_kv` | `"physics:angular:damping"` | PD control derivative gain (kv) - from DriveAPI |
-| `dofs_stiffness` | **Revolute joints:** `["physxLimit:angular:stiffness", "physics:stiffness", "stiffness"]`<br>**Prismatic joints:** `["physxLimit:linear:stiffness", "physxLimit:X:stiffness", "physxLimit:Y:stiffness", "physxLimit:Z:stiffness", "physics:linear:stiffness", "linear:stiffness"]` | Passive joint stiffness (depends on joint type) |
-| `dofs_damping` | **Revolute joints:** `["physxLimit:angular:damping", "physics:angular:damping", "angular:damping"]`<br>**Prismatic joints:** `["physxLimit:linear:damping", "physxLimit:X:damping", "physxLimit:Y:damping", "physxLimit:Z:damping", "physics:linear:damping", "linear:damping"]` | Passive joint damping (depends on joint type) |
+| `dofs_frictionloss` | `["physxJoint:jointFriction", "physics:jointFriction", "jointFriction", "friction"]` | 关节摩擦（被动属性） |
+| `dofs_armature` | `["physxJoint:armature", "physics:armature", "armature"]` | 关节惯量（被动属性） |
+| `dofs_kp` | `"physics:stiffness"` | PD 控制比例增益 (kp) - 来自 DriveAPI |
+| `dofs_kv` | `"physics:angular:damping"` | PD 控制微分增益 (kv) - 来自 DriveAPI |
+| `dofs_stiffness` | **旋转关节：** `["physxLimit:angular:stiffness", "physics:stiffness", "stiffness"]`<br>**滑动关节：** `["physxLimit:linear:stiffness", "physxLimit:X:stiffness", "physxLimit:Y:stiffness", "physxLimit:Z:stiffness", "physics:linear:stiffness", "linear:stiffness"]` | 被动关节刚度（取决于关节类型） |
+| `dofs_damping` | **旋转关节：** `["physxLimit:angular:damping", "physics:angular:damping", "angular:damping"]`<br>**滑动关节：** `["physxLimit:linear:damping", "physxLimit:X:damping", "physxLimit:Y:damping", "physxLimit:Z:damping", "physics:linear:damping", "linear:damping"]` | 被动关节阻尼（取决于关节类型） |
 
-Note that, attribute name within bracket (`[...]`) is unofficial USD attribute, user can setup their own attribute name candidates to customize the parsing behavior, while the attribute name without bracket (`...`) is official USD attribute, which is parsed from the USD file directly.
+注意，方括号 (`[...]`) 内的属性名称是非官方的 USD 属性，用户可以设置自己的属性名称候选来自定义解析行为，而没有方括号 (`...`) 的属性名称是官方 USD 属性，直接从 USD 文件解析。
 
-### Geometry Parsing Options
+### 几何体解析选项
 
-Genesis can parse collision and visual geometries from USD files. You can configure regex patterns to identify which prims should be treated as collision-only or visual-only geometry. The parser uses `re.match()` to check if a prim's name matches each pattern from the start of the string.
+Genesis 可以从 USD 文件解析碰撞和视觉几何体。你可以配置正则表达式模式来识别哪些 prim 应被视为仅碰撞或仅视觉几何体。解析器使用 `re.match()` 检查 prim 的名称是否从字符串开头匹配每个模式。
 
-**Recognition Rules:**
+**识别规则：**
 
-1. **Pattern Matching**: The parser recursively traverses the prim hierarchy. For each prim, it checks the prim's name against the patterns in order. Once a prim matches a pattern, it is marked as visual-matched or collision-matched, and this classification is inherited by all its child prims recursively.
+1. **模式匹配**：解析器递归遍历 prim 层次结构。对于每个 prim，它按顺序检查 prim 的名称是否匹配模式。一旦 prim 匹配模式，它就被标记为视觉匹配或碰撞匹配，该分类由其所有子 prim 递归继承。
 
-2. **Geometry Classification**: 
-   - A prim matching a visual pattern is treated as visual-only geometry (not used for collision detection).
-   - A prim matching a collision pattern is treated as collision-only geometry (not used for visualization).
-   - A prim matching both patterns is treated as both visual and collision geometry.
-   - A prim matching neither pattern is also treated as both visual and collision geometry (this is the default behavior for mesh-only USD assets).
+2. **几何体分类**：
+   - 匹配视觉模式的 prim 被视为仅视觉几何体（不用于碰撞检测）。
+   - 匹配碰撞模式的 prim 被视为仅碰撞几何体（不用于可视化）。
+   - 同时匹配两种模式的 prim 被视为视觉和碰撞几何体。
+   - 不匹配任何模式的 prim 也被视为视觉和碰撞几何体（这是仅网格 USD 资源的默认行为）。
 
-3. **Visibility and Purpose**: Only visible prims (not marked as "invisible") are parsed. Prims with purpose "guide" are excluded from visual geometry but can still be collision geometry.
+3. **可见性和用途**：仅解析可见的 prim（未标记为 "invisible"）。用途为 "guide" 的 prim 从视觉几何体中排除，但仍可以是碰撞几何体。
 
-**Example Configuration:**
+**配置示例：**
 
 ```python
 gs.morphs.USD(
     file="robot.usd",
-    # Regex patterns to identify collision meshes (tried in order)
+    # 识别碰撞网格的正则表达式模式（按顺序尝试）
     collision_mesh_prim_patterns=[
-        r"^([cC]ollision).*",  # Matches prims starting with "Collision" or "collision"
+        r"^([cC]ollision).*",  # 匹配以 "Collision" 或 "collision" 开头的 prim
     ],
-    # Regex patterns to identify visual meshes
+    # 识别视觉网格的正则表达式模式
     visual_mesh_prim_patterns=[
-        r"^([vV]isual).*",     # Matches prims starting with "Visual" or "visual"
+        r"^([vV]isual).*",     # 匹配以 "Visual" 或 "visual" 开头的 prim
     ],
 )
 ```
 
-**Example Stage Structures:**
+**Stage 结构示例：**
 
-- **Direct geometry on rigid body**: The geometry prim itself doesn't match any pattern, so it's treated as both visual and collision.
+- **刚体上的直接几何体**：几何体 prim 本身不匹配任何模式，因此被视为视觉和碰撞几何体。
 
     ```usd
     def Cube "Cube" (
@@ -193,64 +193,64 @@ gs.morphs.USD(
     {
     }
     ```
-- **Separate visual and collision children**: Direct children matching patterns are treated accordingly, and the match propagates to their subtrees.
+- **单独的视觉和碰撞子项**：匹配模式的直接子项被相应处理，匹配传播到其子树。
 
     ```usd
     def Xform "ObjectA" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI"]
         )
         {
-            def Cube "Visual"      # Matches visual pattern → visual-only
+            def Cube "Visual"      # 匹配视觉模式 → 仅视觉
             {
             }
 
-            def Cube "Collision"   # Matches collision pattern → collision-only
+            def Cube "Collision"   # 匹配碰撞模式 → 仅碰撞
             {
             }
         }
     ```
-- **Nested hierarchies**: Once a parent matches a pattern, all descendants inherit that classification.
+- **嵌套层次结构**：一旦父项匹配模式，所有后代继承该分类。
 
     ```usd
     def Xform "ObjectB" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI"]
         )
         {
-            def Xform "Visual"     # Matches visual pattern
+            def Xform "Visual"     # 匹配视觉模式
             {
-                def Mesh "Cube"    # Inherits visual-only (entire subtree)
+                def Mesh "Cube"    # 继承仅视觉（整个子树）
                 {
                 }
-                def Mesh "Sphere"  # Inherits visual-only
+                def Mesh "Sphere"  # 继承仅视觉
                 {
                 }
             }
 
-            def Xform "Collision" # Matches collision pattern
+            def Xform "Collision" # 匹配碰撞模式
             {
-                def Cube "Cube"   # Inherits collision-only (entire subtree)
+                def Cube "Cube"   # 继承仅碰撞（整个子树）
                 {
                 }
             }
         }
     ```
-- **No pattern match**: Prims that don't match any pattern are treated as both visual and collision.
+- **无模式匹配**：不匹配任何模式的 prim 被视为视觉和碰撞几何体。
     ```usd
     def Xform "ObjectC" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI"]
     )
     {
-        def Mesh "Whatever"  # No pattern match → both visual and collision
+        def Mesh "Whatever"  # 无模式匹配 → 视觉和碰撞
         {
         }
     }
     ```
 
 
-## Next Steps
+## 下一步
 
-- Learn about [controlling robots](control_your_robot.md) in Genesis
-- Explore [inverse kinematics](inverse_kinematics_motion_planning.md) for USD-loaded robots
-- Check out [parallel simulation](parallel_simulation.md) for training with USD assets
-- See the [API reference](../../api_reference/options/morph/file_morph/file_morph.md) for detailed USD morph options
-- See the [conventions](conventions.md) for more details on the coordinate system and mathematical conventions used throughout Genesis.
+- 了解如何在 Genesis 中[控制机器人](control_your_robot.md)
+- 探索 USD 加载机器人的[逆运动学](inverse_kinematics_motion_planning.md)
+- 查看[并行模拟](parallel_simulation.md)了解如何使用 USD 资源进行训练
+- 参阅 [API 参考](../../api_reference/options/morph/file_morph/file_morph.md)了解详细的 USD morph 选项
+- 参阅[约定](conventions.md)了解 Genesis 使用的坐标系和数学约定的更多详细信息。

@@ -1,36 +1,36 @@
-# 🏔️ Terrain Simulation and Generation
+# 🏔️ 地形模拟与生成
 
-Genesis provides first-class support for **height-field terrains** via the `gs.morphs.Terrain` morph.  A terrain is a static rigid object represented internally by a height map (for fast collision queries) and a watertight triangle mesh (for visualisation & SDF generation).
+Genesis 通过 `gs.morphs.Terrain` morph 为 **高度场地形** 提供一流的支持。地形是一个静态刚体对象，内部由高度图（用于快速碰撞查询）和水密三角网格（用于可视化和 SDF 生成）表示。
 
-This page introduces the three most common ways to create terrains:
+本页介绍了创建地形的三种最常见方式：
 
-1. Pass in your own NumPy height map.
-2. Procedurally generate a *sub-terrain* grid (Isaac Gym style).
-3. Convert an arbitrary triangle mesh to a height map automatically.
+1. 传入你自己的 NumPy 高度图。
+2. 程序化生成 *子地形* 网格（Isaac Gym 风格）。
+3. 自动将任意三角网格转换为高度图。
 
 ---
 
-## 1  Use a custom height map
-If you already have terrain data (for example from DEM files) you can feed it directly to Genesis.  The only two numbers you need are the horizontal and vertical scales.
+## 1  使用自定义高度图
+如果你已有地形数据（例如来自 DEM 文件），可以直接将其输入 Genesis。你只需要两个数值：水平比例和垂直比例。
 
 ```python
 import numpy as np
 import genesis as gs
 
-# 1. initialise Genesis
-gs.init(seed=0, backend=gs.gpu)  # use gs.cpu for CPU backend
+# 1. 初始化 Genesis
+gs.init(seed=0, backend=gs.gpu)  # 使用 gs.cpu 表示 CPU 后端
 
-# 2. create a scene
+# 2. 创建场景
 scene = gs.Scene(show_viewer=True)
 
-# 3. prepare a height map (here a simple bump for demo)
+# 3. 准备高度图（这里是一个简单的凸起用于演示）
 hf = np.zeros((40, 40), dtype=np.int16)
 hf[10:30, 10:30] = 200 * np.hanning(20)[:, None] * np.hanning(20)[None, :]
 
-horizontal_scale = 0.25  # metres between grid points
-vertical_scale   = 0.005  # metres per height-field unit
+horizontal_scale = 0.25  # 网格点之间的米数
+vertical_scale   = 0.005  # 每个高度场单位的米数
 
-# 4. add the terrain entity
+# 4. 添加地形实体
 scene.add_entity(
     morph=gs.morphs.Terrain(
         height_field=hf,
@@ -41,13 +41,13 @@ scene.add_entity(
 
 scene.build()
 
-# run the sim so you can inspect the surface
+# 运行模拟以便你可以检查表面
 for _ in range(1_000):
     scene.step()
 ```
 
-### Visual debugging tip
-After building the scene the height map is stored in `terrain.geoms[0].metadata["height_field"]`.  You can draw small spheres on each sample to see the actual geometry:
+### 可视化调试技巧
+构建场景后，高度图存储在 `terrain.geoms[0].metadata["height_field"]` 中。你可以在每个采样点上绘制小球来查看实际几何形状：
 
 ```python
 import torch
@@ -62,15 +62,15 @@ scene.draw_debug_spheres(poss, radius=0.05, color=(0, 0, 1, 0.7))
 
 ---
 
-## 2  Procedural sub-terrains
-`gs.morphs.Terrain` can also **synthesise** complex grounds by tiling a grid of *sub-terrains* – the same technique used by Isaac Gym.  You only specify:
+## 2  程序化子地形
+`gs.morphs.Terrain` 还可以通过拼接 *子地形* 网格来**合成**复杂地面——与 Isaac Gym 使用的技术相同。你只需指定：
 
-* `n_subterrains=(nx, ny)` – how many tiles in each direction.
-* `subterrain_size=(sx, sy)` – size of each tile in metres.
-* `subterrain_types` – a 2-D list selecting a generator for each tile.
+* `n_subterrains=(nx, ny)` – 每个方向的瓦片数量。
+* `subterrain_size=(sx, sy)` – 每个瓦片的尺寸（米）。
+* `subterrain_types` – 一个二维列表，为每个瓦片选择生成器。
 
-The full list of built-in generators is:
-`flat_terrain`, `random_uniform_terrain`, `pyramid_sloped_terrain`, `discrete_obstacles_terrain`, `wave_terrain`, `pyramid_stairs_terrain`, `stairs_terrain`, `stepping_stones_terrain`, `fractal_terrain`.
+内置生成器的完整列表包括：
+`flat_terrain`, `random_uniform_terrain`, `pyramid_sloped_terrain`, `discrete_obstacles_terrain`, `wave_terrain`, `pyramid_stairs_terrain`, `stairs_terrain`, `stepping_stones_terrain`, `fractal_terrain`。
 
 ```python
 scene = gs.Scene(show_viewer=True)
@@ -88,27 +88,27 @@ terrain = scene.add_entity(
     ),
 )
 
-scene.build(n_envs=100)  # you can still run many parallel envs
+scene.build(n_envs=100)  # 你仍然可以运行多个并行环境
 ```
 
-The code above is essentially the same as `examples/rigid/terrain_subterrain.py` shipped with Genesis.  Feel free to open the example for a complete runnable script.
+上面的代码本质上与 Genesis 附带的 `examples/rigid/terrain_subterrain.py` 相同。欢迎打开该示例查看完整的可运行脚本。
 
 ---
 
-## 3  Generate a height map from a triangle mesh
-Sometimes you already have a detailed CAD or photogrammetry mesh and just want collisions to run quickly.  The helper `genesis.utils.terrain.mesh_to_heightfield` samples the mesh with vertical rays and returns a NumPy height array together with the grid coordinates.
+## 3  从三角网格生成高度图
+有时你已经有一个详细的 CAD 或摄影测量网格，只是希望碰撞检测运行得更快。辅助函数 `genesis.utils.terrain.mesh_to_heightfield` 使用垂直光线采样网格，并返回一个 NumPy 高度数组以及网格坐标。
 
 ```python
 from genesis.utils.terrain import mesh_to_heightfield
 import os
 
-# path to your .obj / .glb / .stl terrain
+# 你的 .obj / .glb / .stl 地形文件路径
 mesh_path = os.path.join(gs.__path__[0], "assets", "meshes", "terrain_45.obj")
 
-horizontal_scale = 2.0  # desired grid spacing (metres)
+horizontal_scale = 2.0  # 期望的网格间距（米）
 height, xs, ys = mesh_to_heightfield(mesh_path, spacing=horizontal_scale, oversample=3)
 
-# shift the terrain so the centre of the mesh becomes (0,0)
+# 移动地形，使网格中心变为 (0,0)
 translation = np.array([xs.min(), ys.min(), 0.0])
 
 scene = gs.Scene(show_viewer=True)
@@ -117,19 +117,19 @@ scene.add_entity(
         height_field=height,
         horizontal_scale=horizontal_scale,
         vertical_scale=1.0,
-        pos=translation,  # optional world transform
+        pos=translation,  # 可选的世界变换
     ),
 )
 scene.add_entity(gs.morphs.Sphere(pos=(10, 15, 10), radius=1))
 scene.build()
 ```
 
-This procedure is wrapped in `examples/rigid/terrain_from_mesh.py`.
+这个过程被封装在 `examples/rigid/terrain_from_mesh.py` 中。
 
 ---
 
-## API reference
-For a complete list of keyword arguments please refer to the autogenerated API page:
+## API 参考
+有关完整的关键字参数列表，请参阅自动生成的 API 页面：
 
 ```{eval-rst}
 .. autoclass:: genesis.options.morphs.Terrain
@@ -139,9 +139,9 @@ For a complete list of keyword arguments please refer to the autogenerated API p
 
 ---
 
-### Saving & re-using terrains
-When a terrain is created, Genesis generates the height map, the watertight mesh for collision detection and the simplified mesh for visuals. One can enable caching of the height map when a terrain is first created for a given set of options by passing `name="my_terrain"`, which would later be loaded from cache without regeneration. This is useful for reconstructing randomized terrains exactly.
+### 保存与重复使用地形
+创建地形时，Genesis 会生成高度图、用于碰撞检测的水密网格以及用于可视化的简化网格。你可以通过在首次创建地形时传入 `name="my_terrain"` 来启用高度图的缓存，之后将从缓存加载而无需重新生成。这对于精确重建随机化地形非常有用。
 
 ---
 
-Happy climbing! 🧗‍♂️🏔️
+祝你攀登愉快！🧗‍♂️🏔️

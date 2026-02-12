@@ -1,112 +1,112 @@
-# 🧮 Non-rigid Coupling
+# 🧮 非刚体耦合
 
-Genesis allows you to combine multiple continuum and rigid-body solvers in the **same scene** – e.g. MPM snow interacting with SPH water, deformable FEM tissue colliding with surgical tools, or rigid props splashing into a granular bed.  All cross-solver interactions are orchestrated by the `gs.engine.Coupler` class.
+Genesis 允许您在**同一场景**中组合多个连续介质和刚体求解器——例如 MPM 雪与 SPH 水交互、可变形 FEM 组织与手术工具碰撞，或刚体道具溅入颗粒床。所有跨求解器交互都由 `gs.engine.Coupler` 类协调。
 
-This page explains:
+本页解释：
 
-* the **architecture** of the Coupler and how it decides which solver pairs are active;
-* the **impulse-based collision response** that governs momentum exchange;
-* the meaning of **friction, restitution, softness** and other coupling parameters;
-* a quick **reference table** of currently supported solver pairs; and
-* **usage examples** showing how to enable/disable specific interactions.
+* Coupler 的**架构**以及它如何决定哪些求解器对处于活动状态；
+* 控制动量交换的**基于脉冲的碰撞响应**；
+* **摩擦、恢复、柔软度**和其他耦合参数的含义；
+* 当前支持的求解器对的**快速参考表**；以及
+* 显示如何启用/禁用特定交互的**使用示例**。
 
 ---
 
-## 1. Architecture overview
+## 1. 架构概述
 
-Internally the simulator owns **one Coupler instance** which keeps pointers to every solver.  During each sub-step the simulator executes:
+内部模拟器拥有**一个 Coupler 实例**，它保存指向每个求解器的指针。在每个子步骤中，模拟器执行：
 
-1. `coupler.preprocess(f)`  &nbsp;&nbsp; – e.g. surfacing operations for CPIC.
-2. `solver.substep_pre_coupling(f)`       – advance each individual solver.
-3. `coupler.couple(f)`       – exchange momentum between solvers.
-4. `solver.substep_post_coupling(f)`       – solver postprocessing after collision.
+1. `coupler.preprocess(f)`  &nbsp;&nbsp; – 例如 CPIC 的表面操作。
+2. `solver.substep_pre_coupling(f)`       – 推进每个单独的求解器。
+3. `coupler.couple(f)`       – 在求解器之间交换动量。
+4. `solver.substep_post_coupling(f)`       – 碰撞后的求解器后处理。
 
-Because all solver fields live on Taichi data-structures the Coupler can call Taichi `@kernel`s that touch the memory of several solvers **without data copies**.
+因为所有求解器字段都驻留在 Taichi 数据结构中，Coupler 可以调用触及多个求解器内存的 Taichi `@kernel`，**无需数据拷贝**。
 
-### 1.1 Activating a coupling pair
+### 1.1 激活耦合对
 
-Whether a pair is active is determined **statically once** when `Coupler.build()` is called:
+一对是否处于活动状态在调用 `Coupler.build()` 时**静态确定一次**：
 
 ```python
 self._rigid_mpm = rigid.is_active() and mpm.is_active() and options.rigid_mpm
 ```
 
 
-## 2. Impulse-based collision response
+## 2. 基于脉冲的碰撞响应
 
-### 2.1 Signed distance & influence weight
+### 2.1 符号距离与影响权重
 
-For every candidate contact the Coupler queries the signed distance function `sdf(p)` of the rigid geometry.  The *softness* parameter produces a smooth blending weight
+对于每个候选接触，Coupler 查询刚体几何体的符号距离函数 `sdf(p)`。*柔软度*参数产生一个平滑的混合权重
 
 $$
 \text{influence} = \min\bigl( \exp\!\left(-\dfrac{\;d\;}{\epsilon}\right) ,\;1 \bigr)
 $$
 
-where `d` is the signed distance and `ε = coup_softness`.  Large softness values make the contact zone thicker and produce gentler impulses.
+其中 `d` 是符号距离，`ε = coup_softness`。较大的柔软度值使接触区更厚，产生更柔和的脉冲。
 
-### 2.2 Relative velocity decomposition
+### 2.2 相对速度分解
 
-For a particle/grid node with world velocity **v** and a rigid body velocity **vᵣ**, the **relative velocity** is
+对于具有世界速度 **v** 的粒子/网格节点和刚体速度 **vᵣ**，**相对速度**为
 
 $$ \mathbf r = \mathbf v - \mathbf v_{\text{rigid}}. $$
 
-Split **r** into its normal and tangential components
+将 **r** 分解为其法向和切向分量
 
 $$
  r_n = (\mathbf r \cdot \mathbf n)\,\mathbf n, \quad
  r_t = \mathbf r - r_n
 $$
 
-with **n** the outward surface normal.
+其中 **n** 是向外的表面法线。
 
-### 2.3 Normal impulse (restitution)
+### 2.3 法向脉冲（恢复）
 
-If the normal component is *inward* ($r_n<0$) an impulse is applied so that after the collision
+如果法向分量是*向内*的 ($r_n<0$)，则施加一个脉冲，使得碰撞后
 
 $$ r_n' = -e\,r_n, \quad 0 \le e \le 1, $$
 
-where `e = coup_restitution` is the **restitution coefficient**.  `e=0` is perfectly inelastic, `e=1` perfectly elastic.
+其中 `e = coup_restitution` 是**恢复系数**。`e=0` 是完全非弹性的，`e=1` 是完全弹性的。
 
-### 2.4 Tangential impulse (Coulomb friction)
+### 2.4 切向脉冲（库仑摩擦）
 
-Friction is implemented by **scaling** the tangential component:
+摩擦通过**缩放**切向分量来实现：
 
 $$ r_t' = \max\!\bigl( 0,\;|r_t| + \mu \, r_n\bigr) \; \dfrac{r_t}{|r_t|}\,, $$
 
-with `μ = coup_friction`.  This is an impulse-based variant of Coulomb friction that ensures the post-collision tangential speed never exceeds the sticking limit.
+其中 `μ = coup_friction`。这是库仑摩擦的基于脉冲的变体，确保碰撞后的切向速度不超过粘着极限。
 
-### 2.5 Velocity update and momentum transfer
+### 2.5 速度更新与动量传递
 
-The new particle/node velocity is then
+新的粒子/节点速度为
 
 $$ \mathbf v' = \mathbf v_{\text{rigid}} + (r_t' + r_n') \times \text{influence} + \mathbf r\,(1-\text{influence}). $$
 
-The *change of momentum*
+*动量变化*
 
 $$ \Delta\mathbf p = m\,(\mathbf v' - \mathbf v) $$
 
-is applied as an **external force** on the rigid body
+作为**外力**应用于刚体
 
 $$ \mathbf F_{\text{rigid}} = -\dfrac{\Delta\mathbf p}{\Delta t}. $$
 
-Thus Newton's third law is satisfied and the rigid body responds to fluid impacts.
+因此满足牛顿第三定律，刚体对流体冲击做出响应。
 
 ---
 
-## 3. Supported solver pairs
+## 3. 支持的求解器对
 
-| Pair | Direction | Notes |
+| 对 | 方向 | 说明 |
 |------|-----------|-------|
-| **MPM ↔ Rigid** | impulse based on grid nodes (supports CPIC) |
-| **MPM ↔ SPH**   | averages SPH particle velocities within an MPM cell |
-| **MPM ↔ PBD**   | similar to SPH but skips pinned PBD particles |
-| **FEM ↔ Rigid** | collision on surface vertices only |
-| **FEM ↔ MPM**   | uses MPM P2G/G2P weights to exchange momentum |
-| **FEM ↔ SPH**   | experimental – normal projection only |
-| **SPH ↔ Rigid** | robust side-flip handling of normals |
-| **PBD ↔ Rigid** | positional correction then velocity projection |
-| **Tool ↔ MPM**  | delegated to each Tool entity's `collide()` |
+| **MPM ↔ Rigid** | 基于网格节点的脉冲（支持 CPIC） |
+| **MPM ↔ SPH**   | 平均 MPM 单元内的 SPH 粒子速度 |
+| **MPM ↔ PBD**   | 类似于 SPH 但跳过固定的 PBD 粒子 |
+| **FEM ↔ Rigid** | 仅在表面顶点上的碰撞 |
+| **FEM ↔ MPM**   | 使用 MPM P2G/G2P 权重交换动量 |
+| **FEM ↔ SPH**   | 实验性 – 仅法向投影 |
+| **SPH ↔ Rigid** | 法线的鲁棒侧面翻转处理 |
+| **PBD ↔ Rigid** | 位置校正然后速度投影 |
+| **Tool ↔ MPM**  | 委托给每个 Tool 实体的 `collide()` |
 
-If a combination is not in the table it is currently unsupported.
+如果表中未列出某个组合，则当前不支持。
 
 ---

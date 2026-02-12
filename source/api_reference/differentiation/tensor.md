@@ -1,19 +1,19 @@
 # Tensor
 
-The `genesis.grad.Tensor` class extends `torch.Tensor` to support end-to-end gradient flow through Genesis simulations.
+`genesis.grad.Tensor` 类扩展了 `torch.Tensor`，以支持通过 Genesis 仿真的端到端梯度流。
 
-## Overview
+## 概述
 
-Genesis Tensors:
+Genesis Tensors：
 
-- Extend PyTorch tensors with scene tracking
-- Enable automatic gradient propagation through physics
-- Support all standard PyTorch operations
-- Track parent tensors for gradient flow
+- 通过 scene tracking 扩展 PyTorch tensors
+- 支持通过物理的自动梯度传播
+- 支持所有标准 PyTorch 操作
+- 追踪父 tensors 以实现梯度流
 
-## Usage
+## 用法
 
-Genesis Tensors are automatically created when you access state:
+当你访问状态时，Genesis Tensors 会自动创建：
 
 ```python
 import genesis as gs
@@ -30,48 +30,48 @@ scene = gs.Scene(
 robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 scene.build()
 
-# These return genesis.grad.Tensor
+# 这些返回 genesis.grad.Tensor
 pos = robot.get_pos()       # Genesis Tensor
 vel = robot.get_vel()       # Genesis Tensor
 qpos = robot.get_qpos()     # Genesis Tensor
 ```
 
-## Gradient Flow
+## 梯度流
 
 ```python
-# Forward pass
+# 正向传播
 scene.step()
 pos = robot.get_pos()
 
-# Compute loss
+# 计算损失
 target = torch.tensor([1.0, 0.0, 0.5], device=gs.device)
 loss = (pos - target).pow(2).sum()
 
-# Backward pass - flows through simulation
+# 反向传播 - 流经仿真
 loss.backward()
 ```
 
-## Detaching from Scene
+## 从 Scene 分离
 
-To prevent gradients from flowing through the simulation:
+要阻止梯度流经仿真：
 
 ```python
-# Detach and remove scene tracking
+# 分离并移除 scene tracking
 pos_detached = pos.detach(sceneless=True)
 
-# Or explicitly
+# 或显式地
 pos_sceneless = pos.sceneless()
 ```
 
-## Checking Scene Association
+## 检查 Scene 关联
 
 ```python
-# Check if tensor is associated with a scene
+# 检查 tensor 是否与 scene 关联
 if pos.scene is not None:
     print(f"Tensor from scene: {pos.scene.uid}")
 ```
 
-## API Reference
+## API 参考
 
 ```{eval-rst}
 .. autoclass:: genesis.grad.Tensor
@@ -80,7 +80,7 @@ if pos.scene is not None:
    :show-inheritance:
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`index` - Differentiable simulation overview
-- {doc}`creation_ops` - Creating tensors
+- {doc}`index` - 可微分仿真概述
+- {doc}`creation_ops` - 创建 tensors

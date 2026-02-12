@@ -1,16 +1,16 @@
-# IMU Sensor
+# IMU 传感器
 
-The `IMUSensor` (Inertial Measurement Unit) provides accelerometer and gyroscope readings for robot state estimation.
+`IMUSensor`（惯性测量单元）提供用于机器人状态估计的加速度计和陀螺仪读数。
 
-## Overview
+## 概述
 
-An IMU sensor measures:
+IMU 传感器测量：
 
-- **Linear acceleration**: 3D acceleration including gravity
-- **Angular velocity**: 3D rotational velocity
-- **Orientation**: Current orientation (optional)
+- **线加速度**：包含重力在内的 3D 加速度
+- **角速度**：3D 旋转速度
+- **方向**：当前方向（可选）
 
-## Usage
+## 用法
 
 ```python
 import genesis as gs
@@ -20,61 +20,61 @@ scene = gs.Scene()
 robot = scene.add_entity(gs.morphs.URDF(file="quadruped.urdf"))
 scene.build()
 
-# Add IMU to robot base
+# 添加 IMU 到机器人基座
 imu = scene.add_sensor(
     gs.sensors.IMU(
         link=robot.get_link("base_link"),
     )
 )
 
-# Simulation loop
+# 仿真循环
 for i in range(1000):
     scene.step()
 
-    # Get IMU readings
+    # 获取 IMU 读数
     data = imu.get_data()
-    accel = data.linear_acceleration  # (3,) acceleration in m/s^2
-    gyro = data.angular_velocity      # (3,) angular velocity in rad/s
+    accel = data.linear_acceleration  # (3,) 加速度，单位 m/s^2
+    gyro = data.angular_velocity      # (3,) 角速度，单位 rad/s
 ```
 
-## Configuration
+## 配置
 
 ```python
 gs.sensors.IMU(
-    link=link,                    # RigidLink to attach sensor to
-    frame="local",                # Reference frame: "world" or "local"
+    link=link,                    # 附加传感器的 RigidLink
+    frame="local",                # 参考坐标系："world" 或 "local"
 
-    # Accelerometer parameters
-    accel_noise_density=0.0,      # Noise density (m/s^2/sqrt(Hz))
-    accel_random_walk=0.0,        # Random walk (m/s^3/sqrt(Hz))
-    accel_bias_correlation_time=0.0,  # Bias correlation time (s)
+    # 加速度计参数
+    accel_noise_density=0.0,      # 噪声密度 (m/s^2/sqrt(Hz))
+    accel_random_walk=0.0,        # 随机游走 (m/s^3/sqrt(Hz))
+    accel_bias_correlation_time=0.0,  # 偏置相关时间 (s)
 
-    # Gyroscope parameters
-    gyro_noise_density=0.0,       # Noise density (rad/s/sqrt(Hz))
-    gyro_random_walk=0.0,         # Random walk (rad/s^2/sqrt(Hz))
-    gyro_bias_correlation_time=0.0,   # Bias correlation time (s)
+    # 陀螺仪参数
+    gyro_noise_density=0.0,       # 噪声密度 (rad/s/sqrt(Hz))
+    gyro_random_walk=0.0,         # 随机游走 (rad/s^2/sqrt(Hz))
+    gyro_bias_correlation_time=0.0,   # 偏置相关时间 (s)
 )
 ```
 
-## Noise Modeling
+## 噪声建模
 
-The IMU supports realistic noise modeling based on Allan variance parameters:
+IMU 支持基于 Allan 方差参数的真实噪声建模：
 
-### Accelerometer Noise
+### 加速度计噪声
 
-| Parameter | Description | Typical Value |
+| 参数 | 描述 | 典型值 |
 |-----------|-------------|---------------|
-| `accel_noise_density` | White noise | 0.001-0.01 m/s^2/sqrt(Hz) |
-| `accel_random_walk` | Bias instability | 0.0001-0.001 m/s^3/sqrt(Hz) |
+| `accel_noise_density` | 白噪声 | 0.001-0.01 m/s^2/sqrt(Hz) |
+| `accel_random_walk` | 偏置不稳定性 | 0.0001-0.001 m/s^3/sqrt(Hz) |
 
-### Gyroscope Noise
+### 陀螺仪噪声
 
-| Parameter | Description | Typical Value |
+| 参数 | 描述 | 典型值 |
 |-----------|-------------|---------------|
-| `gyro_noise_density` | White noise | 0.0001-0.001 rad/s/sqrt(Hz) |
-| `gyro_random_walk` | Bias instability | 0.00001-0.0001 rad/s^2/sqrt(Hz) |
+| `gyro_noise_density` | 白噪声 | 0.0001-0.001 rad/s/sqrt(Hz) |
+| `gyro_random_walk` | 偏置不稳定性 | 0.00001-0.0001 rad/s^2/sqrt(Hz) |
 
-## Example: Quadruped State Estimation
+## 示例：四足机器人状态估计
 
 ```python
 import genesis as gs
@@ -85,14 +85,14 @@ scene = gs.Scene()
 quadruped = scene.add_entity(gs.morphs.URDF(file="go2.urdf"))
 scene.build()
 
-# Add IMU with realistic noise
+# 添加带有真实噪声的 IMU
 imu = scene.add_sensor(
     gs.sensors.IMU(
         link=quadruped.get_link("base"),
     )
 )
 
-# State estimation loop
+# 状态估计循环
 velocity_estimate = np.zeros(3)
 dt = scene.dt
 
@@ -101,11 +101,11 @@ for i in range(1000):
 
     data = imu.get_data()
 
-    # Simple integration (real systems use Kalman filtering)
+    # 简单积分（实际系统使用卡尔曼滤波）
     velocity_estimate += data.linear_acceleration * dt
 ```
 
-## API Reference
+## API 参考
 
 ```{eval-rst}
 .. autoclass:: genesis.engine.sensors.IMUSensor
@@ -114,7 +114,7 @@ for i in range(1000):
    :show-inheritance:
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`index` - Sensor overview
-- {doc}`contact` - Contact force sensing
+- {doc}`index` - 传感器概述
+- {doc}`contact` - 接触力传感

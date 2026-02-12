@@ -1,33 +1,33 @@
-# 🖥️ Multi-GPU Simulation
+# 🖥️ 多 GPU 模拟
 
-Genesis supports multi-GPU execution for scaling simulations.
+Genesis 支持多 GPU 执行以扩展模拟。
 
-## Single GPU Configuration
+## 单 GPU 配置
 
 ```python
 import genesis as gs
 
-# Automatic GPU selection
+# 自动 GPU 选择
 gs.init(backend=gs.gpu)
 
-# Force specific backend
+# 强制特定后端
 gs.init(backend=gs.cuda)   # NVIDIA CUDA
 gs.init(backend=gs.metal)  # Apple Metal
-gs.init(backend=gs.cpu)    # CPU fallback
+gs.init(backend=gs.cpu)    # CPU 回退
 ```
 
-## Parallel Environments (Single GPU)
+## 并行环境（单 GPU）
 
-Scale by batching environments on one GPU:
+通过在单个 GPU 上批处理环境来扩展：
 
 ```python
 scene.build(n_envs=2048, env_spacing=(1.0, 1.0))
-# All environments run in parallel on same GPU
+# 所有环境在同一 GPU 上并行运行
 ```
 
-## Multi-GPU with Multiprocessing
+## 使用多进程的多 GPU
 
-Run separate processes per GPU:
+每 GPU 运行单独的进程：
 
 ```python
 import os
@@ -40,17 +40,17 @@ def run_simulation(gpu_id):
 
     import genesis as gs
     gs.init(backend=gs.gpu)
-    # ... simulation code ...
+    # ... 模拟代码 ...
 
 if __name__ == "__main__":
-    for i in range(2):  # 2 GPUs
+    for i in range(2):  # 2 个 GPU
         p = multiprocessing.Process(target=run_simulation, args=(i,))
         p.start()
 ```
 
-## Distributed Training (DDP)
+## 分布式训练 (DDP)
 
-Use PyTorch Distributed Data Parallel:
+使用 PyTorch 分布式数据并行：
 
 ```bash
 torchrun --standalone --nnodes=1 --nproc_per_node=2 train.py
@@ -73,48 +73,48 @@ torch.cuda.set_device(0)
 dist.init_process_group(backend="nccl", init_method="env://")
 model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[0])
 
-# Training loop with gradient synchronization
+# 带梯度同步的训练循环
 for step in range(steps):
     scene.step()
-    loss.backward()  # DDP handles all-reduce
+    loss.backward()  # DDP 处理 all-reduce
     optimizer.step()
 
 dist.barrier()
 dist.destroy_process_group()
 ```
 
-## Environment Variables
+## 环境变量
 
-| Variable | Purpose |
+| 变量 | 目的 |
 |----------|---------|
-| `CUDA_VISIBLE_DEVICES` | PyTorch/CUDA GPU selection |
-| `TI_VISIBLE_DEVICE` | Taichi GPU selection |
-| `EGL_DEVICE_ID` | Rendering GPU (OpenGL/EGL) |
+| `CUDA_VISIBLE_DEVICES` | PyTorch/CUDA GPU 选择 |
+| `TI_VISIBLE_DEVICE` | Taichi GPU 选择 |
+| `EGL_DEVICE_ID` | 渲染 GPU (OpenGL/EGL) |
 
-Always set all three together for multi-GPU setups.
+对于多 GPU 设置，始终同时设置所有三个。
 
-## GPU Selection Patterns
+## GPU 选择模式
 
-| Pattern | Method | GPUs | Complexity |
+| 模式 | 方法 | GPU | 复杂度 |
 |---------|--------|------|------------|
-| Single GPU | `gs.init(backend=gs.gpu)` | 1 | Low |
-| Batched envs | `scene.build(n_envs=N)` | 1 | Low |
-| Multi-process | Multiprocessing + env vars | N | Medium |
-| Distributed | torchrun + DDP | N | High |
+| 单 GPU | `gs.init(backend=gs.gpu)` | 1 | 低 |
+| 批处理环境 | `scene.build(n_envs=N)` | 1 | 低 |
+| 多进程 | 多进程 + 环境变量 | N | 中 |
+| 分布式 | torchrun + DDP | N | 高 |
 
-## Best Practices
+## 最佳实践
 
-1. **Batch first**: Use large `n_envs` on single GPU before scaling to multi-GPU
-2. **Set all env vars**: Always set CUDA, Taichi, and EGL device together
-3. **Synchronize DDP**: Call `dist.barrier()` before destroying process groups
-4. **Headless rendering**: Set `pyglet.options["headless"] = True` on servers
-5. **Monitor memory**: Use `nvidia-smi` during batched simulation
+1. **优先批处理**：在扩展到多 GPU 之前，先在单个 GPU 上使用大的 `n_envs`
+2. **设置所有环境变量**：始终同时设置 CUDA、Taichi 和 EGL 设备
+3. **同步 DDP**：在销毁进程组之前调用 `dist.barrier()`
+4. **无头渲染**：在服务器上设置 `pyglet.options["headless"] = True`
+5. **监控内存**：在批处理模拟期间使用 `nvidia-smi`
 
-## Device Access
+## 设备访问
 
-After initialization:
+初始化后：
 
 ```python
-gs.device    # PyTorch device (e.g., "cuda:0", "mps:0")
-gs.backend   # Backend type (gs.cuda, gs.metal, gs.cpu)
+gs.device    # PyTorch 设备 (例如 "cuda:0", "mps:0")
+gs.backend   # 后端类型 (gs.cuda, gs.metal, gs.cpu)
 ```

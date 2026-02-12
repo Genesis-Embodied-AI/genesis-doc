@@ -1,4 +1,4 @@
-# `Camera`
+# `相机 (Camera)`
 
 ```{eval-rst}  
 .. automodule:: genesis.vis.camera

@@ -1,8 +1,8 @@
-# 💧 Particle Emitters
+# 💧 粒子发射器
 
-Emitters generate particles for fluid and material simulations (SPH, MPM, PBD).
+发射器用于生成流体和材料模拟的粒子（SPH、MPM、PBD）。
 
-## Creating an Emitter
+## 创建发射器
 
 ```python
 import genesis as gs
@@ -25,39 +25,39 @@ emitter = scene.add_emitter(
 scene.build()
 ```
 
-## Supported Materials
+## 支持的材质
 
-- `gs.materials.SPH.Liquid()` - SPH fluid
-- `gs.materials.MPM.Liquid()` - MPM liquid
-- `gs.materials.MPM.Sand()` - Granular material
-- `gs.materials.PBD.Liquid()` - Position-based fluid
+- `gs.materials.SPH.Liquid()` - SPH 流体
+- `gs.materials.MPM.Liquid()` - MPM 液体
+- `gs.materials.MPM.Sand()` - 颗粒材料
+- `gs.materials.PBD.Liquid()` - 基于位置的流体
 
-## Directional Emission
+## 定向发射
 
 ```python
 for step in range(500):
     emitter.emit(
-        pos=np.array([0.5, 0.5, 2.0]),      # Nozzle position
-        direction=np.array([0.0, 0.0, -1.0]), # Emission direction
-        speed=5.0,                            # Particle speed
-        droplet_shape="circle",               # Shape: circle, sphere, square, rectangle
-        droplet_size=0.1,                     # Radius or side length
+        pos=np.array([0.5, 0.5, 2.0]),      # 喷嘴位置
+        direction=np.array([0.0, 0.0, -1.0]), # 发射方向
+        speed=5.0,                            # 粒子速度
+        droplet_shape="circle",               # 形状：circle, sphere, square, rectangle
+        droplet_size=0.1,                     # 半径或边长
     )
     scene.step()
 ```
 
-### Droplet Shapes
+### 液滴形状
 
-| Shape | `droplet_size` | Description |
+| 形状 | `droplet_size` | 描述 |
 |-------|---------------|-------------|
-| `"circle"` | `float` | Cylindrical stream |
-| `"sphere"` | `float` | Spherical droplet |
-| `"square"` | `float` | Cubic droplet |
-| `"rectangle"` | `(w, h)` | Rectangular stream |
+| `"circle"` | `float` | 圆柱流 |
+| `"sphere"` | `float` | 球形液滴 |
+| `"square"` | `float` | 立方体液滴 |
+| `"rectangle"` | `(w, h)` | 矩形流 |
 
-## Omnidirectional Emission
+## 全向发射
 
-Emit particles radially from a spherical source:
+从球形源径向发射粒子：
 
 ```python
 emitter.emit_omni(
@@ -67,11 +67,11 @@ emitter.emit_omni(
 )
 ```
 
-## Dynamic Emission
+## 动态发射
 
 ```python
 for i in range(1000):
-    # Oscillating direction
+    # 振荡方向
     direction = np.array([0.0, np.sin(i / 10) * 0.3, -1.0])
 
     emitter.emit(
@@ -84,7 +84,7 @@ for i in range(1000):
     scene.step()
 ```
 
-## Multiple Emitters
+## 多发射器
 
 ```python
 emitter1 = scene.add_emitter(
@@ -104,8 +104,8 @@ for step in range(500):
     scene.step()
 ```
 
-## Notes
+## 注意事项
 
-- Emitters must be added before `scene.build()`
-- Particles recycle when `max_particles` is reached
-- Not compatible with differentiable simulation (`requires_grad=True`)
+- 发射器必须在 `scene.build()` 之前添加
+- 当达到 `max_particles` 时粒子会循环使用
+- 与可微模拟不兼容（`requires_grad=True`）

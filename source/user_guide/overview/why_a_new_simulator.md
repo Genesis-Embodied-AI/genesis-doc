@@ -1,11 +1,12 @@
-# 🧬 Why A New Physics Simulator
-Compared to prior simulation platforms, here we highlight several key features of Genesis:
-- 🐍 **Pythonic** and fully transparent. Genesis is developed and fully open-source in python, making code understanding and contribution way more easier.
-- 👶 **Effortless installation** and **extremely simple** and **user-friendly** API design.
-- 🚀 **Parallelized simulation** with ***unprecedented speed***: Genesis is the **world's fastest physics engine**, delivering simulation speeds up to ***10~80x*** (yes, this is a bit sci-fi) faster than existing *GPU-accelerated* robotic simulators (Isaac Gym/Sim/Lab, Mujoco MJX, etc), ***without any compromise*** on simulation accuracy and fidelity.
-- 💥 A **unified** framework that supports various state-of-the-art physics solvers, modeling **a vast range of materials** and physical phenomena.
-- 📸 Photo-realistic ray-tracing rendering with optimized performance.
-- 📐 **Differentiability**: Genesis is designed to be fully compatible with differentiable simulation. Currently, our MPM solver and Tool Solver are differentiable, and differentiability for other solvers will be added soon (starting with rigid-body simulation).
-- ☝🏻 Physically-accurate and differentiable **tactile sensor**.
-- 🌌 Native support for ***[Generative Simulation](https://arxiv.org/abs/2305.10455)***, allowing **language-prompted data generation** of various modalities: *interactive scenes*, *task proposals*, *rewards*, *assets*, *character motions*, *policies*, *trajectories*, *camera motions*, *(physically-accurate) videos*, and more.
+# 🧬 为什么需要一个新的物理模拟器
 
+与以往的仿真平台相比，这里我们重点介绍 Genesis 的几个关键特性：
+
+- 🐍 **Pythonic**且完全透明。Genesis 使用 Python 开发并完全开源，使代码理解和贡献变得更加容易。
+- 👶 ** effortless 安装**和**极其简单**、**用户友好**的 API 设计。
+- 🚀 **并行仿真**具有***前所未有的速度***：Genesis 是**世界上最快的物理引擎**，仿真速度比现有的* GPU 加速*机器人仿真器（Isaac Gym/Sim/Lab、Mujoco MJX 等）快***10~80 倍***（是的，这有点科幻），且在仿真精度和保真度上***没有任何妥协***。
+- 💥 一个**统一**的框架，支持各种最先进的物理求解器，建模**广泛的材料**和物理现象。
+- 📸 具有优化性能的照片级真实感光线追踪渲染。
+- 📐 **可微性**：Genesis 设计为与可微仿真完全兼容。目前，我们的 MPM 求解器和工具求解器是可微的，其他求解器的可微性将很快添加（从刚体仿真开始）。
+- ☝🏻 物理精确且可微的**触觉传感器**。
+- 🌌 原生支持***[生成式仿真](https://arxiv.org/abs/2305.10455)***，允许对各种模态进行**语言提示的数据生成**：*交互式场景*、*任务提案*、*奖励*、*资产*、*角色动作*、*策略*、*轨迹*、*相机运动*、*（物理精确的）视频*等。

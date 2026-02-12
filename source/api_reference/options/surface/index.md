@@ -1,9 +1,11 @@
-# Surface
-A ``Surface`` object encapsulates all visual information used for rendering an entity or its sub-components (links, geoms, etc.)
-The surface contains different types textures: diffuse_texture, specular_texture, roughness_texture, metallic_texture, transmission_texture, normal_texture, and emissive_texture. Each one of them is a `gs.textures.Texture` object.
+# 表面材质 (Surface)
+
+`Surface` 对象封装了用于渲染实体或其子组件（links、geoms 等）的所有视觉信息。
+
+表面材质包含不同类型的纹理：diffuse_texture、specular_texture、roughness_texture、metallic_texture、transmission_texture、normal_texture 和 emissive_texture。每一种都是 `gs.textures.Texture` 对象。
 
 :::{note}
-Most advanced surface types are only supported by cameras using the `RayTracer` rendering backend. If `Rasterizer` is used, only color will be rendered.
+大多数高级表面材质类型仅在使用 `RayTracer` 渲染后端时受相机支持。如果使用 `Rasterizer`，则仅会渲染颜色。
 :::
 
 

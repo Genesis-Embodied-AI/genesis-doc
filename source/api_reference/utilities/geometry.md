@@ -1,10 +1,10 @@
 # Geometry Utilities
 
-Genesis provides utility functions for geometric transformations and calculations.
+Genesis 提供用于几何变换和计算的工具函数。
 
-## Quaternion Operations
+## Quaternion 操作
 
-Genesis uses `(x, y, z, w)` quaternion convention (scalar-last).
+Genesis 使用 `(x, y, z, w)` 四元数约定（标量在后）。
 
 ```python
 import genesis.utils.geom as gu
@@ -27,7 +27,7 @@ q_inv = gu.quat_inv(quat)
 rot_matrix = gu.quat_to_matrix(quat)
 ```
 
-## Transform Operations
+## Transform 操作
 
 ```python
 import genesis.utils.geom as gu
@@ -45,7 +45,7 @@ transformed = gu.transform_by_trans_quat(point, pos, quat)
 original = gu.inv_transform_by_trans_quat(transformed, pos, quat)
 ```
 
-## Rotation Conversions
+## Rotation 转换
 
 ```python
 import genesis.utils.geom as gu
@@ -62,7 +62,7 @@ R = np.eye(3)
 quat = gu.matrix_to_quat(R)
 ```
 
-## Vector Operations
+## Vector 操作
 
 ```python
 import genesis.utils.geom as gu
@@ -80,9 +80,9 @@ cross = gu.cross(a, b)
 angle = gu.angle_between(a, b)
 ```
 
-## Common Patterns
+## 常见模式
 
-### Setting Entity Orientation
+### 设置实体方向
 
 ```python
 import genesis as gs
@@ -100,7 +100,7 @@ quat = gu.axis_angle_to_quat([0, 0, 1], angle)
 box.set_quat(quat)
 ```
 
-### Camera Look-at Calculation
+### 相机 Look-at 计算
 
 ```python
 import genesis.utils.geom as gu
@@ -113,7 +113,7 @@ direction = target - camera_pos
 direction = direction / np.linalg.norm(direction)
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`tensor_utils` - Tensor conversions
-- {doc}`/api_reference/entity/index` - Entity transforms
+- {doc}`tensor_utils` - 张量转换
+- {doc}`/api_reference/entity/index` - 实体变换

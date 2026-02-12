@@ -1,8 +1,8 @@
 # Constants & Enums
 
-Genesis defines several enums and constants for physics simulation configuration.
+Genesis 定义了多个枚举和常量，用于物理仿真配置。
 
-## Backend Selection
+## Backend 选择
 
 ```python
 import genesis as gs
@@ -19,7 +19,7 @@ gs.backend.opengl   # OpenGL
 gs.init(backend=gs.gpu)
 ```
 
-## Joint Types
+## Joint 类型
 
 ```python
 # Joint types for articulated bodies
@@ -30,7 +30,7 @@ gs.JOINT_TYPE.SPHERICAL  # Ball joint (3 DOF)
 gs.JOINT_TYPE.FREE       # Free joint (6 DOF)
 ```
 
-## Geometry Types
+## Geometry 类型
 
 ```python
 # Geometry types for collision shapes
@@ -44,7 +44,7 @@ gs.GEOM_TYPE.MESH       # Mesh
 gs.GEOM_TYPE.TERRAIN    # Heightfield terrain
 ```
 
-## Control Modes
+## Control 模式
 
 ```python
 # Control modes for joints
@@ -80,7 +80,7 @@ rigid_options = gs.options.RigidOptions(
 )
 ```
 
-## Image Types
+## Image 类型
 
 ```python
 # Camera output types
@@ -99,7 +99,7 @@ gs.EQUALITY_TYPE.WELD     # Weld constraint
 gs.EQUALITY_TYPE.JOINT    # Joint equality
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`device` - Device and platform utilities
-- {doc}`/api_reference/options/index` - Configuration options
+- {doc}`device` - 设备和平台工具
+- {doc}`/api_reference/options/index` - 配置选项

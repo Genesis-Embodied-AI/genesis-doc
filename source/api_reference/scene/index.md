@@ -1,6 +1,6 @@
 # Scene
-A ``genesis.Scene`` object wraps all components in a simulation environment, including a simulator (containing multiple physics solvers), entities, and a visualizer (controlling both the viewer and all the cameras).
-Basically, everything happens inside a scene.
+``genesis.Scene`` 对象封装了仿真环境中的所有组件，包括 simulator（包含多个物理 solver）、entities 和 visualizer（控制 viewer 和所有 cameras）。
+基本上，所有操作都在 scene 内部完成。
 
 ```{toctree}
 scene

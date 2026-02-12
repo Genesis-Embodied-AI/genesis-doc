@@ -1,10 +1,10 @@
 # File I/O Utilities
 
-Genesis provides utilities for file operations, path handling, and loading robot/scene descriptions.
+Genesis 提供文件操作、路径处理以及加载机器人/场景描述的工具。
 
-## Cache Directories
+## 缓存目录
 
-Genesis caches compiled kernels and processed assets:
+Genesis 缓存编译后的内核和处理后的资源：
 
 ```python
 import genesis as gs
@@ -17,9 +17,9 @@ gsd_cache = gs.utils.get_gsd_cache_dir()
 src_dir = gs.utils.get_src_dir()
 ```
 
-## URDF Loading
+## URDF 加载
 
-URDF (Unified Robot Description Format) files can be loaded directly:
+可以直接加载 URDF（Unified Robot Description Format）文件：
 
 ```python
 import genesis as gs
@@ -41,7 +41,7 @@ robot = scene.add_entity(gs.morphs.URDF(
 scene.build()
 ```
 
-### URDF Customization
+### URDF 自定义
 
 ```python
 # Override link properties
@@ -56,9 +56,9 @@ robot = scene.add_entity(gs.morphs.URDF(
 ))
 ```
 
-## MJCF Loading
+## MJCF 加载
 
-MuJoCo XML format (MJCF) is also supported:
+也支持 MuJoCo XML 格式（MJCF）：
 
 ```python
 # Load MJCF model
@@ -71,9 +71,9 @@ robot = scene.add_entity(gs.morphs.MJCF(
 ))
 ```
 
-## Mesh Loading
+## Mesh 加载
 
-Genesis supports various mesh formats:
+Genesis 支持多种 mesh 格式：
 
 | Format | Extension | Notes |
 |--------|-----------|-------|
@@ -93,13 +93,13 @@ mesh = scene.add_entity(gs.morphs.Mesh(
 ))
 ```
 
-## Asset Paths
+## 资源路径
 
-Genesis looks for assets in:
+Genesis 在以下位置查找资源：
 
-1. Absolute path (if provided)
-2. Relative to current working directory
-3. Genesis assets directory
+1. 绝对路径（如果提供）
+2. 相对于当前工作目录
+3. Genesis 资源目录
 
 ```python
 # Absolute path
@@ -112,7 +112,7 @@ robot = scene.add_entity(gs.morphs.URDF(file="robots/my_robot.urdf"))
 plane = scene.add_entity(gs.morphs.Plane())
 ```
 
-## See Also
+## 另请参阅
 
-- {doc}`/api_reference/options/morph/file_morph/index` - File-based morphs
-- {doc}`/api_reference/entity/index` - Entity loading
+- {doc}`/api_reference/options/morph/file_morph/index` - 基于文件的 morphs
+- {doc}`/api_reference/entity/index` - 实体加载

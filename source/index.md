@@ -10,68 +10,68 @@
 <a href="https://drive.google.com/uc?export=view&id=1ZS9nnbQ-t1IwkzJlENBYqYIIOOZhXuBZ"><img src="https://img.shields.io/badge/WeChat-07C160?style=for-the-badge&logo=wechat&logoColor=white" height="20" style="display:inline"></a>
 
 
-## What is Genesis?
+## Genesis 是什么？
 
-Genesis is a physics platform designed for general purpose *Robotics/Embodied AI/Physical AI* applications. It is simultaneously multiple things:
+Genesis 是一个为通用*机器人/具身智能/物理 AI*应用设计的物理平台。它同时包含以下几个方面：
 
-1. A **universal physics engine** re-built from the ground up, capable of simulating a wide range of materials and physical phenomena.
-2. A **lightweight**, **ultra-fast**, **pythonic**, and **user-friendly** robotics simulation platform.
-3. A powerful and fast **photo-realistic rendering system**.
-4. A **generative data engine** that transforms user-prompted natural language description into various modalities of data.
+1. 一个从零开始重新构建的**通用物理引擎**，能够模拟各种材料和物理现象。
+2. 一个**轻量级**、**超高速**、**Pythonic**且**用户友好**的机器人仿真平台。
+3. 一个强大且快速的**照片级真实感渲染系统**。
+4. 一个**生成式数据引擎**，可将用户提示的自然语言描述转换为各种模态的数据。
 
-Powered by a universal physics engine re-designed and re-built from the ground up, Genesis integrates various physics solvers and their coupling into a unified framework. This core physics engine is further enhanced by a generative agent framework that operates at an upper level, aiming towards fully **automated data generation** for robotics and beyond.
-Currently, we are open-sourcing the underlying physics engine and the simulation platform. The generative framework will be released in the near future.
+Genesis 基于从零开始重新设计和构建的通用物理引擎，将各种物理求解器及其耦合整合到一个统一的框架中。这个核心物理引擎进一步由上层运行的生成式代理框架增强，旨在实现机器人及其他领域完全**自动化的数据生成**。
+目前，我们正在开源底层物理引擎和仿真平台。生成式框架将在近期发布。
 
-Genesis is built and will continuously evolve with the following ***long-term missions***:
+Genesis 的构建和持续演进遵循以下***长期使命***：
 
-1. **Lowering the barrier** to using physics simulations and making robotics research accessible to everyone. (See our [commitment](https://genesis-world.readthedocs.io/en/latest/user_guide/overview/mission.html))
-2. **Unifying a wide spectrum of state-of-the-art physics solvers** into a single framework, allowing re-creating the whole physical world in a virtual realm with the highest possible physical, visual and sensory fidelity, using the most advanced simulation techniques.
-3. **Minimizing human effort** in collecting and generating data for robotics and other domains, letting the data flywheel spin on its own.
+1. **降低**使用物理仿真的门槛，让机器人研究对每个人都可及。（参见我们的[承诺](https://genesis-world.readthedocs.io/en/latest/user_guide/overview/mission.html)）
+2. **将广泛的最先进物理求解器统一**到一个框架中，使用最先进的仿真技术，以最高的物理、视觉和感官保真度在虚拟世界中重现整个物理世界。
+3. **最小化**机器人及其他领域数据收集和生成的人力投入，让数据飞轮自行运转。
 
-## Key Features
+## 核心特性
 
-Compared to prior simulation platforms, here we highlight several key features of Genesis:
+与以往的仿真平台相比，以下是 Genesis 的几个核心特性：
 
-- 🐍 **100% Python**, both front-end interface and back-end physics engine, all natively developed in python.
-- 👶 **Effortless installation** and **extremely simple** and **user-friendly** API design.
-- 🚀 **Parallelized simulation** with ***unprecedented speed***: Genesis is the **world's fastest physics engine**, delivering simulation speeds up to ***10~80x*** (yes, this is a bit sci-fi) faster than existing *GPU-accelerated* robotic simulators (Isaac Gym/Sim/Lab, Mujoco MJX, etc), ***without any compromise*** on simulation accuracy and fidelity.
-- 💥 A **unified** framework that supports various state-of-the-art physics solvers, modeling **a vast range of materials** and physical phenomena.
-- 📸 Photo-realistic ray-tracing rendering with optimized performance.
-- 📐 **Differentiability**: Genesis is designed to be fully compatible with differentiable simulation. Currently, our MPM solver and Tool Solver are differentiable, and differentiability for other solvers will be added soon (starting with rigid-body simulation).
-- ☝🏻 Physically-accurate and differentiable **tactile sensor**.
-- 🌌 Native support for ***[Generative Simulation](https://arxiv.org/abs/2305.10455)***, allowing **language-prompted data generation** of various modalities: *interactive scenes*, *task proposals*, *rewards*, *assets*, *character motions*, *policies*, *trajectories*, *camera motions*, *(physically-accurate) videos*, and more.
+- 🐍 **100% Python**，前端接口和后端物理引擎都原生使用 Python 开发。
+- 👶 **轻松安装**，API 设计**极其简单**且**用户友好**。
+- 🚀 **并行仿真**带来***前所未有的速度***：Genesis 是**世界上最快的物理引擎**，仿真速度比现有的*GPU 加速*机器人仿真器（Isaac Gym/Sim/Lab、Mujoco MJX 等）快***10~80 倍***（是的，这有点科幻），同时***不妥协***仿真精度和保真度。
+- 💥 **统一**框架支持各种最先进的物理求解器，建模**广泛的材料**和物理现象。
+- 📸 优化的照片级真实感光线追踪渲染。
+- 📐 **可微分性**：Genesis 设计为与可微分仿真完全兼容。目前，我们的 MPM 求解器和工具求解器是可微分的，其他求解器的可微分性将很快添加（从刚体仿真开始）。
+- ☝🏻 物理精确且可微分的**触觉传感器**。
+- 🌌 原生支持***[生成式仿真](https://arxiv.org/abs/2305.10455)***，允许**语言提示的数据生成**，包括各种模态：*交互式场景*、*任务提案*、*奖励*、*资产*、*角色动作*、*策略*、*轨迹*、*相机运动*、*（物理精确的）视频*等。
 
-## Getting Started
+## 快速开始
 
-### Quick Installation
+### 快速安装
 
-Genesis is available via PyPI:
+Genesis 可通过 PyPI 获取：
 
 ```bash
 pip install genesis-world
 ```
 
-You also need to install **PyTorch** following the [official instructions](https://pytorch.org/get-started/locally/).
+你还需要按照[官方说明](https://pytorch.org/get-started/locally/)安装 **PyTorch**。
 
-### Documentation
+### 文档
 
-Please refer to our [documentation site](https://genesis-world.readthedocs.io/en/latest/user_guide/index.html) to for detailed installation steps, tutorials and API references.
+请参阅我们的[文档站点](https://genesis-world.readthedocs.io/en/latest/user_guide/index.html)了解详细的安装步骤、教程和 API 参考。
 
-## Contributing to Genesis
+## 为 Genesis 贡献
 
-The goal of the Genesis project is to build a fully transparent, user-friendly ecosystem where contributors from both robotics and computer graphics can **come together to collaboratively create a high-efficiency, realistic (both physically and visually) virtual world for robotics research and beyond**.
+Genesis 项目的目标是构建一个完全透明、用户友好的生态系统，让来自机器人和计算机图形学领域的贡献者能够**齐聚一堂，协作创建一个高效率、真实（包括物理和视觉）的虚拟世界，用于机器人研究及其他领域**。
 
-We sincerely welcome *any forms of contributions* from the community to make the world a better place for robots. From **pull requests** for new features, **bug reports**, to even tiny **suggestions** that will make Genesis API more intuitive, all are wholeheartedly appreciated!
+我们诚挚欢迎社区以*任何形式*做出贡献，让世界成为机器人更好的地方。从**新功能的 pull request**、**bug 报告**，到哪怕是让 Genesis API 更直观的微小**建议**，都衷心感谢！
 
-## Support
+## 支持
 
-- Please use Github [Issues](https://github.com/Genesis-Embodied-AI/Genesis/issues) for bug reports and feature requests.
+- 请使用 Github [Issues](https://github.com/Genesis-Embodied-AI/Genesis/issues)提交 bug 报告和功能请求。
 
-- Please use GitHub [Discussions](https://github.com/Genesis-Embodied-AI/Genesis/discussions) for discussing ideas, and asking questions.
+- 请使用 GitHub [Discussions](https://github.com/Genesis-Embodied-AI/Genesis/discussions)讨论想法和提问。
 
-## Citation
+## 引用
 
-If you used Genesis in your research, we would appreciate it if you could cite it. We are still working on a technical report, and before it's public, you could consider citing:
+如果你在你的研究中使用了 Genesis，我们将非常感谢你能引用它。我们仍在撰写技术报告，在它公开之前，你可以考虑引用：
 
 ```
 @misc{Genesis,

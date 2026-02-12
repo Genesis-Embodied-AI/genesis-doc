@@ -1,17 +1,17 @@
 # Tensor Utilities
 
-Genesis provides utilities for converting between different array and tensor formats.
+Genesis 提供用于在不同数组和张量格式之间转换的工具。
 
-## Overview
+## 概述
 
-Genesis uses:
-- **Taichi fields**: For GPU-accelerated physics computation
-- **PyTorch tensors**: For state access and differentiability
-- **NumPy arrays**: For data export and visualization
+Genesis 使用：
+- **Taichi fields**: 用于 GPU 加速物理计算
+- **PyTorch tensors**: 用于状态访问和可微性
+- **NumPy arrays**: 用于数据导出和可视化
 
-## Tensor Conversion
+## 张量转换
 
-### To NumPy
+### 转换为 NumPy
 
 ```python
 import genesis as gs
@@ -27,14 +27,14 @@ qpos_np = gs.utils.tensor_to_array(qpos)
 print(type(qpos_np))  # numpy.ndarray
 ```
 
-### To CPU
+### 转换为 CPU
 
 ```python
 # Move tensor to CPU (if on GPU)
 qpos_cpu = gs.utils.tensor_to_cpu(qpos)
 ```
 
-### Creating Tensors
+### 创建 Tensors
 
 ```python
 import torch
@@ -46,9 +46,9 @@ tensor = torch.zeros(10, device=gs.device, dtype=gs.tc_float)
 tensor = gs.utils.to_gs_tensor([1.0, 2.0, 3.0])
 ```
 
-## Common Patterns
+## 常见模式
 
-### Getting Entity State
+### 获取实体状态
 
 ```python
 # Returns PyTorch tensor
@@ -60,7 +60,7 @@ import numpy as np
 pos_np = positions.cpu().numpy()
 ```
 
-### Setting Entity State
+### 设置实体状态
 
 ```python
 import torch
@@ -75,7 +75,7 @@ robot.set_dofs_position([0.1, 0.2, 0.3])
 
 ### Batched Tensors
 
-With `n_envs > 1`:
+使用 `n_envs > 1`：
 
 ```python
 scene.build(n_envs=16)
@@ -87,14 +87,14 @@ all_positions = robot.get_qpos()
 some_positions = robot.get_qpos(envs_idx=[0, 5, 10])
 ```
 
-## Data Types
+## 数据类型
 
 | Genesis | PyTorch | NumPy | Description |
 |---------|---------|-------|-------------|
-| `gs.tc_float` | `torch.float32` | `np.float32` | Default float |
-| `gs.tc_int` | `torch.int32` | `np.int32` | Default int |
+| `gs.tc_float` | `torch.float32` | `np.float32` | 默认 float |
+| `gs.tc_int` | `torch.int32` | `np.int32` | 默认 int |
 
-## See Also
+## 另请参阅
 
-- {doc}`device` - Device configuration
-- {doc}`/api_reference/engine/states/index` - State management
+- {doc}`device` - 设备配置
+- {doc}`/api_reference/engine/states/index` - 状态管理

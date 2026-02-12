@@ -1,12 +1,12 @@
-# 🌊 Beyond Rigid Bodies
+# 🌊 超越刚体
 
-Genesis unified multiple physics solvers and supports simulation beyond rigid body dynamics. A `solver` is essentially a set of physics simulation algorithms to handle a specific set of materials. In this tutorial, we will go through 3 popular solvers and use them to simulate entities with different physical properties:
-- [Smooth Particle Hydrodynamics (SPH) Solver](#sph)
-- [Material Point Method (MPM) Solver](#mpm)
-- [Position Based Dynamics (PBD) Solver](#pbd)
+Genesis 统一了多个物理求解器，支持超越刚体动力学的仿真。`solver`（求解器）本质上是处理特定材料集的一组物理仿真算法。在本教程中，我们将介绍 3 个流行的求解器，并使用它们来仿真具有不同物理属性的实体：
+- [光滑粒子流体动力学（SPH）求解器](#sph)
+- [物质点法（MPM）求解器](#mpm)
+- [基于位置的动力学（PBD）求解器](#pbd)
 
-## Liquid simulation using SPH Solver <a id="sph"></a>
-First, let's see how we can simulate a water cube. Let's create an empty scene and add a plane as usual:
+## 使用 SPH 求解器进行液体仿真 <a id="sph"></a>
+首先，让我们看看如何仿真一个水立方。让我们像往常一样创建一个空场景并添加一个平面：
 ```python
 import genesis as gs
 
@@ -36,14 +36,14 @@ plane = scene.add_entity(
     morph=gs.morphs.Plane(),
 )
 ```
-A few things to we should pay attention to here:
-- When configuring `sim_options`, now we are using a relatively small `dt` with `substeps=10`. This means inside the simulator, for each `step`, it will simulate 10 `substep`s, each with `substep_dt = 4e-3 / 10`. When we were dealing with rigid bodies earlier, we didn't need to set this and simply used the default setting (`substeps=1`), which only runs 1 substeps in each step.
-Next, let's add water. Adding
-- As we discussed before, we use `options` to configure each different solver. Since we are using `SPHSolver`, we need to configure its properties via `sph_options`. In this example, we set the boundary of the solver, and specified the particle size to be 0.01m. SPHSolver is a lagrangian solver, meaning it uses particles to represent objects.
-- In `vis_options`, we specified that we would like to see the boundary of the SPH Solver in the rendered view.
+这里我们应该注意几点：
+- 配置 `sim_options` 时，现在我们使用相对较小的 `dt` 并设置 `substeps=10`。这意味着在仿真器内部，对于每个 `step`，它将仿真 10 个 `substep`，每个 `substep_dt = 4e-3 / 10`。当我们之前处理刚体时，我们不需要设置这个，只是使用了默认设置（`substeps=1`），每个步骤只运行 1 个子步骤。
+接下来，让我们添加水。添加
+- 正如我们之前讨论的，我们使用 `options` 来配置每个不同的求解器。由于我们使用 `SPHSolver`，我们需要通过 `sph_options` 配置其属性。在这个示例中，我们设置求解器的边界，并将粒子大小指定为 0.01m。SPHSolver 是一个拉格朗日求解器，意味着它使用粒子来表示对象。
+- 在 `vis_options` 中，我们指定希望在渲染视图中看到 SPH 求解器的边界。
 
-Next, let's add a water block entity and start the simulation!
-When we add the block, the only difference we need to make to turn it from a rigid block to a water block is setting the `material`. In fact, earlier when we were dealing with only rigid bodies, this was internally set to be `gs.materials.Rigid()` by default. Since we are now using the SPH Solver for liquid simulation, we select the `Liquid` material under the `SPH` category:
+接下来，让我们添加一个水块实体并开始仿真！
+当我们添加块时，将它从刚体块变成水块所需的唯一区别是设置 `material`。事实上，当我们之前只处理刚体时，这在内部默认设置为 `gs.materials.Rigid()`。由于我们现在使用 SPH 求解器进行液体仿真，我们在 `SPH` 类别下选择 `Liquid` 材料：
 ```python
 liquid = scene.add_entity(
     material=gs.materials.SPH.Liquid(
@@ -66,28 +66,28 @@ horizon = 1000
 for i in range(horizon):
     scene.step()
 ```
-When creating the `Liquid` material, we set `sampler='pbs'`. This configures how we want to sample particles given the `Box` morph. `pbs` stands for 'physics-based sampling', which runs some extra simulation steps to make sure the particles are arranged in a physically natural way. You can also use `'regular'` sampler to sample the particles simply using a grid lattice pattern. If you are using other solvers such as MPM, you can also use `'random'` sampler.
+创建 `Liquid` 材料时，我们设置 `sampler='pbs'`。这配置了我们希望如何根据 `Box` morph 对粒子进行采样。`pbs` 代表'基于物理的采样'，它运行一些额外的仿真步骤以确保粒子以物理自然的方式排列。你也可以使用 `'regular'` 采样器简单地使用网格晶格模式对粒子进行采样。如果你使用其他求解器，如 MPM，你也可以使用 `'random'` 采样器。
 
-You may also note that we passed in an extra attribute -- `surface`. This attribute is used to define all the visual properties of the entity. Here, we set the color of the water to be blueish, and chose to visualize it as particles by setting `vis_mod='particle'`.
+你可能还注意到我们传入了一个额外的属性——`surface`。此属性用于定义实体的所有视觉属性。这里，我们将水的颜色设置为偏蓝色，并通过设置 `vis_mod='particle'` 选择将其可视化为粒子。
 
-Once you run this successfully, you will see the water drops and spreads over the plane, but constrained within the solver boundary:
+一旦你成功运行此示例，你会看到水落下并在平面上扩散，但限制在求解器边界内：
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/sph_liquid.mp4" type="video/mp4">
 </video>
 
-You can get the real-time particle positions by:
+你可以通过以下方式获取实时粒子位置：
 ```
 particles = liquid.get_particles_pos()
 ```
 
-**Changing the liquid properties:** You can also play with the physical properties of the liquid. For example, you can increase its viscosity (`mu`) and surface tension (`gamma`):
+**更改液体属性：** 你也可以调整液体的物理属性。例如，你可以增加其粘度（`mu`）和表面张力（`gamma`）：
 ```python
 material=gs.materials.SPH.Liquid(mu=0.02, gamma=0.02),
 ```
-and see how the behavior will be different. Enjoy!
+并观察行为将如何不同。尽情享受吧！
 
-The complete script:
+完整脚本：
 ```python
 import genesis as gs
 
@@ -118,7 +118,7 @@ plane = scene.add_entity(
 )
 
 liquid = scene.add_entity(
-    # viscous liquid
+    # 粘性液体
     # material=gs.materials.SPH.Liquid(mu=0.02, gamma=0.02),
     material=gs.materials.SPH.Liquid(),
     morph=gs.morphs.Box(
@@ -138,20 +138,20 @@ horizon = 1000
 for i in range(horizon):
     scene.step()
 
-# get particle positions
+# 获取粒子位置
 particles = liquid.get_particles_pos()
 ```
 
-## Deformable object simulation using MPM Solver <a id="mpm"></a>
+## 使用 MPM 求解器进行可变形物体仿真 <a id="mpm"></a>
 
-MPM solver is a very powerful physics solver that supports a wider range of materials. MPM stands for material point method, and uses a hybrid lagrangian-eulerian representation, i.e. both particles and grids, to represent objects.
+MPM 求解器是一个非常强大的物理求解器，支持更广泛的材料。MPM 代表物质点法，使用混合拉格朗日-欧拉表示，即粒子和网格，来表示对象。
 
-In this example, let's create three objects:
-- An elastic cube, visualized as `'particles'`
-- A liquid cube, visualized as `'particles'`
-- An elastoplastic sphere, visualized as the original sphere mesh, but deformed based on the internal particle state (`vis_mode='visual'`). Such process that maps internal particle state to a deformed visual mesh is called *skinning* in computer graphics.
+在本示例中，让我们创建三个对象：
+- 一个弹性立方体，可视化为 `'particles'`
+- 一个液体立方体，可视化为 `'particles'`
+- 一个弹塑性球体，可视化为原始球体网格，但基于内部粒子状态变形（`vis_mode='visual'`）。将内部粒子状态映射到变形视觉网格的过程在计算机图形学中称为 *蒙皮*。
 
-Complete code script:
+完整代码脚本：
 ```python
 import genesis as gs
 
@@ -227,21 +227,21 @@ horizon = 1000
 for i in range(horizon):
     scene.step()
 ```
-Note that to change the underlying physical material, all you have to do is to change the `material` attribute. Feel free to play with other material types (such as `MPM.Sand()` and `MPM.Snow()`), as well as the property values in each material type.
+注意，要更改底层物理材料，你所要做的就是更改 `material` 属性。随意尝试其他材料类型（如 `MPM.Sand()` 和 `MPM.Snow()`），以及每种材料类型中的属性值。
 
-Expected rendered result:
+预期的渲染结果：
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/mpm.mp4" type="video/mp4">
 </video>
 
-## Cloth simulation with PBD Solver <a id="pbd"></a>
+## 使用 PBD 求解器进行布料仿真 <a id="pbd"></a>
 
-PBD stands for Position Based Dynamics. This is also a lagrangian solver that represents entities using particles and edges, and simulates their state by solving a set of position-based constraints. It can be used to simulate 1D/2D/3D entities that preserve their topologies. In this example, we will see how to simulate cloth with PBD solver.
+PBD 代表基于位置的动力学。这也是一个拉格朗日求解器，使用粒子和边来表示实体，并通过求解一组基于位置的约束来仿真它们的状态。它可以用于仿真保持其拓扑结构的 1D/2D/3D 实体。在本示例中，我们将看到如何使用 PBD 求解器仿真布料。
 
-In this example, we will add two square-shape cloth entities: one with 4 corners fixed, the other with only 1 corner fixed and falls down onto the first piece of cloth. In addition, we will render them using different `vis_mode`s.
+在本示例中，我们将添加两个方形布料实体：一个固定 4 个角，另一个只固定 1 个角并落到第一块布上。此外，我们将使用不同的 `vis_mode` 渲染它们。
 
-Create the scene and build:
+创建场景并构建：
 ```python
 import genesis as gs
 
@@ -300,7 +300,7 @@ cloth_2 = scene.add_entity(
 scene.build()
 ```
 
-Then, let's fix the corners (particles) we want. To do this, we provide a handy tool to locate a particle using a location in the cartesian space:
+然后，让我们固定我们想要的角（粒子）。为此，我们提供了一个方便的工具，使用笛卡尔空间中的位置来定位粒子：
 ```python
 
 cloth_1.fix_particles(cloth_1.find_closest_particle((-1, -1, 1.0)))
@@ -314,7 +314,7 @@ for i in range(horizon):
     scene.step()
 ```
 
-Expected rendered result:
+预期的渲染结果：
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/pbd_cloth.mp4" type="video/mp4">
@@ -322,9 +322,9 @@ Expected rendered result:
 
 
 :::{warning}
-**Skinning for 2D meshes**
+**2D 网格的蒙皮**
 
-We noticed some issues when using a 2D flat cloth mesh and set `vis_mode='visual'`, this is due to degenerated pseudo-inverse matrix computation when computing the barycentric weights. You may notice weird visualization results in the above example if you add a non-zero euler to the cloth and use `vis_mode='visual'`. We will fix this very soon.
+我们注意到在使用 2D 平面布料网格并设置 `vis_mode='visual'` 时存在一些问题，这是由于计算质心权重时退化的伪逆矩阵计算导致的。如果你在上述示例中添加非零的欧拉角并使用 `vis_mode='visual'`，你可能会注意到奇怪的可视化结果。我们将很快修复这个问题。
 :::
 
-***More tutorials on inter-solver coupling coming soon!***
+***关于求解器耦合的更多教程即将推出！***
