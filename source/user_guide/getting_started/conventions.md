@@ -107,5 +107,5 @@ obj_y = scene.add_entity(
 
 导入后，morph 将具有 **imported_as_zup** 标志，允许了解是否对网格进行了修正：
 ```python
-obj_y.morph.metadata["imported_as_zup"]
+obj_y.vgeoms[0].mesh.metadata["imported_as_zup"]
 ```

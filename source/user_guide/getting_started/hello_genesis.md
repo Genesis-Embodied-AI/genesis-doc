@@ -29,7 +29,7 @@ for i in range(1000):
 import genesis as gs
 gs.init(backend=gs.cpu)
 ```
-- **后端设备（Backend device）**：Genesis 设计为跨平台，支持各种后端设备。这里我们使用 `gs.cpu`。如果你需要 GPU 加速的[并行仿真](parallel_simulation.md)，可以切换到其他后端，如 `gs.cuda`、`gs.vulkan` 或 `gs.metal`。你也可以使用 `gs.gpu` 作为快捷方式，Genesis 会根据你的系统选择合适的后端（例如，如果有 CUDA 可用则选择 `gs.cuda`，对于 Apple Silicon 设备则选择 `gs.metal`）。
+- **后端设备（Backend device）**：Genesis 设计为跨平台，支持各种后端设备。这里我们使用 `gs.cpu`。如果你需要 GPU 加速的[并行仿真](parallel_simulation.md)，可以切换到其他后端，如 `gs.cuda`、`gs.amdgpu` 或 `gs.metal`。你也可以使用 `gs.gpu` 作为快捷方式，Genesis 会根据你的系统选择合适的后端（例如，如果有 CUDA 可用则选择 `gs.cuda`，对于 Apple Silicon 设备则选择 `gs.metal`）。
 - **精度级别（Precision level）**：默认情况下，Genesis 使用 f32 精度。如果需要更高的精度，可以通过设置 `precision='64'` 切换到 f64。
 - **日志级别（Logging level）**：Genesis 初始化后，你会在终端看到日志输出，详细说明系统信息和 Genesis 相关信息，如当前版本。你可以通过将 `logging_level` 设置为 `'warning'` 来抑制日志输出。
 - **配色方案（Color scheme）**：Genesis 日志使用的默认配色主题针对深色背景终端进行了优化，即 `theme='dark'`。如果你使用的是浅色背景的终端，可以切换到 `'light'`，或者如果你只喜欢黑白配色，可以直接使用 `'dumb'`。

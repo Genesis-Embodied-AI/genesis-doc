@@ -109,7 +109,7 @@ if TYPE_CHECKING:
    ```bash
    ldconfig -p | grep EGL
    ```
-   您应该 ideally 看到：
+   您应该看到：
    ```
    libEGL_nvidia.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libEGL_nvidia.so.0
    ```
@@ -132,7 +132,7 @@ if TYPE_CHECKING:
    ```
    ✅ 您现在应该只能看到 `libEGL_nvidia.so.0`。
 
-4. **（可选 – 针对边缘情况）** 检查 NVIDIA EGL ICD 配置文件是否存在
+4. **（可选 – 针对少数情况）** 检查 NVIDIA EGL ICD 配置文件是否存在
 
     在大多数情况下，如果正确安装了 NVIDIA 驱动程序，此文件应该已经存在。但是，在某些最小化或容器化环境（例如无头 Docker 镜像）中，如果 EGL 初始化失败，您可能需要手动创建它：
     ```bash

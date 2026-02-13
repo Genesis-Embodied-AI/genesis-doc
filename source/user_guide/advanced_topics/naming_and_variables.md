@@ -132,7 +132,7 @@ ti_ivec4 = ti.types.vector(4, ti_int)
     ```python
     ti.types.struct(
         stiffness=gs.ti_float,        # 自由度的刚度
-        sol_params=gs.ti_vec7,        # 约束求解器 ()
+        sol_params=gs.ti_vec7,        # 约束求解器
         invweight=gs.ti_float,        # 逆质量
         armature=gs.ti_float,         # 自由度电枢惯性/质量 
         damping=gs.ti_float,          # 阻尼系数
