@@ -1,20 +1,20 @@
-# 🧗 高级和并行逆运动学 (IK)
+# 🧗 高级与并行 IK
 
-本文介绍Genesis中IK求解器的高级功能。展示如何设置灵活的目标姿态，以及如何批量处理机器人的IK求解。
+Genesis 中的 IK 求解器具有许多强大的功能。在本示例中，我们将展示如何配置 IK 求解器以接受更灵活的目标姿态，以及如何在批量设置中求解。
 
-## 多末端执行器的IK求解
+### 多末端执行器连杆的 IK
 
-这个例子中，把机器人夹爪的左右手指设为两个独立的目标。只关注手指的位置和Z轴方向，而不限制完整的6自由度姿态。
+在这个示例中，我们将使用机器人夹爪的左手指和右手指作为两个独立的目标连杆。此外，我们不为每个连杆使用完整的 6 自由度姿态作为目标姿态，而是只考虑它们的位置和 Z 轴方向来求解。
 
 ```python
 import numpy as np
 
 import genesis as gs
 
-########################## 初始化 ##########################
-gs.init(seed=0, precision='32', logging_level='debug')
+########################## init ##########################
+gs.init(seed=0, precision='32', logging_level='info')
 
-########################## 创建场景 ##########################
+########################## create a scene ##########################
 scene = gs.Scene(
     viewer_options= gs.options.ViewerOptions(
         camera_pos=(2.0, -2, 1.5),
@@ -27,7 +27,7 @@ scene = gs.Scene(
     ),
 )
 
-########################## 实体 ##########################
+########################## entities ##########################
 
 scene.add_entity(
     gs.morphs.Plane(),
@@ -36,7 +36,7 @@ robot = scene.add_entity(
     gs.morphs.MJCF(file='xml/franka_emika_panda/panda.xml'),
 )
 
-# 添加两个可视化的目标标记
+# 两个用于可视化的目标连杆
 target_left = scene.add_entity(
     gs.morphs.Mesh(
         file='meshes/axis.obj',
@@ -52,7 +52,7 @@ target_right = scene.add_entity(
     surface=gs.surfaces.Default(color=(0.5, 1.0, 0.5, 1)),
 )
 
-########################## 构建 ##########################
+########################## build ##########################
 scene.build()
 
 target_quat = np.array([0, 1, 0, 0])
@@ -73,40 +73,39 @@ for i in range(0, 2000):
         links    = [left_finger, right_finger],
         poss     = [target_pos_left, target_pos_right],
         quats    = [target_quat, target_quat],
-        rot_mask = [False, False, True], # 仅限制z轴方向
+        rot_mask = [False, False, True], # 只限制 Z 轴方向
     )
 
-    # 仅用于可视化，无需物理仿真
+    # 注意，这个 IK 仅用于可视化目的，因此这里我们不调用 scene.step()，只更新状态和可视化器
+    # 在实际控制应用中，你应该使用 robot.control_dofs_position() 和 scene.step()
     robot.set_dofs_position(q)
     scene.visualizer.update()
 ```
 
-效果演示:
+这是你将要看到的：
 
-![IK Multilink Demo](https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/ik_multilink.mp4)
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/ik_multilink.mp4" type="video/mp4">
+</video>
 
-代码要点:
+以下是我们在本示例中希望你了解的一些新内容：
+- 我们使用 `robot.inverse_kinematics_multilink()` API 来求解考虑多个目标连杆的 IK。使用此 API 时，我们传入目标连杆对象的列表、目标位置的列表和目标方向（四元数）的列表。
+- 我们使用 `rot_mask` 来屏蔽我们不关心的轴方向。在这个示例中，我们希望两个手指都向下指，即它们的 Z 轴应该向下。但是，我们对限制它们在水平平面内的旋转不太感兴趣。你可以灵活地使用这个 `rot_mask` 来实现你想要的目标姿态。同样，你也可以使用 `pos_mask` 来屏蔽沿 x/y/z 轴的位置。
+- 由于这个示例不涉及任何物理，在设置机器人和两个目标连杆的位置后，我们不需要通过 `scene.step()` 调用物理仿真；相反，我们只需调用 `scene.visualizer.update()` 来更新查看器（和相机，如果有）中的变化。
+- **什么是 qpos？** 注意我们对目标连杆使用了 `set_qpos` 来设置状态。`qpos` 表示实体在广义坐标中的配置。对于单臂，其 `qpos` 与其 `dofs_position` 相同，并且它的所有关节（旋转 + 平移）都只有 1 个自由度。对于一个通过自由关节连接到 `world` 的自由网格，这个关节有 6 个自由度（3 个平移 + 3 个旋转），而其广义坐标 `q` 是一个 7 维向量，本质上是其 xyz 平移 + wxyz 四元数，因此其 `qpos` 与其 `dofs_position` 不同。你可以使用 `set_qpos()` 和 `set_dofs_position()` 来设置其状态，但由于这里我们知道期望的四元数，使用 `qpos` 计算更方便。简而言之，这种差异来自于我们如何表示旋转，旋转可以表示为 3 维向量（绕 3 个轴的旋转）或 4 维向量（wxyz 四元数）。
 
-- `inverse_kinematics_multilink()` 函数用来求解多目标链接的IK问题
-- `rot_mask` 可以选择要限制的旋转轴。这里只限制Z轴方向，让手指朝下
-- 不涉及物理仿真,只需用 `visualizer.update()` 更新显示
-- `qpos` 和 `dofs_position` 的区别:
-  - 机械臂两者相同
-  - 自由网格的`qpos`是7维向量(xyz位置 + wxyz四元数)
-  - `dofs_position`是6维向量(xyz位置 + xyz旋转角)
+### 并行仿真的 IK
 
-### 批量处理的IK求解
-
-Genesis可以批量求解IK问题。下面创建16个并行环境，让每个机器人末端执行器用不同速度旋转:
+Genesis 允许你在处于批量环境时求解 IK。让我们生成 16 个并行环境，让每个机器人的末端执行器以不同的角速度旋转：
 
 ```python
 import numpy as np
 import genesis as gs
 
-########################## 初始化 ##########################
+########################## init ##########################
 gs.init()
 
-########################## 创建场景 ##########################
+########################## create a scene ##########################
 scene = gs.Scene(
     viewer_options= gs.options.ViewerOptions(
         camera_pos    = (0.0, -2, 1.5),
@@ -119,7 +118,7 @@ scene = gs.Scene(
     ),
 )
 
-########################## 实体 ##########################
+########################## entities ##########################
 plane = scene.add_entity(
     gs.morphs.Plane(),
 )
@@ -127,11 +126,11 @@ robot = scene.add_entity(
     gs.morphs.MJCF(file='xml/franka_emika_panda/panda.xml'),
 )
 
-########################## 构建 ##########################
+########################## build ##########################
 n_envs = 16
 scene.build(n_envs=n_envs, env_spacing=(1.0, 1.0))
 
-target_quat = np.tile(np.array([0, 1, 0, 0]), [n_envs, 1]) # 末端朝下
+target_quat = np.tile(np.array([0, 1, 0, 0]), [n_envs, 1]) # 指向下
 center = np.tile(np.array([0.4, -0.2, 0.25]), [n_envs, 1])
 angular_speed = np.random.uniform(-10, 10, n_envs)
 r = 0.1
@@ -149,14 +148,14 @@ for i in range(0, 1000):
         link     = ee_link,
         pos      = target_pos,
         quat     = target_quat,
-        rot_mask = [False, False, True], # 仅限制z轴方向
+        rot_mask = [False, False, True], # 演示目的：只限制 Z 轴方向
     )
 
     robot.set_qpos(q)
     scene.step()
 ```
+处理并行环境时，你所要做的就是确保将额外的批处理维度插入到你的目标姿态变量中。
 
-处理并行环境时，只需在目标姿态变量中增加批量维度即可。
-
-![Batched IK Demo](https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/batched_IK.mp4)
-
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/batched_IK.mp4" type="video/mp4">
+</video>

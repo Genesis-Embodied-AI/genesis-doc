@@ -1,22 +1,13 @@
-# 表面 (Surface)
+# 表面材质 (Surface)
 
-`Surface` 对象封装了用于渲染实体或其子组件（如链接、几何体等）的所有视觉属性。
+`Surface` 对象封装了用于渲染实体或其子组件（links、geoms 等）的所有视觉信息。
 
-## 纹理类型
-
-表面包含以下类型的纹理，每个纹理都是 `gs.textures.Texture` 对象：
-
-- diffuse_texture（漫反射纹理）
-- specular_texture（镜面反射纹理）
-- roughness_texture（粗糙度纹理）
-- metallic_texture（金属度纹理）
-- transmission_texture（透射纹理）
-- normal_texture（法线纹理）
-- emissive_texture（发光纹理）
+表面材质包含不同类型的纹理：diffuse_texture、specular_texture、roughness_texture、metallic_texture、transmission_texture、normal_texture 和 emissive_texture。每一种都是 `gs.textures.Texture` 对象。
 
 :::{note}
-注意：大多数高级表面类型仅支持使用 `RayTracer` 渲染后端的相机。使用 `Rasterizer` 时，只会渲染基础颜色。
+大多数高级表面材质类型仅在使用 `RayTracer` 渲染后端时受相机支持。如果使用 `Rasterizer`，则仅会渲染颜色。
 :::
+
 
 ```{toctree}
 :maxdepth: 2
