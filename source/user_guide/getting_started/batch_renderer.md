@@ -1,6 +1,6 @@
 # 🎬 批量渲染器
 
-BatchRenderer 使用 Madrona GPU 批量渲染技术，实现高吞吐量的多环境模拟。
+BatchRenderer 使用 Madrona GPU 批量渲染技术，实现高吞吐量的多环境仿真。
 
 ## 安装
 

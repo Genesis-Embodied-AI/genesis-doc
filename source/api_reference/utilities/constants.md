@@ -12,7 +12,6 @@ gs.backend.cpu      # CPU backend
 gs.backend.gpu      # Auto-select GPU (CUDA on Linux, Metal on MacOS)
 gs.backend.cuda     # NVIDIA CUDA
 gs.backend.metal    # Apple Metal
-gs.backend.vulkan   # Vulkan
 gs.backend.opengl   # OpenGL
 gs.backend.amdgpu   # AMD ROCm (HIP)
 

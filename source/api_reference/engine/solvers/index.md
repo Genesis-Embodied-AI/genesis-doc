@@ -81,7 +81,7 @@ for i in range(1000):
 
 ## GPU 加速
 
-所有 solvers 都通过 Taichi 利用 GPU 加速：
+所有求解器均通过 Quadrants（原 Taichi）实现 GPU 加速：
 
 - Parallel computation across particles/elements (跨粒子/元素的并行计算)
 - Efficient memory management (高效的内存管理)

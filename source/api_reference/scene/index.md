@@ -5,7 +5,6 @@
 ```{toctree}
 scene
 simulator
-coupler
 ```
 
 <!-- weird to put the following here

@@ -1,6 +1,6 @@
 # 📡 Raycaster 模式
 
-Genesis 为 LiDAR 和深度传感器模拟提供了多种射线模式。
+Genesis 为 LiDAR 和深度传感器仿真提供了多种射线模式。
 
 ## 模式类型
 

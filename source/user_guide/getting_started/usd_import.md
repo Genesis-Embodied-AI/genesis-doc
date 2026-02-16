@@ -1,8 +1,8 @@
 # 📦 加载 USD 场景
 
-Genesis 支持从 Universal Scene Description (USD) 文件加载复杂场景，使你能够导入具有正确物理属性和关节配置的铰接机器人、刚体对象和完整环境。USD 是由 Pixar 开发的开源框架，用于在 3D 世界中进行描述、合成、模拟和协作。
+Genesis 支持从 Universal Scene Description (USD) 文件加载复杂场景，使您能够导入具有正确物理属性和关节配置的铰接机器人、刚体对象和完整环境。USD 是由 Pixar 开发的开源框架，用于在 3D 世界中进行描述、合成、仿真和协作。
 
-本教程将指导你在 Genesis 中加载 USD 文件、配置解析选项以及使用基于 USD 的场景。该解析器设计为与从 NVIDIA Isaac Sim 等流行工具导出的资源无缝协作，同时支持标准 USD 物理模式。
+本教程将指导您在 Genesis 中加载 USD 文件、配置解析选项以及使用基于 USD 的场景。该解析器设计为与从 NVIDIA Isaac Sim 等流行工具导出的资源无缝协作，同时支持标准 USD 物理模式。
 
 ## 安装
 
@@ -14,7 +14,7 @@ pip install -e .[usd]
 
 ### 可选：USD 材质烘焙
 
-对于超越 `UsdPreviewSurface` 的高级材质解析，你可以选择性安装 Omniverse Kit 进行 USD 材质烘焙。此功能仅适用于 Python 3.10 和 3.11 以及 GPU 后端。（对于 Python 3.12，场景中大部分材质可能成功烘焙，但有些会保持未烘焙状态。）
+对于超越 `UsdPreviewSurface` 的高级材质解析，您可以选择性安装 Omniverse Kit 进行 USD 材质烘焙。此功能仅适用于 Python 3.10 和 3.11 以及 GPU 后端。（对于 Python 3.12，场景中大部分材质可能成功烘焙，但有些会保持未烘焙状态。）
 
 ```bash
 pip install --extra-index-url https://pypi.nvidia.com/ omniverse-kit
@@ -23,15 +23,15 @@ export OMNI_KIT_ACCEPT_EULA=yes
 
 **注意：** 必须设置 `OMNI_KIT_ACCEPT_EULA` 环境变量以接受 EULA。这是一次性操作。一旦设置，将不会再次提示。如果禁用 USD 烘焙，Genesis 将仅解析 `UsdPreviewSurface` 类型的材质。
 
-如果你遇到 Genesis 警告 "Baking process failed: ..."，以下是一些故障排除提示：
+如果您遇到 Genesis 警告 "Baking process failed: ..."，以下是一些故障排除提示：
 
 - **EULA 接受**：首次启动可能需要接受 Omniverse EULA。在运行时接受或设置 `OMNI_KIT_ACCEPT_EULA=yes` 自动接受。
 
 - **IOMMU 警告**：首次启动时可能会弹出显示 "IOMMU Enabled" 警告的窗口。及时点击 "OK" 以避免超时。
 
-- **初始安装**：首次启动可能会安装额外的依赖项，这可能导致超时。安装完成后再次运行你的程序；后续运行将不需要安装。
+- **初始安装**：首次启动可能会安装额外的依赖项，这可能导致超时。安装完成后再次运行您的程序；后续运行将不需要安装。
 
-- **多个 Python 环境**：如果你有多个 Python 环境（特别是不同 Python 版本），Omniverse Kit 扩展可能会跨环境冲突。删除共享的 Omniverse 扩展文件夹（例如 Linux 上的 `~/.local/share/ov/data/ext`）然后重试。
+- **多个 Python 环境**：如果您有多个 Python 环境（特别是不同 Python 版本），Omniverse Kit 扩展可能会跨环境冲突。删除共享的 Omniverse 扩展文件夹（例如 Linux 上的 `~/.local/share/ov/data/ext`）然后重试。
 
 ## 概述
 
@@ -102,7 +102,7 @@ entities = scene.add_stage(
     ),
 )
 
-# 构建并模拟
+# 构建并仿真
 scene.build()
 ```
 
@@ -152,7 +152,7 @@ gs.morphs.USD(
 
 ### 几何体解析选项
 
-Genesis 可以从 USD 文件解析碰撞和视觉几何体。你可以配置正则表达式模式来识别哪些 prim 应被视为仅碰撞或仅视觉几何体。解析器使用 `re.match()` 检查 prim 的名称是否从字符串开头匹配每个模式。
+Genesis 可以从 USD 文件解析碰撞和视觉几何体。您可以配置正则表达式模式来识别哪些 prim 应被视为仅碰撞或仅视觉几何体。解析器使用 `re.match()` 检查 prim 的名称是否从字符串开头匹配每个模式。
 
 **识别规则：**
 
@@ -251,6 +251,6 @@ gs.morphs.USD(
 
 - 了解如何在 Genesis 中[控制机器人](control_your_robot.md)
 - 探索 USD 加载机器人的[逆运动学](inverse_kinematics_motion_planning.md)
-- 查看[并行模拟](parallel_simulation.md)了解如何使用 USD 资源进行训练
+- 查看[并行仿真](parallel_simulation.md)了解如何使用 USD 资源进行训练
 - 参阅 [API 参考](../../api_reference/options/morph/file_morph/file_morph.md)了解详细的 USD morph 选项
 - 参阅[约定](conventions.md)了解 Genesis 使用的坐标系和数学约定的更多详细信息。

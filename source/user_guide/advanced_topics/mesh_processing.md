@@ -74,7 +74,7 @@ Genesis 自动处理碰撞网格：
 
 ## 四面体化 (Tetrahedralization)
 
-用于 FEM/可变形模拟：
+用于 FEM/可变形仿真：
 
 ```python
 entity = scene.add_entity(

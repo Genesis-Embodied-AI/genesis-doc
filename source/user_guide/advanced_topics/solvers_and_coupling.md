@@ -14,14 +14,14 @@ Genesis 允许您在**同一场景**中组合多个连续介质和刚体求解�
 
 ## 1. 架构概述
 
-内部模拟器拥有**一个 Coupler 实例**，它保存指向每个求解器的指针。在每个子步骤中，模拟器执行：
+内部仿真器拥有**一个 Coupler 实例**，它保存指向每个求解器的指针。在每个子步骤中，仿真器执行：
 
 1. `coupler.preprocess(f)`  &nbsp;&nbsp; – 例如 CPIC 的表面操作。
 2. `solver.substep_pre_coupling(f)`       – 推进每个单独的求解器。
 3. `coupler.couple(f)`       – 在求解器之间交换动量。
 4. `solver.substep_post_coupling(f)`       – 碰撞后的求解器后处理。
 
-因为所有求解器字段都驻留在 Taichi 数据结构中，Coupler 可以调用触及多个求解器内存的 Taichi `@kernel`，**无需数据拷贝**。
+因为所有求解器字段都驻留在 Quadrants 数据结构中，Coupler 可以调用触及多个求解器内存的 Quadrants `@kernel`，**无需数据拷贝**。
 
 ### 1.1 激活耦合对
 

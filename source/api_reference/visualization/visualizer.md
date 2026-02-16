@@ -4,7 +4,7 @@
 
 ## 概述
 
-当你创建 `Scene` 时，Visualizer 会自动创建，并负责：
+当您创建 `Scene` 时，Visualizer 会自动创建，并负责：
 
 - 管理交互式 `Viewer` 窗口
 - 协调多个 `Camera` 实例

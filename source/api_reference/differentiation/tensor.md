@@ -13,7 +13,7 @@ Genesis Tensors：
 
 ## 用法
 
-当你访问状态时，Genesis Tensors 会自动创建：
+当您访问状态时，Genesis Tensors 会自动创建：
 
 ```python
 import genesis as gs

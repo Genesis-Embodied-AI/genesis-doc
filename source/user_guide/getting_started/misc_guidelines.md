@@ -1,10 +1,10 @@
 # 📝 指南
 
-（我会持续更新）
-- 尽可能使用 genesis.tensor。注意，当我们将 genesis tensor 传递给 taichi kernels 时，调用 tensor.assert_contiguous() 检查它是否连续，因为 taichi 只支持连续的外部 tensor。
-- 不要向用户暴露任何与 taichi 相关的用法。
-- 当你添加新类时，也实现 `__repr__()` 以便于交互式调试。（参见 genesis/engine/states.py 作为示例）
-- 将所有与模拟相关的内容包含在 genesis.engine 中。
+（持续更新中）
+- 尽可能使用 genesis.tensor。注意，当我们将 genesis tensor 传递给 Quadrants kernels 时，调用 tensor.assert_contiguous() 检查它是否连续，因为 Quadrants 只支持连续的外部 tensor。
+- 不要向用户暴露任何与 Quadrants 相关的用法。
+- 当您添加新类时，也实现 `__repr__()` 以便于交互式调试。（参见 genesis/engine/states.py 作为示例）
+- 将所有与仿真相关的内容包含在 genesis.engine 中。
 - 使用 `genesis.logger.info()`/`debug()`/`warning()` 而不是 `print()`。
 - 用户会被提醒，不建议过多次查询场景状态而不使用它们。所有访问的场景状态将存储在场景级列表中，并被视为计算图的一部分。调用 `scene.reset_grad()` 时将释放此列表，释放所有占用的 GPU 内存。
 - 层次结构 - 我们抽象了实体创建的每个级别，因此它们是统一的，并且彼此独立：
@@ -104,4 +104,4 @@
     - 对于流体体，支持的模式有 ['particle', 'recon']。默认类型是 `particle`。
         - `particle` 将渲染内部粒子。如果输入纹理是颜色纹理，将使用颜色。如果是图像纹理，粒子将使用 texture 的 mean_color 渲染。
         - `recon` 将使用粒子进行表面重建。
-    '''
+

@@ -66,22 +66,22 @@ horizon = 1000
 for i in range(horizon):
     scene.step()
 ```
-创建 `Liquid` 材料时，我们设置 `sampler='pbs'`。这配置了我们希望如何根据 `Box` morph 对粒子进行采样。`pbs` 代表'基于物理的采样'，它运行一些额外的仿真步骤以确保粒子以物理自然的方式排列。你也可以使用 `'regular'` 采样器简单地使用网格晶格模式对粒子进行采样。如果你使用其他求解器，如 MPM，你也可以使用 `'random'` 采样器。
+创建 `Liquid` 材料时，我们设置 `sampler='pbs'`。这配置了我们希望如何根据 `Box` morph 对粒子进行采样。`pbs` 代表'基于物理的采样'，它运行一些额外的仿真步骤以确保粒子以物理自然的方式排列。您也可以使用 `'regular'` 采样器简单地使用网格晶格模式对粒子进行采样。如果您使用其他求解器，如 MPM，您也可以使用 `'random'` 采样器。
 
-你可能还注意到我们传入了一个额外的属性——`surface`。此属性用于定义实体的所有视觉属性。这里，我们将水的颜色设置为偏蓝色，并通过设置 `vis_mod='particle'` 选择将其可视化为粒子。
+您可能还注意到我们传入了一个额外的属性——`surface`。此属性用于定义实体的所有视觉属性。这里，我们将水的颜色设置为偏蓝色，并通过设置 `vis_mod='particle'` 选择将其可视化为粒子。
 
-一旦你成功运行此示例，你会看到水落下并在平面上扩散，但限制在求解器边界内：
+一旦您成功运行此示例，您会看到水落下并在平面上扩散，但限制在求解器边界内：
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/sph_liquid.mp4" type="video/mp4">
 </video>
 
-你可以通过以下方式获取实时粒子位置：
+您可以通过以下方式获取实时粒子位置：
 ```
 particles = liquid.get_particles_pos()
 ```
 
-**更改液体属性：** 你也可以调整液体的物理属性。例如，你可以增加其粘度（`mu`）和表面张力（`gamma`）：
+**更改液体属性：** 您也可以调整液体的物理属性。例如，您可以增加其粘度（`mu`）和表面张力（`gamma`）：
 ```python
 material=gs.materials.SPH.Liquid(mu=0.02, gamma=0.02),
 ```
@@ -227,7 +227,7 @@ horizon = 1000
 for i in range(horizon):
     scene.step()
 ```
-注意，要更改底层物理材料，你所要做的就是更改 `material` 属性。随意尝试其他材料类型（如 `MPM.Sand()` 和 `MPM.Snow()`），以及每种材料类型中的属性值。
+注意，要更改底层物理材料，您所要做的就是更改 `material` 属性。随意尝试其他材料类型（如 `MPM.Sand()` 和 `MPM.Snow()`），以及每种材料类型中的属性值。
 
 预期的渲染结果：
 
@@ -324,7 +324,7 @@ for i in range(horizon):
 :::{warning}
 **2D 网格的蒙皮**
 
-我们注意到在使用 2D 平面布料网格并设置 `vis_mode='visual'` 时存在一些问题，这是由于计算质心权重时退化的伪逆矩阵计算导致的。如果你在上述示例中添加非零的欧拉角并使用 `vis_mode='visual'`，你可能会注意到奇怪的可视化结果。我们将很快修复这个问题。
+我们注意到在使用 2D 平面布料网格并设置 `vis_mode='visual'` 时存在一些问题，这是由于计算质心权重时退化的伪逆矩阵计算导致的。如果您在上述示例中添加非零的欧拉角并使用 `vis_mode='visual'`，您可能会注意到奇怪的可视化结果。我们将很快修复这个问题。
 :::
 
 ***关于求解器耦合的更多教程即将推出！***

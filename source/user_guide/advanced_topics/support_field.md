@@ -15,7 +15,7 @@ Genesis 中凸体形状的碰撞检测严重依赖*支持函数*。Minkowski Por
    * `support_v ∈ ℝ^{N_dir×3}` – *对象空间*中的实际顶点位置。
    * `support_vid ∈ ℕ^{N_dir}`   – 原始顶点索引（用于热启动 SDF 查询）。
    * `support_cell_start[i_g]`   – 每个几何体扁平数组的前缀和偏移量。
-3. **Taichi Fields** – 数组被复制到 GPU 驻留的 Taichi 字段中，以便内核无需主机往返即可访问它们。
+3. **Quadrants Fields** – 数组被复制到 GPU 驻留的 Quadrants 字段中，以便内核无需主机往返即可访问它们。
 
 ```python
 v_ws, idx = support_field._func_support_world(dir_ws, i_geom, i_batch)

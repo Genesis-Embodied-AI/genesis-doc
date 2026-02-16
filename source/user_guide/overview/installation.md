@@ -76,7 +76,7 @@ Traceback (most recent call last):
 genesis.GenesisException: Genesis hasn't been initialized. Did you call `gs.init()`?
 ```
 
-这个错误虽然是 bug 但是预期的行为。任何引擎相关的子模块必须在初始化 Genesis 之后导入，以便有机会配置低级的 GsTaichi 功能，如快速缓存机制或 Gstaichi 动态数组模式。在实践中，这个限制不应该成为任何人的障碍，因为引擎相关的类不意味着手动实例化。不过，为了类型检查而导入它们可能是方便的。如果是这样，只需使用类型检查保护，例如：
+这个错误虽然是 bug 但是预期的行为。任何引擎相关的子模块必须在初始化 Genesis 之后导入，以便有机会配置低级的 Quadrants 功能，如快速缓存机制或 Quadrants 动态数组模式。在实践中，这个限制不应该成为任何人的障碍，因为引擎相关的类不意味着手动实例化。不过，为了类型检查而导入它们可能是方便的。如果是这样，只需使用类型检查保护，例如：
 
 ```python
 from typing import TYPE_CHECKING
@@ -231,17 +231,17 @@ Genesis 默认尝试 EGL 渲染，因此在大多数环境中您无需手动设�
     export LIBGL_ALWAYS_SOFTWARE=1
     ```
 
-### [Windows 11 通过 WSL2 上的 Ubuntu VM] Taichi 和 Genesis 找不到 cudalib.so 并回退到 CPU
+### [Windows 11 通过 WSL2 上的 Ubuntu VM] Quadrants 和 Genesis 找不到 cudalib.so 并回退到 CPU
 
-安装 Pytorch 和 Genesis 后，Taichi 回退到 CPU，而 torch 在 CUDA 上初始化正常。
+安装 Pytorch 和 Genesis 后，Quadrants 回退到 CPU，而 torch 在 CUDA 上初始化正常。
 
 症状：
 
 - 运行 `python -c "import torch; print(torch.zeros((3,), device='cuda'))"` 输出 `tensor([0., 0., 0.], device='cuda:0')`
-- 但运行 `python -c "import gstaichi as ti; ti.init(arch=ti.gpu)"` 输出类似
+- 但运行 `python -c "import quadrants as qd; qd.init(arch=qd.gpu)"` 输出类似
     ```
     [W 06/18/25 12:47:56.784 14507] [cuda_driver.cpp:load_lib@36] libcuda.so lib not found.
-    [Taichi] Starting on arch=vulkan
+    [Quadrants] Starting on arch=vulkan
     ```
 
 修复方法：

@@ -1,17 +1,17 @@
-# 🏔️ 地形模拟与生成
+# 🏔️ 地形仿真与生成
 
 Genesis 通过 `gs.morphs.Terrain` morph 为 **高度场地形** 提供一流的支持。地形是一个静态刚体对象，内部由高度图（用于快速碰撞查询）和水密三角网格（用于可视化和 SDF 生成）表示。
 
 本页介绍了创建地形的三种最常见方式：
 
-1. 传入你自己的 NumPy 高度图。
+1. 传入您自己的 NumPy 高度图。
 2. 程序化生成 *子地形* 网格（Isaac Gym 风格）。
 3. 自动将任意三角网格转换为高度图。
 
 ---
 
 ## 1  使用自定义高度图
-如果你已有地形数据（例如来自 DEM 文件），可以直接将其输入 Genesis。你只需要两个数值：水平比例和垂直比例。
+如果您已有地形数据（例如来自 DEM 文件），可以直接将其输入 Genesis。您只需要两个数值：水平比例和垂直比例。
 
 ```python
 import numpy as np
@@ -41,13 +41,13 @@ scene.add_entity(
 
 scene.build()
 
-# 运行模拟以便你可以检查表面
+# 运行仿真以便您可以检查表面
 for _ in range(1_000):
     scene.step()
 ```
 
 ### 可视化调试技巧
-构建场景后，高度图存储在 `terrain.geoms[0].metadata["height_field"]` 中。你可以在每个采样点上绘制小球来查看实际几何形状：
+构建场景后，高度图存储在 `terrain.geoms[0].metadata["height_field"]` 中。您可以在每个采样点上绘制小球来查看实际几何形状：
 
 ```python
 import torch
@@ -63,7 +63,7 @@ scene.draw_debug_spheres(poss, radius=0.05, color=(0, 0, 1, 0.7))
 ---
 
 ## 2  程序化子地形
-`gs.morphs.Terrain` 还可以通过拼接 *子地形* 网格来**合成**复杂地面——与 Isaac Gym 使用的技术相同。你只需指定：
+`gs.morphs.Terrain` 还可以通过拼接 *子地形* 网格来**合成**复杂地面——与 Isaac Gym 使用的技术相同。您只需指定：
 
 * `n_subterrains=(nx, ny)` – 每个方向的瓦片数量。
 * `subterrain_size=(sx, sy)` – 每个瓦片的尺寸（米）。
@@ -88,7 +88,7 @@ terrain = scene.add_entity(
     ),
 )
 
-scene.build(n_envs=100)  # 你仍然可以运行多个并行环境
+scene.build(n_envs=100)  # 您仍然可以运行多个并行环境
 ```
 
 上面的代码本质上与 Genesis 附带的 `examples/rigid/terrain_subterrain.py` 相同。欢迎打开该示例查看完整的可运行脚本。
@@ -96,13 +96,13 @@ scene.build(n_envs=100)  # 你仍然可以运行多个并行环境
 ---
 
 ## 3  从三角网格生成高度图
-有时你已经有一个详细的 CAD 或摄影测量网格，只是希望碰撞检测运行得更快。辅助函数 `genesis.utils.terrain.mesh_to_heightfield` 使用垂直光线采样网格，并返回一个 NumPy 高度数组以及网格坐标。
+有时您已经有一个详细的 CAD 或摄影测量网格，只是希望碰撞检测运行得更快。辅助函数 `genesis.utils.terrain.mesh_to_heightfield` 使用垂直光线采样网格，并返回一个 NumPy 高度数组以及网格坐标。
 
 ```python
 from genesis.utils.terrain import mesh_to_heightfield
 import os
 
-# 你的 .obj / .glb / .stl 地形文件路径
+# 您的 .obj / .glb / .stl 地形文件路径
 mesh_path = os.path.join(gs.__path__[0], "assets", "meshes", "terrain_45.obj")
 
 horizontal_scale = 2.0  # 期望的网格间距（米）
@@ -140,8 +140,8 @@ scene.build()
 ---
 
 ### 保存与重复使用地形
-创建地形时，Genesis 会生成高度图、用于碰撞检测的水密网格以及用于可视化的简化网格。你可以通过在首次创建地形时传入 `name="my_terrain"` 来启用高度图的缓存，之后将从缓存加载而无需重新生成。这对于精确重建随机化地形非常有用。
+创建地形时，Genesis 会生成高度图、用于碰撞检测的水密网格以及用于可视化的简化网格。您可以通过在首次创建地形时传入 `name="my_terrain"` 来启用高度图的缓存，之后将从缓存加载而无需重新生成。这对于精确重建随机化地形非常有用。
 
 ---
 
-祝你攀登愉快！🧗‍♂️🏔️
+祝您攀登愉快！🧗‍♂️🏔️

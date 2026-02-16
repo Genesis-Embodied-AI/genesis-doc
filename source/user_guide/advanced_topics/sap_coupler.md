@@ -67,7 +67,7 @@ sphere = scene.add_entity(
 )
 ```
 
-## FEM 模拟
+## FEM 仿真
 
 ```python
 sphere = scene.add_entity(
@@ -86,8 +86,8 @@ sphere = scene.add_entity(
 
 **使用 LegacyCoupler：**
 - 多粒子求解器（MPM、SPH、PBD）
-- 可微模拟（SAP 不支持梯度）
-- 纯刚体模拟
+- 可微仿真（SAP 不支持梯度）
+- 纯刚体仿真
 
 ## 性能
 
@@ -100,4 +100,4 @@ sphere = scene.add_entity(
 - 仅支持刚体 + FEM 求解器
 - 需要 64 位精度 (`precision="64"`)
 - FEM 必须使用隐式求解器
-- 可微模拟不支持梯度
+- 可微仿真不支持梯度

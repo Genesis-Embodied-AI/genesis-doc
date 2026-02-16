@@ -5,7 +5,7 @@ Genesis 提供用于在不同数组和张量格式之间转换的工具。
 ## 概述
 
 Genesis 使用：
-- **Taichi fields**: 用于 GPU 加速物理计算
+- **Quadrants fields**: 用于 GPU 加速物理计算
 - **PyTorch tensors**: 用于状态访问和可微性
 - **NumPy arrays**: 用于数据导出和可视化
 
