@@ -175,6 +175,17 @@ The full example script is available at `examples/sensors/contact_force_go2.py` 
 ```{figure} ../../_static/images/contact_force_sensor.png
 ```
 
+## KinematicContactProbe Sensor
+The `KinematicContactProbe` is a tactile sensor which queries contact depth along "probe" points associated with a rigid entity link. Instead of forces retrieved from the physics solver like the contact sensors above, this sensor estimates force purely on the contact penetration depth: `F = stiffness * penetration * probe_normal`.
+
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/kin_probe_data.mp4" type="video/mp4">
+</video>
+
+An example script with teleop control is available at `examples/sensors/kinematic_contact_probe.py` to play around with.
+
+A grid of tactile probes could easily be placed on a robot hand or end effector to imitate taxels (tactile pixels) of a tactile sensor.
+
 ## Raycaster Sensors: Lidar and Depth Camera
 
 The `Raycaster` sensor measures distance by casting rays into the scene and detecting intersections with geometry.
