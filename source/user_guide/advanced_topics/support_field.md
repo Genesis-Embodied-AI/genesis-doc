@@ -1,4 +1,4 @@
-# 🚀 Support Field 
+# 🚀 Support Field
 
 Collision detection for convex shapes in Genesis relies heavily on *support functions*.  Every iteration of the Minkowski Portal Refinement (MPR) algorithm asks questions of the form:
 
@@ -15,7 +15,7 @@ A naïve implementation has to iterate over all vertices every time – wasteful
    * `support_v ∈ ℝ^{N_dir×3}` – the actual vertex positions in *object space*.
    * `support_vid ∈ ℕ^{N_dir}`   – original vertex indices (useful to warm-start SDF queries).
    * `support_cell_start[i_g]`   – prefix-sum offset into the flattened arrays per geometry.
-3. **Taichi Fields** – The arrays are copied into GPU-resident Taichi fields so that kernels can access them without host round-trips.
+3. **Quadrants Fields** – The arrays are copied into GPU-resident Quadrants fields so that kernels can access them without host round-trips.
 
 ```python
 v_ws, idx = support_field._func_support_world(dir_ws, i_geom, i_batch)
@@ -69,4 +69,4 @@ v_ws, idx = s_field._func_support_world(dir_ws, i_geom, i_env)
 
 The Support Field is an **acceleration structure** exclusively used by the *convex–convex* narrow phase.  Other collision paths – SDF, terrain, plane–box – bypass it because they either rely on analytical support functions or distance fields.
 
-For details on how MPR integrates this structure see {doc}`Collision, Contacts & Forces <collision_contacts_forces>`. 
+For details on how MPR integrates this structure see {doc}`Collision, Contacts & Forces <collision_contacts_forces>`.

@@ -1,8 +1,8 @@
 # 📝 Guidelines
 
 (I will keep updating this)
-- Use genesis.tensor whenever possible. Note that when we pass genesis tensor to taichi kernels, call tensor.assert_contiguous() to check whether it's contiguous, since taichi only support contiguous external tensor.
-- Don't expose any taichi-related usage to user.
+- Use genesis.tensor whenever possible. Note that when we pass genesis tensor to Quadrants kernels, call tensor.assert_contiguous() to check whether it's contiguous, since Quadrants only support contiguous external tensor.
+- Don't expose any quadrants-related usage to user.
 - When you add new class, also implement `__repr__()` for easier interactive debugging. (See genesis/engine/states.py as an example)
 - Contain all simulation-related stuff in genesis.engine.
 - Use `genesis.logger.info()`/`debug()`/`warning()` instead of `print()`.

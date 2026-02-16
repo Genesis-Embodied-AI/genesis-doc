@@ -28,19 +28,19 @@ Behind the scenes, the `Scene` is powered by a `Simulator`, which includes:
 
 We have been recieving a lot of questions about how to partially manipulate a rigid entity like only controling or retrieving certain attributes. Thus, we figure it would be nice to write a more in-depth explaination on index access to data.
 
-**Structured Data Field**. For most of the case, we are using [struct Taichi field](https://docs.taichi-lang.org/docs/type#struct-types-and-dataclass). Take MPM for an example for better illustration ([here](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/solvers/mpm_solver.py#L103C1-L107C10) and [here](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/solvers/mpm_solver.py#L123)),
+**Structured Data Field**. For most of the case, we are using [struct Quadrants field](https://docs.taichi-lang.org/docs/type#struct-types-and-dataclass). Take MPM for an example for better illustration ([here](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/solvers/mpm_solver.py#L103C1-L107C10) and [here](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/solvers/mpm_solver.py#L123)),
 ```
-struct_particle_state_render = ti.types.struct(
-    pos=gs.ti_vec3,
-    vel=gs.ti_vec3,
-    active=gs.ti_int,
+struct_particle_state_render = qd.types.struct(
+    pos=gs.qd_vec3,
+    vel=gs.qd_vec3,
+    active=gs.qd_int,
 )
 ...
 self.particles_render = struct_particle_state_render.field(
-    shape=self._n_particles, needs_grad=False, layout=ti.Layout.SOA
+    shape=self._n_particles, needs_grad=False, layout=qd.Layout.SOA
 )
 ```
-This means we are create a huge "array" (called field in Taichi) with each entry being a structured data type that includes `pos`, `vel`, and `active`. Note that this data field is of length `n_particles`, which include __ALL__ particles in a scene. Then, suppose there are multiple entities in the scene, how do we differentiate across entities? A straightforward idea is to "tag" each entry of the data field with the corresponding entity ID. However, it may not be the best practice from the memory layout, computation, and I/O perspective. Alternatively, we use index offsets to distinguish entities.
+This means we are create a huge "array" (called field in Quadrants) with each entry being a structured data type that includes `pos`, `vel`, and `active`. Note that this data field is of length `n_particles`, which include __ALL__ particles in a scene. Then, suppose there are multiple entities in the scene, how do we differentiate across entities? A straightforward idea is to "tag" each entry of the data field with the corresponding entity ID. However, it may not be the best practice from the memory layout, computation, and I/O perspective. Alternatively, we use index offsets to distinguish entities.
 
 **Local and Global Indexing**. The index offset provides simultaneously the simple, intuitive user interface (local indexing) and the optimized low-level implementation (global indexing). Local indexing allows interfacing __WITHIN__ an entity, e.g., the 1st joint or 30th particles of a specific entity. The global indexing is the pointer directly to the data field inside the solver which consider all entities in the scene. A visual illustration looks like this
 
@@ -55,7 +55,7 @@ We provide some concrete examples in the following for better understanding,
 
 ## Direct Access to Data Field
 
-Normally, we do not encourage users to directly access the (Taichi) data field.
+Normally, we do not encourage users to directly access the (Quadrants) data field.
 Instead, users should mostly use the APIs in each entity, such as `RigidEntity.get_dofs_position`.
 However, if one would like to access to data field not supported via APIs and could not wait for the new API support, one could try a direct access of data field, which may be a quick and dirty (yet most likely inefficient) solution. Specifically, following the data indexing mechanism described in the previous section, suppose one would like to do
 ```
@@ -71,6 +71,6 @@ tgt = all_dofs_pos[:, entity.dof_start:entity.dof_end]  # the first dimension is
 
 All entities are associated with a specific solver (except for hybrid entity).
 Each desired physical attribute is stored somewhere in the solver (e.g., dofs position here is stored as `dofs_state.pos` in the rigid solver).
-For more details of these mapping, you could check {doc}`Naming and Variables <naming_and_variables>`. 
+For more details of these mapping, you could check {doc}`Naming and Variables <naming_and_variables>`.
 Also, all the data field in the solver follows a global indexing (for all entities) where you need `entity.*_start` and `entity.*_end` to only extract the data relevant with a specific entity.
 

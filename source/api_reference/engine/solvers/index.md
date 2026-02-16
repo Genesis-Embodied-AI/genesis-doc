@@ -81,7 +81,7 @@ for i in range(1000):
 
 ## GPU Acceleration
 
-All solvers leverage GPU acceleration through Taichi:
+All solvers leverage GPU acceleration through Quadrants (formerly Taichi):
 
 - Parallel computation across particles/elements
 - Efficient memory management
