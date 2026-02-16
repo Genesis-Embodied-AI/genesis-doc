@@ -11,7 +11,7 @@ scene = gs.Scene()
 robot = scene.add_entity(gs.morphs.MJCF(file="franka.xml"))
 scene.build()
 
-# 模拟
+# 仿真
 for _ in range(100):
     scene.step()
 
@@ -120,4 +120,4 @@ with open("state.pkl", "wb") as f:
 - 检查点需要兼容的场景配置（相同的实体、求解器选项）
 - 32 位精度在保存/加载之间可能损失 ~2e-6 的精度
 - 使用 `envs_idx` 参数进行高效的部分重置
-- `scene.t` 存储模拟步数
+- `scene.t` 存储仿真步数

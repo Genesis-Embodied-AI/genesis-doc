@@ -6,7 +6,7 @@ Genesis 支持各种光源来照亮渲染场景。灯光配置会影响交互式
 
 Genesis 中的灯光通过可视化选项进行配置，可以包括：
 
-- **方向光（Directional lights）**：平行光线，模拟远处光源（如太阳）
+- **方向光（Directional lights）**：平行光线，仿真远处光源（如太阳）
 - **点光源（Point lights）**：特定位置的全向光源
 - **环境光（Ambient lighting）**：全局照明水平
 

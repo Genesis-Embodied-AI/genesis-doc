@@ -1,6 +1,6 @@
 # 💧 粒子发射器
 
-发射器用于生成流体和材料模拟的粒子（SPH、MPM、PBD）。
+发射器用于生成流体和材料仿真的粒子（SPH、MPM、PBD）。
 
 ## 创建发射器
 
@@ -108,4 +108,4 @@ for step in range(500):
 
 - 发射器必须在 `scene.build()` 之前添加
 - 当达到 `max_particles` 时粒子会循环使用
-- 与可微模拟不兼容（`requires_grad=True`）
+- 与可微仿真不兼容（`requires_grad=True`）

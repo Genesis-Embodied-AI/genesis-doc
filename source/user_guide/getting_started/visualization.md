@@ -1,10 +1,10 @@
 # 📸 可视化与渲染
 
-Genesis 的可视化系统由你刚刚创建的场景的 `visualizer` 管理（即 `scene.visualizer`）。有两种可视化场景的方式：1）使用在单独线程中运行的交互式查看器，2）通过手动向场景添加相机并使用相机渲染图像。
+Genesis 的可视化系统由您刚刚创建的场景的 `visualizer` 管理（即 `scene.visualizer`）。有两种可视化场景的方式：1）使用在单独线程中运行的交互式查看器，2）通过手动向场景添加相机并使用相机渲染图像。
 
 
 ## 查看器
-如果你连接到显示器，可以使用交互式查看器来可视化场景。Genesis 使用不同的 `options` 组来配置场景中的不同组件。要配置查看器，你可以在创建场景时更改 `viewer_options` 中的参数。此外，我们使用 `vis_options` 来指定与可视化相关的属性，这些属性将由查看器和相机（我们很快会添加）共享。
+如果您连接到显示器，可以使用交互式查看器来可视化场景。Genesis 使用不同的 `options` 组来配置场景中的不同组件。要配置查看器，您可以在创建场景时更改 `viewer_options` 中的参数。此外，我们使用 `vis_options` 来指定与可视化相关的属性，这些属性将由查看器和相机（我们很快会添加）共享。
 
 使用更详细的查看器和可视化设置创建场景（这看起来有点复杂，但仅用于说明目的）：
 ```python
@@ -31,7 +31,7 @@ scene = gs.Scene(
 在这里，我们可以指定查看器相机的姿态和视场角（fov）。如果 `max_FPS` 设置为 `None`，查看器将尽可能快地运行。如果 `res` 设置为 None，Genesis 将自动创建一个 4:3 窗口，高度设置为显示器高度的一半。还要注意，在上述设置中，我们设置为使用光栅化后端进行相机渲染。Genesis 提供两种渲染后端：`gs.renderers.Rasterizer()` 和 `gs.renderers.RayTracer()`。查看器始终使用光栅化器。默认情况下，相机也使用光栅化器。
 
 
-场景创建后，你可以通过 `scene.visualizer.viewer` 或简单地使用 `scene.viewer` 作为快捷方式来访问查看器对象。你可以查询或设置查看器相机姿态：
+场景创建后，您可以通过 `scene.visualizer.viewer` 或简单地使用 `scene.viewer` 作为快捷方式来访问查看器对象。您可以查询或设置查看器相机姿态：
 ```python
 cam_pose = scene.viewer.camera_pose
 
@@ -39,7 +39,7 @@ scene.viewer.set_camera_pose(cam_pose)
 ```
 
 ## 相机与无头渲染
-现在让我们手动向场景添加一个相机对象。相机不连接到查看器或显示器，仅在你需要时返回渲染的图像。因此，相机可以在无头模式下工作。
+现在让我们手动向场景添加一个相机对象。相机不连接到查看器或显示器，仅在您需要时返回渲染的图像。因此，相机可以在无头模式下工作。
 
 ```python
 cam = scene.add_camera(
@@ -52,7 +52,7 @@ cam = scene.add_camera(
 ```
 如果 `GUI=True`，每个相机将创建一个 opencv 窗口来动态显示渲染的图像。注意这与查看器 GUI 不同。
 
-然后，一旦我们构建场景，就可以使用相机渲染图像。我们的相机支持渲染 RGB 图像、深度、分割掩码和表面法线。默认情况下，仅渲染 RGB，你可以在调用 `camera.render()` 时通过设置参数来开启其他模式：
+然后，一旦我们构建场景，就可以使用相机渲染图像。我们的相机支持渲染 RGB 图像、深度、分割掩码和表面法线。默认情况下，仅渲染 RGB，您可以在调用 `camera.render()` 时通过设置参数来开启其他模式：
 
 ```python
 scene.build()
@@ -61,7 +61,7 @@ scene.build()
 rgb, depth, segmentation, normal = cam.render(depth=True, segmentation=True, normal=True)
 ```
 
-如果你使用了 `GUI=True` 并且连接了显示器，你应该能看到 4 个窗口。（有时 opencv 窗口会有额外的延迟，所以如果窗口是黑色的，你可以调用额外的 `cv2.waitKey(1)`，或者简单地再次调用 `render()` 来刷新窗口。）
+如果您使用了 `GUI=True` 并且连接了显示器，您应该能看到 4 个窗口。（有时 opencv 窗口会有额外的延迟，所以如果窗口是黑色的，您可以调用额外的 `cv2.waitKey(1)`，或者简单地再次调用 `render()` 来刷新窗口。）
 ```{figure} ../../_static/images/multimodal.png
 ```
 
@@ -87,7 +87,7 @@ for i in range(120):
 # 停止录制并保存视频。如果未指定 `filename`，将使用调用者文件名自动生成名称。
 cam.stop_recording(save_to_filename='video.mp4', fps=60)
 ```
-你将把视频保存到 `video.mp4`：
+您将把视频保存到 `video.mp4`：
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/cam_record.mp4" type="video/mp4">
@@ -154,7 +154,7 @@ cam.stop_recording(save_to_filename='video.mp4', fps=60)
 ```
 ## 照片级真实感光线追踪渲染
 
-Genesis 提供光线追踪渲染后端以实现照片级真实感渲染。你可以在创建场景时通过设置 `renderer=gs.renderers.RayTracer()` 轻松切换到使用此后端。此相机允许更多参数调整，如 `spp`、`aperture`、`model` 等。
+Genesis 提供光线追踪渲染后端以实现照片级真实感渲染。您可以在创建场景时通过设置 `renderer=gs.renderers.RayTracer()` 轻松切换到使用此后端。此相机允许更多参数调整，如 `spp`、`aperture`、`model` 等。
 
 ### 设置
 
@@ -179,7 +179,7 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110
 g++ --version
 gcc --version
 ```
-如果你的本地版本不符合要求版本，请安装 CMake。我们使用 `snap` 而不是 `apt`，因为我们需要 CMake 版本 >= 3.26。但是，请记住使用正确的 cmake。你可能有 `/usr/local/bin/cmake`，但 `snap` 安装的包位于 `/snap/bin/cmake`（或 `/usr/bin/snap`）。请通过 `echo $PATH` 仔细检查二进制路径的顺序。
+如果您的本地版本不符合要求版本，请安装 CMake。我们使用 `snap` 而不是 `apt`，因为我们需要 CMake 版本 >= 3.26。但是，请记住使用正确的 cmake。您可能有 `/usr/local/bin/cmake`，但 `snap` 安装的包位于 `/snap/bin/cmake`（或 `/usr/bin/snap`）。请通过 `echo $PATH` 仔细检查二进制路径的顺序。
 ```bash
 sudo snap install cmake --classic
 cmake --version
@@ -191,7 +191,7 @@ sudo apt-get install uuid-dev # UUID
 sudo apt-get install zlib1g-dev # zlib
 ```
 
-如果你没有 sudo，以下命令也可以在你的 conda 环境中安装所需的依赖项：
+如果您没有 sudo，以下命令也可以在您的 conda 环境中安装所需的依赖项：
 ```bash
 conda install -c conda-forge gcc=11.4 gxx=11.4 
 conda install -c conda-forge cmake=3.26.1
@@ -200,27 +200,27 @@ conda install -c conda-forge libuuid # UUID
 conda install -c conda-forge zlib # zlib
 ```
 
-构建 `LuisaRender`。请记住使用正确的 cmake。默认情况下，我们使用 OptiX 降噪器（仅适用于 CUDA 后端）。如果你需要 OIDN 降噪器，请附加 `-D LUISA_COMPUTE_DOWNLOAD_OIDN=ON`。
+构建 `LuisaRender`。请记住使用正确的 cmake。默认情况下，我们使用 OptiX 降噪器（仅适用于 CUDA 后端）。如果您需要 OIDN 降噪器，请附加 `-D LUISA_COMPUTE_DOWNLOAD_OIDN=ON`。
 ```bash
 cd genesis/ext/LuisaRender
 cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON -D LUISA_COMPUTE_ENABLE_GUI=OFF -D LUISA_RENDER_BUILD_TESTS=OFF # 记得检查 python 版本
 cmake --build build -j $(nproc)
 ```
 
-如果你真的难以完成构建，我们在[这里](https://drive.google.com/drive/folders/1Ah580EIylJJ0v2vGOeSBU_b8zPDWESxS?usp=sharing)有一些构建版本，你可以检查你的机器是否恰好有相同的设置。命名遵循 `build_<commit-tag>_cuda<version>_python<version>`。下载与你系统匹配的版本，重命名为 `build/` 并放在 `genesis/ext/LuisaRender` 中。
+如果您真的难以完成构建，我们在[这里](https://drive.google.com/drive/folders/1Ah580EIylJJ0v2vGOeSBU_b8zPDWESxS?usp=sharing)有一些构建版本，您可以检查您的机器是否恰好有相同的设置。命名遵循 `build_<commit-tag>_cuda<version>_python<version>`。下载与您系统匹配的版本，重命名为 `build/` 并放在 `genesis/ext/LuisaRender` 中。
 
-最后，你可以运行示例，
+最后，您可以运行示例，
 ```bash
 cd examples/rendering
 python demo.py
 ```
-你应该能够得到
+您应该能够得到
 ```{figure} ../../_static/images/raytracing_demo.png
 ```
 
 ## 使用 gs-madrona 批量渲染
 
-Genesis 通过 gs-madrona 提供高吞吐量批量渲染后端。你可以通过设置 `renderer=gs.renderers.BatchRenderer(use_rasterizer=True/False)` 轻松切换到 gs-madrona 后端
+Genesis 通过 gs-madrona 提供高吞吐量批量渲染后端。您可以通过设置 `renderer=gs.renderers.BatchRenderer(use_rasterizer=True/False)` 轻松切换到 gs-madrona 后端
 
 ### 前提条件
 请首先按照[官方 README 说明](https://github.com/Genesis-Embodied-AI/Genesis#quick-installation)安装最新版本的 Genesis。
@@ -258,7 +258,7 @@ renderer = gs.options.renderers.BatchRenderer(
 
 ### 常见问题
 - 运行 `cmake -S . -B build` 时仍检测不到已安装的库，
-    你可以通过显式设置 `XXX_INCLUDE_DIR` 等选项手动指示 CMake 检测依赖项，例如 `ZLIB_INCLUDE_DIR=/path/to/include`。对于 conda 环境，`XXX_INCLUDE_DIR` 通常遵循 `/home/user/anaconda3/envs/genesis/include` 格式。
+    您可以通过显式设置 `XXX_INCLUDE_DIR` 等选项手动指示 CMake 检测依赖项，例如 `ZLIB_INCLUDE_DIR=/path/to/include`。对于 conda 环境，`XXX_INCLUDE_DIR` 通常遵循 `/home/user/anaconda3/envs/genesis/include` 格式。
 - 执行 `cmake -S . -B build` 时出现 Pybind 错误，
     ```bash
     CMake Error at src/apps/CMakeLists.txt:12 (find_package):
@@ -272,19 +272,19 @@ renderer = gs.options.renderers.BatchRenderer(
         pybind11Config.cmake
         pybind11-config.cmake
     ```
-    你可能忘记执行 `pip install -e ".[render]"`。或者，你可以简单地执行 `pip install "pybind11[global]"`。
+    您可能忘记执行 `pip install -e ".[render]"`。或者，您可以简单地执行 `pip install "pybind11[global]"`。
 - 运行 `cmake -S . -B build` 时出现 CUDA 运行时编译错误，
     ```bash
     /usr/bin/ld: CMakeFiles/luisa-cuda-nvrtc-standalone-compiler.dir/cuda_nvrtc_compiler.cpp.o: in function `main':
     cuda_nvrtc_compiler.cpp:(.text.startup+0x173): undefined reference to `nvrtcGetOptiXIRSize'
     /usr/bin/ld: cuda_nvrtc_compiler.cpp:(.text.startup+0x197): undefined reference to `nvrtcGetOptiXIR'
     ```
-    你需要安装"系统级"的 cuda-toolkit（[官方安装指南](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)）。首先检查 cuda-toolkit，
+    您需要安装"系统级"的 cuda-toolkit（[官方安装指南](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)）。首先检查 cuda-toolkit，
     ```bash
-    nvcc --version # 这应该与你的 nvidia-smi 中的 cuda 版本一致
-    which nvcc # 只是检查你正在使用预期的 cuda-toolkit
+    nvcc --version # 这应该与您的 nvidia-smi 中的 cuda 版本一致
+    which nvcc # 只是检查您正在使用预期的 cuda-toolkit
     ```
-    如果你无法从 `nvcc` 获得正确的输出，请按照官方 cuda-toolkit 安装指南进行操作。作为示例，以下是安装 cuda-12.4 的 cuda-toolkit 的方法。按照[此处](https://developer.nvidia.com/cuda-12-4-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local)的说明下载安装程序。
+    如果您无法从 `nvcc` 获得正确的输出，请按照官方 cuda-toolkit 安装指南进行操作。作为示例，以下是安装 cuda-12.4 的 cuda-toolkit 的方法。按照[此处](https://developer.nvidia.com/cuda-12-4-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local)的说明下载安装程序。
     ```bash
     wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
     sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
@@ -309,16 +309,16 @@ renderer = gs.options.renderers.BatchRenderer(
     <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_audit_preinit@GLIBC_PRIVATE'
     <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_find_dso_for_object@GLIBC_PRIVATE'
     ```
-    这可能是由于你的 conda 环境中的 cuda-toolkit 导致的。请执行以下操作并安装系统级 CUDA，
+    这可能是由于您的 conda 环境中的 cuda-toolkit 导致的。请执行以下操作并安装系统级 CUDA，
     ```bash
     which nvcc
     conda uninstall cuda-toolkit
     ```
-    或者，你可以将你的 conda 库路径添加到运行时库路径，
+    或者，您可以将您的 conda 库路径添加到运行时库路径，
     ```bash
-    ls $CONDA_PREFIX/lib/libcudart.so # 你应该有这个
+    ls $CONDA_PREFIX/lib/libcudart.so # 您应该有这个
 
-    # 在你的 ~/.bashrc 中，添加
+    # 在您的 ~/.bashrc 中，添加
     LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}/usr/local/cuda-12.4/lib64
     ```
     最后，记得在完成上述修复后清除构建，
@@ -338,7 +338,7 @@ renderer = gs.options.renderers.BatchRenderer(
     CMake Error: CMAKE_C_COMPILER not set, after EnableLanguage
     CMake Error: CMAKE_CXX_COMPILER not set, after EnableLanguage
     ```
-    你可能没有使用版本 11 的 `gcc` 和 `g++`。请仔细检查（i）版本（ii）二进制文件是否指向预期的路径（iii）二进制路径的顺序，
+    您可能没有使用版本 11 的 `gcc` 和 `g++`。请仔细检查（i）版本（ii）二进制文件是否指向预期的路径（iii）二进制路径的顺序，
     ```bash
     gcc --version
     g++ --version
@@ -350,10 +350,10 @@ renderer = gs.options.renderers.BatchRenderer(
     ```bash
     [Genesis] [11:29:47] [ERROR] Failed to import LuisaRenderer. ImportError: /home/tsunw/miniconda3/envs/genesis-test1/bin/../lib/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by /home/tsunw/workspace/Genesis/genesis/ext/LuisaRender/build/bin/liblc-core.so)
     ```
-    Conda 的 `libstdc++.so.6` 不支持 3.4.30。你需要将系统的移到 conda 中（[参考](https://stackoverflow.com/a/73708979)）。
+    Conda 的 `libstdc++.so.6` 不支持 3.4.30。您需要将系统的移到 conda 中（[参考](https://stackoverflow.com/a/73708979)）。
     ```bash
     cd $CONDA_PREFIX/lib
     mv libstdc++.so.6 libstdc++.so.6.old
     ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 libstdc++.so.6
     ```
-- 断言 'lerror' 失败：无法写入进程：管道损坏：你可能需要使用与编译时相同版本的 CUDA。
+- 断言 'lerror' 失败：无法写入进程：管道损坏：您可能需要使用与编译时相同版本的 CUDA。

@@ -1,6 +1,6 @@
 # Couplers
 
-Couplers 处理 Genesis 中不同 solvers 之间的多物理场交互。它们支持模拟不同材料类型相互作用的场景（例如机器人抓取软体物体）。
+Couplers 处理 Genesis 中不同 solvers 之间的多物理场交互。它们支持仿真不同材料类型相互作用的场景（例如机器人抓取软体物体）。
 
 ## 可用的 Couplers
 

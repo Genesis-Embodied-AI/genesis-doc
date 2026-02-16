@@ -16,11 +16,11 @@ Under the hood, the scene consists of a simulator that encapsulates,
 
 从用户的角度来看，在 Genesis 中构建环境涉及向 `Scene` 添加 `Entity` 对象。每个 `Entity` 由以下部分定义：
 - `Morph`：实体的几何形状，例如基本形状（如立方体、球体）或关节模型（如 URDF、MJCF）。
-- `Material`：实体的物理属性，例如弹性固体、液体或颗粒材料。材料类型决定了所使用的底层求解器——例如，MPM 和 SPH 都可以模拟液体，但各自表现出不同的行为。
+- `Material`：实体的物理属性，例如弹性固体、液体或颗粒材料。材料类型决定了所使用的底层求解器——例如，MPM 和 SPH 都可以仿真液体，但各自表现出不同的行为。
 - `Surface`：视觉和交互相关的表面属性，例如纹理、粗糙度或反射率。
 
 在幕后，`Scene` 由 `Simulator` 提供支持，其中包括：
-- `Solver`：核心物理求解器，负责模拟不同的物理模型，例如刚体动力学、物质点法（MPM）、有限元法（FEM）、基于位置的动力学（PBD）和光滑粒子流体动力学（SPH）。
+- `Solver`：核心物理求解器，负责仿真不同的物理模型，例如刚体动力学、物质点法（MPM）、有限元法（FEM）、基于位置的动力学（PBD）和光滑粒子流体动力学（SPH）。
 - `Coupler`：处理求解器之间交互的模块，确保一致的力耦合和实体间动力学。
 
 
@@ -48,8 +48,8 @@ self.particles_render = struct_particle_state_render.field(
 ```
 
 我们在下面提供了一些具体示例以便更好地理解：
-- 在 MPM 模拟中，假设 `vel=torch.zeros((mpm_entity.n_particles, 3))`（仅考虑 __该__ 实体的所有粒子），[`mpm_entity.set_velocity(vel)`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L296) 自动抽象出全局索引的偏移。在底层，Genesis 实际上在做类似 `mpm_solver.particles[start:end].vel = vel` 的操作，其中 `start` 是偏移量（[`mpm_entity.particle_start`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L453)），`end` 是偏移量加上粒子数量（[`mpm_entity.particle_end`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L457)）。
-- 在刚体模拟中，所有 `*_idx_local` 都表示局部索引，用户通过它们进行交互。它们将通过 `entity.*_start + *_idx_local` 转换为全局索引。假设我们想通过 [`rigid_entity.get_dofs_position(dofs_idx_local=[2])`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/rigid_entity/rigid_entity.py#L2201) 获取第 3 个自由度的位置，这实际上是在访问 `rigid_solver.dofs_state[2+offset].pos`，其中 `offset` 是 [`rigid_entity.dofs_start`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/rigid_entity/rigid_entity.py#L2717)。
+- 在 MPM 仿真中，假设 `vel=torch.zeros((mpm_entity.n_particles, 3))`（仅考虑 __该__ 实体的所有粒子），[`mpm_entity.set_velocity(vel)`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L296) 自动抽象出全局索引的偏移。在底层，Genesis 实际上在做类似 `mpm_solver.particles[start:end].vel = vel` 的操作，其中 `start` 是偏移量（[`mpm_entity.particle_start`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L453)），`end` 是偏移量加上粒子数量（[`mpm_entity.particle_end`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L457)）。
+- 在刚体仿真中，所有 `*_idx_local` 都表示局部索引，用户通过它们进行交互。它们将通过 `entity.*_start + *_idx_local` 转换为全局索引。假设我们想通过 [`rigid_entity.get_dofs_position(dofs_idx_local=[2])`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/rigid_entity/rigid_entity.py#L2201) 获取第 3 个自由度的位置，这实际上是在访问 `rigid_solver.dofs_state[2+offset].pos`，其中 `offset` 是 [`rigid_entity.dofs_start`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/rigid_entity/rigid_entity.py#L2717)。
 
 （关于相关设计模式 [实体组件系统 (ECS)](https://en.wikipedia.org/wiki/Entity_component_system) 的有趣阅读）
 

@@ -25,7 +25,7 @@ scene = gs.Scene(
 
 | 参数 | 默认值 | 描述 |
 |-----------|---------|-------------|
-| `dt` | 0.001 | IPC 模拟的时间步长 |
+| `dt` | 0.001 | IPC 仿真的时间步长 |
 | `contact_d_hat` | 0.001 | 接触屏障距离 |
 | `contact_friction_mu` | 0.5 | 摩擦系数 |
 | `ipc_constraint_strength` | (100, 100) |（平移、旋转）耦合强度 |
@@ -33,7 +33,7 @@ scene = gs.Scene(
 | `IPC_self_contact` | False | 启用刚体-刚体自碰撞 |
 | `enable_ipc_gui` | False | Polyscope 可视化 |
 
-## 布料模拟
+## 布料仿真
 
 ```python
 scene = gs.Scene(
@@ -86,9 +86,9 @@ cube = scene.add_entity(
 ## 何时使用 IPC
 
 **使用 IPC：**
-- 带碰撞的布料/织物模拟
+- 带碰撞的布料/织物仿真
 - FEM 对象与刚体交互
-- 高质量抓取模拟
+- 高质量抓取仿真
 - 稳定的基于约束的接触解析
 
 **使用 LegacyCoupler：**
