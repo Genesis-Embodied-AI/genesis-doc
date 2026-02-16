@@ -42,8 +42,8 @@ To disable default viewer controls and/or hide the help text, set the correspond
 ```python
 scene = gs.Scene(
     viewer_options=gs.options.ViewerOptions(
-        disable_help_text=True,  # hide the instructions text
-        disable_default_keybinds=True,  # disable default viewer key shortcuts
+        enable_help_text=False,         # hide the instructions text
+        enable_default_keybinds=False,  # disable default viewer key shortcuts
     ),
 )
 ```
