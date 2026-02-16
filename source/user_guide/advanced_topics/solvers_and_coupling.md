@@ -21,7 +21,7 @@ Internally the simulator owns **one Coupler instance** which keeps pointers to e
 3. `coupler.couple(f)`       – exchange momentum between solvers.
 4. `solver.substep_post_coupling(f)`       – solver postprocessing after collision.
 
-Because all solver fields live on Taichi data-structures the Coupler can call Taichi `@kernel`s that touch the memory of several solvers **without data copies**.
+Because all solver fields live on Quadrants data-structures the Coupler can call Quadrants `@kernel`s that touch the memory of several solvers **without data copies**.
 
 ### 1.1 Activating a coupling pair
 

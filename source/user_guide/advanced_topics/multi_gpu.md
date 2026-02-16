@@ -35,7 +35,7 @@ import multiprocessing
 
 def run_simulation(gpu_id):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
-    os.environ["TI_VISIBLE_DEVICE"] = str(gpu_id)
+    os.environ["QD_VISIBLE_DEVICE"] = str(gpu_id)
     os.environ["EGL_DEVICE_ID"] = str(gpu_id)
 
     import genesis as gs
@@ -64,7 +64,7 @@ import genesis as gs
 
 local_rank = int(os.environ.get("LOCAL_RANK", 0))
 os.environ["CUDA_VISIBLE_DEVICES"] = str(local_rank)
-os.environ["TI_VISIBLE_DEVICE"] = str(local_rank)
+os.environ["QD_VISIBLE_DEVICE"] = str(local_rank)
 
 gs.init(backend=gs.gpu, seed=local_rank)
 scene.build(n_envs=2048)
@@ -88,7 +88,7 @@ dist.destroy_process_group()
 | Variable | Purpose |
 |----------|---------|
 | `CUDA_VISIBLE_DEVICES` | PyTorch/CUDA GPU selection |
-| `TI_VISIBLE_DEVICE` | Taichi GPU selection |
+| `QD_VISIBLE_DEVICE` | Quadrants GPU selection |
 | `EGL_DEVICE_ID` | Rendering GPU (OpenGL/EGL) |
 
 Always set all three together for multi-GPU setups.
@@ -105,7 +105,7 @@ Always set all three together for multi-GPU setups.
 ## Best Practices
 
 1. **Batch first**: Use large `n_envs` on single GPU before scaling to multi-GPU
-2. **Set all env vars**: Always set CUDA, Taichi, and EGL device together
+2. **Set all env vars**: Always set CUDA, Quadrants, and EGL device together
 3. **Synchronize DDP**: Call `dist.barrier()` before destroying process groups
 4. **Headless rendering**: Set `pyglet.options["headless"] = True` on servers
 5. **Monitor memory**: Use `nvidia-smi` during batched simulation

@@ -5,7 +5,7 @@ Genesis provides utilities for converting between different array and tensor for
 ## Overview
 
 Genesis uses:
-- **Taichi fields**: For GPU-accelerated physics computation
+- **Quadrants fields**: For GPU-accelerated physics computation
 - **PyTorch tensors**: For state access and differentiability
 - **NumPy arrays**: For data export and visualization
 

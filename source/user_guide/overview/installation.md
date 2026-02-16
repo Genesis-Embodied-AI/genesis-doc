@@ -69,7 +69,7 @@ Traceback (most recent call last):
 genesis.GenesisException: Genesis hasn't been initialized. Did you call `gs.init()`?
 ```
 
-This error is bug but expected. Any engine-related submodules must be imported after initializing Genesis to have the opportunity to configure low-level GsTaichi features such as fast cache mechanism or Gstaichi dynamic array mode. In practice, this limitation should not be a blocker for anybody, because engine-related classes are not meant to be instantiated manually. Still, it may be convenient to import them for type checking. If so, just use typing checking guard, e.g.:
+This error is bug but expected. Any engine-related submodules must be imported after initializing Genesis to have the opportunity to configure low-level Quadrants features such as fast cache mechanism or Quadrants dynamic array mode. In practice, this limitation should not be a blocker for anybody, because engine-related classes are not meant to be instantiated manually. Still, it may be convenient to import them for type checking. If so, just use typing checking guard, e.g.:
 ```python
 from typing import TYPE_CHECKING
 
@@ -223,17 +223,17 @@ Genesis tries EGL rendering by default, so in most environments you don’t need
     export LIBGL_ALWAYS_SOFTWARE=1
     ```
 
-### [Ubuntu VM on Windows 11 via WSL2] Taichi and Genesis do not find cudalib.so and falls back to CPU
+### [Ubuntu VM on Windows 11 via WSL2] Quadrants and Genesis do not find cudalib.so and falls back to CPU
 
-After installing Pytorch and Genesis, Taichi falls back to CPU, while torch initalizes okay on CUDA.
+After installing Pytorch and Genesis, Quadrants falls back to CPU, while torch initalizes okay on CUDA.
 
 Symptoms:
 
 - running `python -c "import torch; print(torch.zeros((3,), device='cuda'))"` outputs `tensor([0., 0., 0.], device='cuda:0')`
-- but running `python -c "import gstaichi as ti; ti.init(arch=ti.gpu)"` outputs something like
+- but running `python -c "import quadrants as qd; qd.init(arch=qd.gpu)"` outputs something like
     ```
     [W 06/18/25 12:47:56.784 14507] [cuda_driver.cpp:load_lib@36] libcuda.so lib not found.
-    [Taichi] Starting on arch=vulkan
+    [Quadrants] Starting on arch=vulkan
     ```
 
 Fix:

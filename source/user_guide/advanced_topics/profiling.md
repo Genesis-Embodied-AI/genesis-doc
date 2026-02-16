@@ -1,6 +1,6 @@
-# Measure performance in Genesis and gstaichi
+# Measure performance in Genesis and Quadrants
 
-## Measuring gstaichi kernel execution time, and checking launch latency
+## Measuring Quadrants kernel execution time, and checking launch latency
 
 Add pytorch profiler to the code, e.g.:
 
@@ -51,13 +51,13 @@ For example, something like:
 ```bash
 # Step the profiler after the physics step
 if self.profiler is not None:
-    ti.sync()  # Ensure all Taichi GPU operations complete before profiling
+    qd.sync()  # Ensure all Quadrants GPU operations complete before profiling
     self.profiler.step()
 ```
 
-## Within gstaichi kernels
+## Within Quadrants kernels
 
-Torch profiler records the time spend in CUDA kernels, not gstaichi kernels. This is already one level deeper than what you could do with a CPU-only profiler (e.g. pyspy) + sync. But if you want to go deeper and profile code blocks inside individual GPU kernels per GPU-thread (block actually), you can use clock_counter for this.
+Torch profiler records the time spend in CUDA kernels, not Quadrants kernels. This is already one level deeper than what you could do with a CPU-only profiler (e.g. pyspy) + sync. But if you want to go deeper and profile code blocks inside individual GPU kernels per GPU-thread (block actually), you can use clock_counter for this.
 
 First, create an enum with the things you will want to measure, e.g.:
 
@@ -73,26 +73,26 @@ class Time(IntEnum):
     StepLast = 6
 ```
 
-Pass in a tensor of ti.64, e.g. timers. Then, inside the kernel, do things like:
+Pass in a tensor of qd.64, e.g. timers. Then, inside the kernel, do things like:
 
 ```bash
-@ti.kernel
-def k1(... previous args, times: ti.types.NDArray[ti.i64, 1]:
-	start = ti.clock_counter()
+@qd.kernel
+def k1(... previous args, times: qd.types.NDArray[qd.i64, 1]:
+	start = qd.clock_counter()
 	linesearch()
-	end = ti.clock_counter()
+	end = qd.clock_counter()
   if i_b == 0:
       times[Time.LineSearch, it] = end - start
   start = end
-  
+
   step2()
-	end = ti.clock_counter()
+	end = qd.clock_counter()
   if i_b == 0:
       times[Time.Step2, it] = end - start
   start = end
-    
+
   update_constraint()
-	end = ti.clock_counter()
+	end = qd.clock_counter()
   if i_b == 0:
       times[Time.UpdateConstraint, it] = end - start
   start = end
