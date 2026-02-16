@@ -35,7 +35,7 @@ import multiprocessing
 
 def run_simulation(gpu_id):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
-    os.environ["TI_VISIBLE_DEVICE"] = str(gpu_id)
+    os.environ["QD_VISIBLE_DEVICE"] = str(gpu_id)
     os.environ["EGL_DEVICE_ID"] = str(gpu_id)
 
     import genesis as gs
@@ -64,7 +64,7 @@ import genesis as gs
 
 local_rank = int(os.environ.get("LOCAL_RANK", 0))
 os.environ["CUDA_VISIBLE_DEVICES"] = str(local_rank)
-os.environ["TI_VISIBLE_DEVICE"] = str(local_rank)
+os.environ["QD_VISIBLE_DEVICE"] = str(local_rank)
 
 gs.init(backend=gs.gpu, seed=local_rank)
 scene.build(n_envs=2048)
@@ -88,7 +88,7 @@ dist.destroy_process_group()
 | 变量 | 目的 |
 |----------|---------|
 | `CUDA_VISIBLE_DEVICES` | PyTorch/CUDA GPU 选择 |
-| `TI_VISIBLE_DEVICE` | Taichi GPU 选择 |
+| `QD_VISIBLE_DEVICE` | QD GPU 选择 |
 | `EGL_DEVICE_ID` | 渲染 GPU (OpenGL/EGL) |
 
 对于多 GPU 设置，始终同时设置所有三个。
@@ -105,7 +105,7 @@ dist.destroy_process_group()
 ## 最佳实践
 
 1. **优先批处理**：在扩展到多 GPU 之前，先在单个 GPU 上使用大的 `n_envs`
-2. **设置所有环境变量**：始终同时设置 CUDA、Taichi 和 EGL 设备
+2. **设置所有环境变量**：始终同时设置 CUDA、Quadrants 和 EGL 设备
 3. **同步 DDP**：在销毁进程组之前调用 `dist.barrier()`
 4. **无头渲染**：在服务器上设置 `pyglet.options["headless"] = True`
 5. **监控内存**：在批处理仿真期间使用 `nvidia-smi`

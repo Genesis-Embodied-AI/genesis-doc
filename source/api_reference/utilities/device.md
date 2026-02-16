@@ -78,11 +78,11 @@ gs.set_random_seed(42)
 ## 类型提示
 
 ```python
-# Taichi types
-gs.ti_float  # Taichi float type
-gs.ti_int    # Taichi int type
-gs.ti_vec3   # Taichi 3D vector
-gs.ti_mat3   # Taichi 3x3 matrix
+# Quadrants types
+gs.qd_float  # Quadrants float type
+gs.qd_int    # Quadrants int type
+gs.qd_vec3   # Quadrants 3D vector
+gs.qd_mat3   # Quadrants 3x3 matrix
 
 # PyTorch types
 gs.tc_float  # PyTorch float dtype

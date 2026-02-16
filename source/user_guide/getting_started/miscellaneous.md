@@ -2,9 +2,9 @@
 
 ## 运行性能基准测试
 
-* 在进行性能分析和/或基准测试时，可能需要临时禁用缓存。最直接的解决方案是完全清除持久性本地缓存文件夹。不推荐这样做，因为它的影响会持续到实验范围之外，减慢所有未来仿真的启动速度，直到缓存最终恢复。您应该将 Genesis（和 Taichi）重定向到某个替代的临时缓存文件夹。这可以通过编辑任何 Python 代码、设置几个环境变量来完成：
+* 在进行性能分析和/或基准测试时，可能需要临时禁用缓存。最直接的解决方案是完全清除持久性本地缓存文件夹。不推荐这样做，因为它的影响会持续到实验范围之外，减慢所有未来仿真的启动速度，直到缓存最终恢复。您应该将 Genesis（和 Quadrants）重定向到某个替代的临时缓存文件夹。这可以通过编辑任何 Python 代码、设置几个环境变量来完成：
 ```bash
-XDG_CACHE_HOME="$(mktemp -d)" GS_CACHE_FILE_PATH="$XDG_CACHE_HOME/genesis" TI_OFFLINE_CACHE_FILE_PATH="$XDG_CACHE_HOME/taichi" python [...]
+XDG_CACHE_HOME="$(mktemp -d)" GS_CACHE_FILE_PATH="$XDG_CACHE_HOME/genesis" QD_OFFLINE_CACHE_FILE_PATH="$XDG_CACHE_HOME/quadrants" python [...]
 ```
 注意，在 Linux 上指定 `XDG_CACHE_HOME` 就足够了，但在 Windows 和 Mac OS 上则不够。
 

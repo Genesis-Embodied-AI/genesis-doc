@@ -51,13 +51,13 @@
 ```bash
 # 在物理步骤后步进分析器
 if self.profiler is not None:
-    ti.sync()  # 确保所有 Taichi GPU 操作在分析前完成
+    qd.sync()  # 确保所有 Quadrants GPU 操作在分析前完成
     self.profiler.step()
 ```
 
 ## 在内核内部
 
-Torch profiler 记录在 CUDA 内核中花费的时间，而不是 Taichi 内核。这已经比仅使用 CPU profiler（例如 pyspy）+ sync 更深入一层。但如果您想更深入，并在每个 GPU 线程（实际上是块）上分析单个 GPU 内核内的代码块，您可以使用 clock_counter。
+Torch profiler 记录在 CUDA 内核中花费的时间，而不是 Quadrants 内核。这已经比仅使用 CPU profiler（例如 pyspy）+ sync 更深入一层。但如果您想更深入，并在每个 GPU 线程（实际上是块）上分析单个 GPU 内核内的代码块，您可以使用 clock_counter。
 
 首先，创建一个枚举，包含您想要测量的内容，例如：
 
@@ -73,26 +73,26 @@ class Time(IntEnum):
     StepLast = 6
 ```
 
-传入一个 ti.64 的张量，例如 timers。然后，在内核内部，执行如下操作：
+传入一个 qd.64 的张量，例如 timers。然后，在内核内部，执行如下操作：
 
 ```bash
-@ti.kernel
-def k1(... previous args, times: ti.types.NDArray[ti.i64, 1]:
-	start = ti.clock_counter()
+@qd.kernel
+def k1(... previous args, times: qd.types.NDArray[qd.i64, 1]:
+	start = qd.clock_counter()
 	linesearch()
-	end = ti.clock_counter()
+	end = qd.clock_counter()
   if i_b == 0:
       times[Time.LineSearch, it] = end - start
   start = end
   
   step2()
-	end = ti.clock_counter()
+	end = qd.clock_counter()
   if i_b == 0:
       times[Time.Step2, it] = end - start
   start = end
     
   update_constraint()
-	end = ti.clock_counter()
+	end = qd.clock_counter()
   if i_b == 0:
       times[Time.UpdateConstraint, it] = end - start
   start = end

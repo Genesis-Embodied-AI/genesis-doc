@@ -21,7 +21,7 @@ Genesis 允许您在**同一场景**中组合多个连续介质和刚体求解�
 3. `coupler.couple(f)`       – 在求解器之间交换动量。
 4. `solver.substep_post_coupling(f)`       – 碰撞后的求解器后处理。
 
-因为所有求解器字段都驻留在 Taichi 数据结构中，Coupler 可以调用触及多个求解器内存的 Taichi `@kernel`，**无需数据拷贝**。
+因为所有求解器字段都驻留在 Quadrants 数据结构中，Coupler 可以调用触及多个求解器内存的 Quadrants `@kernel`，**无需数据拷贝**。
 
 ### 1.1 激活耦合对
 

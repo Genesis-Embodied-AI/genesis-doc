@@ -28,19 +28,19 @@ Under the hood, the scene consists of a simulator that encapsulates,
 
 我们收到了很多关于如何部分操作刚体实体的问题，例如仅控制或检索某些属性。因此，我们认为有必要对数据索引访问进行更深入的解释。
 
-**结构化数据字段**。在大多数情况下，我们使用 [struct Taichi field](https://docs.taichi-lang.org/docs/type#struct-types-and-dataclass)。以 MPM 为例进行更好的说明（[此处](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/solvers/mpm_solver.py#L103C1-L107C10) 和 [此处](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/solvers/mpm_solver.py#L123)）：
+**结构化数据字段**。在大多数情况下，我们使用 [struct Quadrants field](https://docs.Quadrants-lang.org/docs/type#struct-types-and-dataclass)。以 MPM 为例进行更好的说明（[此处](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/solvers/mpm_solver.py#L103C1-L107C10) 和 [此处](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/solvers/mpm_solver.py#L123)）：
 ```
-struct_particle_state_render = ti.types.struct(
-    pos=gs.ti_vec3,
-    vel=gs.ti_vec3,
-    active=gs.ti_int,
+struct_particle_state_render = qd.types.struct(
+    pos=gs.qd_vec3,
+    vel=gs.qd_vec3,
+    active=gs.qd_int,
 )
 ...
 self.particles_render = struct_particle_state_render.field(
-    shape=self._n_particles, needs_grad=False, layout=ti.Layout.SOA
+    shape=self._n_particles, needs_grad=False, layout=qd.Layout.SOA
 )
 ```
-这意味着我们正在创建一个巨大的"数组"（在 Taichi 中称为 field），其中每个条目都是一个结构化数据类型，包含 `pos`、`vel` 和 `active`。注意，这个数据字段的长度是 `n_particles`，包含场景中的 __所有__ 粒子。那么，假设场景中有多个实体，我们如何区分不同的实体呢？一个直接的想法是用相应的实体 ID "标记" 数据字段的每个条目。然而，从内存布局、计算和 I/O 的角度来看，这可能不是最佳实践。相反，我们使用索引偏移来区分实体。
+这意味着我们正在创建一个巨大的"数组"（在 Quadrants 中称为 field），其中每个条目都是一个结构化数据类型，包含 `pos`、`vel` 和 `active`。注意，这个数据字段的长度是 `n_particles`，包含场景中的 __所有__ 粒子。那么，假设场景中有多个实体，我们如何区分不同的实体呢？一个直接的想法是用相应的实体 ID "标记" 数据字段的每个条目。然而，从内存布局、计算和 I/O 的角度来看，这可能不是最佳实践。相反，我们使用索引偏移来区分实体。
 
 **局部索引和全局索引**。索引偏移同时提供了简单直观的用户界面（局部索引）和优化的底层实现（全局索引）。局部索引允许在实体 __内部__ 进行交互，例如特定实体的第 1 个关节或第 30 个粒子。全局索引是直接指向求解器内部数据字段的指针，考虑了场景中的所有实体。视觉示意如下：
 
@@ -55,7 +55,7 @@ self.particles_render = struct_particle_state_render.field(
 
 ## 直接访问数据字段
 
-通常，我们不鼓励用户直接访问（Taichi）数据字段。
+通常，我们不鼓励用户直接访问（Quadrants）数据字段。
 相反，用户应该主要使用每个实体中的 API，例如 `RigidEntity.get_dofs_position`。
 但是，如果有人想访问 API 不支持的数据字段，并且无法等待新的 API 支持，可以尝试直接访问数据字段，这可能是一个快速但（很可能）低效的解决方案。具体来说，按照上一节描述的数据索引机制，假设有人想这样做：
 ```
