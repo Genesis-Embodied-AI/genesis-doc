@@ -1,18 +1,12 @@
-# 场景
-
- ``genesis.Scene`` 对象封装了模拟环境中的所有组件，包括模拟器（包含多个物理求解器）、实体和可视化器（控制查看器和所有摄像机）。
-基本上，所有操作都在场景内进行。
-
-- 场景：描述整个模拟环境的容器。
-- 模拟器：负责物理仿真计算的核心组件。
-- 耦合器：用于连接不同物理系统的组件。
-- 力场：定义作用在实体上的力的区域。
-- 网格：用于表示几何形状的结构。
+# Scene
+``genesis.Scene`` 对象封装了仿真环境中的所有组件，包括 simulator（包含多个物理 solver）、entities 和 visualizer（控制 viewer 和所有 cameras）。
+基本上，所有操作都在 scene 内部完成。
 
 ```{toctree}
 scene
 simulator
-coupler
-force_field
-mesh
 ```
+
+<!-- weird to put the following here
+force_field
+mesh -->

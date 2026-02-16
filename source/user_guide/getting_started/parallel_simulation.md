@@ -3,20 +3,21 @@
 ```{figure} ../../_static/images/parallel_sim.png
 ```
 
-GPU加速仿真的最大优势是能实现场景级别的并行性，让我们可以同时在成千上万个环境中训练机器人。
+使用 GPU 加速仿真的最大优势是能够实现场景级并行，从而可以在数千个环境中同时训练机器人。
 
-Genesis中创建并行仿真很简单:构建场景时只需添加参数`n_envs`来指定想要多少个环境就行了。为了跟随模仿学习文献的命名习惯,我们也用术语`batching`来表示并行操作。
+在 Genesis 中，创建并行仿真就像您想象的那么简单：构建场景时，您只需添加一个额外的参数 `n_envs` 来告诉仿真器您想要多少个环境。就是这样。
 
-下面是示例代码:
+注意，为了模仿学习文献中的命名约定，我们也将使用术语 `batching` 来表示并行化操作。
 
+示例脚本：
 ```python
 import genesis as gs
 import torch
 
-########################## 初始化 ##########################
+########################## init ##########################
 gs.init(backend=gs.gpu)
 
-########################## 创建场景 ##########################
+########################## create a scene ##########################
 scene = gs.Scene(
     show_viewer    = True,
     viewer_options = gs.options.ViewerOptions(
@@ -29,7 +30,7 @@ scene = gs.Scene(
     ),
 )
 
-########################## 实体 ##########################
+########################## entities ##########################
 plane = scene.add_entity(
     gs.morphs.Plane(),
 )
@@ -38,16 +39,16 @@ franka = scene.add_entity(
     gs.morphs.MJCF(file='xml/franka_emika_panda/panda.xml'),
 )
 
-########################## 构建 ##########################
+########################## build ##########################
 
-# 创建20个并行环境
+# 创建 20 个并行环境
 B = 20
 scene.build(n_envs=B, env_spacing=(1.0, 1.0))
 
 # 控制所有机器人
 franka.control_dofs_position(
     torch.tile(
-        torch.tensor([0, 0, 0, -1.0, 0, 0, 0, 0.02, 0.02], device=gs.device), (B, 1)
+        torch.tensor([0, 0, 0, -1.0, 0, 1.0, 0, 0.02, 0.02], device=gs.device), (B, 1)
     ),
 )
 
@@ -55,36 +56,29 @@ for i in range(1000):
     scene.step()
 ```
 
-这个代码和[Hello, Genesis](hello_genesis.md)中的示例基本一样,只是`scene.build()`多了两个参数:
+上述脚本与您在[您好，Genesis](hello_genesis.md)中看到的示例几乎相同，只是 `scene.build()` 现在附加了两个额外的参数：
+- `n_envs`：这指定了您想要创建的批量环境的数量
+- `env_spacing`：生成的并行环境共享相同的状态。为了可视化目的，您可以指定此参数要求可视化器以网格形式分布所有环境，每个环境之间的距离为 (x, y) 米。注意这只影响可视化行为，不会改变每个环境中实体的实际位置。
 
-- `n_envs`: 指定要创建的并行环境数量
-- `env_spacing`: 由于所有并行环境共享同样的状态,这个参数用来指定可视化时把环境放在网格中的间距(x和y方向的距离,单位:米)。这只影响显示效果,不会改变环境中实体的实际位置。
-
-## 控制批量环境中的机器人
-
-之前教程中用过的API比如`franka.control_dofs_position()`仍然可以用来控制批量机器人,只需输入变量增加一个批量维度就行:
-
+### 控制批量环境中的机器人
+回想一下，我们在前面的教程中使用了 `franka.control_dofs_position()` 等 API。现在您可以使用完全相同的 API 来控制批量机器人，只是输入变量需要一个额外的批处理维度：
 ```python
 franka.control_dofs_position(torch.zeros(B, 9, device=gs.device))
 ```
+由于我们在 GPU 上运行仿真，为了减少 CPU 和 GPU 之间的数据传输开销，我们可以使用通过 `gs.device` 选择的 torch 张量而不是 numpy 数组（但 numpy 数组也可以）。当您需要频繁发送具有巨大批量大小的张量时，这可以带来明显的性能提升。
 
-因为我们在GPU上运行仿真,为了减少CPU和GPU间的数据传输,建议用`gs.device`指定的torch张量而不是numpy数组(不过numpy数组也能用)。当经常要传输大批量的张量时,这样能明显提升性能。
-
-上面的调用会控制所有环境中的机器人。如果只想控制部分环境,可以额外传入`envs_idx`,但要确保`position`张量的批量维度和`envs_idx`长度一致:
-
+上述调用将控制批量环境中的所有机器人。如果您只想控制一部分环境，您可以额外传入 `envs_idx`，但要确保 `position` 张量的批处理维度大小与 `envs_idx` 的长度匹配：
 ```python
-# 只控制3个环境:1、5和7
+# 仅控制 3 个环境：1、5 和 7
 franka.control_dofs_position(
     position = torch.zeros(3, 9, device=gs.device),
     envs_idx = torch.tensor([1, 5, 7], device=gs.device),
 )
 ```
+此调用只会向 3 个选定的环境发送零位置命令。
 
-这样只会向这3个选定的环境发送零位置命令。
-
-## 享受超快的仿真速度
-
-Genesis支持同时运行数万个环境,带来惊人的仿真速度。下面关闭可视化,把批量改成30000(如果GPU显存不够就用小一点的数):
+### 享受未来的速度！
+Genesis 支持多达数万个并行环境，并以此来解锁前所未有的仿真速度。现在，让我们关闭查看器，将批量大小更改为 30000（如果您的 GPU 显存相对较小，请考虑使用较小的值）：
 
 ```python
 import torch
@@ -112,7 +106,7 @@ scene.build(n_envs=30000)
 # 控制所有机器人
 franka.control_dofs_position(
     torch.tile(
-        torch.tensor([0, 0, 0, -1.0, 0, 0, 0, 0.02, 0.02], device=gs.device), (30000, 1)
+        torch.tensor([0, 0, 0, -1.0, 0, 1.0, 0, 0.02, 0.02], device=gs.device), (30000, 1)
     ),
 )
 
@@ -120,11 +114,10 @@ for i in range(1000):
     scene.step()
 ```
 
-在RTX 4090和14900K的台式机上运行这个程序能达到每秒**4300万**帧,比实时快430,000倍,真是太快了!
-
+在配备 RTX 4090 和 14900K 的台式机上运行上述脚本，您会获得未来感的仿真速度——超过**4300 万**帧每秒，这比实时快 430,000 倍。尽情享受吧！
 ```{figure} ../../_static/images/parallel_speed.png
 ```
 
 :::{tip}
-**FPS显示:** Genesis默认会在终端显示实时仿真速度。创建场景时设置`show_FPS=False`可以关闭这个功能。
+**FPS 日志记录：** 默认情况下，Genesis 日志记录器会在终端中显示实时仿真速度。您可以在创建场景时通过设置 `scene.profiling_options.show_FPS=False` 来禁用此行为。
 :::

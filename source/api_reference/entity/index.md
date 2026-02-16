@@ -1,7 +1,16 @@
-# 实体
+# Entity
 
-实体（Entity）是Genesis项目中的一个重要概念。它代表了系统中的一个对象或数据结构，具有唯一标识符和相关属性。通过实体，用户可以在Genesis项目中进行数据管理和操作。
+`Entity` 对象是场景中所有需要物理仿真（除了渲染）的事物的抽象。
+这包括刚体或可变形物体、液体等，使用不同的物理 solvers（如 MPM、PBD 等）进行仿真。
 
 ```{toctree}
-rigidentity/index
+rigid_entity/index
+mpm_entity
+fem_entity
+pbd_entity/index
+sph_entity
+drone_entity
+hybrid_entity
+emitter
 ```
+<!-- tool, sf -->

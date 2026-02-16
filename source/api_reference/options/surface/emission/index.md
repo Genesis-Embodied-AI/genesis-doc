@@ -1,6 +1,4 @@
-# 发射
-
-此文档介绍了Genesis项目中的发射选项。发射选项用于控制表面发射的行为和属性。
+# 自发光 (Emission)
 
 ```{toctree}
 :maxdepth: 2

@@ -1,65 +1,107 @@
-# 📝 杂项指南
+# 📝 指南
 
-(本文档会持续更新)
-
-- 尽量用 genesis.tensor。用 taichi 内核时先用 tensor.assert_contiguous() 检查张量是否连续，因为 taichi 只支持连续外部张量。
-- 不要暴露 taichi 相关用法。
-- 新增类时记得实现 `__repr__()` 便于调试 (参考 genesis/engine/states.py)。
-- 所有模拟相关内容都放在 genesis.engine 里。
-- 用 `genesis.logger.info()`/`debug()`/`warning()` 代替 `print()`。
-- 提醒用户不要过度查询场景状态。查询的状态会存入场景级列表作为计算图的一部分。用 `scene.reset_grad()` 时会释放列表,释放 GPU 内存。
-- 层级结构 - 我们把各层实体创建都做了统一和独立的抽象:
-  - 物理求解器：支持 MPM、PBD、SPH、FEM、刚体等。用户可以灵活选择,不用改前端 API。
-  - 材料 -> 决定了后端物理求解器。有 MPMLiquid、SPHLiquid、PBDLiquid、MPMElastic、FEMElastic 等。
-  - 几何 -> 定义实体形状。可以是形状原语、网格或 URDF。这些几何形状和求解器无关。
-  - 所有实体都通过 `scene.add_entity()` 添加。
-- 默认求解顺序(保持代码一致):
-  - 刚体
-  - 角色
-  - mpm
-  - sph
-  - pbd
-  - fem
-  - sf
-- 参数约定:
-  - 四元数: `[w, x, y, z]`
-  - 欧拉角
-    - 用户输入: 外在 x-y-z,单位是 `度`。用了 `scipy.Rotation` 的 `xyz` 顺序。
-    - 内部 xyz: 用内在旋转顺序 x-y-z,和 mujoco 一样。角速度用旋转向量。
-- 用 `id` 表示对象的 `uuid`, `idx` 表示索引
+（持续更新中）
+- 尽可能使用 genesis.tensor。注意，当我们将 genesis tensor 传递给 Quadrants kernels 时，调用 tensor.assert_contiguous() 检查它是否连续，因为 Quadrants 只支持连续的外部 tensor。
+- 不要向用户暴露任何与 Quadrants 相关的用法。
+- 当您添加新类时，也实现 `__repr__()` 以便于交互式调试。（参见 genesis/engine/states.py 作为示例）
+- 将所有与仿真相关的内容包含在 genesis.engine 中。
+- 使用 `genesis.logger.info()`/`debug()`/`warning()` 而不是 `print()`。
+- 用户会被提醒，不建议过多次查询场景状态而不使用它们。所有访问的场景状态将存储在场景级列表中，并被视为计算图的一部分。调用 `scene.reset_grad()` 时将释放此列表，释放所有占用的 GPU 内存。
+- 层次结构 - 我们抽象了实体创建的每个级别，因此它们是统一的，并且彼此独立：
+    - 物理求解器：我们支持多种类型：MPM、PBD、SPH、FEM、刚体等。理念是让用户灵活选择，而无需更改任何前端 API
+    - material -> 这决定了后端物理求解器。我们将有 MPMLiquid、SPHLiquid、PBDLiquid、MPMElastic、FEMElastic 等。
+    - geom -> 这定义实体的几何形状。可以是形状基本体之一，或来自网格，或来自 URDF 等。这些几何体独立于所使用的求解器。
+    - 所有不同的实体都通过相同的 `scene.add_entity()` 添加
+- 默认求解器顺序（为代码一致性）
+    - rigid
+    - mpm
+    - sph
+    - pbd
+    - fem
+    - sf
+- 一些顺序约定
+    - 四元数：`[w, x, y, z]`
+    - 欧拉角
+        - 用户输入：我们使用 extrinsic x-y-z，单位为 `degree`，因为这更直观
+            - 解释：它遵循 `scipy.Rotation` 的 `xyz` 顺序。
+        - 内部 xyz：
+            - 欧拉角在不同来源中的定义不同
+            - 在我们的情况下，我们使用 xyz 指代 intrinsic 旋转顺序 x-y-z，与 mujoco 相同。注意，这与其他一致，例如 dof 力和位置。
+            - 对于角速度，我们使用 rotvec。
+- 我们对每个对象的 `uuid` 使用 `id`，对其索引使用 `idx`
 - `uv` 顺序
-  - assimp、trimesh: 从左下角开始
-  - 我们的、pygltflib、luisa: 从左上角开始
-- 模拟选项和求解器选项
-  - 同时存在的参数,求解器选项优先级更高。没定义时用模拟选项的值初始化。
-  - 建议用模拟选项定义 dt,让所有求解器用相同时间尺度。但可以给不同求解器设不同 dt。
-  - 刚体求解器按步操作,其他按子步操作。非刚体求解器在模拟选项里用 `substeps`。
-- 刚体求解器的设计约定
-  - 用 `*_idx` 表示属性,如 `link_info.parent_idx`
-  - 循环迭代用 `i_*` 表示 id
-  - 内核循环变量:
-    - 后缀: `i_l`链接, `i_p`父链接, `i_r`根链接, `i_g`几何, `i_d`自由度
-    - 前缀: `l_`链接, `l_info`链接信息, `g_`几何, `p_`父级
-  - 索引存储:
-    - 各类存全局偏移索引。查询实体时全局索引更好
-    - 每个对象存:
-      - 父类引用
-      - 全局 `idx`
-      - 子项的偏移
-  - root vs base
-    - 内部用 `root`,文档用 `base`
-  - 控制接口:
-    - 根位置合并到第一个固定关节
-    - 通过命令速度控制
-    - 位置控制用后台 PD 控制器发速度命令
-  - mjcf vs urdf
-    - mjcf 跳过 worldbody
-    - urdf 加载所有内容
-  - 碰撞处理用凸化几何:
-    - 网格资产生成凸包
-    - mjcf 基于 mujoco 几何凸化
-    - urdf 凸化最低级网格
-- 可视化模式支持:
-  - 刚体: visual、collision、sdf,默认 visual
-  - 可变形非流体: visual、particle、recon,默认 visual
-  - 流体: particle、recon,默认 particle
+    - assimp、trimesh：从左下角开始
+    - ours、pygltflib、luisa：从左上角开始
+- sim options 与 solver options
+    - 对于任何同时存在于 sim 和 solver options 中的参数，solver options 中的参数具有更高优先级，未定义时将使用 sim options 中的值初始化
+    - 推荐的方式是通过 sim options 定义 dt，以便所有求解器在相同的时间尺度上运行。但是，用户也可以为不同的求解器设置不同的 dt
+    - RigidSolver 在 step 级别运行，所有其他求解器在 substep 级别运行。为了使它们兼容，所有非刚体求解器使用 sim options 中的 `substeps`。
+- 刚体求解器的一些设计和约定
+    - 对于属性，我们使用 `*_idx`。例如 `link_info.parent_idx`
+    - 对于循环迭代中的 id，我们使用 `i_*`。
+    - 对于 kernel 循环内的所有变量
+        - 后缀缩写：
+            - `i_l`：link id
+            - `i_p`：parent link id
+            - `i_r`：root link id
+            - `i_g`：geom id
+            - `i_d`：dof
+        - 对于前缀，我们使用：
+            - `l_`：link
+            - `l_info`：links_info[i_l, i_b]
+            - `g_`：geom
+            - `p_`：parent
+            - ...
+    - 关于索引存储
+        - 我们在每个类（`link`、`geom` 等）中存储偏移后的索引还是仅存储本地索引？
+            - 让我们做前者，因为当用户查询例如 `entity` 时，如果它显示全局 link idx 会更好
+            - 这适用于 `link`、`geom`、`verts` 等的索引。
+        - 每个对象存储
+            - 其父类。例如 `link` 存储其 `entity`
+            - 偏移后的全局 `idx`
+            - 其子项的偏移值。例如 `geom` 只存储 `vert`、`face` 和 `edge` 的 `idx_offset_*`。
+    - root 与 base
+        - `root` 是一个更自然的名称，因为我们使用树结构表示 links，而 `base` 从用户的角度来看信息量更大
+        - 让我们在内部使用 `root` link，在文档等中使用 `base` link。
+    - root pose 与 q（当前设计可能会更改）
+        - 对于 arm 和单个 mesh，加载时指定的 pos 和 euler 是其 root pose，而 q 将相对于此
+    - 控制接口
+        - root pose 应与第一个（固定）关节的关节 pose 合并，该关节连接世界到第一个 link
+        - 如果我们想控制某物，我们将命令 velocity
+            - 因此，如果是自由关节，没问题。我们将覆盖 velocity
+            - 如果是固定关节，没有 dof，所以我们无法控制它
+        - 如果我们需要位置控制，我们将编写一个 PD 控制器并在底层发送 velocity 命令。
+        - 我们仍然可以更改 root pos（第一个关节 pos），即使它是固定的。但不推荐这样做。
+            - 这适用于固定关节和自由关节。两种情况都不推荐，因为即使是自由关节，设置位置也会违反物理规律。
+            - 那么自由关节和固定关节有什么区别？
+                - 自由 dof 会受外部影响，而固定关节不会
+    - mjcf 与 urdf
+        - mjcf xml 总是有 worldbody，所以我们会跳过它。有时这个 worldbody 有一些关联的 geoms，暂时不支持。
+        - urdf 只有 robot，所以我们会加载所有内容。有时 robot 可以有一个包含的 world link，然后它将被加载到 genesis 的 world 中并成为实体的 root link。
+    - 碰撞处理：我们基于凸体化 geoms 存储
+        - 对于基于 mesh 的资源，我们生成 mesh 中所有组的凸包
+            - 这个组可以是原本存储的子网格，或者如果 group_by_material=True，我们将按材质分组
+            - 每个组将是一个 RigidGeom
+        - 对于 mjcf，我们基于 mujoco 的 geoms 进行凸体化。每个 mj geom 将是一个 RigidGeom
+        - 对于 urdf
+            - 每个 urdf 可以包含多个 links，每个 link 包含多个几何体（collisions 和 visuals），每个几何体将是一个基本体或一个外部资源。由于 `.obj` 包含多个子网格，一个 urdf 几何体可以有多个网格
+            - 我们凸体化这个最低级别的网格并存储为 RigidGeom
+    - 控制接口设计
+        - 我们不会明确有 `base pose` 这样的概念
+            - 在 pybullet 中，可移动 mesh 是其自己的 baselink，当被推动时其 base pose 会改变
+            - 在 genesis 中
+                - 所有内容都将连接到 world（link -1）
+                - 所有内容都将有 root pose。这是初始 pose 且不会改变。这是我们计算 q 时使用的参考。
+                - 自由移动的对象将通过具有 6 DoF 的自由关节连接到 world。当被推动时，此状态会改变，但其 root pose 保持不变。
+    - 前缀 `v`
+        - 用于用于可视化的全局参数（visual geoms、verts、edges、normals 等）
+- `surface.vis_mode`：
+    - 对于刚体，支持的模式有 ['visual', 'collision', 'sdf']。默认类型是 `visual`。
+    - 对于可变形非流体体，支持的模式有 ['visual', 'particle', 'recon']。默认类型是 `visual`。
+        - `visual` 将渲染输入的完整视觉网格，使用内部粒子状态进行蒙皮
+        - `particle` 将渲染内部粒子。如果输入纹理是颜色纹理，将使用颜色。如果是图像纹理，粒子将使用 texture 的 mean_color 渲染。
+        - `recon` 将使用粒子进行表面重建。
+    - 对于流体体，支持的模式有 ['particle', 'recon']。默认类型是 `particle`。
+        - `particle` 将渲染内部粒子。如果输入纹理是颜色纹理，将使用颜色。如果是图像纹理，粒子将使用 texture 的 mean_color 渲染。
+        - `recon` 将使用粒子进行表面重建。
+
