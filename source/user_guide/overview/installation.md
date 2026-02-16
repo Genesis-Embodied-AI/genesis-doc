@@ -238,7 +238,7 @@ Genesis 默认尝试 EGL 渲染，因此在大多数环境中您无需手动设�
 症状：
 
 - 运行 `python -c "import torch; print(torch.zeros((3,), device='cuda'))"` 输出 `tensor([0., 0., 0.], device='cuda:0')`
-- 但运行 `python -c "import gstaichi as ti; ti.init(arch=ti.gpu)"` 输出类似
+- 但运行 `python -c "import genesis as gs; gs.init(backend=gs.gpu)"` 输出类似
     ```
     [W 06/18/25 12:47:56.784 14507] [cuda_driver.cpp:load_lib@36] libcuda.so lib not found.
     [Taichi] Starting on arch=vulkan

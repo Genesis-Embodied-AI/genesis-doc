@@ -1,6 +1,6 @@
-# 在 Genesis 和 gstaichi 中测量性能
+# 在 Genesis 中测量性能
 
-## 测量 gstaichi 内核执行时间，并检查启动延迟
+## 测量内核执行时间，并检查启动延迟
 
 将 pytorch profiler 添加到代码中，例如：
 
@@ -55,9 +55,9 @@ if self.profiler is not None:
     self.profiler.step()
 ```
 
-## 在 gstaichi 内核内部
+## 在内核内部
 
-Torch profiler 记录在 CUDA 内核中花费的时间，而不是 gstaichi 内核。这已经比仅使用 CPU profiler（例如 pyspy）+ sync 更深入一层。但如果您想更深入，并在每个 GPU 线程（实际上是块）上分析单个 GPU 内核内的代码块，您可以使用 clock_counter。
+Torch profiler 记录在 CUDA 内核中花费的时间，而不是 Taichi 内核。这已经比仅使用 CPU profiler（例如 pyspy）+ sync 更深入一层。但如果您想更深入，并在每个 GPU 线程（实际上是块）上分析单个 GPU 内核内的代码块，您可以使用 clock_counter。
 
 首先，创建一个枚举，包含您想要测量的内容，例如：
 
