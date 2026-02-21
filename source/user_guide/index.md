@@ -42,6 +42,7 @@ getting_started/emitters
 getting_started/surfaces_textures
 getting_started/usd_import
 getting_started/domain_randomization
+getting_started/viewer_plugin
 getting_started/miscellaneous
 getting_started/config_system
 ```
