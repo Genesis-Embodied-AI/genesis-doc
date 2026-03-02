@@ -1,16 +1,17 @@
-# 🛠️ Installation
-## Prerequisites
+# 🛠️ インストール
+## 前提条件
 * **Python**: >=3.10,<3.14
-* **OS**: Linux (*recommended*) / MacOS / Windows
+* **OS**: Linux（**推奨**）/ MacOS / Windows
 
 :::{note}
-Genesis is designed to be ***cross-platform***, supporting backend devices including *CPU*, *CUDA GPU* and *non-CUDA GPU*. That said, it is recommended to use **Linux** platform with **CUDA-compatible GPU** to achieve the best performance.
+Genesis は ***クロスプラットフォーム*** 設計で、*CPU*、*CUDA GPU*、*non-CUDA GPU* の各バックエンドに対応しています。
+ただし最良の性能を得るため、**Linux** + **CUDA 対応 GPU** の利用を推奨します。
 :::
 
-Supported features on various systems are as follows:
+各システムでサポートされる機能は次のとおりです。
 <div style="text-align: center;">
 
-| OS  | GPU Device        | GPU Simulation | CPU Simulation | Interactive Viewer | Headless Rendering |
+| OS  | GPU デバイス        | GPU シミュレーション | CPU シミュレーション | インタラクティブビューア | ヘッドレスレンダリング |
 | ------- | ----------------- | -------------- | -------------- | ---------------- | ------------------ |
 | Linux   | Nvidia            | ✅             | ✅             | ✅               | ✅                 |
 |         | AMD               | ✅             | ✅             | ✅               | ✅                 |
@@ -22,40 +23,44 @@ Supported features on various systems are as follows:
 
 </div>
 
-## Installation
-1. Install **PyTorch** following the [official instructions](https://pytorch.org/get-started/locally/).
+## インストール
+1. [公式手順](https://pytorch.org/get-started/locally/) に従って **PyTorch** をインストールします。
 
-2. Install Genesis via PyPI:
+2. PyPI から Genesis をインストールします。
     ```bash
     pip install genesis-world
     ```
 
 :::{note}
-If you are using Genesis with CUDA, make sure appropriate nvidia-driver is installed on your machine.
+CUDA で Genesis を使う場合、適切な nvidia-driver がインストールされていることを確認してください。
 :::
 
-## (Optional) Surface Reconstruction
-If you need fancy visuals for visualizing particle-based entities (fluids, deformables, etc.), you typically need to reconstruct the mesh surface using the internal particle-based representation. For this purpose, [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf), a state-of-the-art surface reconstruction, is supported out-of-the-box. Alternatively, we also provide `ParticleMesher`, our own openVDB-based surface reconstruction tool, which is faster but lower quantity:
+## （オプション）サーフェス再構成
+
+粒子ベースエンティティ（流体・変形体など）を高品質に可視化したい場合、内部の粒子表現からメッシュ表面を再構成する必要があることがあります。
+この用途に、最先端の再構成ツール [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) をそのまま利用できます。
+また、より高速だが品質は低めの openVDB ベース自前実装 `ParticleMesher` も提供しています。
 ```bash
 echo "export LD_LIBRARY_PATH=${PWD}/ext/ParticleMesher/ParticleMesherPy:$LD_LIBRARY_PATH" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-## (Optional) Ray Tracing Renderer
+## （オプション）レイトレーシングレンダラー
 
-If you need photo-realistic visuals, Genesis has a built-in a ray-tracing (path-tracing) based renderer developped using [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain specific language designed for rendering. See [Visualization & Rendering](../getting_started/visualization.md) for setup.
+フォトリアルな描画が必要な場合、Genesis には [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute) で実装されたパストレーシング型レンダラーが内蔵されています。
+設定方法は [ビジュアライゼーションとレンダリング](../getting_started/visualization.md) を参照してください。
 
-## (Optional) USD Assets
+## （オプション）USD アセット
 
-If you need to load USD assets into Genesis scenes, see [USD Import Setup](../getting_started/usd_import.md#installation) for installation instructions.
+USD アセットを Genesis シーンへ読み込みたい場合は、[USD 読み込み設定](../getting_started/usd_import.md#installation) の手順を参照してください。
 
-## Troubleshooting
+## トラブルシューティング
 
-### Import Error
+### インポートエラー
 
-#### 'Genesis hasn't been initialized'
+#### 「Genesis が初期化されていません（Genesis hasn't been initialized）」 
 
-Genesis is not initialized, trying to import any engine-related submodule will raise an exception, e.g.;
+Genesis が初期化されていない状態でエンジン関連サブモジュールを import すると、次のような例外が発生します。
 ```python
 Traceback (most recent call last):
   File "/home/jeremy/Downloads/Genesis_Jeremy/examples/./init_error.py", line 3, in <module>
@@ -69,7 +74,10 @@ Traceback (most recent call last):
 genesis.GenesisException: Genesis hasn't been initialized. Did you call `gs.init()`?
 ```
 
-This error is bug but expected. Any engine-related submodules must be imported after initializing Genesis to have the opportunity to configure low-level Quadrants features such as fast cache mechanism or Quadrants dynamic array mode. In practice, this limitation should not be a blocker for anybody, because engine-related classes are not meant to be instantiated manually. Still, it may be convenient to import them for type checking. If so, just use typing checking guard, e.g.:
+これはバグではなく仕様です。
+低レベル機能（高速キャッシュ機構や Quadrants の動的配列モードなど）を設定できるようにするため、エンジン関連サブモジュールは Genesis 初期化後に import する必要があります。
+実運用ではエンジンクラスを直接インスタンス化することは通常ないため、ほとんどの場合問題になりません。
+型チェック目的で import したい場合は、次のようにガードしてください。
 ```python
 from typing import TYPE_CHECKING
 
@@ -78,59 +86,65 @@ if TYPE_CHECKING:
     from genesis.engine.entities.drone_entity import DroneEntity
 ```
 
-#### Circular Import Error
+#### 循環インポートエラー
 
-Python would fail to (circular) import Genesis if the current directory is the source directory of Genesis. This is likely due to Genesis being installed WITHOUT enabling editable mode, either from PyPI Package Index or from source. The obvious workaround is moving out of the source directory of Genesis before running Python. The long-term solution is simply switching to editable install mode: first uninstall Python package `genesis-world`, then run `pip install -e '.[render]'` inside the source directory of Genesis.
+現在ディレクトリが Genesis のソースディレクトリだと、Genesis の（循環）import に失敗する場合があります。
+これは、PyPI またはソースから editable モードなしでインストールしているケースで起こりやすいです。
+回避策は、Python 実行前にソースディレクトリから移動することです。
+恒久対応としては editable インストールへ切り替えてください。
+まず `genesis-world` をアンインストールし、Genesis ソースディレクトリ内で `pip install -e '.[render]'` を実行します。
 
-### [Native Ubuntu] Slow Rendering (CPU aka. Software Fallback)
+### [Native Ubuntu] 描画が遅い（CPU へのソフトウェアフォールバック）
 
-Sometimes, when using `cam.render()` or viewer-related functions in Genesis, rendering becomes extremely slow. This is **not a Genesis issue**. Genesis relies on PyRender and EGL for GPU-based offscreen rendering. If your system isn’t correctly set up to use `libnvidia-egl`, it may **silently fall back to MESA (CPU) rendering**, severely affecting performance.
+Genesis で `cam.render()` や viewer 関連機能を使うと極端に遅くなる場合があります。
+これは **Genesis 側の問題ではありません**。
+Genesis は GPU オフスクリーン描画のため PyRender と EGL を利用しますが、`libnvidia-egl` が正しく設定されていないと **MESA（CPU 描画）へ静かにフォールバック** し、性能が大きく低下します。
 
-Even if the GPU appears accessible, your system might still default to CPU rendering unless explicitly configured.
+GPU が見えていても、明示設定しないと CPU 描画へ落ちるケースがあります。
 
 ---
 
-#### ✅ Ensure GPU Rendering is Active
+#### ✅ GPU 描画を有効化する
 
-1. **Install NVIDIA GL libraries**
+1. **NVIDIA GL ライブラリをインストール**
    ```bash
    sudo apt update && sudo apt install -y libnvidia-gl-525
    ```
 
-2. **Check if EGL is pointing to the NVIDIA driver**
+2. **EGL が NVIDIA ドライバを指しているか確認**
    ```bash
    ldconfig -p | grep EGL
    ```
-   You should ideally see:
+   理想的には次が見えるはずです。
    ```
    libEGL_nvidia.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libEGL_nvidia.so.0
    ```
 
-   ⚠️ You *may also see*:
+   ⚠️ 次が見える場合があります。
    ```
    libEGL_mesa.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libEGL_mesa.so.0
    ```
 
-   This is not always a problem — **some systems can handle both**.
-   But if you're experiencing **slow rendering**, it's often best to remove Mesa.
+   これは必ずしも問題ではありませんが、**描画が遅い** 場合は Mesa 削除が有効なことがあります。
 
-3. **(Optional but recommended)** Remove MESA to prevent fallback:
+3. **（任意だが推奨）Mesa を削除してフォールバックを防ぐ**
    ```bash
    sudo apt remove -y libegl-mesa0 libegl1-mesa libglx-mesa0
    ```
-   Then recheck:
+   その後再確認:
    ```bash
    ldconfig -p | grep EGL
    ```
-   ✅ You should now only see `libEGL_nvidia.so.0`.
+   ✅ `libEGL_nvidia.so.0` のみが見える状態が理想です。
 
-4. **(Optional – for edge cases)** Check if the NVIDIA EGL ICD config file exists
+4. **（任意・特殊ケース）NVIDIA EGL ICD 設定ファイルを確認**
 
-    In most cases, this file should already be present if your NVIDIA drivers are correctly installed. However, in some minimal or containerized environments (e.g., headless Docker images), you might need to manually create it if EGL initialization fails:
+    通常は NVIDIA ドライバが正しく入っていればこのファイルは存在します。
+    ただし、最小構成環境やコンテナ環境（例: ヘッドレス Docker）では EGL 初期化失敗時に手動作成が必要な場合があります。
     ```bash
     cat /usr/share/glvnd/egl_vendor.d/10_nvidia.json
     ```
-    Should contain:
+    内容は次のようになります。
     ```json
     {
         "file_format_version" : "1.0.0",
@@ -140,7 +154,7 @@ Even if the GPU appears accessible, your system might still default to CPU rende
     }
     ```
 
-    If not, create it:
+    なければ作成:
     ```bash
     bash -c 'cat > /usr/share/glvnd/egl_vendor.d/10_nvidia.json <<EOF
     {
@@ -152,38 +166,39 @@ Even if the GPU appears accessible, your system might still default to CPU rende
     EOF'
     ```
 
-    Similarly, some symlink may be missing for the CUDA runtime:
+    同様に CUDA ランタイムのシンボリックリンクが不足している場合があります。
     ```bash
     ln -s /usr/lib/x86_64-linux-gnu/libcuda.so.1 /usr/lib/x86_64-linux-gnu/libcuda.so
     ```
 
-5. **Set global NVIDIA rendering environment variables**
+5. **グローバル環境変数を設定**
 
-Genesis tries EGL rendering by default, so in most environments you don’t need to manually set `PYOPENGL_PLATFORM`. However, setting these variables can help ensure stability in custom setups (e.g., Docker, headless servers):
+Genesis は通常 EGL 描画を自動で試みるため、多くの環境では `PYOPENGL_PLATFORM` 手動指定は不要です。
+ただし Docker やヘッドレスサーバなどでは明示設定で安定する場合があります。
 
-   Add to `~/.bashrc` or `~/.zshrc`:
+   `~/.bashrc` または `~/.zshrc` に追記:
    ```bash
    export NVIDIA_DRIVER_CAPABILITIES=all
    export PYOPENGL_PLATFORM=egl
    ```
 
-   Reload:
+   再読み込み:
    ```bash
    source ~/.bashrc  # or source ~/.zshrc
    ```
 
-   Confirm:
+   確認:
    ```python
    import os
    print("[DEBUG] Using OpenGL platform:", os.environ.get("PYOPENGL_PLATFORM"))
    print("[DEBUG] NVIDIA capabilities:", os.environ.get("NVIDIA_DRIVER_CAPABILITIES"))
    ```
 
-### [Docker Container (Genesis image) on Windows 11 via WSL2] Black Rendering Window
+### [Windows 11 + WSL2 上の Genesis Docker] 画面が黒く表示される
 
-    For machines with Nvidia GPU, make sure that NVIDIA Container Toolkit is installed. The official guide is available [here](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
+    Nvidia GPU マシンでは NVIDIA Container Toolkit がインストールされていることを確認してください。公式ガイドは [こちら](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)。
 
-    Some users may still be experiencing rendering issues on Windows when running Genesis inside a Docker container based on Genesis image. This is generally fixed by adding WSL libraries to Linux's search path for dynamic libraries, which is specified by the environment variable `LD_LIBRARY_PATH`, i.e.:
+    Windows 上で Genesis ベース Docker コンテナを実行した際に描画問題が残る場合、Linux の動的ライブラリ検索パス（`LD_LIBRARY_PATH`）へ WSL ライブラリを追加すると改善することがあります。
     ```bash
     docker run --gpus all --rm -it \
     -e DISPLAY=$DISPLAY \
@@ -193,50 +208,50 @@ Genesis tries EGL rendering by default, so in most environments you don’t need
     genesis
     ```
 
-### [Ubuntu VM on Windows 11 via WSL2] OpenGL error
+### [Windows 11 + WSL2 上の Ubuntu VM] OpenGL エラー
 
-    For machines with Nvidia GPU, try to force GPU-accelerated rendering by exporting the following environment variables inside the Ubuntu VM:
+    Nvidia GPU マシンでは、Ubuntu VM 内で以下の環境変数を設定し GPU 描画を強制してみてください。
     ```bash
     export LIBGL_ALWAYS_INDIRECT=0
     export GALLIUM_DRIVER=d3d12
     export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA
     ```
 
-    If it does not work, try installing the latest version of OSMesa:
+    うまくいかない場合は OSMesa の最新版を試してください。
     ```bash
     sudo add-apt-repository ppa:kisak/kisak-mesa
     sudo apt update
     sudo apt upgrade
     ```
-    Then, only enforce direct rendering:
+    その後は direct rendering（直接描画）のみ有効化:
     ```bash
     export LIBGL_ALWAYS_INDIRECT=0
     ```
 
-    At the point, `glxinfo` mesa utility can be used to determine which OpenGL vendor is being used by default, i.e.:
+    この時点で `glxinfo` を使い、既定 OpenGL ベンダーを確認できます。
     ```bash
     glxinfo -B
     ```
 
-    As a last resort, one can force CPU (aka. software) rendering using OSMesa if necessary as follows:
+    最後の手段として、必要なら OSMesa による CPU 描画を強制します。
     ```bash
     export LIBGL_ALWAYS_SOFTWARE=1
     ```
 
-### [Ubuntu VM on Windows 11 via WSL2] Quadrants and Genesis do not find cudalib.so and falls back to CPU
+### [Windows 11 + WSL2 上の Ubuntu VM] Quadrants/Genesis が `cudalib.so` を見つけられず CPU フォールバックする
 
-After installing Pytorch and Genesis, Quadrants falls back to CPU, while torch initalizes okay on CUDA.
+PyTorch と Genesis を導入後、torch は CUDA を使えているのに Quadrants が CPU フォールバックする場合があります。
 
-Symptoms:
+症状:
 
-- running `python -c "import torch; print(torch.zeros((3,), device='cuda'))"` outputs `tensor([0., 0., 0.], device='cuda:0')`
-- but running `python -c "import quadrants as qd; qd.init(arch=qd.gpu)"` outputs something like
+- `python -c "import torch; print(torch.zeros((3,), device='cuda'))"` は `tensor([0., 0., 0.], device='cuda:0')` を出力
+- しかし `python -c "import quadrants as qd; qd.init(arch=qd.gpu)"` は次のような出力
     ```
     [W 06/18/25 12:47:56.784 14507] [cuda_driver.cpp:load_lib@36] libcuda.so lib not found.
     [Quadrants] Starting on arch=vulkan
     ```
 
-Fix:
+対処:
 
-- check if libcuda.so and other cuda libraries are in the lib folder with `ls /usr/lib/wsl/lib/`
-- if so, update the library path with `export LD_LIBRARY_PATH=/usr/lib/wsl/lib:$LD_LIBRARY_PATH`
+- `ls /usr/lib/wsl/lib/` で libcuda.so などの CUDA ライブラリ存在を確認
+- 存在する場合は `export LD_LIBRARY_PATH=/usr/lib/wsl/lib:$LD_LIBRARY_PATH` を設定

@@ -1,112 +1,119 @@
-# 🧮 Non-rigid Coupling
+# 🧮 非剛体カップリング
 
-Genesis allows you to combine multiple continuum and rigid-body solvers in the **same scene** – e.g. MPM snow interacting with SPH water, deformable FEM tissue colliding with surgical tools, or rigid props splashing into a granular bed.  All cross-solver interactions are orchestrated by the `gs.engine.Coupler` class.
+Genesis では、複数の連続体ソルバーと剛体ソルバーを **同一シーン** で組み合わせられます。
+例えば MPM 雪と SPH 水の相互作用、変形 FEM 組織と手術ツールの衝突、粒状床へ飛び込む剛体などです。
+ソルバー間相互作用はすべて `gs.engine.Coupler` クラスで統括されます。
 
-This page explains:
+このページでは次を説明します。
 
-* the **architecture** of the Coupler and how it decides which solver pairs are active;
-* the **impulse-based collision response** that governs momentum exchange;
-* the meaning of **friction, restitution, softness** and other coupling parameters;
-* a quick **reference table** of currently supported solver pairs; and
-* **usage examples** showing how to enable/disable specific interactions.
+* Coupler の **アーキテクチャ** と、どのソルバーペアが有効化されるか
+* 運動量交換を決める **インパルスベース衝突応答**
+* **摩擦、反発、softness** などカップリングパラメータの意味
+* 現在対応しているソルバーペアの **早見表**
+* 特定相互作用を有効/無効にする **利用例**
 
 ---
 
-## 1. Architecture overview
+## 1. アーキテクチャ概要
 
-Internally the simulator owns **one Coupler instance** which keeps pointers to every solver.  During each sub-step the simulator executes:
+内部的にシミュレータは **1 つの Coupler インスタンス** を持ち、全ソルバーへの参照を保持します。
+各サブステップで次を実行します。
 
-1. `coupler.preprocess(f)`  &nbsp;&nbsp; – e.g. surfacing operations for CPIC.
-2. `solver.substep_pre_coupling(f)`       – advance each individual solver.
-3. `coupler.couple(f)`       – exchange momentum between solvers.
-4. `solver.substep_post_coupling(f)`       – solver postprocessing after collision.
+1. `coupler.preprocess(f)`  – 例: CPIC 用サーフェシング
+2. `solver.substep_pre_coupling(f)` – 各ソルバーを個別更新
+3. `coupler.couple(f)` – ソルバー間で運動量交換
+4. `solver.substep_post_coupling(f)` – 衝突後のソルバー後処理
 
-Because all solver fields live on Quadrants data-structures the Coupler can call Quadrants `@kernel`s that touch the memory of several solvers **without data copies**.
+全ソルバーフィールドは Quadrants データ構造上にあるため、Coupler は複数ソルバーのメモリへ **コピーなし** でアクセスする Quadrants `@kernel` を呼べます。
 
-### 1.1 Activating a coupling pair
+### 1.1 カップリングペア有効化
 
-Whether a pair is active is determined **statically once** when `Coupler.build()` is called:
+ペアが有効かどうかは `Coupler.build()` 時に **静的に一度だけ** 決まります。
 
 ```python
 self._rigid_mpm = rigid.is_active() and mpm.is_active() and options.rigid_mpm
 ```
 
 
-## 2. Impulse-based collision response
+## 2. インパルスベース衝突応答
 
-### 2.1 Signed distance & influence weight
+### 2.1 符号付き距離と影響重み
 
-For every candidate contact the Coupler queries the signed distance function `sdf(p)` of the rigid geometry.  The *softness* parameter produces a smooth blending weight
+各接触候補に対して、Coupler は剛体ジオメトリの符号付き距離関数 `sdf(p)` を問い合わせます。
+*softness* パラメータにより、滑らかなブレンド重みを作ります。
 
 $$
 \text{influence} = \min\bigl( \exp\!\left(-\dfrac{\;d\;}{\epsilon}\right) ,\;1 \bigr)
 $$
 
-where `d` is the signed distance and `ε = coup_softness`.  Large softness values make the contact zone thicker and produce gentler impulses.
+ここで `d` は符号付き距離、`ε = coup_softness` です。
+softness が大きいほど接触領域は厚くなり、インパルスは穏やかになります。
 
-### 2.2 Relative velocity decomposition
+### 2.2 相対速度の分解
 
-For a particle/grid node with world velocity **v** and a rigid body velocity **vᵣ**, the **relative velocity** is
+世界速度 **v** を持つ粒子/グリッドノードと剛体速度 **vᵣ** の **相対速度** は
 
 $$ \mathbf r = \mathbf v - \mathbf v_{\text{rigid}}. $$
 
-Split **r** into its normal and tangential components
+これを法線成分と接線成分に分解します。
 
 $$
  r_n = (\mathbf r \cdot \mathbf n)\,\mathbf n, \quad
  r_t = \mathbf r - r_n
 $$
 
-with **n** the outward surface normal.
+ここで **n** は外向き法線です。
 
-### 2.3 Normal impulse (restitution)
+### 2.3 法線インパルス（反発）
 
-If the normal component is *inward* ($r_n<0$) an impulse is applied so that after the collision
+法線成分が内向き（$r_n<0$）なら、衝突後に
 
 $$ r_n' = -e\,r_n, \quad 0 \le e \le 1, $$
 
-where `e = coup_restitution` is the **restitution coefficient**.  `e=0` is perfectly inelastic, `e=1` perfectly elastic.
+となるようインパルスを加えます。
+`e = coup_restitution` は **反発係数** で、`e=0` は完全非弾性、`e=1` は完全弾性です。
 
-### 2.4 Tangential impulse (Coulomb friction)
+### 2.4 接線インパルス（クーロン摩擦）
 
-Friction is implemented by **scaling** the tangential component:
+摩擦は接線成分の **スケーリング** で実装されます。
 
 $$ r_t' = \max\!\bigl( 0,\;|r_t| + \mu \, r_n\bigr) \; \dfrac{r_t}{|r_t|}\,, $$
 
-with `μ = coup_friction`.  This is an impulse-based variant of Coulomb friction that ensures the post-collision tangential speed never exceeds the sticking limit.
+ここで `μ = coup_friction` です。
+これはクーロン摩擦のインパルス型実装で、衝突後の接線速度が静止限界を超えないようにします。
 
-### 2.5 Velocity update and momentum transfer
+### 2.5 速度更新と運動量移送
 
-The new particle/node velocity is then
+新しい粒子/ノード速度は
 
 $$ \mathbf v' = \mathbf v_{\text{rigid}} + (r_t' + r_n') \times \text{influence} + \mathbf r\,(1-\text{influence}). $$
 
-The *change of momentum*
+運動量変化
 
 $$ \Delta\mathbf p = m\,(\mathbf v' - \mathbf v) $$
 
-is applied as an **external force** on the rigid body
+は剛体への **外力** として適用されます。
 
 $$ \mathbf F_{\text{rigid}} = -\dfrac{\Delta\mathbf p}{\Delta t}. $$
 
-Thus Newton's third law is satisfied and the rigid body responds to fluid impacts.
+これにより作用反作用を満たし、剛体側も流体衝撃に応答します。
 
 ---
 
-## 3. Supported solver pairs
+## 3. サポートされるソルバーペア
 
-| Pair | Direction | Notes |
+| ペア | 方向 | 備考 |
 |------|-----------|-------|
-| **MPM ↔ Rigid** | impulse based on grid nodes (supports CPIC) |
-| **MPM ↔ SPH**   | averages SPH particle velocities within an MPM cell |
-| **MPM ↔ PBD**   | similar to SPH but skips pinned PBD particles |
-| **FEM ↔ Rigid** | collision on surface vertices only |
-| **FEM ↔ MPM**   | uses MPM P2G/G2P weights to exchange momentum |
-| **FEM ↔ SPH**   | experimental – normal projection only |
-| **SPH ↔ Rigid** | robust side-flip handling of normals |
-| **PBD ↔ Rigid** | positional correction then velocity projection |
-| **Tool ↔ MPM**  | delegated to each Tool entity's `collide()` |
+| **MPM ↔ Rigid** | グリッドノードに基づくインパルス（CPIC 対応） |
+| **MPM ↔ SPH**   | MPM セル内の SPH 粒子速度を平均化 |
+| **MPM ↔ PBD**   | SPH 類似だが固定 PBD 粒子は除外 |
+| **FEM ↔ Rigid** | 表面頂点のみで衝突 |
+| **FEM ↔ MPM**   | MPM の P2G/G2P 重みで運動量交換 |
+| **FEM ↔ SPH**   | 実験的（法線射影のみ） |
+| **SPH ↔ Rigid** | 法線の side-flip を考慮した安定処理 |
+| **PBD ↔ Rigid** | 位置補正後に速度射影 |
+| **Tool ↔ MPM**  | 各 Tool エンティティの `collide()` へ委譲 |
 
-If a combination is not in the table it is currently unsupported.
+表にない組み合わせは現時点で未対応です。
 
 ---

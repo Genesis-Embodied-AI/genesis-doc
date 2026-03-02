@@ -1,12 +1,12 @@
-# 🎑 Viewer Interaction
+# 🎑 ビューア操作
 
-The Genesis viewer supports mouse and keyboard interaction for camera controls, recording, visualization toggles, and more. 
-This functionality can easily be extended with custom keybindings and viewer plugins.
+Genesis ビューアは、カメラ操作、録画、可視化切り替えなどのためのマウス・キーボード操作をサポートします。
+この機能は、カスタムキーバインドとビューアプラグインで簡単に拡張できます。
 
 
-## Adding keybinds
+## キーバインドの追加
 
-Register keybindings with `scene.viewer.register_keybinds(...)` before `scene.build()`.
+`scene.build()` 前に `scene.viewer.register_keybinds(...)` でキーバインドを登録します。
 
 
 ```python
@@ -23,7 +23,7 @@ def stop():
 scene.viewer.register_keybinds(
     kb.Keybind("greetings", kb.Key.G, kb.KeyAction.PRESS, callback=lambda: print("Hello!")),
     kb.Keybind("quit", kb.Key.ESCAPE, kb.KeyAction.PRESS, callback=stop),
-    # add as many keybinds as you want!
+    # 必要なだけキーバインドを追加できます
 )
 scene.build()
 
@@ -34,37 +34,38 @@ while is_running:
 ```{figure} ../../_static/images/keybindings_instructions.png
 :alt: Viewer overlay showing keyboard instructions including plugin keybindings
 ```
-Registered keybindings are shown in the instructions overlay in the viewer so users can discover controls at a glance.
+登録したキーバインドは、ビューアの説明オーバーレイに表示されるため、利用者は操作方法をすぐ把握できます。
 
 
-To disable default viewer controls and/or hide the help text, set the corresponding options when creating the scene:
+デフォルトのビューア操作を無効化したり、ヘルプ表示を隠したい場合は、シーン作成時に対応オプションを設定します。
 
 ```python
 scene = gs.Scene(
     viewer_options=gs.options.ViewerOptions(
-        enable_help_text=False,         # hide the instructions text
-        enable_default_keybinds=False,  # disable default viewer key shortcuts
+        enable_help_text=False,         # 操作説明テキストを非表示にする
+        enable_default_keybinds=False,  # 既定のキーボードショートカットを無効化する
     ),
 )
 ```
 
 
-## Viewer Plugins
+## ビューアプラグイン
 
-Viewer plugins extend the interactive scene viewer with custom input handling and visualization.
-They receive mouse and keyboard events, can draw debug geometry each frame, and run logic on every simulation step—ideal for tools like picking points on meshes or dragging bodies with the mouse.
+ビューアプラグインは、カスタム入力処理や可視化機能でインタラクティブなシーンビューアを拡張します。
+マウス/キーボードイベントの受信、毎フレームのデバッグジオメトリ描画、各シミュレーションステップでのロジック実行が可能で、
+メッシュ上の点選択やマウスドラッグ操作などのツール実装に適しています。
 
-Add plugins with `scene.viewer.add_plugin(plugin)` *before* `scene.build()`.
-Example scripts are available under `examples/viewer_plugin/`.
+プラグインは `scene.build()` *前* に `scene.viewer.add_plugin(plugin)` で追加します。
+サンプルスクリプトは `examples/viewer_plugin/` にあります。
 
 
-### Mouse Interaction Plugin
+### マウス操作プラグイン
 
-The **`MouseInteractionPlugin`** lets you click and drag rigid bodies in the scene.
-You can either move bodies by directly setting their position (default) or apply spring forces for a more physical feel.
+**`MouseInteractionPlugin`** は、シーン内の剛体をクリック＆ドラッグできます。
+既定では位置を直接設定して移動し、オプションでバネ力を使ったより物理的な操作も可能です。
 
-The full example script is available at `examples/viewer_plugin/mouse_interaction.py`.
-Use the `--use_force` flag to enable spring forces instead of position control.
+完全なサンプルは `examples/viewer_plugin/mouse_interaction.py` にあります。
+位置制御ではなくバネ力を使うには `--use_force` フラグを使ってください。
 
 ```python
 scene.viewer.add_plugin(
@@ -81,30 +82,31 @@ scene.viewer.add_plugin(
 </video>
 
 
-### Custom plugins
+### カスタムプラグイン
 
-You can implement custom plugins by subclassing `ViewerPlugin` (or `RaycasterViewerPlugin` if you require screen-to-world raycasting) and adding them with `scene.viewer.add_plugin()`.
+`ViewerPlugin`（またはスクリーン座標→ワールドレイ変換が必要なら `RaycasterViewerPlugin`）を継承し、`scene.viewer.add_plugin()` で追加することで独自プラグインを実装できます。
 
-#### ViewerPlugin base class
+#### ViewerPlugin ベースクラス
 
-Custom plugins subclass `gs.vis.viewer_plugins.ViewerPlugin`.
-The viewer calls `build(viewer, camera, scene)` after the scene is built; override it to store references and set up state.
+カスタムプラグインは `gs.vis.viewer_plugins.ViewerPlugin` を継承します。
+シーンビルド後にビューアから `build(viewer, camera, scene)` が呼ばれるので、参照保存や初期化処理をここで行います。
 
-Event hooks return `EVENT_HANDLED` (or `True`) to indicate the event was consumed, or `None` to let other plugins or the default viewer handle it.
+イベントフックは、イベントを消費した場合 `EVENT_HANDLED`（または `True`）を返し、
+他プラグインやデフォルトビューアへ処理を渡す場合は `None` を返します。
 
-| Method | Description |
+| メソッド | 説明 |
 |--------|-------------|
-| `on_mouse_motion(x, y, dx, dy)` | Mouse moved |
-| `on_mouse_drag(x, y, dx, dy, buttons, modifiers)` | Mouse dragged with button held |
-| `on_mouse_press(x, y, buttons, modifiers)` | Mouse button pressed (called once on initial press) |
-| `on_mouse_release(x, y, buttons, modifiers)` | Mouse button released |
-| `on_mouse_scroll(x, y, dx, dy)` | Mouse scroll wheel |
-| `on_key_press(key, modifiers)` | Keyboard button was pressed |
-| `on_key_release(key, modifiers)` | Keyboard button released |
-| `on_resize(width, height)` | Window resized |
-| `update_on_sim_step()` | Called every `scene.step()` |
-| `on_draw()` | Called each frame for custom drawing |
-| `on_close()` | Called when the viewer closes |
+| `on_mouse_motion(x, y, dx, dy)` | マウス移動時に呼ばれます |
+| `on_mouse_drag(x, y, dx, dy, buttons, modifiers)` | ボタン押下中のドラッグ時に呼ばれます |
+| `on_mouse_press(x, y, buttons, modifiers)` | マウスボタン押下時に呼ばれます（初回押下で 1 回） |
+| `on_mouse_release(x, y, buttons, modifiers)` | マウスボタン解放時に呼ばれます |
+| `on_mouse_scroll(x, y, dx, dy)` | スクロールホイール操作時に呼ばれます |
+| `on_key_press(key, modifiers)` | キー押下時に呼ばれます |
+| `on_key_release(key, modifiers)` | キー解放時に呼ばれます |
+| `on_resize(width, height)` | ウィンドウリサイズ時に呼ばれます |
+| `update_on_sim_step()` | `scene.step()` ごとに呼ばれます |
+| `on_draw()` | 各フレームでカスタム描画のために呼ばれます |
+| `on_close()` | ビューア終了時に呼ばれます |
 
 ```python
 from genesis.vis.viewer_plugins import ViewerPlugin, EVENT_HANDLED, EVENT_HANDLE_STATE
@@ -112,25 +114,27 @@ from genesis.vis.viewer_plugins import ViewerPlugin, EVENT_HANDLED, EVENT_HANDLE
 class MyPlugin(ViewerPlugin):
     def build(self, viewer, camera, scene):
         super().build(viewer, camera, scene)
-        # self.viewer, self.camera, self.scene are set
+        # self.viewer, self.camera, self.scene が設定される
 
     def on_key_press(self, symbol: int, modifiers: int) -> EVENT_HANDLE_STATE:
         if symbol == ord("x"):
-            # do something
+            # 何らかの処理
             return EVENT_HANDLED
         return None
 
     def on_draw(self) -> None:
-        # e.g. draw debug geometry via self.scene.draw_debug_*()
+        # 例: self.scene.draw_debug_*() でデバッグ描画
         pass
 ```
 
-#### RaycasterViewerPlugin and screen-space rays
+#### RaycasterViewerPlugin とスクリーン空間レイ
 
-For click-to-select or drag-in-3D behavior you need a ray from the camera through the mouse position.
-Subclass `RaycasterViewerPlugin` instead of `ViewerPlugin`; it maintains a raycaster and provides `_screen_position_to_ray(x, y)` that returns a `Ray` (origin and direction in world frame).
+クリック選択や 3D ドラッグ挙動には、マウス座標を通るカメラレイが必要です。
+`ViewerPlugin` ではなく `RaycasterViewerPlugin` を継承すると、レイキャスタを内部保持し、
+`_screen_position_to_ray(x, y)` で `Ray`（ワールド座標系の始点と方向）を取得できます。
 
-`RaycasterViewerPlugin` also overrides `update_on_sim_step()` so the raycaster stays in sync with the scene each step.
+`RaycasterViewerPlugin` は `update_on_sim_step()` もオーバーライドしており、
+各ステップでレイキャスタをシーンと同期します。
 
 ```python
 from genesis.vis.viewer_plugins import RaycasterViewerPlugin, EVENT_HANDLED
@@ -149,16 +153,18 @@ class PickerPlugin(RaycasterViewerPlugin):
         return None
 ```
 
-Use `scene.viewer.register_keybinds()` to register keys (e.g. quit, toggle modes); those keybindings are displayed in the viewer's keyboard instructions overlay so users can easily discover them.
+`scene.viewer.register_keybinds()` を使ってキー（終了、モード切替など）を登録すると、
+そのキーバインドはビューアのキーボード説明オーバーレイにも表示されます。
 
 
-#### Example: Mesh Point Selector
+#### 例: Mesh Point Selector
 
-The **`MeshPointSelectorPlugin`** uses mouse raycasting to select points on rigid meshes.
-Click to add or remove a point; selected points are shown as spheres and can be snapped to a grid.
-On close, the plugin writes selected points (in link-local coordinates) to a CSV file, which is useful if needing to get local positions for placing sensors on an entity.
+**`MeshPointSelectorPlugin`** は、マウスレイキャストで剛体メッシュ上の点を選択します。
+クリックで点を追加/削除し、選択点は球で表示され、グリッドスナップも可能です。
+終了時に、選択点（リンクローカル座標）を CSV へ出力します。
+これはエンティティ上にセンサーを配置するためのローカル位置取得などに有用です。
 
-The full example script is available at `examples/viewer_plugin/mesh_point_selector.py`.
+完全なサンプルは `examples/viewer_plugin/mesh_point_selector.py` にあります。
 
 ```python
 from genesis.vis.viewer_plugins import MeshPointSelectorPlugin

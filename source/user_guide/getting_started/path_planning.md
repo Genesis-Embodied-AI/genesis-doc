@@ -1,8 +1,8 @@
-# 🗺️ Path Planning
+# 🗺️ 経路計画
 
-Genesis provides RRT-based motion planning for collision-free robot paths.
+Genesis は、衝突回避ロボット経路のための RRT ベースのモーションプランニングを提供します。
 
-## Basic Usage
+## 基本的な使い方
 
 ```python
 import genesis as gs
@@ -13,46 +13,46 @@ robot = scene.add_entity(gs.morphs.MJCF(file="franka.xml"))
 obstacle = scene.add_entity(gs.morphs.Box(pos=(0.5, 0, 0.3), size=(0.1, 0.3, 0.3), fixed=True))
 scene.build()
 
-# Define goal configuration
+# 目標姿勢を定義
 goal_qpos = robot.inverse_kinematics(
     link=robot.get_link("hand"),
     pos=np.array([0.6, 0.0, 0.3]),
 )
 
-# Plan collision-free path
+# 衝突のない経路を計画
 path = robot.plan_path(qpos_goal=goal_qpos, num_waypoints=200)
 
-# Execute path
+# 経路を実行
 for waypoint in path:
     robot.control_dofs_position(waypoint)
     scene.step()
 ```
 
-## Parameters
+## パラメータ
 
 ```python
 robot.plan_path(
-    qpos_goal,                  # Goal configuration (required)
-    qpos_start=None,            # Start config (default: current)
-    planner="RRTConnect",       # "RRT" or "RRTConnect"
-    num_waypoints=300,          # Output path length
-    resolution=0.05,            # Planning resolution
-    smooth_path=True,           # Apply path smoothing
-    max_nodes=4000,             # Max tree size
-    timeout=None,               # Timeout per attempt (seconds)
-    max_retry=1,                # Retry count
-    ignore_collision=False,     # Skip collision checks
+    qpos_goal,                  # 目標姿勢（必須）
+    qpos_start=None,            # 開始姿勢（デフォルト: 現在値）
+    planner="RRTConnect",       # "RRT" または "RRTConnect"
+    num_waypoints=300,          # 出力経路長
+    resolution=0.05,            # 計画分解能
+    smooth_path=True,           # 経路平滑化を適用
+    max_nodes=4000,             # 木の最大ノード数
+    timeout=None,               # 各試行のタイムアウト（秒）
+    max_retry=1,                # リトライ回数
+    ignore_collision=False,     # 衝突判定をスキップ
 )
 ```
 
-## Planner Types
+## プランナー種別
 
-- **RRTConnect** (default): Bidirectional, more efficient
-- **RRT**: Single-tree, simpler
+- **RRTConnect**（デフォルト）: 双方向探索でより効率的
+- **RRT**: 単一木探索でよりシンプル
 
-## Planning with Object Attachment
+## 物体を把持した状態での計画
 
-Plan while carrying an object:
+物体を保持したまま計画します。
 
 ```python
 path = robot.plan_path(
@@ -62,7 +62,7 @@ path = robot.plan_path(
 )
 ```
 
-## Check Planning Success
+## 計画成功の確認
 
 ```python
 path, is_valid = robot.plan_path(
@@ -74,16 +74,16 @@ if is_valid:
     print("Planning succeeded!")
 ```
 
-## Multi-Environment Planning
+## マルチ環境での計画
 
 ```python
 scene.build(n_envs=16)
 
-# Plan for all environments
+# 全環境で計画
 path = robot.plan_path(qpos_goal=target_qpos)
 print(path.shape)  # (num_waypoints, 16, n_dofs)
 
-# Plan for specific environments
+# 特定環境のみ計画
 path, valid = robot.plan_path(
     qpos_goal=target_qpos,
     envs_idx=[0, 5, 10],
@@ -91,9 +91,9 @@ path, valid = robot.plan_path(
 )
 ```
 
-## Performance Tips
+## パフォーマンスのヒント
 
-- Increase `resolution` for faster (lower quality) planning
-- Decrease `resolution` for smoother paths
-- Use `timeout` and `max_retry` for reliability
-- `RRTConnect` is generally faster than `RRT`
+- `resolution` を大きくすると高速化（ただし品質は低下）
+- `resolution` を小さくすると経路が滑らかになる
+- 信頼性向上には `timeout` と `max_retry` を使う
+- 一般に `RRTConnect` は `RRT` より高速

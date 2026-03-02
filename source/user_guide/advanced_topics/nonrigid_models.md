@@ -1,124 +1,135 @@
-# 🧩 Non-rigid Dynamics
+# 🧩 非剛体ダイナミクス
 
-This page gives a compact overview of the physical models implemented by Genesis' continuum and discrete solvers.  The emphasis is on *which equations are being solved and how*, rather than on the Python API. For coupling theory see the dedicated *Solvers & Coupling* chapter.
-
----
-
-## 1. Eulerian Stable-Fluid Solver (`SFSolver`)
-
-**Purpose.** Fast smoke / gas simulation on a fixed grid.
-
-**Governing equations** – incompressible Navier–Stokes.
-
-**Algorithm** – Jos Stam's *Stable Fluids*:
-
-1. **Advection** – velocities are back-traced with third-order RK and interpolated (`backtrace` + `trilerp`).  Numerically unconditionally stable.
-2. **External impulses** – jet sources inject momentum after advection.
-3. **Viscosity / decay** – optional exponential damping term.
-4. **Pressure projection** – solve Poisson by Jacobi iteration (`pressure_jacobi`).
-
-5. **Boundary conditions** – zero-normal velocity enforced by mirroring components at solid faces.
-
-Because all steps are explicit or diagonally implicit the method is extremely robust at large time-steps and suitable for real-time effects.
+このページでは、Genesis の連続体/離散ソルバーで実装されている物理モデルを簡潔に整理します。
+重点は Python API ではなく、*どの方程式をどのように解いているか* です。
+カップリング理論は専用章 *Solvers & Coupling* を参照してください。
 
 ---
 
-## 2. Material Point Method Solver (`MPMSolver`)
+## 1. オイラー系 Stable-Fluid（安定流体）ソルバー（`SFSolver`）
 
-**Purpose.** Unified simulation of solids, liquids and granular media using particles + background grid.
+**目的**: 固定グリッド上での高速な煙/気体シミュレーション。
 
-**Core idea.**  The continuum momentum equation is evaluated on an Eulerian grid while material history (deformation gradient, plastic strain, etc.) is stored on Lagrangian particles.
+**支配方程式** – 非圧縮 Navier–Stokes。
 
-### 2.1 Update sequence (APIC / CPIC variant)
+**アルゴリズム** – Jos Stam の *Stable Fluids*:
 
-| Phase | Description |
+1. **移流（Advection）** – 速度場を 3 次 RK で逆追跡し補間（`backtrace` + `trilerp`）。数値的に無条件安定。
+2. **外力インパルス** – 移流後にジェット源から運動量を注入。
+3. **粘性/減衰** – 任意の指数減衰項。
+4. **圧力投影** – Jacobi 反復（`pressure_jacobi`）で Poisson 方程式を解く。
+5. **境界条件** – 固体面で成分ミラーリングにより法線方向速度をゼロ化。
+
+すべてのステップが陽的または対角陰的のため、大きい時間刻みでも頑健で、リアルタイム用途に適します。
+
+---
+
+## 2. Material Point Method（マテリアルポイント法）ソルバー（`MPMSolver`）
+
+**目的**: 粒子 + 背景グリッドにより、固体・液体・粒状体を統一的にシミュレーション。
+
+**基本アイデア**: 連続体の運動量方程式はオイラー格子上で評価し、
+変形勾配や塑性ひずみなどの履歴量はラグランジュ粒子に保持します。
+
+### 2.1 更新シーケンス（APIC / CPIC 変種）
+
+| フェーズ | 説明 |
 |-------|-------------|
-| P2G | Transfer mass and momentum to neighbour grid nodes with B-spline weights; add stress contribution. |
-| Grid solve | Divide by mass to obtain velocities, apply gravity & boundary collisions. |
-| G2P | Interpolate grid velocity back, update affine matrix and position. |
-| Polar-SVD | Decompose deformation graident; material law returns new deformation gradient. |
+| P2G | B-spline 重みで質量と運動量を近傍グリッドへ転送し、応力寄与を加算 |
+| グリッド解法 | 質量で割って速度を求め、重力と境界衝突を適用 |
+| G2P | グリッド速度を補間して粒子へ戻し、アフィン行列と位置を更新 |
+| 極分解（Polar-SVD） | 変形勾配を分解し、材料則により新しい変形勾配を計算 |
 
-### 2.2 Constitutive models
+### 2.2 構成則モデル
 
-Genesis ships several analytic stress functions:
+Genesis は複数の解析的応力関数を提供します。
 
-* **Neo-Hookean elastic** (chalk/snow)
-* **Von Mises capped plasticity** (snow-plastic)
-* **Weakly compressible liquid** (WC fluid)
-* **Anisotropic muscle** adding active fibre stress
+* **Neo-Hookean elastic**（チョーク/雪）
+* **Von Mises capped plasticity**（雪の塑性）
+* **Weakly compressible liquid**（WC 流体）
+* **Anisotropic muscle**（能動繊維応力付き）
 
 ---
 
-## 3. Finite Element Method Solver (`FEMSolver`)
+## 3. Finite Element Method（有限要素法）ソルバー（`FEMSolver`）
 
-**Purpose.** High-quality deformable solids with tetrahedral meshes; optional implicit integration for stiff materials.
+**目的**: 四面体メッシュによる高品質な変形体シミュレーション。
+剛性材料向けに陰解法積分を選択可能。
 
-### 3.1 Energy formulation
+### 3.1 エネルギー定式化
 
-Total potential energy
+全ポテンシャルエネルギー:
 
 $$ \Pi(\mathbf x) = \sum_{e} V_{e}\,\psi(\mathbf F_e) - \sum_{i} m_{i}\,\mathbf g\!\cdot\!\mathbf x_i. $$
 
-The first variation yields the internal force; the second variation gives the element stiffness.
+第一変分で内部力、第二変分で要素剛性を得ます。
 
-### 3.2 Implicit backward Euler
+### 3.2 後退オイラー陰解法
 
-Given current state $(\mathbf x^n, \mathbf v^n)$ solve for $\mathbf x^{n+1}$ by Newton–Raphson:
+現在状態 $(\mathbf x^n, \mathbf v^n)$ から、Newton–Raphson で $\mathbf x^{n+1}$ を解きます。
 
 $$ \mathbf r(\mathbf x) = \frac{m}{\Delta t^{2}}(\mathbf x - \hat{\mathbf x}) + \frac{\partial \Pi}{\partial \mathbf x} = 0,$$
-where $\hat{\mathbf x} = \mathbf x^{n} + \Delta t\,\mathbf v^{n}$ is the inertial prediction.
+ここで $\hat{\mathbf x} = \mathbf x^{n} + \Delta t\,\mathbf v^{n}$ は慣性予測です。
 
-Each Newton step solves $\mathbf H\,\delta \mathbf x = -\mathbf r$ with PCG; $\mathbf H$ is the consistent stiffness + mass matrix.  A block-Jacobi inverse of per-vertex 3×3 blocks is used as preconditioner.  Line-search (Armijo back-tracking) guarantees energy decrease.
+各 Newton ステップで $\mathbf H\,\delta \mathbf x = -\mathbf r$ を PCG で解きます。
+$\mathbf H$ は整合剛性 + 質量行列です。
+前処理には頂点ごとの 3×3 ブロック逆行列を使う block-Jacobi を用います。
+ラインサーチ（Armijo バックトラッキング）でエネルギー減少を保証します。
 
 ---
 
-## 4. Position-Based Dynamics Solver (`PBDSolver`)
+## 4. Position-Based Dynamics（位置ベース力学）ソルバー（`PBDSolver`）
 
-**Purpose.** Real-time cloth, elastic rods, XPBD fluids and particle crowds.
+**目的**: リアルタイムのクロス、弾性ロッド、XPBD 流体、粒子群。
 
-### 4.1 XPBD integration cycle
+### 4.1 XPBD 積分サイクル
 
-1. **Predict** – explicit Euler: $\mathbf v^{*}\!=\!\mathbf v + \Delta t\,\mathbf f/m$ and $\mathbf x^{*}\!=\!\mathbf x + \Delta t\,\mathbf v^{*}$.
-2. **Project constraints** – iterate over edges, tetrahedra, SPH density etc.
-   For each constraint $C(\mathbf x)\!=\!0$ solve for Lagrange multiplier λ
-   
+1. **予測（Predict）** – 陽的オイラー:
+   $\mathbf v^{*}\!=\!\mathbf v + \Delta t\,\mathbf f/m$、
+   $\mathbf x^{*}\!=\!\mathbf x + \Delta t\,\mathbf v^{*}$。
+2. **制約投影（Project constraints）** – 辺、四面体、SPH 密度などを反復処理。
+   各制約 $C(\mathbf x)\!=\!0$ に対してラグランジュ乗数 λ を解く:
+
    $$ \Delta\mathbf x = -\frac{C + \alpha\,\lambda^{old}}{\sum w_i\,|\nabla\!C_i|^{2}+\alpha}\,\nabla\!C, \quad \alpha = \frac{\text{compliance}}{\Delta t^{2}}. $$
 
-3. **Update velocities** – $\mathbf v = (\mathbf x^{new}-\mathbf x^{old})/\Delta t$.
+3. **速度更新（Update velocities）** –
+   $\mathbf v = (\mathbf x^{new}-\mathbf x^{old})/\Delta t$。
 
-### 4.2 Supported constraints
+### 4.2 対応制約
 
-* Stretch / bending (cloth)
-* Volume preservation (XPBD tetrahedra)
-* Incompressible SPH density & viscosity constraints (fluid-PBD)
-* Collision & friction via positional correction + Coulomb model.
+* 伸長 / 曲げ（クロス）
+* 体積保持（XPBD 四面体）
+* 非圧縮 SPH 密度制約 + 粘性制約（流体 PBD）
+* 位置補正 + クーロンモデルによる衝突・摩擦
 
 ---
 
-## 5. Smoothed Particle Hydrodynamics Solver (`SPHSolver`)
+## 5. Smoothed Particle Hydrodynamics（SPH）ソルバー（`SPHSolver`）
 
-**Purpose.** Particle-based fluids with either WCSPH or DFSPH pressure solvers.
+**目的**: WCSPH または DFSPH 圧力ソルバーによる粒子ベース流体。
 
-### 5.1 Kernels
+### 5.1 カーネル
 
-Cubic spline kernel $W(r,h)$ and gradient $\nabla W$ with support radius $h=$ `_support_radius`.
+三次スプラインカーネル $W(r,h)$ と勾配 $\nabla W$。
+サポート半径は $h=$ `_support_radius`。
 
-### 5.2 Weakly Compressible SPH (WCSPH)
+### 5.2 弱圧縮性 SPH（WCSPH）
 
-* Equation of state: $p_i = k\bigl[(\rho_i/\rho_0)^{\gamma}-1\bigr]$.
-* Momentum equation:
-  
+* 状態方程式: $p_i = k\bigl[(\rho_i/\rho_0)^{\gamma}-1\bigr]$。
+* 運動方程式:
+
   $$ \frac{d\mathbf v_i}{dt} = -\sum_j m_j \left( \frac{p_i}{\rho_i^2} + \frac{p_j}{\rho_j^2} \right) \nabla W_{ij} + \mathbf g + \mathbf f_{visc} + \mathbf f_{surf}. $$
 
-### 5.3 Divergence-free SPH (DFSPH)
+### 5.3 発散フリー SPH（DFSPH）
 
-* Splits solve into **divergence pass** (enforce $\nabla\!\cdot\mathbf v = 0$) and **density pass** (enforce $\rho\!=\!\rho_0$).
-* Both passes iteratively compute per-particle pressure coefficient κ with Jacobi iterations using the *DFSPh factor* field.
-* Ensures incompressibility with bigger time-steps than WCSPH.
+* 解法を **divergence pass**（$\nabla\!\cdot\mathbf v = 0$）と
+  **density pass**（$\rho\!=\!\rho_0$）に分離。
+* どちらのパスも Jacobi 反復で粒子ごとの圧力係数 κ を求め、*DFSPH factor* フィールドを使用。
+* WCSPH より大きい時間刻みで非圧縮性を維持できます。
 
 ---
 
-### References
+### 参考文献
 
 * Stam, J. "Stable Fluids", SIGGRAPH 1999.
 * Zhu, Y.⁠ & Bridson, R. "Animating Sand as a Fluid", SIGGRAPH 2005.

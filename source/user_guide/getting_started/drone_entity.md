@@ -1,8 +1,8 @@
-# 🚁 Drone Entity
+# 🚁 ドローンエンティティ
 
-Genesis provides specialized drone simulation with propeller physics and motor control.
+Genesis は、プロペラ物理とモーター制御を備えた専用ドローンシミュレーションを提供します。
 
-## Creating a Drone
+## ドローンの作成
 
 ```python
 import genesis as gs
@@ -27,69 +27,69 @@ drone = scene.add_entity(
 scene.build()
 ```
 
-## Drone Morph Options
+## ドローン Morph オプション
 
 ```python
 gs.morphs.Drone(
-    file="urdf/drones/cf2x.urdf",  # URDF file path
-    model="CF2X",                   # Model: "CF2X", "CF2P", or "RACE"
-    pos=(0.0, 0.0, 0.5),           # Initial position
-    euler=(0.0, 0.0, 0.0),         # Initial orientation (degrees)
+    file="urdf/drones/cf2x.urdf",  # URDF ファイルパス
+    model="CF2X",                   # モデル: "CF2X", "CF2P", または "RACE"
+    pos=(0.0, 0.0, 0.5),            # 初期位置
+    euler=(0.0, 0.0, 0.0),          # 初期姿勢（度）
     propellers_link_name=('prop0_link', 'prop1_link', 'prop2_link', 'prop3_link'),
-    propellers_spin=(-1, 1, -1, 1), # Spin directions: 1=CCW, -1=CW
+    propellers_spin=(-1, 1, -1, 1), # 回転方向: 1=CCW, -1=CW
 )
 ```
 
-## Motor Control
+## モーター制御
 
-Control propellers via RPM (revolutions per minute):
+RPM（1分あたり回転数）でプロペラを制御します。
 
 ```python
-hover_rpm = 14475.8  # Approximate hover RPM for CF2X
+hover_rpm = 14475.8  # CF2X のホバリング目安 RPM
 max_rpm = 25000.0
 
 for step in range(1000):
-    # Set RPM for each propeller [front-left, front-right, back-left, back-right]
+    # 各プロペラの RPM [front-left, front-right, back-left, back-right]
     rpms = np.array([hover_rpm, hover_rpm, hover_rpm, hover_rpm])
 
-    # Add differential thrust for motion
-    rpms[0] += 100  # Increase front-left
-    rpms[3] += 100  # Increase back-right
+    # 差動推力を加えて運動を作る
+    rpms[0] += 100  # front-left を増加
+    rpms[3] += 100  # back-right を増加
     rpms = np.clip(rpms, 0, max_rpm)
 
-    drone.set_propellels_rpm(rpms)  # Call ONCE per step
+    drone.set_propellels_rpm(rpms)  # 1 ステップにつき 1 回だけ呼ぶ
     scene.step()
 ```
 
-**Important:** `set_propellels_rpm()` must be called exactly once per simulation step.
+**重要:** `set_propellels_rpm()` はシミュレーション 1 ステップにつき必ず 1 回だけ呼び出してください。
 
-## Physics Model
+## 物理モデル
 
-- **Thrust:** `F = KF × RPM²` (vertical force per propeller)
-- **Torque:** `τ = KM × RPM² × spin_direction` (yaw moment)
-- **Control:**
-  - Differential thrust between propellers → translation
-  - Differential moment between pairs → rotation
+- **推力:** `F = KF × RPM²`（プロペラごとの鉛直力）
+- **トルク:** `τ = KM × RPM² × spin_direction`（ヨー方向モーメント）
+- **制御:**
+  - プロペラ間の差動推力 → 並進
+  - ペア間の差動モーメント → 回転
 
-## Multi-Environment
+## マルチ環境
 
 ```python
 scene.build(n_envs=32)
 
-# Control shape: (n_envs, n_propellers)
+# 制御入力形状: (n_envs, n_propellers)
 rpms = np.tile([hover_rpm] * 4, (32, 1))
 drone.set_propellels_rpm(rpms)
 ```
 
-## Available Models
+## 利用可能なモデル
 
-| Model | File | Description |
+| モデル | ファイル | 説明 |
 |-------|------|-------------|
-| CF2X | `urdf/drones/cf2x.urdf` | Crazyflie 2.0 X-config |
-| CF2P | `urdf/drones/cf2p.urdf` | Crazyflie 2.0 Plus |
-| RACE | `urdf/drones/racer.urdf` | Racing drone |
+| CF2X | `urdf/drones/cf2x.urdf` | Crazyflie 2.0 X 構成 |
+| CF2P | `urdf/drones/cf2p.urdf` | Crazyflie 2.0 Plus 構成 |
+| RACE | `urdf/drones/racer.urdf` | レーシングドローン |
 
-## Example: Hover Control
+## 例: ホバリング制御
 
 ```python
 import genesis as gs

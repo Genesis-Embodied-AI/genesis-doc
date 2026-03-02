@@ -1,18 +1,18 @@
-# 📃 Naming and Variables
+# 📃 命名規則と変数
 
-Different solvers represent physical entities using various formats, such as particles, elements, grids, and surfaces. Each data field is prefixed according to its corresponding representation. For computational efficiency and structures, data fields associated with different physical attributes are organized into the following categories (based on types of computations):
-- `*_state_*`: Dynamic states updated at every solver step. These fields are typically instantiated with `requires_grad` enabled by default. Its field size is, if differentiable, (number of substeps, number of units) and, if not, (number of units), where units depend on the representation like particles, vertices, etc. There may be different suffix for further specification such as,
-    - `*_state_ng`: Set `requires_gradient` to False.
-- `*_info`: Static attributes that remain constant throughout the simulation, typically encompassing physical properties such as mass, stiffness, viscosity, etc. Its field size is (number of units,)
-- `*_render`: Fields used exclusively for visualization, not directly involved in the physics computations. Its field size is (number of units,).
+各ソルバーは、粒子・要素・グリッド・サーフェスなど異なる表現で物理エンティティを扱います。各データフィールドには対応する表現に応じた接頭辞が付きます。計算効率と構造化のため、物理属性に対応するデータフィールドは（計算種別に応じて）次のカテゴリに整理されています。
+- `*_state_*`: 各ソルバーステップで更新される動的状態。通常は `requires_grad=True` で生成されます。フィールドサイズは、微分可能時は（サブステップ数, 単位数）、非微分時は（単位数）です。単位は粒子・頂点など表現依存です。さらに次のような接尾辞を持つ場合があります。
+    - `*_state_ng`: `requires_gradient` を False に設定。
+- `*_info`: シミュレーション中に不変な静的属性。質量、剛性、粘性などの物理パラメータを含みます。フィールドサイズは（単位数）。
+- `*_render`: 可視化専用で、物理計算には直接関与しないフィールド。フィールドサイズは（単位数）。
 <!-- Note that there may be both static and dynamic attributes for rendering, resulting in `*_state_render` and `*_info_render`. -->
-<!-- There may be different suffix for further specification such as,
-    - `*_state_ng`: Set `requires_gradient` to False.
-    - `*_state_reordered`: Cached data with reordering. -->
+<!-- より詳細な指定として、次のような接尾辞を使う場合があります。
+- `*_state_ng`: `requires_gradient` を False に設定。
+- `*_state_reordered`: 並べ替え済みキャッシュデータ。 -->
 
-Overall, the naming following `<representation>_<computation-type>`. (We always follow plural form with an s in representation, e.g., `dofs`, `particles`, `elements`, etc.)
+命名は基本的に `<representation>_<computation-type>` に従います。（`dofs`, `particles`, `elements` など、representation は常に複数形 `s` 付きです。）
 
-Also, some useful generic data types (defined in [genesis/\_\_init\_\_.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/__init__.py)):
+また、便利な汎用データ型（定義: [genesis/\_\_init\_\_.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/__init__.py)）を示します。
 ```python
 qd_vec2 = qd.types.vector(2, qd_float)
 qd_vec3 = qd.types.vector(3, qd_float)
@@ -29,14 +29,14 @@ qd_ivec3 = qd.types.vector(3, qd_int)
 qd_ivec4 = qd.types.vector(4, qd_int)
 ```
 
-In the following sections, we briefly describe the variables used by each solver.
+以下では、各ソルバーで使われる変数を簡潔に説明します。
 
-## Rigid Solver
+## Rigid ソルバー
 
-The rigid solver involves links, joints, geometry, and vertex representations. The rigid solver models articulated bodies composed of links and joints, with each link potentially consisting of multiple geometric components. Each geometry, in turn, may contain numerous vertices.
+Rigid ソルバーでは、リンク・関節・ジオメトリ・頂点の表現を扱います。リンクと関節で構成されるアーティキュレート剛体をモデル化し、各リンクは複数ジオメトリを持つことがあり、各ジオメトリは多数の頂点を持ち得ます。
 
-For links,
-* Dynamic link state (`links_state`)
+リンクについて:
+* 動的リンク状態（`links_state`）
     ```python
     qd.types.struct(
         parent_idx=gs.qd_int,         # index of the parent link in the kinematic tree (-1 if root)
@@ -59,7 +59,7 @@ For links,
         entity_idx=gs.qd_int,         # index of the entity this link belongs to
     )
     ```
-* Static link information (`links_info`)
+* 静的リンク情報（`links_info`）
     ```python
     qd.types.struct(
         cinr_inertial=gs.qd_mat3,     # com-based body inertia
@@ -97,8 +97,8 @@ For links,
     )
     ```
 
-For joints,
-* Dynamic DoF state (`dofs_state`)
+関節について:
+* 動的 DoF 状態（`dofs_state`）
     ```python
     qd.types.struct(
         force=gs.qd_float,            # total net force applied on this DoF after accumulation
@@ -128,7 +128,7 @@ For joints,
         hibernated=gs.qd_int,         # indicate hibernation
     )
     ```
-* Static DoF information (`dofs_info`)
+* 静的 DoF 情報（`dofs_info`）
     ```python
     qd.types.struct(
         stiffness=gs.qd_float,        # stiffness of the DoF
@@ -145,7 +145,7 @@ For joints,
         force_range=gs.qd_vec2,       # minimum and maximum allowed control force
     )
     ```
-* Static joint information (`joints_info`)
+* 静的関節情報（`joints_info`）
     ```python
     qd.types.struct(
         type=gs.qd_int,               # joint type ID (e.g., revolute, prismatic, fixed)
@@ -159,8 +159,8 @@ For joints,
     )
     ```
 
-For geometries,
-* Dynamic geometry state (`geom_state`)
+ジオメトリについて:
+* 動的ジオメトリ状態（`geom_state`）
     ```python
     qd.types.struct(
         pos=gs.qd_vec3,               # current world position of the geometry
@@ -171,7 +171,7 @@ For geometries,
         aabb_max=gs.qd_vec3,          # maximum bound of the geometry's AABB
     )
     ```
-* Static geometry information (`geom_info`)
+* 静的ジオメトリ情報（`geom_info`）
     ```python
     qd.types.struct(
         link_idx=gs.qd_int,           # index of the link this geometry belongs to
@@ -185,12 +185,12 @@ For geometries,
 <!-- TODO: verts -->
 <!-- TODO: rendering stuffs -->
 
-## MPM Solver
+## MPM ソルバー
 
-Material Point Method (MPM) uses particle- and grid-based representations.
+Material Point Method（MPM）は、粒子表現とグリッド表現を使用します。
 
-For particles,
-* Dynamic particle state (`particles_state`)
+粒子について:
+* 動的粒子状態（`particles_state`）
     ```python
     qd.types.struct(
         pos=gs.qd_vec3,    # position
@@ -205,13 +205,13 @@ For particles,
         Jp=gs.qd_float,    # volume ratio
     )
     ```
-* Dynamic particle state without gradient (`particles_stage_ng`)
+* 勾配なし動的粒子状態（`particles_stage_ng`）
     ```python
     qd.types.struct(
         active=gs.qd_int,  # whether the particle is active or not
     )
     ```
-* Static particle information (`particles_info`)
+* 静的粒子情報（`particles_info`）
     ```python
     qd.types.struct(
         material_idx=gs.qd_int,       # material id
@@ -223,8 +223,8 @@ For particles,
     )
     ```
 
-For grid,
-* Dynamic grid state (`grid_state`)
+グリッドについて:
+* 動的グリッド状態（`grid_state`）
     ```python
     qd.types.struct(
         vel_in=gs.qd_vec3,   # input momentum
@@ -233,8 +233,8 @@ For grid,
     )
     ```
 
-For rendering,
-* Particle attributes for particle-based rendering (`particles_render`)
+レンダリングについて:
+* 粒子ベース描画用の粒子属性（`particles_render`）
     ```python
     qd.types.struct(
         pos=gs.qd_vec3,   # position
@@ -242,14 +242,14 @@ For rendering,
         active=gs.qd_int, # whether the particle is active
     )
     ```
-* Static virtual vertex information for visual-based rendering (`vverts_info`)
+* 可視化用仮想頂点の静的情報（`vverts_info`）
     ```python
     qd.types.struct(
         support_idxs=qd.types.vector(n_vvert_supports, gs.qd_int),      # the indices of the supporting particles
         support_weights=qd.types.vector(n_vvert_supports, gs.qd_float), # the interpolation weights
     )
     ```
-* Dynamic virtual vertex state for visual-based rendering (`vverts_render`)
+* 可視化用仮想頂点の動的状態（`vverts_render`）
     ```python
     qd.types.struct(
         pos=gs.qd_vec3,   # the position of the virtual vertices
@@ -257,33 +257,33 @@ For rendering,
     )
     ```
 
-Check [`genesis/solvers/mpm_solver.py`](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/engine/solvers/mpm_solver.py) for more details.
+詳細は [`genesis/solvers/mpm_solver.py`](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/engine/solvers/mpm_solver.py) を参照してください。
 
-## FEM Solver
+## FEM ソルバー
 
-Finite Element Method (FEM) uses element and surface representation, where some attributes in elements are stored in the associated vertices.
+Finite Element Method（FEM）は、要素表現とサーフェス表現を使用します。要素に属する属性の一部は対応頂点側に保存されます。
 
-For elements,
-* Dynamic element state in element (`elements_el_state`)
+要素について:
+* 要素側の動的要素状態（`elements_el_state`）
     ```python
     qd.types.struct(
         actu=gs.qd_float,  # actuation
     )
     ```
-* Dynamic element state in vertex (`elements_v_state`)
+* 頂点側の動的要素状態（`elements_v_state`）
     ```python
     qd.types.struct(
         pos=gs.qd_vec3,  # position
         vel=gs.qd_vec3,  # velocity
     )
     ```
-* Dynamic element state without gradient (`elements_el_state_ng`)
+* 勾配なし動的要素状態（`elements_el_state_ng`）
     ```python
     qd.types.struct(
         active=gs.qd_int,  # whether the element is actice
     )
     ```
-* Static element information (`elements_el_info`)
+* 静的要素情報（`elements_el_info`）
     ```python
     qd.types.struct(
         el2v=gs.qd_ivec4,            # vertex index of an element
@@ -297,8 +297,8 @@ For elements,
     )
     ```
 
-For surfaces,
-* Static surface information (`surfaces_info`)
+サーフェスについて:
+* 静的サーフェス情報（`surfaces_info`）
     ```python
     qd.types.struct(
         tri2v=gs.qd_ivec3,  # vertex index of a triangle
@@ -307,29 +307,29 @@ For surfaces,
     )
     ```
 
-For rendering,
-* Dynamic surface attribute in vertex (`surfaces_v_render`)
+レンダリングについて:
+* 頂点側の動的サーフェス属性（`surfaces_v_render`）
     ```python
     qd.types.struct(
         vertices=gs.qd_vec3, # position
     )
     ```
-* Dynamic surface attribute in face (`surfaces_f_render`)
+* 面側の動的サーフェス属性（`surfaces_f_render`）
     ```python
     qd.types.struct(
         indices=gs.qd_int, # vertex indices corresponding to this surface unit (TODO: this is ugly as we flatten out (n_surfaces_max, 3))
     )
     ```
 
-Check [`genesis/solvers/fem_solver.py`](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/engine/solvers/fem_solver.py) for more details.
+詳細は [`genesis/solvers/fem_solver.py`](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/engine/solvers/fem_solver.py) を参照してください。
 
 
-## PBD Solver
+## PBD ソルバー
 
-Position Based Dynamics (PBD) uses a particle-based representation.
+Position Based Dynamics（PBD）は粒子ベース表現を使用します。
 
-For particles,
-* Dynamic particle state (`particles_state`, `particles_state_reordered`)
+粒子について:
+* 動的粒子状態（`particles_state`, `particles_state_reordered`）
     ```python
     qd.types.struct(
         free=gs.qd_int,  # whether the particle is free to move. If 0, it is kinematically controlled (e.g., fixed or externally manipulated)
@@ -341,14 +341,14 @@ For particles,
         rho=gs.qd_float, # estimated fluid density
     )
     ```
-* Dynamic particle state without gradient (`particles_state_ng`, `particles_state_ng_reordered`)
+* 勾配なし動的粒子状態（`particles_state_ng`, `particles_state_ng_reordered`）
     ```python
     qd.types.struct(
         reordered_idx=gs.qd_int, # reordering index
         active=gs.qd_int,        # whether the particle is active
     )
     ```
-* Static particle information (`particles_info`, `particles_info_reordered`)
+* 静的粒子情報（`particles_info`, `particles_info_reordered`）
     ```python
     qd.types.struct(
         mass=gs.qd_float,                 # mass
@@ -363,8 +363,8 @@ For particles,
     )
     ```
 
-For rendering,
-* Particle attribute (`particles_render`)
+レンダリングについて:
+* 粒子属性（`particles_render`）
     ```python
     qd.types.struct(
         pos=gs.qd_vec3,   # position
@@ -373,14 +373,14 @@ For rendering,
     )
     ```
 
-Check [`genesis/solvers/pbd_solver.py`](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/engine/solvers/pbd_solver.py) for more details.
+詳細は [`genesis/solvers/pbd_solver.py`](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/engine/solvers/pbd_solver.py) を参照してください。
 
-## SPH Solver
+## SPH ソルバー
 
-Smoothed Particle Hydrodynamics (SPH) uses a particle-based representation.
+Smoothed Particle Hydrodynamics（SPH）は粒子ベース表現を使用します。
 
-For particles,
-* Dynamic particle state (`particles_state`, `particles_state_reordered`)
+粒子について:
+* 動的粒子状態（`particles_state`, `particles_state_reordered`）
     ```python
     qd.types.struct(
         pos=gs.qd_vec3,           # position
@@ -392,14 +392,14 @@ For particles,
         drho=gs.qd_float,         # density derivative (rate of change)
     )
     ```
-* Dynamic particle state without gradient (`particles_state_ng`, `particles_state_ng_reordered`)
+* 勾配なし動的粒子状態（`particles_state_ng`, `particles_state_ng_reordered`）
     ```python
     qd.types.struct(
         reordered_idx=gs.qd_int, # reordering index
         active=gs.qd_int,        # whether the particle is active
     )
     ```
-* Static particle information (`particles_info`, `particles_info_reordered`)
+* 静的粒子情報（`particles_info`, `particles_info_reordered`）
     ```python
     qd.types.struct(
         rho=gs.qd_float,       # rest density
@@ -411,8 +411,8 @@ For particles,
     )
     ```
 
-For rendering,
-* Particle attributes (`particles_render`)
+レンダリングについて:
+* 粒子属性（`particles_render`）
     ```python
     qd.types.struct(
         pos=gs.qd_vec3,   # position
@@ -421,6 +421,6 @@ For rendering,
     )
     ```
 
-Check [`genesis/solvers/sph_solver.py`](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/engine/solvers/sph_solver.py) for more details.
+詳細は [`genesis/solvers/sph_solver.py`](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/engine/solvers/sph_solver.py) を参照してください。
 
 <!-- ## SF Solver -->

@@ -1,16 +1,16 @@
-# 💡 Tips
+# 💡 ヒント
 
-## Running Performance Benchmarks
+## パフォーマンスベンチマークの実行
 
-* One may need to temporarily disable caching when doing profiling and/or benchmarking. The most straightforward solution would be to completely wip out the persistent local cache folder. This is not recommended because its effect will persist beyond the scope of your experiment, slowing down start up of all your future simulations until your cache is finally recovered. One should rather redirect Genesis (and Quadrants) to some alternative temporary cache folder. This can be done editing any Python code, by setting a few environment variables:
+* プロファイリングやベンチマークを行う際には、キャッシュを一時的に無効化したい場合があります。最も単純な方法は永続的なローカルキャッシュフォルダを完全に削除することですが、これは推奨されません。実験後も影響が残り、キャッシュが再構築されるまで今後のシミュレーション起動が遅くなるためです。代わりに、Genesis（および Quadrants）のキャッシュ先を一時フォルダへリダイレクトするのが望ましいです。これは Python コードを編集せず、環境変数を設定するだけで実行できます：
 ```bash
 XDG_CACHE_HOME="$(mktemp -d)" GS_CACHE_FILE_PATH="$XDG_CACHE_HOME/genesis" QD_OFFLINE_CACHE_FILE_PATH="$XDG_CACHE_HOME/quadrants" python [...]
 ```
-Note that specifying `XDG_CACHE_HOME` is sufficient on Linux, but not on Windows OS and Mac OS.
+`XDG_CACHE_HOME` の指定だけで十分なのは Linux のみで、Windows および macOS では不十分な点に注意してください。
 
-# 🖥️ Command Line Tools
+# 🖥️ コマンドラインツール
 
-We provided some command line tools that you can execute in terminal once Genesis is installed. These include:
+Genesis をインストールすると、ターミナルで実行できるコマンドラインツールが利用できます。主なものは以下です：
 
-- `gs view *.*`: Visualize a given asset (mesh/URDF/MJCF) (can be useful if you want to quickly check if your asset can be loaded and visualized correctly)
-- `gs animate 'path/*.png'`: Combine all images that matches the given pattern into a video.
+- `gs view *.*`: 指定したアセット（mesh/URDF/MJCF）を可視化します（アセットが正しく読み込み・表示できるかを素早く確認するのに便利です）
+- `gs animate 'path/*.png'`: 指定パターンに一致する画像を動画にまとめます。

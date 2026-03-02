@@ -1,8 +1,8 @@
-# 💾 Checkpoints
+# 💾 チェックポイント
 
-Genesis provides state save/load functionality for training resumption and episode resets.
+Genesis は、学習再開やエピソードリセットのための状態保存/読込機能を提供します。
 
-## Basic Save/Load
+## 基本的な保存/読込
 
 ```python
 import genesis as gs
@@ -11,39 +11,39 @@ scene = gs.Scene()
 robot = scene.add_entity(gs.morphs.MJCF(file="franka.xml"))
 scene.build()
 
-# Simulate
+# シミュレーション
 for _ in range(100):
     scene.step()
 
-# Save checkpoint
+# チェックポイント保存
 scene.save_checkpoint("checkpoint.pkl")
 
-# Load in new scene
+# 新しいシーンで読込
 scene2 = gs.Scene()
 robot2 = scene2.add_entity(gs.morphs.MJCF(file="franka.xml"))
 scene2.build()
 scene2.load_checkpoint("checkpoint.pkl")
 ```
 
-## State Objects
+## 状態オブジェクト
 
 ```python
-# Get current state (in-memory)
+# 現在状態を取得（メモリ上）
 state = scene.get_state()
 
-# Reset to initial state
+# 初期状態へリセット
 scene.reset()
 
-# Reset to custom state
+# 任意状態へリセット
 scene.reset(state=state)
 ```
 
-## RL Episode Resets
+## RL エピソードリセット
 
 ```python
 scene.build(n_envs=N)
 
-# Snapshot initial state
+# 初期状態をスナップショット
 init_state = scene.get_state()
 
 for episode in range(num_episodes):
@@ -53,32 +53,32 @@ for episode in range(num_episodes):
         scene.step()
         obs, reward, done = get_observations()
 
-        # Reset environments where episode ended
+        # 終了した環境のみリセット
         if done.any():
             done_envs = torch.where(done)[0].tolist()
             scene.reset(state=init_state, envs_idx=done_envs)
 ```
 
-## Selective Environment Reset
+## 環境を選択したリセット
 
 ```python
 scene.build(n_envs=16)
 
-# Reset all environments
+# 全環境をリセット
 scene.reset()
 
-# Reset specific environments
+# 特定環境のみリセット
 scene.reset(envs_idx=[0, 2, 5])
 
-# Reset with custom state for specific envs
+# 特定環境へ任意状態を適用
 scene.reset(state=init_state, envs_idx=[1, 3, 7])
 ```
 
-## State Contents
+## 状態内容
 
-The `SimState` object contains:
+`SimState` オブジェクトには次が含まれます。
 
-| Solver | State Variables |
+| ソルバー | 状態変数 |
 |--------|-----------------|
 | Rigid | `qpos`, `dofs_vel`, `links_pos`, `links_quat` |
 | MPM | `pos`, `vel`, `C`, `F`, `Jp`, `active` |
@@ -86,15 +86,15 @@ The `SimState` object contains:
 | PBD | `pos`, `vel`, `free` |
 | FEM | `pos`, `vel`, `active` |
 
-## Checkpoint File Format
+## チェックポイントファイル形式
 
-Checkpoints are pickled dictionaries:
+チェックポイントは pickle 化された辞書です。
 
 ```python
 {
     "timestamp": time.time(),
     "step_index": scene.t,
-    "arrays": {  # Numpy arrays keyed by solver/field
+    "arrays": {  # solver/field キーごとの Numpy 配列
         "RigidSolver.qpos": np.array(...),
         "MPMSolver.pos": np.array(...),
         ...
@@ -102,22 +102,22 @@ Checkpoints are pickled dictionaries:
 }
 ```
 
-## Serialization for Transfer
+## 転送用シリアライズ
 
 ```python
-# Make state serializable (detach from graph)
+# 状態をシリアライズ可能にする（計算グラフから分離）
 state = scene.get_state()
 state_serializable = state.serializable()
 
-# Now safe to pickle
+# 安全に pickle 可能
 import pickle
 with open("state.pkl", "wb") as f:
     pickle.dump(state_serializable, f)
 ```
 
-## Important Notes
+## 重要な注意点
 
-- Checkpoints require compatible scene configuration (same entities, solver options)
-- 32-bit precision may lose ~2e-6 accuracy between save/load
-- Use `envs_idx` parameter for efficient partial resets
-- `scene.t` stores the simulation step count
+- チェックポイントには互換シーン設定が必要です（同一エンティティ・同一ソルバー設定）
+- 32-bit 精度では save/load 間で約 ~2e-6 の誤差が生じる場合があります
+- 部分リセットには `envs_idx` を使うと効率的です
+- `scene.t` はシミュレーションステップ数を保持します

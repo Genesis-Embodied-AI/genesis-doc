@@ -1,19 +1,20 @@
-# 🎥 Saving and Visualizing Data with Recorders
-Genesis also provides data recording utilities for automatically processing data without slowing down the simulation.
-This can be used to stream formatted data to a file, or visualize the data live.
+# 🎥 レコーダーを使ったデータ保存と可視化
+Genesis には、シミュレーションを遅くせずにデータを自動処理できる記録ユーティリティも用意されています。
+これにより、整形済みデータをファイルへストリーム出力したり、ライブ可視化したりできます。
 
 ```python
-# 1. Start recording before building scene
+# 1. シーンを build する前に記録開始
 sensor.start_recording(
     rec_options=gs.recorders.NPZFile(
         filename="sensor_data.npz"
     ),
 )
 ```
-... And that's it! Recordings will automatically stop and clean up when the scene is no longer active, and can also
-be stopped with `scene.stop_recording()`.
+... 以上です。記録はシーンが非アクティブになると自動で停止・クリーンアップされます。
+また、`scene.stop_recording()` でも停止できます。
 
-You can record sensor data with `sensor.start_recording(recorder_options)` or any other kind of data using `scene.start_recording(data_func, recorder_options)` with a custom data function. For example:
+センサーデータは `sensor.start_recording(recorder_options)` で記録できます。
+また、カスタムのデータ取得関数を使って `scene.start_recording(data_func, recorder_options)` により任意データを記録することもできます。例：
 
 ```
 def imu_data_func():
@@ -44,5 +45,5 @@ scene.start_recording(
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/imu.mp4" type="video/mp4">
 </video>
 
-See RecorderOptions in the API reference for currently available recorders.
-More example uses of recorders can also be seen in `examples/sensors/`. 
+現在利用可能なレコーダーについては、API リファレンスの `RecorderOptions` を参照してください。
+レコーダーの利用例は `examples/sensors/` にもあります。 

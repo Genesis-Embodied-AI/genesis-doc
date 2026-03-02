@@ -1,52 +1,53 @@
-# 🖲️ Sensors
+# 🖲️ センサー
 
-Robots need sensors to observe the world around them.
-In Genesis, sensors extract information from the scene, computing values using the state of the scene but not affecting the scene itself.
+ロボットは周囲の世界を観測するためにセンサーを必要とします。
+Genesis におけるセンサーは、シーン状態を使って情報を計算して取得しますが、シーン自体には影響を与えません。
 
-Sensors can be created with `scene.add_sensor(sensor_options)` and read with `sensor.read()` or `sensor.read_ground_truth()`.
+センサーは `scene.add_sensor(sensor_options)` で作成し、`sensor.read()` または `sensor.read_ground_truth()` で読み取ります。
 ```python
 scene = ...
 
-# 1. Add sensors to the scene
+# 1. シーンにセンサーを追加
 sensor = scene.add_sensor(
     gs.sensors.Contact(
         ...,
-        draw_debug=True, # visualize the sensor data in the scene viewer
+        draw_debug=True, # シーンビューア上でセンサーデータを可視化
     )
 )
 
-# 2. Build the scene
+# 2. シーンをビルド
 scene.build()
 
 for _ in range(1000):
     scene.step()
 
-    # 3. Read data from sensors
+    # 3. センサーからデータを取得
     measured_data = sensor.read()
     ground_truth_data = sensor.read_ground_truth()
 ```
 
-Currently supported sensors:
-- `IMU` (accelerometer and gyroscope)
-- `Contact` (boolean per rigid link)
-- `ContactForce` (xyz force per rigid link)
+現在サポートされているセンサー:
+- `IMU`（加速度計 + ジャイロ）
+- `Contact`（剛体リンクごとの真偽値）
+- `ContactForce`（剛体リンクごとの xyz 力）
 - `Raycaster`
   - `Lidar`
   - `DepthCamera`
 <!-- - `RGBCamera` -->
 
-Example usage of sensors can be found under `examples/sensors/`.
+センサーの利用例は `examples/sensors/` にあります。
 
 
-## IMU Example
+## IMU の例
 
-In this tutorial, we'll walk through how to set up an Inertial Measurement Unit (IMU) sensor on a robotic arm's end-effector. The IMU will measure linear acceleration and angular velocity as the robot traces a circular path, and we'll visualize the data in real-time with realistic noise parameters.
+このチュートリアルでは、ロボットアームのエンドエフェクタに IMU センサーを設定する方法を説明します。
+ロボットが円軌道をたどる際の線形加速度と角速度を IMU で計測し、現実的なノイズパラメータ付きでリアルタイム可視化します。
 
-The full example script is available at `examples/sensors/imu_franka.py`.
+完全なサンプルスクリプトは `examples/sensors/imu_franka.py` にあります。
 
-### Scene Setup
+### シーン設定
 
-First, let's create our simulation scene and load the robotic arm:
+まずシミュレーションシーンを作成し、ロボットアームを読み込みます。
 
 ```python
 import genesis as gs
@@ -76,11 +77,12 @@ end_effector = franka.get_link("hand")
 motors_dof = (0, 1, 2, 3, 4, 5, 6)
 ```
 
-Here we set up a basic scene with a Franka robotic arm. The camera is positioned to give us a good view of the robot's workspace, and we identify the end-effector link where we'll attach our IMU sensor.
+ここでは Franka ロボットアームを使った基本シーンを構築しています。
+カメラは作業空間を見やすい位置に配置し、IMU を取り付けるエンドエフェクタリンクを取得します。
 
-### Adding the IMU Sensor
+### IMU センサーの追加
 
-We "attach" the IMU sensor onto the entity at the end effector by specifying the `entity_idx` and `link_idx_local`.
+`entity_idx` と `link_idx_local` を指定して、エンドエフェクタ上のエンティティに IMU を「取り付け」ます。
 
 ```python
 imu = scene.add_sensor(
@@ -103,18 +105,18 @@ imu = scene.add_sensor(
 )
 ```
 
-The `gs.sensors.IMU` constructor has options to configure the following sensor characteristics:
-- `pos_offset` specifies the sensor's position relative to the link frame
-- `acc_cross_axis_coupling` and `gyro_cross_axis_coupling` simulate sensor misalignment
-- `acc_noise` and `gyro_noise` add Gaussian noise to measurements
-- `acc_random_walk` and `gyro_random_walk` simulate gradual sensor drift over time
-- `delay` and `jitter` introduce timing realism
-- `interpolate` smooths delayed measurements
-- `draw_debug` visualizes the sensor frame in the viewer
+`gs.sensors.IMU` コンストラクタでは次のセンサー特性を設定できます。
+- `pos_offset`: リンク座標系に対するセンサー位置
+- `acc_cross_axis_coupling` と `gyro_cross_axis_coupling`: センサー軸ずれをシミュレート
+- `acc_noise` と `gyro_noise`: 計測値にガウスノイズを付加
+- `acc_random_walk` と `gyro_random_walk`: 時間経過によるドリフトをシミュレート
+- `delay` と `jitter`: 時間遅延の現実性を導入
+- `interpolate`: 遅延計測を平滑化
+- `draw_debug`: ビューアにセンサーフレームを可視化
 
-### Motion Control and Simulation
+### モーション制御とシミュレーション
 
-Now let's build the scene and create circular motion to generate interesting IMU readings:
+次にシーンをビルドし、興味深い IMU 値が得られるよう円運動を作ります。
 
 ```python
 ########################## build and control ##########################
@@ -144,9 +146,10 @@ for i in range(1000):
     control_franka_circle_path(i)
 ```
 
-The robot traces a horizontal circle while maintaining a fixed orientation. The circular motion creates centripetal acceleration that the IMU will detect, along with any gravitational effects based on the sensor's orientation.
+ロボットは姿勢を固定したまま水平円軌道をたどります。
+この円運動により、IMU は向心加速度や、センサー姿勢に基づく重力影響を検出します。
 
-After building the scene, you can access both measured and ground truth IMU data:
+シーンビルド後は、計測値と真値の両方にアクセスできます。
 
 ```python
 # Access sensor readings
@@ -156,41 +159,43 @@ print("Measured data:")
 print(imu.read())
 ```
 
-The IMU returns data as a **named tuple** with fields:
-- `lin_acc`: Linear acceleration in m/s² (3D vector)
-- `ang_vel`: Angular velocity in rad/s (3D vector)
+IMU は次のフィールドを持つ **named tuple** を返します。
+- `lin_acc`: 線形加速度（m/s², 3 次元ベクトル）
+- `ang_vel`: 角速度（rad/s, 3 次元ベクトル）
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/imu.mp4" type="video/mp4">
 </video>
 
-## Contact Sensors
+## 接触センサー
 
-The contact sensors retrieve contact information per rigid link from the rigid solver.
-`Contact` sensor will return a boolean, and `ContactForce` returns the net force vector in the local frame of the associated rigid link.
+接触センサーは、剛体ソルバーから剛体リンクごとの接触情報を取得します。
+`Contact` センサーは真偽値を返し、`ContactForce` は対応する剛体リンクのローカル座標系で合力ベクトルを返します。
 <!-- NOTE: Untested with other solver couplings -->
 
-The full example script is available at `examples/sensors/contact_force_go2.py` (add flag `--force` to use force sensor).
+完全なサンプルスクリプトは `examples/sensors/contact_force_go2.py` にあります（力センサーを使うには `--force` フラグを追加）。
 
 ```{figure} ../../_static/images/contact_force_sensor.png
 ```
 
-## KinematicContactProbe Sensor
-The `KinematicContactProbe` is a tactile sensor which queries contact depth along "probe" points associated with a rigid entity link. Instead of forces retrieved from the physics solver like the contact sensors above, this sensor estimates force purely on the contact penetration depth: `F = stiffness * penetration * probe_normal`.
+## KinematicContactProbe センサー
+`KinematicContactProbe` は、剛体エンティティリンクに関連付けられた「プローブ」点に沿って接触深さを問い合わせる触覚センサーです。
+前述の接触センサーのように物理ソルバーから力を取得するのではなく、このセンサーは接触貫入深さから `F = stiffness * penetration * probe_normal` として力を推定します。
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/kin_probe_data.mp4" type="video/mp4">
 </video>
 
-An example script with teleop control is available at `examples/sensors/kinematic_contact_probe.py` to play around with.
+テレオペ制御付きのサンプルは `examples/sensors/kinematic_contact_probe.py` にあります。
 
-A grid of tactile probes could easily be placed on a robot hand or end effector to imitate taxels (tactile pixels) of a tactile sensor.
+触覚センサーの taxel（触覚画素）を模倣するために、ロボットハンドやエンドエフェクタ上へ触覚プローブのグリッドを簡単に配置できます。
 
-## Raycaster Sensors: Lidar and Depth Camera
+## Raycaster センサー: Lidar と Depth Camera
 
-The `Raycaster` sensor measures distance by casting rays into the scene and detecting intersections with geometry.
-The number of rays and ray directions can be specified with a `RaycastPattern`.
-`SphericalPattern` supports Lidar-like specification of field of view and angular resolution, and `GridPattern` casts rays from a plane. `DepthCamera` sensors provide the `read_image()` function which formats the raycast information as a depth image. See the API reference for details on the available options.
+`Raycaster` センサーは、シーンにレイを投射してジオメトリとの交差を検出し、距離を計測します。
+レイ本数とレイ方向は `RaycastPattern` で指定できます。
+`SphericalPattern` は視野角と角度分解能の LiDAR 風指定をサポートし、`GridPattern` は平面からレイを投射します。
+`DepthCamera` センサーは `read_image()` によりレイキャスト情報を深度画像として整形します。利用可能なオプションの詳細は API リファレンスを参照してください。
 
 ```python
 lidar = scene.add_sensor(
@@ -219,10 +224,10 @@ depth_camera.read_image() # returns tensor of distances as shape (height, width)
 
 ```
 
-An example script which demonstrates a raycaster sensor mounted on a robot is available at `examples/sensors/lidar_teleop.py`.
-Set the flag `--pattern` to `spherical` for a Lidar like pattern, `grid` for planar grid pattern, and `depth` for depth camera.
+ロボットに取り付けた raycaster センサーの例は `examples/sensors/lidar_teleop.py` にあります。
+`--pattern` フラグに `spherical` を指定すると LiDAR 風、`grid` で平面グリッド、`depth` で深度カメラパターンになります。
 
-Here's what running `python examples/sensors/lidar_teleop.py --pattern depth` looks like:
+`python examples/sensors/lidar_teleop.py --pattern depth` の実行例:
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/depth_camera.mp4" type="video/mp4">

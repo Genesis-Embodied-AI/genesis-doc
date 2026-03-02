@@ -1,52 +1,52 @@
-# 🔧 SAP Coupler
+# 🔧 SAP カップラー
 
-Genesis provides Semi-Analytic Primal (SAP) coupling for accurate rigid-FEM contact handling.
+Genesis は、剛体-FEM 接触を高精度に扱う Semi-Analytic Primal（SAP）カップリングを提供します。
 
-## Requirements
+## 要件
 
 ```python
 import genesis as gs
 
-# Must use 64-bit precision
+# 64-bit 精度が必須
 gs.init(backend=gs.gpu, precision="64")
 ```
 
-## Basic Setup
+## 基本設定
 
 ```python
 scene = gs.Scene(
     sim_options=gs.options.SimOptions(dt=1/60, substeps=2),
-    fem_options=gs.options.FEMOptions(use_implicit_solver=True),  # Required
+    fem_options=gs.options.FEMOptions(use_implicit_solver=True),  # 必須
     coupler_options=gs.options.SAPCouplerOptions(),
 )
 ```
 
-## Key Parameters
+## 主要パラメータ
 
-| Parameter | Default | Description |
+| パラメータ | 既定値 | 説明 |
 |-----------|---------|-------------|
-| `n_sap_iterations` | 5 | SAP solver iterations per step |
-| `n_pcg_iterations` | 100 | Max PCG solver iterations |
-| `sap_convergence_atol` | 1e-6 | Absolute tolerance |
-| `sap_convergence_rtol` | 1e-5 | Relative tolerance |
-| `sap_taud` | 0.1 | Dissipation time scale |
-| `hydroelastic_stiffness` | 1e8 | Hydroelastic contact stiffness |
-| `point_contact_stiffness` | 1e8 | Point contact stiffness |
-| `enable_rigid_fem_contact` | True | Enable rigid-FEM coupling |
+| `n_sap_iterations` | 5 | ステップあたり SAP 反復回数 |
+| `n_pcg_iterations` | 100 | PCG ソルバー最大反復回数 |
+| `sap_convergence_atol` | 1e-6 | 絶対収束許容値 |
+| `sap_convergence_rtol` | 1e-5 | 相対収束許容値 |
+| `sap_taud` | 0.1 | 散逸の時定数 |
+| `hydroelastic_stiffness` | 1e8 | 水弾性接触剛性 |
+| `point_contact_stiffness` | 1e8 | 点接触剛性 |
+| `enable_rigid_fem_contact` | True | 剛体-FEM カップリング有効化 |
 
-## Contact Type Options
+## 接触タイプオプション
 
-| Parameter | Values | Description |
+| パラメータ | 値 | 説明 |
 |-----------|--------|-------------|
-| `fem_floor_contact_type` | "tet", "vert", "none" | FEM-floor contact method |
-| `rigid_floor_contact_type` | "tet", "vert", "none" | Rigid-floor contact |
-| `rigid_rigid_contact_type` | "tet", "none" | Rigid-rigid contact |
+| `fem_floor_contact_type` | "tet", "vert", "none" | FEM-床接触方式 |
+| `rigid_floor_contact_type` | "tet", "vert", "none" | 剛体-床接触 |
+| `rigid_rigid_contact_type` | "tet", "none" | 剛体-剛体接触 |
 
-- **"tet"**: Default, tetrahedralization-based (most accurate)
-- **"vert"**: For very coarse meshes
-- **"none"**: Disable contact type
+- **"tet"**: デフォルト。四面体化ベース（最も高精度）
+- **"vert"**: 非常に粗いメッシュ向け
+- **"none"**: 接触タイプ無効化
 
-## Robot Grasping Example
+## ロボット把持の例
 
 ```python
 scene = gs.Scene(
@@ -67,7 +67,7 @@ sphere = scene.add_entity(
 )
 ```
 
-## FEM Simulation
+## FEM シミュレーション
 
 ```python
 sphere = scene.add_entity(
@@ -76,28 +76,28 @@ sphere = scene.add_entity(
 )
 ```
 
-## When to Use SAP
+## SAP を使うべき場面
 
-**Use SAP for:**
-- Rigid-FEM interactions (robot grasping deformables)
-- Hydroelastic contact model
-- High accuracy requirements
-- Manipulation tasks with deformable objects
+**SAP が適するケース:**
+- 剛体-FEM 相互作用（変形体把持など）
+- Hydroelastic 接触モデル
+- 高精度要件
+- 変形体を含むマニピュレーションタスク
 
-**Use LegacyCoupler for:**
-- Multiple particle solvers (MPM, SPH, PBD)
-- Differentiable simulation (SAP doesn't support gradients)
-- Rigid-only simulations
+**LegacyCoupler が適するケース:**
+- 複数粒子ソルバー（MPM, SPH, PBD）
+- 微分可能シミュレーション（SAP は勾配非対応）
+- 剛体のみシミュレーション
 
-## Performance
+## パフォーマンス
 
-- **Faster convergence**: 40 steps vs 150 for LegacyCoupler
-- **Higher accuracy**: Position error ~1e-3 vs ~5e-3
-- **Trade-off**: Requires 64-bit precision, FEM implicit solver
+- **収束が速い**: LegacyCoupler の 150 ステップに対し 40 ステップ
+- **精度が高い**: 位置誤差 ~1e-3（LegacyCoupler は ~5e-3）
+- **トレードオフ**: 64-bit 精度と FEM 陰解法ソルバーが必要
 
-## Limitations
+## 制限事項
 
-- Only supports Rigid + FEM solvers
-- Requires 64-bit precision (`precision="64"`)
-- FEM must use implicit solver
-- No gradient support for differentiable simulation
+- Rigid + FEM ソルバーのみ対応
+- 64-bit 精度（`precision="64"`）必須
+- FEM は陰解法ソルバー必須
+- 微分可能シミュレーションの勾配は未対応

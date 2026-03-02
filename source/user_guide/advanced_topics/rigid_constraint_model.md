@@ -1,26 +1,27 @@
-# 🔗 Rigid Collision Resolution
+# 🔗 剛体衝突解決
 
-Genesis follows a **quadratic penalty formulation** very similar to that used by [MuJoCo](https://mujoco.readthedocs.io/) for enforcing rigid–body constraints.  This document summarises the mathematics and physical interpretation of the model.
+Genesis は、剛体制約を扱うために [MuJoCo](https://mujoco.readthedocs.io/) と非常に近い **二次ペナルティ定式化** を採用しています。
+この文書では、その数理と物理的解釈を要約します。
 
 ---
 
-## 1. General formulation
+## 1. 一般定式化
 
-Let
+記号:
 
-* $q$ – joint configuration (generalised positions)
-* **\dot q** – generalised velocities
-* $a = \ddot q$ – the unknown **generalised accelerations** to be solved for each sub-step
-* $M(q)$ – joint-space mass matrix (positive definite)
-* $\tau_{ext}$ – all external joint forces **already known** (actuation, gravity, hydrodynamics …)
-* $J $ – a *stack* of kinematic constraints linearised in acceleration space
-* $D$ – diagonal matrix of *softness* / *impedance* parameters per constraint
-* $a_{ref}$ – reference accelerations that try to restore penetrations or satisfy motors
+* $q$ – 関節配置（一般化座標）
+* $\dot q$ – 一般化速度
+* $a = \ddot q$ – 各サブステップで解く未知の **一般化加速度**
+* $M(q)$ – 関節空間質量行列（正定値）
+* $\tau_{ext}$ – **既知** の外力（駆動、重力、流体力学など）
+* $J$ – 加速度空間で線形化された運動学制約のスタック
+* $D$ – 制約ごとの *softness/impedance* を持つ対角行列
+* $a_{ref}$ – 貫入回復やモータ目標を満たす参照加速度
 
-We seek the acceleration that minimises the **quadratic cost**
+求める加速度は次の **二次コスト** を最小化するものです。
 
 $$
-    \frac12 (M a \,{-}\, \tau_{ext})^{\!T} (a \,{-}\, a^{\text{prev}}) 
+    \frac12 (M a \,{-}\, \tau_{ext})^{\!T} (a \,{-}\, a^{\text{prev}})
     \;{+}\;
     \frac12 (J a \,{-}\, a_{ref})^{\!T} D (J a \,{-}\, a_{ref})
 $$
@@ -28,81 +29,89 @@ $$
 
 ---
 
-## 2. Contact & friction model
+## 2. 接触と摩擦モデル
 
-For every **contact pair** Genesis creates four constraints, which are the basis of the friction pyramid. Mathematically each direction **tᵢ** is
+各 **接触ペア** について、Genesis は摩擦ピラミッドを構成する 4 つの制約を生成します。
+各方向 **tᵢ** は次式です。
 
 $$
     \mathbf t\_i = \pm d_1\,\mu - \mathbf n \quad\text{or}\quad \pm d_2\,\mu - \mathbf n ,
 $$
 
-so that a positive multiplier on **tᵢ** produces a force that lies *inside* the cone $|\mathbf f_t| \le \mu f_n$.  A diagonal entry **Dᵢ** proportional to the combined inverse mass gives the familiar *soft-constraint* behaviour where larger *imp* (implicitness) values lead to stiffer contacts.
+これにより **tᵢ** 方向の正の乗数は、常に錐体 $|\mathbf f_t| \le \mu f_n$ の内側の力を生成します。
+対角要素 **Dᵢ** を合成逆質量に比例させることで、
+大きい *imp*（implicitness）ほど接触が硬くなる、よく知られた *soft-constraint* 挙動になります。
 
 ---
 
-## 3. Joint limits (inequality constraints)
+## 3. 関節リミット（不等式制約）
 
-Revolute and prismatic joints optionally carry a **lower** and **upper** position limit.  Whenever the signed distance to a limit becomes negative
+回転関節・直動関節には **下限** と **上限** を設定できます。
+リミットへの符号付き距離が負になると
 
 $$ \phi = q - q_{min} < 0 \quad\text{or}\quad \phi = q_{max} - q < 0 $$
 
-a *single* 1-DOF constraint is spawned with Jacobian
+1 自由度の制約を 1 本生成し、ヤコビアンは
 
 $$ J = \pm 1 $$
 
-and reference acceleration
+参照加速度は
 
 $$ a_{ref} = k\,\phi + c \,\dot q, $$
 
-obtained from the scalar `sol_params` (spring-damper style softness).  The diagonal entry of **D** once again scales with the inverse joint inertia.
+で、スカラー `sol_params`（ばね-ダンパ型 softness）から得ます。
+**D** の対角要素は同様に関節慣性逆数でスケールされます。
 
 ---
 
-## 4. Equality constraints
+## 4. 等式制約
 
-Genesis supports three kinds of **holonomic equalities**:
+Genesis は 3 種類の **ホロノミック等式制約** をサポートします。
 
-| Type | DOF removed | Description |
+| 種類 | 除去 DOF | 説明 |
 |------|-------------|-------------|
-| **Connect** | 3 | Enforces that two points on different bodies share the *same world position*.  Good for ball-and-socket joints. |
-| **Weld**    | 6 | Keeps two frames coincident in both translation **and** rotation (optionally scaled torque). |
-| **Polynomial joint** | 1 | Constrains one joint as a polynomial function of another (useful for complex mechanisms). |
+| **Connect** | 3 | 異なる剛体上の 2 点が *同一ワールド位置* を共有するよう拘束。ボールジョイント向き。 |
+| **Weld**    | 6 | 2 つのフレームを並進・回転の両方で一致させる（トルク係数を任意設定可）。 |
+| **Polynomial joint** | 1 | 一方の関節を他方の多項式関数として拘束（複雑機構向け）。 |
 
-Each equality writes rows into **J** so that their *relative* translational / rotational velocity vanishes.  Softness and Baumgarte stabilisation again come from per-constraint `sol_params`.
-
----
-
-## 5. Solvers
-
-The solver class implements **two interchangeable algorithms**:
-
-### 5.1 Projected Conjugate Gradient (PCG)
-
-* Operates in the **reduced space** of accelerations.
-* Uses the *mass matrix* as pre-conditioner.
-* After each CG step a **back-tracking line search** (Armijo style) projects the new **J a** onto the feasible set (normal ≥0, friction cone).
-* Requires only **matrix-vector products**, making it memory-friendly and fast for scenes with many constraints.
-
-### 5.2 Newton–Cholesky
-
-* Builds the **exact Hessian** \(H = M + J^T D J\).
-* A Cholesky factorisation (with incremental rank-1 updates) yields search directions.
-* Converges in very few steps (often 2-3) but is more expensive for large DOF counts.
-
-Both variants share **identical line-search logic** implemented in `_func_linesearch` that chooses the step length \(\alpha\) minimising the quadratic model whilst respecting inequality activation/de-activation.  The algorithm stops when either
-
-* the gradient norm \(|\nabla f|\) drops below `tolerance · mean_inertia · n_dofs`, or
-* the improvement of the cost function falls below the same threshold.
-
-Warm-starting is supported by initialising from the previous sub-step's smoothed accelerations `acc_smooth`.
+各等式は **J** に行を追加し、相対並進/相対回転速度がゼロになるようにします。
+softness と Baumgarte 安定化は制約ごとの `sol_params` で指定します。
 
 ---
 
-## 6. Practical implications
+## 5. ソルバー
 
-* **Stability** – because constraints are *implicit* in acceleration space the model handles larger time-steps, similar to MuJoCo.
-* **Friction anisotropy** – replacing the cone by a pyramid introduces slight anisotropy.  Increasing the number of directions would reduce this but cost more.
-* **Softness** – tuning `imp` and `timeconst` lets you trade constraint stiffness against numerical conditioning.  Values near 1 are stiff but may slow convergence.
-* **Choosing a solver** – use *CG* for scenes with thousands of DOFs or when memory is tight; switch to *Newton* when you need very high accuracy or when the DOF count is moderate (<100).
+ソルバークラスには **置き換え可能な 2 つのアルゴリズム** があります。
+
+### 5.1 射影共役勾配法（PCG）
+
+* 加速度の **縮約空間** で動作
+* *質量行列* を前処理として利用
+* 各 CG ステップ後、**バックトラッキングラインサーチ**（Armijo 系）で新しい **J a** を可行集合へ射影（法線力 ≥0、摩擦円錐内）
+* **行列-ベクトル積のみ** 必要なため、メモリ効率が良く制約数の多いシーンで高速
+
+### 5.2 ニュートン-コレスキー法
+
+* **厳密 Hessian** \(H = M + J^T D J\) を構築
+* Cholesky 分解（逐次 rank-1 更新付き）で探索方向を算出
+* 少ない反復（多くは 2〜3 回）で収束するが、DOF が大きい場合はコスト増
+
+両方式は `_func_linesearch` で実装された **同一のラインサーチロジック** を共有します。
+これは不等式の有効化/無効化を満たしつつ、二次モデルでステップ長 \(\alpha\) を選びます。
+停止条件:
+
+* 勾配ノルム \(|\nabla f|\) が `tolerance · mean_inertia · n_dofs` 未満
+* またはコスト関数改善量が同閾値未満
+
+前サブステップの平滑化加速度 `acc_smooth` を初期値に使う warm-start もサポートします。
+
+---
+
+## 6. 実用上の含意
+
+* **安定性** – 制約を加速度空間で *陰的* に扱うため、MuJoCo 同様に大きめ時間刻みでも安定
+* **摩擦異方性** – 摩擦円錐をピラミッド近似するため、わずかな異方性が生じる。方向数を増やせば緩和できるがコスト増
+* **Softness** – `imp` と `timeconst` 調整で、拘束剛性と数値条件のトレードオフを制御可能。1 に近いほど硬いが収束は遅くなり得る
+* **ソルバー選択** – DOF が大きい（数千）またはメモリ制約が厳しい場合は *CG*。高精度が必要で DOF が中規模（<100）なら *Newton* を推奨
 
 ---

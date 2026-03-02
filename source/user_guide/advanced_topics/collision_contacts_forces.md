@@ -1,160 +1,172 @@
-# 💥 Rigid Collision Detection
+# 💥 剛体衝突検出
 
-Genesis provides a highly-efficient, feature-rich collision detection and contact generation pipeline for rigid bodies.  The Python implementation lives in `genesis/engine/solvers/rigid/collider_decomp.py`.  This page gives a *conceptual* overview of the algorithmic building blocks so that you can understand, extend or debug the code.
+Genesis は、剛体向けに高効率かつ高機能な衝突検出/接触生成パイプラインを提供します。
+Python 実装は `genesis/engine/solvers/rigid/collider_decomp.py` にあります。
+このページでは、コードの理解・拡張・デバッグに必要なアルゴリズム要素を **概念的に** 整理します。
 
-> **Scope.**  The focus is on rigid–rigid interactions.  Soft-body / particle collisions rely on different solvers are in other files like `genesis/engine/coupler.py`.
+> **対象範囲**: 主に剛体-剛体相互作用です。軟体/粒子衝突は `genesis/engine/coupler.py` など別ソルバー側で処理されます。
 
 ---
 
-## Pipeline Overview
+## パイプライン概要
 
-The whole procedure can be seen as three successive stages:
+処理は次の 3 段階で構成されます。
 
-1. **AABB Update** – update world–space Axis-Aligned Bounding Boxes for every geometry.
-2. **Broad Phase (Sweep-and-Prune)** – quickly reject obviously non-intersecting geom pairs based on AABB and output *possible* collision pairs.
-3. **Narrow Phase** – robustly compute the actual contact manifold (normal, penetration depth, position, etc.) for every surviving pair using primitive-spcific algoirithm, SDF, MPR, or GJK.
+1. **AABB 更新** – 各ジオメトリのワールド座標系 AABB（軸平行境界ボックス）を更新
+2. **ブロードフェーズ（Sweep-and-Prune）** – AABB に基づき、非交差ペアを高速除外して *候補* ペアのみ出力
+3. **ナローフェーズ** – 生き残った各ペアについて、接触法線・貫入深さ・接触位置などの接触マニフォールドを精密計算
 
-`Collider` orchestrates all three stages through the public `detection()` method:
+`Collider` は公開メソッド `detection()` で 3 段階を統括します。
 
 ```python
 collider.detection()  # updates AABBs → SAP broad phase → narrow phase(s)
 ```
 
-Each stage is described in the following sections.
+以降で各段階を説明します。
 
 ---
 
-## 1&nbsp;· AABB Update
+## 1 · AABB 更新
 
-The helper kernel `_func_update_aabbs()` delegates the work to `RigidSolver._func_update_geom_aabbs()`.  It computes a *tight* world-space AABB per geometry and stores the result in `geoms_state[..].aabb_min / aabb_max`.
+ヘルパーカーネル `_func_update_aabbs()` は `RigidSolver._func_update_geom_aabbs()` へ処理を委譲します。
+各ジオメトリの *タイトな* ワールド空間 AABB を計算し、`geoms_state[..].aabb_min / aabb_max` に保存します。
 
-Why do we do this every frame?
+毎フレームこれを行う理由:
 
-* Rigid bodies move ⇒ their bounding boxes change.
-* AABB overlap checks are the cornerstone of the broad phase.
-
----
-
-## 2&nbsp;· Broad Phase – Sweep & Prune
-
-The broad phase is implemented in `_func_broad_phase()`.  It is an *N·log N* insertion-sort variant of the classical Sweep-and-Prune (a.k.a. Sort-and-Sweep):
-
-1.  Project every AABB onto a single axis (currently X) and insert its *min* and *max* endpoints into a sortable buffer.
-2.  **Warm-start** – the endpoints are already almost sorted from the previous frame ⇒ insertion sort is almost linear.
-3.  Sweep through the sorted buffer maintaining an *active set* of intervals that overlap the current endpoint.
-4.  Whenever `min_a` crosses inside `max_b` we have a *potential* pair `(geom_a, geom_b)`.
-
-Extra filtering steps remove pairs that are physically impossible or explicitly disabled:
-
-* Same link / adjacent link filtering.
-* `contype`/`conaffinity` bitmasks.
-* Pairs of links that are both fixed w.r.t. the world.
-* *Hibernation* support – sleeping bodies are ignored unless colliding with awake ones.
-
-The surviving pairs are stored in `broad_collision_pairs` and `n_broad_pairs`.
+* 剛体は動くため、境界ボックスも毎フレーム変化する
+* AABB 重なり判定は broad phase の土台である
 
 ---
 
-## 3&nbsp;· Narrow Phase – Contact Manifold Generation
+## 2 · ブロードフェーズ（Sweep & Prune）
 
-The narrow phase is split into four specialised kernels:
+broad phase は `_func_broad_phase()` で実装されます。
+古典的 Sweep-and-Prune（Sort-and-Sweep）の *N·log N* 挿入ソート変種です。
 
-| Kernel | When it runs | Purpose |
+1. 各 AABB を単一軸（現在は X）へ射影し、*min*/*max* 端点をソート用バッファへ挿入
+2. **Warm-start** – 前フレームからほぼ整列済みなので挿入ソートがほぼ線形化
+3. ソート済みバッファを走査し、現在端点と重なる区間の *active set* を維持
+4. `min_a` が `max_b` の内側へ入ったら候補ペア `(geom_a, geom_b)` を生成
+
+その後、物理的に不可能または無効化されたペアを追加フィルタします。
+
+* 同一リンク/隣接リンクの除外
+* `contype` / `conaffinity` ビットマスク
+* どちらもワールド固定リンクのペア除外
+* *Hibernation* 対応 – 起床中剛体との衝突以外では休止剛体を無視
+
+生き残ったペアは `broad_collision_pairs` と `n_broad_pairs` に保存されます。
+
+---
+
+## 3 · ナローフェーズ（接触マニフォールド生成）
+
+narrow phase は 4 種の専用カーネルに分かれます。
+
+| カーネル | 実行条件 | 目的 |
 |--------|--------------|---------|
-| `_func_narrow_phase_convex_vs_convex` | general convex–convex & plane-convex | Default path using **MPR** (Minkowski Portal Refinement) with fall-back to signed-distance-field queries. Use **GJK** algorithm when `use_gjk_collision` option in `RigidOptions` is set to be `True`.
-| `_func_narrow_phase_convex_specializations` | plane-box & box-box | Specialized handlers for a pair of convex geometries that have analytic solutions.
-| `_func_narrow_phase_any_vs_terrain` | at least one geometry is a *height-field terrain* | Generate multiple contact points per supporting cell.
-| `_func_narrow_phase_nonconvex_vs_nonterrain` | at least one geometry is **non-convex** | Handles mesh ↔ convex or mesh ↔ mesh collisions via SDF vertex/edge sampling.
+| `_func_narrow_phase_convex_vs_convex` | 一般の凸-凸 & 平面-凸 | 既定経路。**MPR**（Minkowski Portal Refinement）を使用し、必要に応じて SDF 問い合わせへフォールバック。`RigidOptions.use_gjk_collision=True` の場合は **GJK** を使用。 |
+| `_func_narrow_phase_convex_specializations` | 平面-箱 & 箱-箱 | 解析解を持つ凸形状ペア向け専用ハンドラ |
+| `_func_narrow_phase_any_vs_terrain` | 少なくとも一方が *height-field terrain* | 支持セルごとに複数接触点を生成 |
+| `_func_narrow_phase_nonconvex_vs_nonterrain` | 少なくとも一方が **非凸** | SDF の頂点/辺サンプリングで mesh↔convex / mesh↔mesh を処理 |
 
-### 3.1&nbsp; Convex–Convex
+### 3.1 凸-凸
 
-#### 3.1.1. GJK
+#### 3.1.1 GJK（ギルバート・ジョンソン・キアーシ）
 
-GJK, along with EPA, is a widely used contact detection algorithm in many physics engines, as it has following advantages:
+GJK（+EPA）は多くの物理エンジンで使われる接触検出法で、主な利点は次です。
 
-* Runs entirely on the GPU thanks to branch-free support-mapping primitives.
-* Requires only a *support function* per shape – no face adjacency or feature cache.
-* Gives seperation distance when the geometries are not in contact.
-* Verified numerical robustness in many implementations.
+* 分岐の少ない support-mapping により GPU 上で完結しやすい
+* 形状ごとに *support function* だけあればよく、面隣接情報や特徴キャッシュが不要
+* 非接触時に分離距離を得られる
+* 多くの実装で数値的頑健性が検証されている
 
-In Genesis, it is enabled when `use_gjk_collision` option in `RigidOptions` is set to be `True`. Also, Genesis enhances
-the robustness of GJK with following measures.
+Genesis では `RigidOptions.use_gjk_collision=True` で有効化されます。
+さらに次の工夫で頑健性を強化しています。
 
-* Thorough degeneracy check on simplex and polytope during runtime.
-* Robust face normal estimation.
-* Robust lower and upper bound estimation on the penetration depth.
+* 実行時の simplex/polytope 退化を徹底チェック
+* 頑健な面法線推定
+* 貫入深さの下限/上限推定を頑健化
 
-Genesis accelerates support queries with a **pre-computed Support Field** (see {doc}`Support Field <support_field>`).
+support 問い合わせは **事前計算 Support Field** で高速化します（{doc}`Support Field <support_field>` 参照）。
 
-Multi-contact generation is enabled by *small pose perturbations* around the first contact normal.  At most five
-contacts (`_n_contacts_per_pair = 5`) are stored per pair.
+複数接触点生成は、最初の接触法線まわりに小さな姿勢摂動を加えて行います。
+各ペアあたり最大 5 接触（`_n_contacts_per_pair = 5`）を保持します。
 
-#### 3.1.2. MPR
+#### 3.1.2 MPR（Minkowski Portal Refinement）
 
-MPR is another contact detection algorithm widely adopted in physics engines. Even though it shares most of the advantages
-of GJK, it does not give separation distance when the geometries are not colliding, and could be susceptible to numerical
-errors and degeneracies as it is not verified as much as GJK in many implementations.
+MPR も広く使われる接触検出法です。
+GJK の利点の多くを共有しますが、非衝突時の分離距離は得られず、
+実装検証の蓄積が GJK より少ないため、数値誤差や退化に弱くなり得ます。
 
-In Genesis, MPR is improved with a signed-distance-field fall-back when there is a deep penetration.
+Genesis では、深い貫入時に SDF フォールバックを入れることで MPR を強化しています。
 
-As GJK, Genesis accelerates support queries of MPR with a pre-computed Support Field, and detect multiple contacts with
-small pose perturbations around the first contact normal. Thus, at most five contacts (`_n_contacts_per_pair = 5`) are stored per pair.
+GJK 同様、MPR も事前計算 Support Field で高速化し、
+最初の法線周りの小摂動で複数接触を検出します。
+したがって 1 ペアあたり最大 5 接触（`_n_contacts_per_pair = 5`）です。
 
-### 3.2&nbsp; Non-convex Objects
+### 3.2 非凸オブジェクト
 
-For triangle meshes or decomposed convex clusters the pipeline uses **signed-distance fields** (SDF) pre-baked offline.  The algorithm samples
+三角形メッシュや凸クラスタ分解済み形状には、オフライン焼き込み済み **SDF（符号付き距離場）** を使います。
+アルゴリズムは
 
-* vertices (vertex–face contact), then
-* edges (edge–edge contact)
+* 頂点（vertex-face 接触）
+* 辺（edge-edge 接触）
 
-and keeps the deepest penetration.  The costly edge pass is skipped if a vertex contact is already found.
+をサンプリングし、最深貫入を採用します。
+頂点接触が既に見つかれば高コストな辺パスは省略されます。
 
-### 3.3&nbsp; Plane ↔ Box Special-Case
+### 3.3 平面↔箱の特殊処理
 
-Mujoco's analytical plane–box and box–box routine is ported for extra stability and to avoid degeneracies when a box lies flush on a plane.
+箱が平面へ面接触するような退化ケースを避けるため、
+MuJoCo の解析的な plane-box / box-box ルーチンを移植しています。
 
 ---
 
-## Contact Data Layout
+## 接触データレイアウト
 
-Successful contacts are pushed into the *struct-of-arrays* field `contact_data`:
+有効接触は `contact_data`（構造体配列）へ格納されます。
 
-| Field | Meaning |
+| Field | 意味 |
 |-------|---------|
-| `geom_a`, `geom_b` | geometry indices |
-| `penetration` | positive depth (≤ 0 means separated) |
-| `normal` | world-space unit vector pointing **from B to A** |
-| `pos` | mid-point of inter-penetration |
-| `friction` | effective Coulomb coefficient (max of the two) |
-| `sol_params` | solver tuning constants |
+| `geom_a`, `geom_b` | ジオメトリインデックス |
+| `penetration` | 正の貫入深さ（≤0 は分離） |
+| `normal` | **B から A** へ向くワールド空間単位法線 |
+| `pos` | 相互貫入領域の中点 |
+| `friction` | 有効クーロン係数（2 形状の最大値） |
+| `sol_params` | ソルバー調整定数 |
 
-`n_contacts` is incremented atomically so that GPU kernels may append in parallel.
-
----
-
-## Warm-Start & Caching
-
-To improve temporal coherence we cache, for every geometry pair, the ID of the previously deepest vertex and the last known separating normal.  The cache is consulted to *seed* the MPR search direction and is cleared when the pair separates in the broad phase.
+`n_contacts` は atomic 加算されるため、GPU カーネルが並列に追記できます。
 
 ---
 
-## Hibernation
+## ウォームスタートとキャッシュ
 
-When this feature is enabled, contacts belonging exclusively to hibernated bodies are preserved but not re-evaluated every frame (`n_contacts_hibernated`).  This drastically reduces GPU work for scenes with large static backgrounds.
+時間的コヒーレンス向上のため、各ジオメトリペアごとに
+「前回の最深頂点 ID」と「既知の分離法線」をキャッシュします。
+このキャッシュは MPR の初期探索方向に使われ、
+broad phase で分離したペアはクリアされます。
 
 ---
 
-## Tuning Parameters
+## ハイバネーション
 
-| Option | Default | Effect |
+この機能を有効にすると、休止剛体同士の接触は保持されますが毎フレーム再評価されません（`n_contacts_hibernated`）。
+大規模静的背景を含むシーンで GPU 負荷を大きく削減できます。
+
+---
+
+## チューニングパラメータ
+
+| オプション | 既定値 | 効果 |
 |--------|---------|--------|
-| `RigidSolver._max_collision_pairs` | 4096 | upper bound on broad-phase pairs (per environment) |
-| `Collider._mc_perturbation` | `1e-2` rad | perturbation angle for multi-contact search |
-| `Collider._mc_tolerance`    | `1e-2` of AABB size  | duplicate-contact rejection radius |
-| `Collider._mpr_to_gjk_overlap_ratio` | `0.5` | threshold to switch from MPR to SDF when one shape encloses the other |
+| `RigidSolver._max_collision_pairs` | 4096 | broad-phase ペア数上限（環境ごと） |
+| `Collider._mc_perturbation` | `1e-2` rad | 多接触探索時の摂動角 |
+| `Collider._mc_tolerance`    | `1e-2` of AABB size  | 重複接触を除外する半径 |
+| `Collider._mpr_to_gjk_overlap_ratio` | `0.5` | 一方が他方を包含する際に MPR から SDF へ切り替える閾値 |
 
 ---
 
-## Further Reading
+## 関連ドキュメント
 
-* {doc}`Support Field <support_field>` – offline acceleration structure for support-mapping shapes.
+* {doc}`Support Field <support_field>` – support-mapping 形状のオフライン加速構造

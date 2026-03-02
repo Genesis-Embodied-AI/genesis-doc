@@ -1,33 +1,33 @@
-# 🖥️ Multi-GPU Simulation
+# 🖥️ マルチ GPU シミュレーション
 
-Genesis supports multi-GPU execution for scaling simulations.
+Genesis は、シミュレーションのスケール拡張に向けたマルチ GPU 実行をサポートします。
 
-## Single GPU Configuration
+## 単一 GPU 設定
 
 ```python
 import genesis as gs
 
-# Automatic GPU selection
+# 自動 GPU 選択
 gs.init(backend=gs.gpu)
 
-# Force specific backend
+# バックエンドを明示指定
 gs.init(backend=gs.cuda)   # NVIDIA CUDA
 gs.init(backend=gs.metal)  # Apple Metal
-gs.init(backend=gs.cpu)    # CPU fallback
+gs.init(backend=gs.cpu)    # CPU フォールバック
 ```
 
-## Parallel Environments (Single GPU)
+## 並列環境（単一 GPU）
 
-Scale by batching environments on one GPU:
+1 枚の GPU 上で環境をバッチ化してスケールします。
 
 ```python
 scene.build(n_envs=2048, env_spacing=(1.0, 1.0))
-# All environments run in parallel on same GPU
+# 全環境を同一 GPU 上で並列実行
 ```
 
-## Multi-GPU with Multiprocessing
+## マルチプロセスによるマルチ GPU
 
-Run separate processes per GPU:
+GPU ごとに別プロセスを実行します。
 
 ```python
 import os
@@ -40,17 +40,17 @@ def run_simulation(gpu_id):
 
     import genesis as gs
     gs.init(backend=gs.gpu)
-    # ... simulation code ...
+    # ... シミュレーションコード ...
 
 if __name__ == "__main__":
-    for i in range(2):  # 2 GPUs
+    for i in range(2):  # GPU 2 枚
         p = multiprocessing.Process(target=run_simulation, args=(i,))
         p.start()
 ```
 
-## Distributed Training (DDP)
+## 分散学習（DDP）
 
-Use PyTorch Distributed Data Parallel:
+PyTorch Distributed Data Parallel を使用します。
 
 ```bash
 torchrun --standalone --nnodes=1 --nproc_per_node=2 train.py
@@ -73,46 +73,46 @@ torch.cuda.set_device(0)
 dist.init_process_group(backend="nccl", init_method="env://")
 model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[0])
 
-# Training loop with gradient synchronization
+# 勾配同期ありの学習ループ
 for step in range(steps):
     scene.step()
-    loss.backward()  # DDP handles all-reduce
+    loss.backward()  # DDP が all-reduce を処理
     optimizer.step()
 
 dist.barrier()
 dist.destroy_process_group()
 ```
 
-## Environment Variables
+## 環境変数
 
-| Variable | Purpose |
+| 変数 | 用途 |
 |----------|---------|
-| `CUDA_VISIBLE_DEVICES` | PyTorch/CUDA GPU selection |
-| `QD_VISIBLE_DEVICE` | Quadrants GPU selection |
-| `EGL_DEVICE_ID` | Rendering GPU (OpenGL/EGL) |
+| `CUDA_VISIBLE_DEVICES` | PyTorch/CUDA の GPU 選択 |
+| `QD_VISIBLE_DEVICE` | Quadrants の GPU 選択 |
+| `EGL_DEVICE_ID` | レンダリング GPU（OpenGL/EGL） |
 
-Always set all three together for multi-GPU setups.
+マルチ GPU 構成では、必ず 3 つを揃えて設定してください。
 
-## GPU Selection Patterns
+## GPU 選択パターン
 
-| Pattern | Method | GPUs | Complexity |
+| パターン | 方法 | GPU 数 | 複雑さ |
 |---------|--------|------|------------|
-| Single GPU | `gs.init(backend=gs.gpu)` | 1 | Low |
-| Batched envs | `scene.build(n_envs=N)` | 1 | Low |
-| Multi-process | Multiprocessing + env vars | N | Medium |
-| Distributed | torchrun + DDP | N | High |
+| 単一 GPU | `gs.init(backend=gs.gpu)` | 1 | 低 |
+| バッチ環境 | `scene.build(n_envs=N)` | 1 | 低 |
+| マルチプロセス | Multiprocessing + 環境変数 | N | 中 |
+| 分散実行 | `torchrun` + DDP | N | 高 |
 
-## Best Practices
+## ベストプラクティス
 
-1. **Batch first**: Use large `n_envs` on single GPU before scaling to multi-GPU
-2. **Set all env vars**: Always set CUDA, Quadrants, and EGL device together
-3. **Synchronize DDP**: Call `dist.barrier()` before destroying process groups
-4. **Headless rendering**: Set `pyglet.options["headless"] = True` on servers
-5. **Monitor memory**: Use `nvidia-smi` during batched simulation
+1. **まずバッチ化**: いきなりマルチ GPU にせず、単一 GPU で大きな `n_envs` を試す
+2. **環境変数を全設定**: CUDA / Quadrants / EGL を常にセットで指定する
+3. **DDP 同期**: プロセスグループ破棄前に `dist.barrier()` を呼ぶ
+4. **ヘッドレス描画**: サーバでは `pyglet.options["headless"] = True` を設定
+5. **メモリ監視**: バッチ実行中は `nvidia-smi` で確認
 
-## Device Access
+## デバイスアクセス
 
-After initialization:
+初期化後:
 
 ```python
 gs.device    # PyTorch device (e.g., "cuda:0", "mps:0")

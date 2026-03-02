@@ -1,111 +1,131 @@
-# 📐 Conventions
+# 📐 規約
 
-This page outlines the coordinate system and mathematical conventions used throughout Genesis.
+このページでは、Genesis 全体で使用される座標系と数理的な規約を説明します。
 
-## Coordinate System
+## 座標系
 
-Genesis uses a right-handed coordinate system with the following conventions:
+Genesis は右手系を採用し、以下の規約に従います。
 
-- **+X axis**: Points out of the screen (towards the viewer)
-- **+Y axis**: Points to the left
-- **+Z axis**: Points upward (vertical)
+- **+X 軸**: 画面の手前方向（閲覧者側）
+- **+Y 軸**: 左方向
+- **+Z 軸**: 上方向（鉛直）
 
-## Quaternion Representation
+## クォータニオン表現
 
-Quaternions in Genesis follow the **(w, x, y, z)** convention, where:
-- **w**: Scalar component (real part)
-- **x, y, z**: Vector components (imaginary parts)
+Genesis のクォータニオンは **(w, x, y, z)** 規約です。
+- **w**: スカラー成分（実部）
+- **x, y, z**: ベクトル成分（虚部）
 
-This is also known as the "scalar-first" or "Hamilton" convention. When specifying rotations using quaternions, always provide them in this order.
+これは "scalar-first" または "Hamilton" 規約とも呼ばれます。
+クォータニオンで回転を指定する際は、常にこの順序で与えてください。
 
-### Example
+### 例
 ```python
-# Quaternion representing a 90-degree rotation around the Z-axis
+# Z軸周りに90度回転するクォータニオン
 rotation = [0.707, 0, 0, 0.707]  # [w, x, y, z]
 ```
 
-## Gravity
+## 重力
 
-The gravitational force vector is defined as:
-- **Gravity direction**: **-Z** (pointing downward)
-- **Default magnitude**: 9.81 m/s²
+重力ベクトルは次のように定義されます。
+- **重力方向**: **-Z**（下向き）
+- **デフォルトの大きさ**: 9.81 m/s²
 
-This means objects will naturally fall in the negative Z direction when no other forces are applied.
+つまり、他の力が作用しない場合、物体は自然に負の Z 方向へ落下します。
 
-## Axis Conversion at Import Time
+## インポート時の軸変換
 
-Different 3D asset formats define (or omit) coordinate system conventions. Genesis allows you to define precisely rules to ensure consistency with its Z-up internal representation. The following sections describe how each supported format is handled.
+3D アセット形式ごとに座標系規約は異なり、規約が明示されない形式もあります。
+Genesis では、内部の Z-up 表現と整合させるためのルールを明確に定義できます。
+以下では、サポート形式ごとの扱いを説明します。
 
-### Alignment with Blender Exporters
+### Blender エクスポータとの整合
 
-Genesis's asset import behavior is explicitly aligned with Blender’s default exporters settings. Blender is a common authoring tool for robotics and simulation assets, and its exporters apply well-defined axis conversions depending on the target format (for example, exporting from Blender’s internal Z-up space to glTF’s Y-up convention).
+Genesis のアセットインポート挙動は、Blender のデフォルトエクスポータ設定に明示的に合わせています。
+Blender はロボティクス/シミュレーションでよく使われる制作ツールで、エクスポータは出力形式に応じた軸変換を実行します
+（例: Blender の内部 Z-up 空間から glTF の Y-up 規約への変換）。
 
-By mirroring Blender’s exporter behavior:
-- Assets exported from Blender using default settings import into Genesis with the **expected orientation**.
-- **Users can rely on Blender’s preview** and transforms **without** introducing format-specific workarounds.
-- **Cross-format consistency** (glTF, STL, OBJ, URDF-referenced meshes) is preserved.
+Blender の挙動に合わせることで、次が保証されます。
+- Blender のデフォルト設定で出力したアセットは、Genesis に期待どおりの向きで取り込まれる
+- ユーザーは形式ごとの回避策なしに、Blender のプレビューと変換結果をそのまま信頼できる
+- 形式間の一貫性（glTF、STL、OBJ、URDF 参照メッシュ）が維持される
 
-### Y-up ↔ Z-up Is Not a Single Convention
+### Y-up ↔ Z-up は単一規約ではない
 
-There is **no single, universal transformation** that converts between Y-up and Z-up coordinate systems. In general, conversions between Y-up and Z-up are defined by 3×3 rotation matrices, and multiple valid matrices exist depending on how the remaining axes (typically forward and right) are mapped. Two assets can both be labeled “Y-up” yet differ in orientation if they choose different forward axes.
+Y-up と Z-up の間を変換する **唯一の普遍変換** は存在しません。
+一般にこの変換は 3×3 回転行列で定義され、残り軸（通常は前方軸と右軸）の対応のさせ方によって複数の有効行列が存在します。
+同じ "Y-up" とされる2つのアセットでも、前方軸の定義が違えば向きは異なります。
 
-As a result, simply stating that an asset is "Y-up" or "Z-up" is not sufficient to fully define its spatial convention. The forward axis choice determines how rotation matrices are defined.
+そのため、アセットが "Y-up" または "Z-up" であるという情報だけでは、空間規約を完全には定義できません。
+回転行列の定義には前方軸の選択が必須です。
 
-#### Genesis Convention
+#### Genesis の規約
 
-Genesis adopts a specific and consistent Y-up ↔ Z-up mapping aligned with Blender’s exporter behavior. More precisely:
+Genesis は、Blender のエクスポータ挙動に合わせた一貫した Y-up ↔ Z-up 対応を採用します。具体的には次のとおりです。
 
-Blender’s internal coordinate system is Z-up. When exporting to Y-up formats, Blender allows you to specify any possible combination of Up and Forward vectors. Genesis adopts Blender’s default Y-up exporter configuration: **Y-up, −Z forward**. This ensures that:
-- Assets exported from Blender with default axis settings appear identical in Genesis
-- The chosen 3×3 rotation matrix is consistent across formats
-- Axis conversion behavior is predictable and reproducible
-- All references to "Y-up" handling in Genesis therefore refer to this specific Blender-aligned Y-up representation, not an abstract or ambiguous Y-up definition.
+Blender の内部座標系は Z-up です。Y-up 形式へエクスポートする際、Blender では Up/Forward ベクトルの組み合わせを任意指定できます。
+Genesis では Blender のデフォルト Y-up エクスポート設定、すなわち **Y-up, −Z forward** を採用します。
+これにより、次が保証されます。
+- Blender のデフォルト軸設定で書き出したアセットが Genesis で同一の見た目になる
+- 採用する 3×3 回転行列が形式間で一貫する
+- 軸変換の挙動が予測可能で再現可能になる
+- Genesis でいう "Y-up" 処理は、曖昧な一般定義ではなく、この Blender 整合の特定表現を指す
 
 ### glTF (.gltf / .glb)
-In Genesis, [glTF assets are always interpreted as Y-up](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#coordinate-system-and-units). During import, Genesis automatically converts glTF meshes from Y-up to Z-up. This behavior is fixed and cannot be overridden, ensuring compliance with the glTF specification. After import, the resulting meshes are guaranteed to be in Genesis Z-up space.
+Genesis では、[glTF アセットは常に Y-up として解釈](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#coordinate-system-and-units) されます。
+インポート時に glTF メッシュは自動で Y-up から Z-up に変換されます。
+この挙動は固定でオーバーライドできず、glTF 仕様への準拠を保証します。
+インポート後のメッシュは、必ず Genesis の Z-up 空間になります。
 
-Blender leaves the option to export a gtTF as Z-up, by unchecking the **+Y-up** option. However, Blender is unable to provide the option to reimport the asset correctly. **Genesis does not support importing glTF exported as Z-up**.
+Blender では **+Y-up** オプションを外すことで glTF を Z-up で出力できます。
+ただし Blender 側ではそのアセットを正しく再インポートする手段がありません。
+**Genesis は Z-up でエクスポートされた glTF のインポートをサポートしません**。
 
-![Diagram](images/blender_gltf_export.png)
+![図](images/blender_gltf_export.png)
 
-Blender GLTF exporter:
+Blender の glTF エクスポータ:
 https://docs.blender.org/manual/en/2.83/addons/import_export/scene_gltf2.html#transform
 
-### STL (.stl) and Wavefront OBJ (.obj)
+### STL (.stl) と Wavefront OBJ (.obj)
 
-STL and Wavefront OBJ formats do not define a standard coordinate system. Therefore, the correct up-axis must be explicitly specified at import. As a result, assets authored in these formats may be either Y-up or Z-up, depending on the originating tool or pipeline. For STL and OBJ files, Genesis allows users to explicitly specify how the asset should be interpreted:
+STL と Wavefront OBJ 形式には標準座標系の規定がありません。
+そのため、インポート時に正しい上方向軸を明示的に指定する必要があります。
+結果として、これらの形式のアセットは作成パイプラインに応じて Y-up の場合も Z-up の場合もあります。
+Genesis では STL/OBJ に対し、アセットの解釈方法をユーザーが明示指定できます。
 
-#### Z-up (default)
+#### Z-up（デフォルト）
 
-The mesh is assumed to already be in Z-up space. No axis conversion is performed at import time.
+メッシュはすでに Z-up 空間にあると仮定され、インポート時の軸変換は行われません。
 
 #### Y-up
 
-The mesh is assumed to be authored in Y-up space and the Y-up → Z-up conversion described above is applied. This flexibility allows STL and OBJ assets from different sources to be imported correctly without modifying the original files.
+メッシュは Y-up 空間で作成されたとみなし、前述の Y-up → Z-up 変換を適用します。
+これにより、元ファイルを変更せずに異なる由来の STL/OBJ を正しく取り込めます。
 
-![Diagram](images/blender_yup_export.png)
+![図](images/blender_yup_export.png)
 
-Blender's Wavefront exporter:
+Blender の Wavefront エクスポータ:
 https://docs.blender.org/manual/en/4.0/files/import_export/obj.html#object-properties
-Blender's STL exporter:
+Blender の STL エクスポータ:
 https://docs.blender.org/manual/fr/3.6/addons/import_export/mesh_stl.html#transform
 
-### Importing assets correctly in Genesis
-In order to hint Genesis, a **file_meshes_are_zup** import option in the FileMorph class is available
+### Genesis での正しいアセットインポート
+Genesis にヒントを与えるため、FileMorph クラスには **file_meshes_are_zup** インポートオプションがあります。
 
 ```python
 obj_y = scene.add_entity(
     morph=gs.morphs.Mesh(
         file="my_obj_file.obj",
-        # We are hinting Genesis that the meshes referenced by this file are 
-        # not in Z-up space and thus need to be converted at import time.
-        # True = mesh is already Z-up; False = mesh is Y-up and needs conversion.
+        # このファイルが参照するメッシュは Z-up ではないため、
+        # インポート時に変換が必要であることを Genesis に伝えます。
+        # True = すでに Z-up、False = Y-up のため変換が必要
         file_meshes_are_zup=False,
     ),
 )
 ```
 
-After import, the morph will have a **imported_as_zup** flag that allows to know if a correction was done on the meshes:
+インポート後、morph には **imported_as_zup** フラグが設定され、
+メッシュに補正が適用されたかどうかを確認できます。
 ```python
 obj_y.vgeoms[0].mesh.metadata["imported_as_zup"]
 ```

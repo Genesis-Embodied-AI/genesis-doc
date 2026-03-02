@@ -1,34 +1,38 @@
-# 🧩 Concepts
+# 🧩 概念
 
-## Systemat Architecture Overview
+## システムアーキテクチャ概要
 
 ```{figure} ../../_static/images/overview.png
 ```
 
-<!-- From an user perspective, building an environment using Genesis is to add `Entity` in `Scene`, where `Entity` is specified by
-- `Morph`: the geometry of the entity, e.g., primitive shapes or URDF.
-- `Material`: the material of the entity, e.g., elastic object, liquid, sand, etc. Material is associated with the underlying solvers, e.g., there is MPM liquid and SPH liquid, those demonstrate different behaviors.
-- `Surface`: the texture, rendering surface parameters etc
+<!-- ユーザー視点では、Genesis で環境を構築するとは `Scene` に `Entity` を追加することです。`Entity` は次で定義されます。
+- `Morph`: エンティティの形状（例: プリミティブ形状や URDF）。
+- `Material`: エンティティの材質（例: 弾性体、液体、砂など）。Material は対応するソルバーに関連づけられ、MPM 液体と SPH 液体のように異なる挙動を示します。
+- `Surface`: テクスチャやレンダリング表面パラメータなど。
 
-Under the hood, the scene consists of a simulator that encapsulates,
-- `Solver`: the physics solver that handles the core physics engine with different methods like rigid, material point method (MPM), finite element method (FEM), etc.
-- `Coupler`: the bridge across solvers that handle forces and any interaction in between. -->
+内部的には、シーンは次を内包するシミュレータで構成されます。
+- `Solver`: 剛体、MPM、FEM などの手法で物理計算を担う中核ソルバー。
+- `Coupler`: ソルバー間の力や相互作用を橋渡しするモジュール。 -->
 
-From a user’s perspective, building an environment in Genesis involves adding `Entity` objects to a `Scene`. Each `Entity` is defined by:
-- `Morph`: the geometry of the entity, such as primitive shapes (e.g., cube, sphere) or articulated models (e.g., URDF, MJCF).
-- `Material`: the physical properties of the entity, such as elastic solids, liquids, or granular materials. The material type determines the underlying solver used—for example, both MPM and SPH can simulate liquids, but each exhibits different behaviors.
-- `Surface`: the visual and interaction-related surface properties, such as texture, roughness, or reflectivity.
+ユーザー視点では、Genesis で環境を構築するとは `Scene` に `Entity` を追加することです。
+各 `Entity` は次で定義されます。
+- `Morph`: エンティティの幾何形状（例: キューブ・球などのプリミティブ、URDF/MJCF などのモデル）
+- `Material`: 物理特性（弾性体、液体、粒状体など）。マテリアル種別によって使用ソルバーが決まり、例えば液体でも MPM と SPH で挙動が異なります。
+- `Surface`: テクスチャ、粗さ、反射率など見た目と相互作用に関わる表面特性
 
-Behind the scenes, the `Scene` is powered by a `Simulator`, which includes:
-- `Solver`: the core physics solvers responsible for simulating different physical models, such as rigid body dynamics, Material Point Method (MPM), Finite Element Method (FEM), Position-Based Dynamics (PBD), and Smoothed Particle Hydrodynamics (SPH).
-- `Coupler`: a module that handles interactions between solvers, ensuring consistent force coupling and inter-entity dynamics.
+内部的には `Scene` は `Simulator` で駆動され、次を含みます。
+- `Solver`: 剛体、MPM、FEM、PBD、SPH など各物理モデルを計算するコアソルバー
+- `Coupler`: ソルバー間相互作用を処理し、力の結合やエンティティ間ダイナミクスの整合を取るモジュール
 
 
-## Data Indexing
+## データインデクシング
 
-We have been recieving a lot of questions about how to partially manipulate a rigid entity like only controling or retrieving certain attributes. Thus, we figure it would be nice to write a more in-depth explaination on index access to data.
+「剛体エンティティの一部属性だけを制御/取得するにはどうするか」という質問が多いため、
+データへのインデックスアクセスを詳しく説明します。
 
-**Structured Data Field**. For most of the case, we are using [struct Quadrants field](https://docs.taichi-lang.org/docs/type#struct-types-and-dataclass). Take MPM for an example for better illustration ([here](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/solvers/mpm_solver.py#L103C1-L107C10) and [here](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/solvers/mpm_solver.py#L123)),
+**構造化データフィールド**。
+多くの場合、[Quadrants の struct field](https://docs.taichi-lang.org/docs/type#struct-types-and-dataclass) を使っています。
+例として MPM を見ると（[ここ](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/solvers/mpm_solver.py#L103C1-L107C10) と [ここ](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/solvers/mpm_solver.py#L123)）、
 ```
 struct_particle_state_render = qd.types.struct(
     pos=gs.qd_vec3,
@@ -40,37 +44,48 @@ self.particles_render = struct_particle_state_render.field(
     shape=self._n_particles, needs_grad=False, layout=qd.Layout.SOA
 )
 ```
-This means we are create a huge "array" (called field in Quadrants) with each entry being a structured data type that includes `pos`, `vel`, and `active`. Note that this data field is of length `n_particles`, which include __ALL__ particles in a scene. Then, suppose there are multiple entities in the scene, how do we differentiate across entities? A straightforward idea is to "tag" each entry of the data field with the corresponding entity ID. However, it may not be the best practice from the memory layout, computation, and I/O perspective. Alternatively, we use index offsets to distinguish entities.
+これは、各要素が `pos`, `vel`, `active` を持つ構造体である巨大な配列（Quadrants では field）を作っていることを意味します。
+このフィールド長は `n_particles` で、シーン内の粒子 **すべて** を含みます。
+ではシーンに複数エンティティがある場合、どう区別するか。
+各要素へ entity ID タグを持たせる方法もありますが、メモリ配置・計算・I/O の観点で最適とは限りません。
+Genesis では代わりに **インデックスオフセット** を使います。
 
-**Local and Global Indexing**. The index offset provides simultaneously the simple, intuitive user interface (local indexing) and the optimized low-level implementation (global indexing). Local indexing allows interfacing __WITHIN__ an entity, e.g., the 1st joint or 30th particles of a specific entity. The global indexing is the pointer directly to the data field inside the solver which consider all entities in the scene. A visual illustration looks like this
+**ローカル/グローバルインデクシング**。
+インデックスオフセットにより、直感的なユーザー API（ローカル）と最適化済み内部実装（グローバル）を両立します。
+ローカルインデクシングは特定エンティティ内の参照（例: 1 番目の関節、30 番目の粒子）です。
+グローバルインデクシングは、シーン内全エンティティを含むソルバーのデータフィールドへの直接ポインタです。
 
 ```{figure} ../../_static/images/local_global_indexing.png
 ```
 
-We provide some concrete examples in the following for better understanding,
-- In MPM simulation, suppose `vel=torch.zeros((mpm_entity.n_particles, 3))` (which only considers all particles of __this__ entity), [`mpm_entity.set_velocity(vel)`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L296) automatically abstract out the offseting for global indexing. Under the hood, Genesis is actually doing something conceptually like `mpm_solver.particles[start:end].vel = vel`, where `start` is the offset ([`mpm_entity.particle_start`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L453)) and `end` is the offset plus the number of particles ([`mpm_entity.particle_end`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L457)).
-- In rigid body simulation, all `*_idx_local` mean the local indexing, with which the users interact. They will be converted to the global indexing through `entity.*_start + *_idx_local`. Suppose we want to get the 3rd dof position by [`rigid_entity.get_dofs_position(dofs_idx_local=[2])`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/rigid_entity/rigid_entity.py#L2201), this is actually accessing `rigid_solver.dofs_state[2+offset].pos` where `offset` is [`rigid_entity.dofs_start`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/rigid_entity/rigid_entity.py#L2717).
+具体例:
+- MPM の場合、`vel=torch.zeros((mpm_entity.n_particles, 3))`（このエンティティの粒子のみ）として [`mpm_entity.set_velocity(vel)`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L296) を呼ぶと、グローバルオフセットは自動抽象化されます。
+  内部的には概念的に `mpm_solver.particles[start:end].vel = vel` を行っており、`start` はオフセット（[`mpm_entity.particle_start`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L453)）、`end` はオフセット + 粒子数（[`mpm_entity.particle_end`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L457)）です。
+- 剛体の場合、`*_idx_local` はすべてローカルインデックスです。これらは `entity.*_start + *_idx_local` でグローバルへ変換されます。
+  例えば [`rigid_entity.get_dofs_position(dofs_idx_local=[2])`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/rigid_entity/rigid_entity.py#L2201) で 3 番目の dof 位置を取ると、実際には `rigid_solver.dofs_state[2+offset].pos` へアクセスしています。ここで `offset` は [`rigid_entity.dofs_start`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/rigid_entity/rigid_entity.py#L2717) です。
 
-(An interesting read of a relevant design pattern called [entity component system (ECS)](https://en.wikipedia.org/wiki/Entity_component_system))
+（関連デザインパターンとして [entity component system (ECS)](https://en.wikipedia.org/wiki/Entity_component_system) も参考になります。）
 
-## Direct Access to Data Field
+## データフィールドへの直接アクセス
 
-Normally, we do not encourage users to directly access the (Quadrants) data field.
-Instead, users should mostly use the APIs in each entity, such as `RigidEntity.get_dofs_position`.
-However, if one would like to access to data field not supported via APIs and could not wait for the new API support, one could try a direct access of data field, which may be a quick and dirty (yet most likely inefficient) solution. Specifically, following the data indexing mechanism described in the previous section, suppose one would like to do
+通常、（Quadrants の）データフィールドへ直接アクセスすることは推奨していません。
+基本的には `RigidEntity.get_dofs_position` のようなエンティティ API を使ってください。
+ただし API 未対応データが必要で、新 API を待てない場合は、
+応急処置として直接アクセスする方法があります（ただし多くの場合は非効率です）。
+前節のインデクシングに従うと、例えば
 ```
 entity: RigidEntity = ...
 tgt = entity.get_dofs_position(...)
 ```
-
-This is equivalent to
+は次と等価です。
 ```
 all_dofs_pos = entity.solver.dofs_state.pos.to_torch()
-tgt = all_dofs_pos[:, entity.dof_start:entity.dof_end]  # the first dimension is the batch dimension
+tgt = all_dofs_pos[:, entity.dof_start:entity.dof_end]  # 先頭次元はバッチ次元
 ```
 
-All entities are associated with a specific solver (except for hybrid entity).
-Each desired physical attribute is stored somewhere in the solver (e.g., dofs position here is stored as `dofs_state.pos` in the rigid solver).
-For more details of these mapping, you could check {doc}`Naming and Variables <naming_and_variables>`.
-Also, all the data field in the solver follows a global indexing (for all entities) where you need `entity.*_start` and `entity.*_end` to only extract the data relevant with a specific entity.
-
+全エンティティは（hybrid entity を除き）特定ソルバーに紐付きます。
+欲しい物理属性はソルバー内部のどこかに保存されます
+（例: dof 位置は rigid solver の `dofs_state.pos`）。
+対応関係の詳細は {doc}`Naming and Variables <naming_and_variables>` を参照してください。
+また、ソルバー内のデータフィールドはすべてグローバルインデクシング（全エンティティ対象）なので、
+特定エンティティ分だけ抽出するには `entity.*_start` と `entity.*_end` を使います。

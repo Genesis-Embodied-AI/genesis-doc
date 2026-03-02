@@ -1,90 +1,91 @@
-# ✍️ Manipulation with Two-Stage Training
+# ✍️ 二段階学習によるマニピュレーション
 
-This example demonstrates robotic manipulation using a **two-stage training paradigm** that combines **reinforcement learning (RL)** and **imitation learning (IL)**. The central idea is to first train a **privileged teacher policy** using full state information, and then distill that knowledge into a **vision-based student policy** that relies on camera observations (and optionally robot proprioception).
-This approach enables efficient learning in simulation while bridging the gap toward real-world deployment where privileged states are unavailable.
-
----
-
-## Environment Overview
-
-The manipulation environment is composed of the following elements:
-
-* **Robot:** A 7-DoF Franka Panda arm with a parallel-jaw gripper.
-* **Object:** A box with randomized initial position and orientation, ensuring diverse training scenarios.
-* **Cameras:** Two stereo RGB cameras (left and right) facing the manipulation scene. Here, we use [Madrona Enginer](https://madrona-engine.github.io/) for batch rendering. 
-* **Observations:**
-
-  * **Privileged state:** End-effector pose and object pose (used only during teacher training).
-  * **Vision state:** Stereo RGB images (used by the student policy).
-* **Actions:** 6-DoF delta end-effector pose commands (3D position + orientation).
-* **Rewards:** A **keypoint alignment** reward is used. This defines reference keypoints between the gripper and the object, encouraging the gripper to align to a graspable pose.
-
-  * This formulation avoids dense shaping terms and directly encodes task success.
-  * Only this reward is required for the policy to learn goal reaching.
+この例では、**強化学習（RL）** と **模倣学習（IL）** を組み合わせた **二段階学習パラダイム** によるロボットマニピュレーションを示します。
+中心となる考え方は、まず完全な状態情報を使って **特権的な教師ポリシー** を学習し、その知識を、カメラ観測（および必要に応じてロボットの固有感覚）に依存する **視覚ベースの生徒ポリシー** へ蒸留することです。
+このアプローチにより、シミュレーション内で効率よく学習しつつ、特権状態が使えない実機環境へのギャップを埋めることができます。
 
 ---
 
-## RL Training (Stage 1: Teacher Policy)
+## 環境概要
 
-In the first stage, we train a teacher policy using **Proximal Policy Optimization (PPO)** from the [RSL-RL library](https://github.com/leggedrobotics/rsl_rl).
+マニピュレーション環境は次の要素で構成されます。
 
-**Setup:**
+* **ロボット:** 7-DoF の Franka Panda アーム（平行ジョーグリッパー付き）。
+* **物体:** 初期位置・姿勢をランダム化した箱。多様な学習シナリオを確保します。
+* **カメラ:** 操作シーンを向いた左右 2 台のステレオ RGB カメラ。ここではバッチレンダリングに [Madrona Engine](https://madrona-engine.github.io/) を使用します。
+* **観測:**
+
+  * **特権状態:** エンドエフェクタ姿勢と物体姿勢（教師学習時のみ使用）。
+  * **視覚状態:** ステレオ RGB 画像（生徒ポリシーで使用）。
+* **行動:** 6-DoF のエンドエフェクタ差分姿勢コマンド（3D 位置 + 姿勢）。
+* **報酬:** **キーポイント整列** 報酬を使用します。これはグリッパーと物体の間に参照キーポイントを定義し、把持可能な姿勢に整列するよう促します。
+
+  * この定式化により密な shaping 項を避け、タスク成功を直接符号化できます。
+  * ポリシーが目標到達を学習するのに必要なのはこの報酬のみです。
+
+---
+
+## RL 学習（ステージ 1: 教師ポリシー）
+
+第 1 段階では、[RSL-RL library](https://github.com/leggedrobotics/rsl_rl) の **Proximal Policy Optimization（PPO）** を使って教師ポリシーを学習します。
+
+**セットアップ:**
 
 ```bash
 pip install tensorboard rsl-rl-lib==2.2.4
 ```
 
-**Training:**
+**学習:**
 
 ```bash
 python examples/manipulation/grasp_train.py --stage=rl
 ```
 
-**Monitoring:**
+**モニタリング:**
 
 ```bash
 tensorboard --logdir=logs
 ```
 
-The reward learning curve looks like the following if the training is successful:
+学習が成功した場合、報酬カーブは次のようになります。
 
 ```{figure} ../../_static/images/manipulation_curve.png
 ```
 
-**Key details:**
+**重要ポイント:**
 
-* **Inputs:** Privileged state (no images).
-* **Outputs:** End-effector action commands.
-* **Parallelization:** Large vectorized rollouts (e.g., 1024–4096 envs) for fast throughput.
-* **Reward design:** Keypoint alignment suffices to produce consistent grasping behavior.
-* **Outcome:** A lightweight MLP policy that learns stable grasping given ground-truth state information.
+* **入力:** 特権状態（画像なし）。
+* **出力:** エンドエフェクタ行動コマンド。
+* **並列化:** 大規模ベクトル化ロールアウト（例: 1024–4096 環境）で高スループット化。
+* **報酬設計:** キーポイント整列だけで一貫した把持挙動を獲得可能。
+* **結果:** 真値状態情報を前提に安定した把持を学習する軽量 MLP ポリシー。
 
-The teacher policy serves as the demonstration source for the next stage.
+この教師ポリシーが次段階のデモンストレーション源になります。
 
 ---
 
-## Imitation Learning (Stage 2: Student Policy)
+## 模倣学習（ステージ 2: 生徒ポリシー）
 
-The second stage trains a **vision-conditioned student policy** that imitates the RL teacher.
+第 2 段階では、RL 教師を模倣する **視覚条件付き生徒ポリシー** を学習します。
 
-**Architecture:**
+**アーキテクチャ:**
 
-* **Encoder:** Shared stereo CNN encoder extracts visual features.
-* **Fusion network:** Merges image features with optional robot proprioception.
-* **Heads:**
-  * **Action head:** Predicts 6-DoF manipulation actions.
-  * **Pose head:** Auxiliary task to predict object pose (xyz + quaternion).
+* **エンコーダ:** 共有ステレオ CNN エンコーダが視覚特徴を抽出。
+* **統合ネットワーク:** 画像特徴と（任意で）ロボット固有感覚を統合。
+* **出力ヘッド:**
+  * **行動ヘッド:** 6-DoF マニピュレーション行動を予測。
+  * **姿勢ヘッド:** 補助タスクとして物体姿勢（xyz + quaternion）を予測。
 
-**Training Objective:**
+**学習目的:**
 
-* **Loss:**
-  * Action MSE (student vs teacher).
-  * Pose loss = position MSE + quaternion distance.
-* **Data Collection:** Teacher provides online supervision, optionally with **DAgger-style corrections** to mitigate covariate shift.
+* **損失関数:**
+  * 行動 MSE（生徒 vs 教師）。
+  * 姿勢損失 = 位置 MSE + クォータニオン距離。
+* **データ収集:** 教師によるオンライン監督。必要に応じて **DAgger 方式の補正** を使い、共変量シフトを緩和します。
 
-**Outcome:** A vision-only policy capable of generalizing grasping behavior without access to privileged states.
+**結果:** 特権状態にアクセスせず、把持挙動を汎化できる視覚ベースポリシー。
 
-**Run training:**
+**学習実行:**
 
 ```bash
 python examples/manipulation/grasp_train.py --stage=bc
@@ -92,11 +93,11 @@ python examples/manipulation/grasp_train.py --stage=bc
 
 ---
 
-## Evaluation
+## 評価
 
-Both teacher and student policies can be evaluated in simulation (with or without visualization).
+教師ポリシー・生徒ポリシーの両方を、可視化あり/なしでシミュレーション評価できます。
 
-* **Teacher Policy (MLP):**
+* **教師ポリシー（MLP）:**
 
 ```bash
 python examples/manipulation/grasp_eval.py --stage=rl
@@ -106,28 +107,28 @@ python examples/manipulation/grasp_eval.py --stage=rl
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/manipulation_rl.mp4" type="video/mp4">
 </video>
 
-* **Student Policy (CNN+MLP):**
+* **生徒ポリシー（CNN+MLP）:**
 
 ```bash
 python examples/manipulation/grasp_eval.py --stage=bc --record
 ```
 
-The student observes the environment via stereo cameras rendered with Mandrona. <video preload="auto" controls="True" width="100%"> <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/manipulation_stereo.mp4" type="video/mp4"> </video>
+生徒は Mandrona でレンダリングされたステレオカメラ観測を使って環境を認識します。
+<video preload="auto" controls="True" width="100%"> <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/manipulation_stereo.mp4" type="video/mp4"> </video>
 
 
-**Logging & Monitoring:**
+**ログとモニタリング:**
 
-* Metrics recorded in TensorBoard (`logs/grasp_rl/` or `logs/grasp_bc/`).
-* Periodic checkpoints for both RL and BC stages.
+* TensorBoard にメトリクスを記録（`logs/grasp_rl/` または `logs/grasp_bc/`）。
+* RL/BC の両段階で定期チェックポイントを保存。
 
 ---
 
-## Summary
+## まとめ
 
-This two-stage pipeline illustrates a practical strategy for robotic manipulation:
+この二段階パイプラインは、ロボットマニピュレーションの実践的戦略を示します。
 
-1. **Teacher policy (RL):** Efficient learning with full information.
-2. **Student policy (IL):** Vision-based control distilled from demonstrations.
+1. **教師ポリシー（RL）:** 完全情報による高効率学習。
+2. **生徒ポリシー（IL）:** デモから蒸留された視覚ベース制御。
 
-The result is a policy that is both sample-efficient in training and robust to realistic perception inputs.
-
+結果として、学習時のサンプル効率と、現実的な知覚入力への頑健性を両立したポリシーが得られます。

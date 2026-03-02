@@ -1,16 +1,16 @@
-# 📷 Camera Sensors
+# 📷 カメラセンサー
 
-Genesis provides three camera sensor backends for rendering RGB images in simulations.
+Genesis は、シミュレーション内で RGB 画像をレンダリングするための 3 種類のカメラセンサーバックエンドを提供します。
 
-## Camera Sensor Types
+## カメラセンサーの種類
 
-| Sensor | Backend | Multi-Env | Best For |
+| センサー | バックエンド | マルチ環境対応 | 用途 |
 |--------|---------|-----------|----------|
-| `RasterizerCameraSensor` | OpenGL | Sequential | Fast real-time rendering |
-| `RaytracerCameraSensor` | LuisaRender | Single only | Photo-realistic images |
-| `BatchRendererCameraSensor` | Madrona GPU | Parallel | High-throughput RL training |
+| `RasterizerCameraSensor` | OpenGL | 逐次 | 高速リアルタイムレンダリング |
+| `RaytracerCameraSensor` | LuisaRender | 単一環境のみ | フォトリアル画像 |
+| `BatchRendererCameraSensor` | Madrona GPU | 並列 | 高スループット RL 学習 |
 
-## Basic Usage
+## 基本的な使い方
 
 ```python
 import genesis as gs
@@ -19,7 +19,7 @@ gs.init(backend=gs.gpu)
 scene = gs.Scene()
 scene.add_entity(morph=gs.morphs.Plane())
 
-# Add a camera sensor
+# カメラセンサーを追加
 camera = scene.add_sensor(
     gs.sensors.RasterizerCameraOptions(
         res=(512, 512),
@@ -32,54 +32,54 @@ camera = scene.add_sensor(
 scene.build(n_envs=1)
 scene.step()
 
-# Read rendered image
+# レンダリング画像を取得
 data = camera.read()
-print(data.rgb.shape)  # (512, 512, 3) for single env
+print(data.rgb.shape)  # 単一環境では (512, 512, 3)
 ```
 
-## Camera Options
+## カメラオプション
 
-### Common Parameters (All Backends)
+### 共通パラメータ（全バックエンド共通）
 
 ```python
 gs.sensors.RasterizerCameraOptions(
     res=(512, 512),              # (width, height)
-    pos=(3.0, 0.0, 2.0),         # Position (world or local if attached)
-    lookat=(0.0, 0.0, 0.0),      # Look-at point
-    up=(0.0, 0.0, 1.0),          # Up vector
-    fov=60.0,                    # Vertical FOV in degrees
-    entity_idx=-1,               # Entity to attach to (-1 = static)
-    link_idx_local=0,            # Link index for attachment
+    pos=(3.0, 0.0, 2.0),         # 位置（固定または取り付けリンク基準）
+    lookat=(0.0, 0.0, 0.0),      # 注視点
+    up=(0.0, 0.0, 1.0),          # 上方向ベクトル
+    fov=60.0,                    # 垂直 FOV（度）
+    entity_idx=-1,               # 取り付け対象エンティティ（-1 = 固定）
+    link_idx_local=0,            # 取り付けリンクインデックス
 )
 ```
 
-### Raytracer-Specific
+### Raytracer 固有オプション
 
 ```python
 gs.sensors.RaytracerCameraOptions(
-    model="pinhole",             # "pinhole" or "thinlens"
-    spp=256,                     # Samples per pixel
-    denoise=False,               # Apply denoising
-    aperture=2.8,                # Depth-of-field (thinlens)
-    focus_dist=3.0,              # Focus distance (thinlens)
+    model="pinhole",             # "pinhole" または "thinlens"
+    spp=256,                     # 1 ピクセルあたりサンプル数
+    denoise=False,               # デノイズを適用
+    aperture=2.8,                # 被写界深度（thinlens）
+    focus_dist=3.0,              # 焦点距離（thinlens）
 )
 ```
 
-### BatchRenderer-Specific
+### BatchRenderer 固有オプション
 
 ```python
 gs.sensors.BatchRendererCameraOptions(
-    near=0.01,                   # Near clip plane
-    far=100.0,                   # Far clip plane
-    use_rasterizer=True,         # GPU rasterizer mode
+    near=0.01,                   # 近クリップ面
+    far=100.0,                   # 遠クリップ面
+    use_rasterizer=True,         # GPU ラスタライザモード
 )
 ```
 
-**Note:** All BatchRenderer cameras must have identical resolution.
+**注意:** BatchRenderer カメラはすべて同一解像度である必要があります。
 
-## Attaching Cameras to Entities
+## エンティティへのカメラ取り付け
 
-Mount a camera on a robot's end-effector:
+ロボットのエンドエフェクタにカメラを搭載する例です。
 
 ```python
 robot = scene.add_entity(morph=gs.morphs.URDF(file="robot.urdf"))
@@ -87,44 +87,44 @@ robot = scene.add_entity(morph=gs.morphs.URDF(file="robot.urdf"))
 camera = scene.add_sensor(
     gs.sensors.BatchRendererCameraOptions(
         res=(640, 480),
-        pos=(0.1, 0.0, 0.05),    # Offset from link frame
-        lookat=(0.2, 0.0, 0.0),  # Look direction
-        entity_idx=robot.idx,    # Attach to robot
-        link_idx_local=8,        # End-effector link
+        pos=(0.1, 0.0, 0.05),    # リンク座標系からのオフセット
+        lookat=(0.2, 0.0, 0.0),  # 視線方向
+        entity_idx=robot.idx,    # ロボットに取り付け
+        link_idx_local=8,        # エンドエフェクタリンク
     )
 )
 ```
 
-The camera automatically follows the entity's motion.
+カメラはエンティティの動きに自動追従します。
 
-## Multi-Environment Rendering
+## マルチ環境レンダリング
 
 ```python
 scene.build(n_envs=4)
 
-# Set different states per environment
+# 環境ごとに異なる状態を設定
 sphere.set_pos([[0, 0, 1], [0.2, 0, 1], [0.4, 0, 1], [0.6, 0, 1]])
 scene.step()
 
-# Read all environments
+# 全環境を取得
 data = camera.read()
 print(data.rgb.shape)  # (4, H, W, 3)
 
-# Read specific environments
+# 特定環境のみ取得
 data = camera.read(envs_idx=[0, 2])
 print(data.rgb.shape)  # (2, H, W, 3)
 ```
 
-## Choosing a Backend
+## バックエンドの選び方
 
-- **Rasterizer**: Default choice, fast, works on all platforms
-- **Raytracer**: Use when photo-realism is needed (requires `renderer=gs.renderers.RayTracer()`)
-- **BatchRenderer**: Use for RL training with many environments (CUDA only)
+- **Rasterizer**: デフォルト選択。高速で全プラットフォームで利用可能
+- **Raytracer**: フォトリアルが必要な場合に使用（`renderer=gs.renderers.RayTracer()` が必要）
+- **BatchRenderer**: 多環境 RL 学習向け（CUDA のみ）
 
 ```python
-# For raytracer, configure scene renderer
+# raytracer 用: scene renderer を設定
 scene = gs.Scene(renderer=gs.renderers.RayTracer())
 
-# For batch renderer
+# batch renderer 用
 scene = gs.Scene(renderer=gs.renderers.BatchRenderer())
 ```

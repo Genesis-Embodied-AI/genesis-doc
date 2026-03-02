@@ -1,21 +1,21 @@
-# 🎬 Batch Renderer
+# 🎬 バッチレンダラー
 
-The BatchRenderer uses Madrona GPU batch rendering for high-throughput multi-environment simulations.
+BatchRenderer は、Madrona の GPU バッチレンダリングを使って、高スループットなマルチ環境シミュレーションを実現します。
 
-## Installation
+## インストール
 
 ```bash
 pip install gs-madrona
 ```
 
-**Requirements:** Linux x86-64, NVIDIA CUDA, Python >= 3.10
+**要件:** Linux x86-64、NVIDIA CUDA、Python >= 3.10
 
-## Basic Setup
+## 基本設定
 
 ```python
 import genesis as gs
 
-gs.init(backend=gs.cuda)  # CUDA required
+gs.init(backend=gs.cuda)  # CUDA が必要
 
 scene = gs.Scene(
     renderer=gs.renderers.BatchRenderer(use_rasterizer=True),
@@ -24,31 +24,31 @@ scene = gs.Scene(
 plane = scene.add_entity(gs.morphs.Plane())
 robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 
-# All batch cameras must have identical resolution
+# すべてのバッチカメラは同一解像度である必要があります
 cam1 = scene.add_camera(res=(256, 256), pos=(2, 0, 1), lookat=(0, 0, 0.5))
 cam2 = scene.add_camera(res=(256, 256), pos=(0, 2, 1), lookat=(0, 0, 0.5))
 
 scene.build(n_envs=128)
 ```
 
-## Rendering
+## レンダリング
 
 ```python
 for step in range(1000):
     scene.step()
 
-    # Render single camera
+    # 単一カメラをレンダリング
     rgb, depth, seg, normal = cam1.render(
         rgb=True, depth=True, segmentation=True, normal=True
     )
-    # Shape: (n_envs, H, W, C)
+    # 形状: (n_envs, H, W, C)
 
-    # Or render all cameras at once
+    # または全カメラを一度にレンダリング
     all_rgb = scene.render_all_cameras(rgb=True)
-    # Shape: (n_cameras, n_envs, H, W, 3)
+    # 形状: (n_cameras, n_envs, H, W, 3)
 ```
 
-## Camera Sensor API
+## カメラセンサー API
 
 ```python
 camera = scene.add_sensor(
@@ -71,10 +71,10 @@ camera = scene.add_sensor(
 
 scene.build(n_envs=64)
 
-data = camera.read()  # Returns CameraData with .rgb tensor
+data = camera.read()  # .rgb テンソルを持つ CameraData を返します
 ```
 
-## Lighting
+## ライティング
 
 ```python
 scene.add_light(
@@ -87,24 +87,24 @@ scene.add_light(
 )
 ```
 
-## Segmentation
+## セグメンテーション
 
 ```python
 scene = gs.Scene(
     renderer=gs.renderers.BatchRenderer(),
     vis_options=gs.options.VisOptions(
-        segmentation_level="link",  # "entity", "link", or "geom"
+        segmentation_level="link",  # "entity"、"link"、または "geom"
     ),
 )
 
-# After rendering
+# レンダリング後
 _, _, seg, _ = camera.render(segmentation=True)
 colored = scene.visualizer.colorize_seg_idxc_arr(seg)
 ```
 
-## Performance Tips
+## パフォーマンスのヒント
 
-- Use identical resolution for all cameras
-- Prefer `use_rasterizer=True` for speed
-- Batch render all cameras with `scene.render_all_cameras()`
-- Typical setup: 256x256 resolution with 128-256 environments
+- すべてのカメラで同一解像度を使用する
+- 速度重視なら `use_rasterizer=True` を優先する
+- `scene.render_all_cameras()` で全カメラをバッチレンダリングする
+- 典型的な構成: 256x256 解像度、128〜256 環境

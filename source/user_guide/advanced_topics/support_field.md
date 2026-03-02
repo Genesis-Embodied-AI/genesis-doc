@@ -1,57 +1,60 @@
-# 🚀 Support Field
+# 🚀 サポートフィールド
 
-Collision detection for convex shapes in Genesis relies heavily on *support functions*.  Every iteration of the Minkowski Portal Refinement (MPR) algorithm asks questions of the form:
+Genesis における凸形状の衝突判定は、*support function* に強く依存しています。
+Minkowski Portal Refinement（MPR）アルゴリズムの各反復では、次のような問い合わせを行います。
 
-> _"Given a direction **d**, which vertex of the shape has the maximum dot-product **v·d**?"_
+> _"方向 **d** が与えられたとき、内積 **v·d** が最大になる頂点はどれか？"_
 
-A naïve implementation has to iterate over all vertices every time – wasteful for models containing thousands of points.  To avoid this, Genesis pre-computes a **Support Field** for every convex geometry during scene initialisation.  The implementation lives in `genesis/engine/solvers/rigid/support_field_decomp.py`.
+素朴実装では毎回すべての頂点を走査する必要があり、数千頂点モデルでは非効率です。
+これを避けるため、Genesis はシーン初期化時に各凸ジオメトリの **Support Field** を前計算します。
+実装は `genesis/engine/solvers/rigid/support_field_decomp.py` にあります。
 
 ---
 
-## How It Works
+## 仕組み
 
-1. **Uniform Direction Grid**  –  The sphere is discretised into `support_res × support_res` directions using longitude/latitude (`θ`, `ϕ`).  By default `support_res = 180`, giving ≈32 k sample directions.
-2. **Offline Projection**      –  For each direction we project *all* vertices and remember the index with the largest dot-product.  The resulting arrays are:
-   * `support_v ∈ ℝ^{N_dir×3}` – the actual vertex positions in *object space*.
-   * `support_vid ∈ ℕ^{N_dir}`   – original vertex indices (useful to warm-start SDF queries).
-   * `support_cell_start[i_g]`   – prefix-sum offset into the flattened arrays per geometry.
-3. **Quadrants Fields** – The arrays are copied into GPU-resident Quadrants fields so that kernels can access them without host round-trips.
+1. **一様方向グリッド** – 球面を経度/緯度（`θ`, `ϕ`）で `support_res × support_res` 方向へ離散化します。デフォルト `support_res = 180` で、約 32k 方向です。
+2. **オフライン投影** – 各方向について *全* 頂点を投影し、内積最大の頂点インデックスを保存します。得られる配列:
+   * `support_v ∈ ℝ^{N_dir×3}` – *オブジェクト空間* の頂点座標
+   * `support_vid ∈ ℕ^{N_dir}` – 元頂点インデックス（SDF 問い合わせの warm-start に有用）
+   * `support_cell_start[i_g]` – ジオメトリごとのフラット配列先頭オフセット
+3. **Quadrants Fields** – これら配列を GPU 常駐の Quadrants field へコピーし、ホスト往復なしでカーネルから参照可能にします。
 
 ```python
 v_ws, idx = support_field._func_support_world(dir_ws, i_geom, i_batch)
 ```
 
-The above gives you the extreme point in world-space for any query direction in **O(1)**.
+これで任意方向に対するワールド空間の極点を **O(1)** で取得できます。
 
 ---
 
-## Data Layout
+## データレイアウト
 
-| Field | Shape | Description |
+| フィールド | 形状 | 説明 |
 |-------|-------|-------------|
-| `support_v`         | `(N_cells, 3)` | vertex positions (float32/64) |
-| `support_vid`       | `(N_cells,)`   | corresponding vertex index (int32) |
-| `support_cell_start`| `(n_geoms,)`   | offset into flattened arrays |
+| `support_v`         | `(N_cells, 3)` | 頂点座標（float32/64） |
+| `support_vid`       | `(N_cells,)`   | 対応頂点インデックス（int32） |
+| `support_cell_start`| `(n_geoms,)`   | フラット配列へのオフセット |
 
-!!! info "Memory footprint"
-    With the default resolution each convex shape uses ≈ 32 k × (3 × 4 + 4) = 416 kB.  For collections of small primitives this is significantly cheaper than building a BVH per shape.
-
----
-
-## Advantages
-
-* **Constant-time look-ups** during MPR ⇒ fewer diverging branches on the GPU.
-* **GPU friendly** – the support field is a simple SOA array, no complex pointer chasing.
-* **Works for *any* convex mesh** – no need for canonical-axes or bounding boxes.
-
-## Limitations & Future Work
-
-* The direction grid is isotropic but not adaptive – features smaller than the angular cell size may map to the wrong vertex.
-* Preprocessing and memory consumption would be expensive if the number of geometry is large in a scene.
+!!! info "メモリ使用量"
+    デフォルト解像度では各凸形状あたり ≈ 32k × (3 × 4 + 4) = 416 kB を使用します。小さなプリミティブ群では、形状ごとに BVH を構築するより安価です。
 
 ---
 
-## API Summary
+## 利点
+
+* MPR 中の **定数時間ルックアップ** により GPU 分岐発散を低減
+* **GPU フレンドリー** – サポートフィールドは単純な SOA 配列で、複雑なポインタ追跡が不要
+* **任意の凸メッシュに適用可能** – 代表軸や境界ボックスに依存しない
+
+## 制限と今後
+
+* 方向グリッドは等方的で非適応のため、角セルより小さな特徴は誤頂点へ割り当てられる可能性があります。
+* シーン内ジオメトリ数が多い場合、前処理時間とメモリ消費が大きくなります。
+
+---
+
+## API サマリ
 
 ```python
 from genesis.engine.solvers.rigid.rigid_solver_decomp import RigidSolver
@@ -61,12 +64,13 @@ s_field  = solver.collider._mpr._support  # internal handle
 v_ws, idx = s_field._func_support_world(dir_ws, i_geom, i_env)
 ```
 
-`v_ws` is the *world-space* support point while `idx` is the vertex ID in the original mesh (global index).
+`v_ws` は *ワールド空間* のサポート点、`idx` は元メッシュ内の頂点 ID（グローバルインデックス）です。
 
 ---
 
-## Relation to Collision Pipeline
+## 衝突パイプラインとの関係
 
-The Support Field is an **acceleration structure** exclusively used by the *convex–convex* narrow phase.  Other collision paths – SDF, terrain, plane–box – bypass it because they either rely on analytical support functions or distance fields.
+Support Field は *凸-凸* 狭域判定専用の **加速構造** です。
+SDF、地形、平面-箱など他の衝突経路は、解析的 support function や距離場を使うためこれを使いません。
 
-For details on how MPR integrates this structure see {doc}`Collision, Contacts & Forces <collision_contacts_forces>`.
+MPR への統合詳細は {doc}`Collision, Contacts & Forces <collision_contacts_forces>` を参照してください。

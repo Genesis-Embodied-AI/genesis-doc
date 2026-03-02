@@ -1,21 +1,21 @@
-# 📡 Raycaster Patterns
+# 📡 レイキャスターパターン
 
-Genesis provides multiple ray patterns for LiDAR and depth sensor simulation.
+Genesis は、LiDAR と深度センサーのシミュレーション向けに複数のレイパターンを提供します。
 
-## Pattern Types
+## パターンの種類
 
-| Pattern | Use Case |
+| パターン | 用途 |
 |---------|----------|
-| `SphericalPattern` | 3D LiDAR (Velodyne, Ouster) |
-| `DepthCameraPattern` | Depth cameras (RealSense, Kinect) |
-| `GridPattern` | Planar sensing, height maps |
+| `SphericalPattern` | 3D LiDAR（Velodyne、Ouster など） |
+| `DepthCameraPattern` | 深度カメラ（RealSense、Kinect） |
+| `GridPattern` | 平面センシング、高さマップ |
 
-## SphericalPattern (LiDAR)
+## SphericalPattern（LiDAR パターン）
 
 ```python
 import genesis as gs
 
-# 360° horizontal, 60° vertical FOV
+# 水平 360°、垂直 60° の FOV
 pattern = gs.sensors.SphericalPattern(
     fov=(360.0, 60.0),
     n_points=(128, 32),
@@ -33,28 +33,28 @@ lidar = scene.add_sensor(
 )
 ```
 
-### SphericalPattern Parameters
+### SphericalPattern のパラメータ
 
 ```python
 gs.sensors.SphericalPattern(
-    fov=(360.0, 60.0),              # (horizontal, vertical) degrees
-    n_points=(128, 64),             # (horizontal, vertical) rays
-    angular_resolution=(0.25, 0.5), # Alternative: degrees per ray
-    angles=(h_angles, v_angles),    # Custom angle arrays
+    fov=(360.0, 60.0),              # (水平, 垂直) 角度
+    n_points=(128, 64),             # (水平, 垂直) レイ本数
+    angular_resolution=(0.25, 0.5), # 代替指定: 1 レイあたりの角度
+    angles=(h_angles, v_angles),    # カスタム角度配列
 )
 ```
 
-### Real LiDAR Configurations
+### 実機 LiDAR の設定例
 
 ```python
 # Velodyne VLP-16
 velodyne = gs.sensors.SphericalPattern(fov=(360.0, 30.0), n_points=(1800, 16))
 
-# Front-facing 120° FOV
+# 前方 120° FOV
 front_lidar = gs.sensors.SphericalPattern(fov=((-60, 60), 30.0), n_points=(128, 32))
 ```
 
-## DepthCameraPattern
+## DepthCameraPattern（深度カメラ）
 
 ```python
 pattern = gs.sensors.DepthCameraPattern(
@@ -72,46 +72,46 @@ depth_cam = scene.add_sensor(
 )
 ```
 
-### DepthCameraPattern Parameters
+### DepthCameraPattern のパラメータ
 
 ```python
 gs.sensors.DepthCameraPattern(
-    res=(640, 480),           # Resolution (width, height)
-    fov_horizontal=90.0,      # Horizontal FOV degrees
-    fov_vertical=None,        # Auto-computed from aspect ratio
-    fx=None, fy=None,         # Focal lengths (override FOV)
-    cx=None, cy=None,         # Principal point
+    res=(640, 480),           # 解像度 (width, height)
+    fov_horizontal=90.0,      # 水平 FOV（度）
+    fov_vertical=None,        # アスペクト比から自動計算
+    fx=None, fy=None,         # 焦点距離（FOV を上書き）
+    cx=None, cy=None,         # 主点
 )
 ```
 
-## GridPattern
+## GridPattern（グリッド）
 
-Planar grid of parallel rays:
+平行レイの平面グリッドです。
 
 ```python
 pattern = gs.sensors.GridPattern(
-    resolution=0.1,            # 10cm spacing
-    size=(2.0, 2.0),           # 2m x 2m grid
-    direction=(0.0, 0.0, -1.0), # Pointing down
+    resolution=0.1,            # 10cm 間隔
+    size=(2.0, 2.0),           # 2m x 2m グリッド
+    direction=(0.0, 0.0, -1.0), # 下向き
 )
 ```
 
-## Reading Sensor Data
+## センサーデータの読み取り
 
 ```python
 scene.build()
 scene.step()
 
-# LiDAR data
+# LiDAR データ
 data = lidar.read()
-points = data.points         # Shape: (n_h, n_v, 3)
-distances = data.distances   # Shape: (n_h, n_v)
+points = data.points         # 形状: (n_h, n_v, 3)
+distances = data.distances   # 形状: (n_h, n_v)
 
-# Depth camera image
-depth_image = depth_cam.read_image()  # Shape: (H, W)
+# 深度カメラ画像
+depth_image = depth_cam.read_image()  # 形状: (H, W)
 ```
 
-## Common Options
+## 共通オプション
 
 ```python
 gs.sensors.Lidar(
@@ -126,10 +126,10 @@ gs.sensors.Lidar(
 )
 ```
 
-## Multi-Environment
+## マルチ環境
 
 ```python
 scene.build(n_envs=4)
 data = lidar.read()
-print(data.points.shape)  # (4, n_h, n_v, 3) for batched envs
+print(data.points.shape)  # バッチ環境では (4, n_h, n_v, 3)
 ```

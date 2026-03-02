@@ -1,4 +1,3 @@
-# 📝 Parallelized RL Training
+# 📝 並列化 RL 学習
 
-
-Coming soon...
+近日公開予定です。

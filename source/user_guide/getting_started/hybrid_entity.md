@@ -1,16 +1,16 @@
-# 🔗 Hybrid Entity
+# 🔗 ハイブリッドエンティティ
 
-HybridEntity combines rigid and soft body physics for simulating deformable robots with rigid skeletons.
+HybridEntity は、剛体と軟体の物理を組み合わせ、剛体スケルトンを持つ変形ロボットをシミュレーションします。
 
-## Overview
+## 概要
 
-A hybrid entity couples:
-- **Rigid component**: Skeleton/structure (from URDF)
-- **Soft component**: Deformable skin (MPM-based)
+Hybrid Entity は次を結合します。
+- **Rigid コンポーネント**: スケルトン/構造（URDF 由来）
+- **Soft コンポーネント**: 変形スキン（MPM ベース）
 
-Use cases: soft grippers, deformable robots, compliant manipulators.
+利用例: ソフトグリッパー、変形ロボット、コンプライアントマニピュレータ。
 
-## Creating a Hybrid Entity
+## ハイブリッドエンティティの作成
 
 ```python
 import genesis as gs
@@ -41,45 +41,45 @@ robot = scene.add_entity(
 scene.build()
 ```
 
-## Hybrid Material Options
+## ハイブリッドマテリアルのオプション
 
 ```python
 gs.materials.Hybrid(
-    material_rigid=gs.materials.Rigid(),     # Rigid body material
-    material_soft=gs.materials.MPM.Muscle(), # Soft material (MPM only)
-    thickness=0.05,                          # Soft skin thickness
-    damping=1000.0,                          # Velocity damping
-    soft_dv_coef=0.01,                       # Rigid→soft velocity transfer
+    material_rigid=gs.materials.Rigid(),     # 剛体マテリアル
+    material_soft=gs.materials.MPM.Muscle(), # 軟体マテリアル（MPM のみ）
+    thickness=0.05,                          # 軟体スキン厚み
+    damping=1000.0,                          # 速度減衰
+    soft_dv_coef=0.01,                       # Rigid→Soft 速度伝達
 )
 ```
 
-## Control
+## 制御
 
-Control uses the rigid skeleton's DOFs:
+制御は剛体スケルトンの DOF を使います。
 
 ```python
 import numpy as np
 
 for step in range(1000):
-    # Sinusoidal joint control
+    # 正弦波の関節制御
     target_vel = [np.sin(step * 0.01)] * robot.n_dofs
     robot.control_dofs_velocity(target_vel)
     scene.step()
 ```
 
-## Accessing Components
+## コンポーネントへのアクセス
 
 ```python
-robot.part_rigid   # RigidEntity (skeleton)
-robot.part_soft    # MPMEntity (skin)
-robot.n_dofs       # Number of DOFs
+robot.part_rigid   # RigidEntity（スケルトン）
+robot.part_soft    # MPMEntity（スキン）
+robot.n_dofs       # DOF 数
 
-# State access
+# 状態アクセス
 robot.get_dofs_position()
 robot.get_dofs_velocity()
 ```
 
-## Example: Soft Gripper
+## 例: ソフトグリッパー
 
 ```python
 gripper = scene.add_entity(
@@ -92,22 +92,22 @@ gripper = scene.add_entity(
     ),
 )
 
-# Add object to grasp
+# 把持対象を追加
 ball = scene.add_entity(
     morph=gs.morphs.Sphere(pos=(0.5, 0.5, 0.1), radius=0.05),
 )
 
 scene.build()
 
-# Close gripper
+# グリッパーを閉じる
 for step in range(500):
     gripper.control_dofs_position([0.5] * gripper.n_dofs)
     scene.step()
 ```
 
-## From Mesh (Automatic Skeletonization)
+## メッシュから作成（自動スケルトン化）
 
-Create hybrid entity from arbitrary mesh:
+任意メッシュから Hybrid Entity を作成できます。
 
 ```python
 creature = scene.add_entity(
@@ -119,13 +119,13 @@ creature = scene.add_entity(
 )
 ```
 
-Genesis automatically:
-1. Extracts skeleton from mesh via skeletonization
-2. Creates rigid body from skeleton
-3. Maps soft particles to skeleton links
+Genesis は自動的に以下を行います。
+1. スケルトン化によりメッシュから骨格を抽出
+2. 骨格から剛体を作成
+3. 軟体粒子を骨格リンクへ対応付け
 
-## Notes
+## 注意点
 
-- Soft material must be MPM-based (`gs.materials.MPM.*`)
-- Higher `damping` reduces oscillation
-- Requires `mpm_options` with appropriate bounds
+- 軟体マテリアルは MPM ベース（`gs.materials.MPM.*`）である必要があります
+- `damping` を大きくすると振動が減少します
+- 適切な境界を設定した `mpm_options` が必要です

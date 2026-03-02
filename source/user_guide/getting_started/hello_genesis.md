@@ -1,4 +1,4 @@
-# 👋🏻 Genesisの使い方
+# 👋🏻 Genesis の使い方
 
 ```{figure} ../../_static/images/hello_genesis.png
 ```

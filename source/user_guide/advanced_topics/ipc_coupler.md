@@ -1,12 +1,12 @@
-# ⚡ IPC Coupler
+# ⚡ IPC カップラー
 
-Genesis provides Incremental Potential Contact (IPC) coupling for high-fidelity deformable-rigid interactions.
+Genesis は、高忠実度な変形体-剛体相互作用のために Incremental Potential Contact（IPC）カップリングを提供します。
 
-## Requirements
+## 要件
 
-Requires `libuipc` library (build from https://github.com/spiriMirror/libuipc).
+`libuipc` ライブラリが必要です（https://github.com/spiriMirror/libuipc からビルド）。
 
-## Basic Setup
+## 基本設定
 
 ```python
 import genesis as gs
@@ -21,19 +21,19 @@ scene = gs.Scene(
 )
 ```
 
-## Key Parameters
+## 主要パラメータ
 
-| Parameter | Default | Description |
+| パラメータ | 既定値 | 説明 |
 |-----------|---------|-------------|
-| `dt` | 0.001 | Time step for IPC simulation |
-| `contact_d_hat` | 0.001 | Contact barrier distance |
-| `contact_friction_mu` | 0.5 | Friction coefficient |
-| `ipc_constraint_strength` | (100, 100) | (translation, rotation) coupling strength |
-| `two_way_coupling` | True | Forces from IPC affect rigid bodies |
-| `IPC_self_contact` | False | Enable rigid-rigid self-collision |
-| `enable_ipc_gui` | False | Polyscope visualization |
+| `dt` | 0.001 | IPC シミュレーションのタイムステップ |
+| `contact_d_hat` | 0.001 | 接触バリア距離 |
+| `contact_friction_mu` | 0.5 | 摩擦係数 |
+| `ipc_constraint_strength` | (100, 100) | （並進, 回転）カップリング強度 |
+| `two_way_coupling` | True | IPC 力を剛体へ反映 |
+| `IPC_self_contact` | False | 剛体-剛体自己衝突を有効化 |
+| `enable_ipc_gui` | False | Polyscope 可視化 |
 
-## Cloth Simulation
+## クロスシミュレーション
 
 ```python
 scene = gs.Scene(
@@ -57,7 +57,7 @@ cloth = scene.add_entity(
 )
 ```
 
-## Robot Grasping
+## ロボット把持
 
 ```python
 scene = gs.Scene(
@@ -71,7 +71,7 @@ scene = gs.Scene(
 
 franka = scene.add_entity(gs.morphs.MJCF(file="panda.xml"))
 
-# Filter which links participate in IPC
+# IPC に参加するリンクをフィルタ
 scene.sim.coupler.set_ipc_link_filter(
     entity=franka,
     link_names=["left_finger", "right_finger"],
@@ -83,30 +83,30 @@ cube = scene.add_entity(
 )
 ```
 
-## When to Use IPC
+## IPC を使うべき場面
 
-**Use IPC for:**
-- Cloth/fabric simulation with collision
-- FEM objects interacting with rigid bodies
-- High-quality grasping simulation
-- Stable constraint-based contact resolution
+**IPC が適するケース:**
+- 衝突を含むクロス/布シミュレーション
+- FEM 物体と剛体の相互作用
+- 高品質な把持シミュレーション
+- 安定した拘束ベース接触解決
 
-**Use LegacyCoupler for:**
-- Simple rigid-MPM, rigid-SPH interactions
-- Lower computational overhead
-- When IPC library unavailable
+**LegacyCoupler が適するケース:**
+- 単純な rigid-MPM, rigid-SPH 相互作用
+- 計算負荷を抑えたい場合
+- IPC ライブラリが利用できない場合
 
-## Contact Handling
+## 接触処理
 
-| Interaction | IPC Behavior |
+| 相互作用 | IPC の挙動 |
 |-------------|--------------|
-| FEM-FEM | Always enabled |
-| FEM-Rigid | Always enabled |
-| Rigid-Rigid | `IPC_self_contact` option |
-| Cloth-Cloth | Always enabled (self-collision) |
+| FEM-FEM | 常に有効 |
+| FEM-Rigid | 常に有効 |
+| Rigid-Rigid | `IPC_self_contact` オプション |
+| Cloth-Cloth | 常に有効（自己衝突） |
 
-## Performance Tips
+## パフォーマンスのヒント
 
-- Match `contact_d_hat` to mesh resolution (0.5-2mm typical)
-- Higher `ipc_constraint_strength` = stiffer but potentially unstable
-- Use `disable_genesis_ground_contact=True` to avoid double-counting ground collision
+- `contact_d_hat` はメッシュ分解能に合わせて設定（通常 0.5-2mm）
+- `ipc_constraint_strength` を上げると剛性は増えるが不安定化する場合がある
+- 地面衝突の二重計算を避けるには `disable_genesis_ground_contact=True` を使う

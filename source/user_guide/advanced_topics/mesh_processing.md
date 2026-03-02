@@ -1,16 +1,16 @@
-# 🔺 Mesh Processing
+# 🔺 メッシュ処理
 
-Genesis provides mesh utilities for loading, simplification, convex decomposition, and collision processing.
+Genesis は、メッシュの読み込み、簡略化、凸分解、衝突処理のためのユーティリティを提供します。
 
-## Loading Meshes
+## メッシュの読み込み
 
 ```python
 import genesis as gs
 
-# Load from file
+# ファイルから読み込み
 entity = scene.add_entity(gs.morphs.Mesh(file="model.obj"))
 
-# With processing options
+# 処理オプション付き
 entity = scene.add_entity(
     gs.morphs.Mesh(
         file="model.obj",
@@ -22,37 +22,37 @@ entity = scene.add_entity(
 )
 ```
 
-## Decimation
+## デシメーション
 
-Reduce mesh complexity for collision performance:
+衝突処理性能のためにメッシュ複雑度を下げます。
 
 ```python
 gs.morphs.Mesh(
     file="high_poly.obj",
     decimate=True,
-    decimate_face_num=500,         # Target face count
-    decimate_aggressiveness=2,     # 0-8 scale
+    decimate_face_num=500,         # 目標面数
+    decimate_aggressiveness=2,     # 0-8 スケール
 )
 ```
 
-**Aggressiveness levels:**
-- 0: Lossless
-- 2: Preserve features (default)
-- 5: Significant reduction
-- 8: Maximum reduction
+**アグレッシブネス レベル:**
+- 0: 無損失
+- 2: 形状特徴を保持（デフォルト）
+- 5: 大幅削減
+- 8: 最大削減
 
-## Convex Decomposition
+## 凸分解
 
-For collision detection, meshes are decomposed into convex parts:
+衝突検出のため、メッシュは凸パーツに分解されます。
 
 ```python
 gs.morphs.Mesh(
     file="concave.obj",
-    convexify=True,  # Auto-decompose if needed
+    convexify=True,  # 必要に応じて自動分解
 )
 ```
 
-Genesis uses COACD library with configurable options:
+Genesis は COACD ライブラリを使い、次のようなオプションを設定できます。
 
 ```python
 gs.options.COACDOptions(
@@ -63,58 +63,58 @@ gs.options.COACDOptions(
 )
 ```
 
-## Collision Processing
+## 衝突処理
 
-Genesis automatically processes collision meshes:
+Genesis は衝突メッシュを自動処理します。
 
-1. **Repair**: Removes duplicate faces
-2. **Convexification check**: Tests if simple convex hull is sufficient
-3. **Decomposition**: Splits concave meshes into convex parts
-4. **Decimation**: Reduces high-poly meshes (>5000 faces warning)
+1. **修復（Repair）**: 重複面を除去
+2. **凸形状化判定（Convexification check）**: 単純凸包で十分か判定
+3. **分解（Decomposition）**: 凹メッシュを凸パーツへ分解
+4. **簡略化（Decimation）**: 高ポリゴンメッシュを簡略化（>5000 面で警告）
 
-## Tetrahedralization
+## 四面体化
 
-For FEM/deformable simulation:
+FEM/変形体シミュレーション向け:
 
 ```python
 entity = scene.add_entity(
     morph=gs.morphs.Mesh(file="model.obj"),
     material=gs.materials.FEM.Elastic(E=1e5, nu=0.4),
 )
-# Mesh auto-tetrahedralized for FEM
+# FEM 用にメッシュは自動で四面体化される
 ```
 
-## Mesh Properties
+## メッシュプロパティ
 
 ```python
 mesh = entity.morph.mesh
 
-verts = mesh.verts      # (N, 3) vertices
-faces = mesh.faces      # (M, 3) face indices
-normals = mesh.normals  # (N, 3) per-vertex normals
-uvs = mesh.uvs          # (N, 2) texture coords
+verts = mesh.verts      # (N, 3) 頂点
+faces = mesh.faces      # (M, 3) 面インデックス
+normals = mesh.normals  # (N, 3) 頂点法線
+uvs = mesh.uvs          # (N, 2) テクスチャ座標
 
 is_convex = mesh.is_convex
 volume = mesh.volume
 area = mesh.area
 ```
 
-## Particle Sampling
+## パーティクルサンプリング
 
-Sample particles from mesh volume:
+メッシュ体積から粒子をサンプリングします。
 
 ```python
 mesh.particlize(p_size=0.01, sampler="random")
 ```
 
-**Samplers:**
-- `"random"`: Random sampling
-- `"pbs_poisson"`: Poisson disk sampling
-- `"pbs_grid"`: Grid-based sampling
+**サンプラー:**
+- `"random"`: ランダムサンプリング
+- `"pbs_poisson"`: Poisson disk サンプリング
+- `"pbs_grid"`: グリッドベースサンプリング
 
-## Primitive Meshes
+## プリミティブメッシュ
 
-Genesis provides built-in primitives:
+Genesis は組み込みプリミティブを提供します。
 
 ```python
 gs.morphs.Sphere(radius=0.5)
@@ -123,23 +123,23 @@ gs.morphs.Cylinder(radius=0.3, height=1.0)
 gs.morphs.Plane()
 ```
 
-## Caching
+## キャッシュ
 
-Genesis caches processed meshes for faster loading:
+Genesis は処理済みメッシュをキャッシュし、読み込みを高速化します。
 
-| Cache Type | Extension | Purpose |
+| キャッシュ種別 | 拡張子 | 用途 |
 |------------|-----------|---------|
-| Convex | `.cvx` | Convex decomposition |
-| Tetrahedral | `.tet` | FEM tetrahedralization |
-| SDF | `.gsd` | Signed distance fields |
-| Remesh | `.rm` | Remeshed versions |
-| Particles | `.ptc` | Particle sampling |
+| Convex | `.cvx` | 凸分解 |
+| Tetrahedral | `.tet` | FEM 四面体化 |
+| SDF | `.gsd` | 符号付き距離場 |
+| Remesh | `.rm` | リメッシュ版 |
+| Particles | `.ptc` | 粒子サンプリング |
 
-Cache uses SHA256 hash of input parameters for invalidation.
+キャッシュ無効化判定には入力パラメータの SHA256 ハッシュを使用します。
 
-## Dependencies
+## 依存関係
 
-- **trimesh**: Core mesh operations
-- **fast_simplification**: Decimation
-- **coacd**: Convex decomposition
-- **pyvista + tetgen**: Tetrahedralization
+- **trimesh**: コアメッシュ操作
+- **fast_simplification**: デシメーション
+- **coacd**: 凸分解
+- **pyvista + tetgen**: 四面体化

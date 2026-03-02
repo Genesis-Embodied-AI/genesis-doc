@@ -1,8 +1,8 @@
-# 💧 Particle Emitters
+# 💧 パーティクルエミッター
 
-Emitters generate particles for fluid and material simulations (SPH, MPM, PBD).
+Emitter は、流体・材料シミュレーション（SPH、MPM、PBD）向けに粒子を生成します。
 
-## Creating an Emitter
+## エミッターの作成
 
 ```python
 import genesis as gs
@@ -25,39 +25,39 @@ emitter = scene.add_emitter(
 scene.build()
 ```
 
-## Supported Materials
+## サポートされるマテリアル
 
-- `gs.materials.SPH.Liquid()` - SPH fluid
-- `gs.materials.MPM.Liquid()` - MPM liquid
-- `gs.materials.MPM.Sand()` - Granular material
-- `gs.materials.PBD.Liquid()` - Position-based fluid
+- `gs.materials.SPH.Liquid()` - SPH 流体
+- `gs.materials.MPM.Liquid()` - MPM 液体
+- `gs.materials.MPM.Sand()` - 粒状体
+- `gs.materials.PBD.Liquid()` - Position-based 流体
 
-## Directional Emission
+## 指向性放出
 
 ```python
 for step in range(500):
     emitter.emit(
-        pos=np.array([0.5, 0.5, 2.0]),      # Nozzle position
-        direction=np.array([0.0, 0.0, -1.0]), # Emission direction
-        speed=5.0,                            # Particle speed
-        droplet_shape="circle",               # Shape: circle, sphere, square, rectangle
-        droplet_size=0.1,                     # Radius or side length
+        pos=np.array([0.5, 0.5, 2.0]),      # ノズル位置
+        direction=np.array([0.0, 0.0, -1.0]), # 放出方向
+        speed=5.0,                            # 粒子速度
+        droplet_shape="circle",               # 形状: circle, sphere, square, rectangle
+        droplet_size=0.1,                     # 半径または辺長
     )
     scene.step()
 ```
 
-### Droplet Shapes
+### 液滴形状
 
-| Shape | `droplet_size` | Description |
+| 形状 | `droplet_size` | 説明 |
 |-------|---------------|-------------|
-| `"circle"` | `float` | Cylindrical stream |
-| `"sphere"` | `float` | Spherical droplet |
-| `"square"` | `float` | Cubic droplet |
-| `"rectangle"` | `(w, h)` | Rectangular stream |
+| `"circle"` | `float` | 円柱状ストリーム |
+| `"sphere"` | `float` | 球状液滴 |
+| `"square"` | `float` | 立方体状液滴 |
+| `"rectangle"` | `(w, h)` | 長方形ストリーム |
 
-## Omnidirectional Emission
+## 全方向放出
 
-Emit particles radially from a spherical source:
+球形ソースから放射状に粒子を放出します。
 
 ```python
 emitter.emit_omni(
@@ -67,11 +67,11 @@ emitter.emit_omni(
 )
 ```
 
-## Dynamic Emission
+## 動的放出
 
 ```python
 for i in range(1000):
-    # Oscillating direction
+    # 振動する方向
     direction = np.array([0.0, np.sin(i / 10) * 0.3, -1.0])
 
     emitter.emit(
@@ -84,7 +84,7 @@ for i in range(1000):
     scene.step()
 ```
 
-## Multiple Emitters
+## 複数エミッター
 
 ```python
 emitter1 = scene.add_emitter(
@@ -104,8 +104,8 @@ for step in range(500):
     scene.step()
 ```
 
-## Notes
+## 注意点
 
-- Emitters must be added before `scene.build()`
-- Particles recycle when `max_particles` is reached
-- Not compatible with differentiable simulation (`requires_grad=True`)
+- Emitter は `scene.build()` 前に追加する必要があります
+- `max_particles` に達すると粒子は再利用されます
+- 微分可能シミュレーション（`requires_grad=True`）とは互換性がありません

@@ -1,20 +1,20 @@
-# 🎨 Surfaces and Textures
+# 🎨 サーフェスとテクスチャ
 
-Genesis provides material and texture configuration for rendering.
+Genesis は、レンダリングのためのマテリアルおよびテクスチャ設定を提供します。
 
-## Surface Types
+## サーフェスタイプ
 
-| Surface | Description |
+| サーフェス | 説明 |
 |---------|-------------|
-| `Rough` | Matte, non-reflective (roughness=1.0) |
-| `Smooth` | Polished plastic (roughness=0.1) |
-| `Reflective` | Highly reflective (roughness=0.01) |
-| `Glass` | Transparent with refraction |
-| `Metal` | Metallic surfaces (Iron, Gold, etc.) |
-| `Water` | Water-like surface |
-| `Emission` | Light-emitting surface |
+| `Rough` | マットで非反射（roughness=1.0） |
+| `Smooth` | 研磨されたプラスチック（roughness=0.1） |
+| `Reflective` | 高反射（roughness=0.01） |
+| `Glass` | 屈折を伴う透明サーフェス |
+| `Metal` | 金属サーフェス（Iron、Gold など） |
+| `Water` | 水面ライクなサーフェス |
+| `Emission` | 発光サーフェス |
 
-## Basic Usage
+## 基本的な使い方
 
 ```python
 import genesis as gs
@@ -25,33 +25,33 @@ scene.add_entity(
 )
 ```
 
-## Surface Properties
+## サーフェスプロパティ
 
 ```python
 gs.surfaces.Smooth(
     color=(1.0, 1.0, 1.0),    # RGB (0-1)
-    roughness=0.1,            # 0=mirror, 1=matte
-    metallic=0.0,             # 0=dielectric, 1=metal
-    opacity=1.0,              # Transparency
-    emissive=(0.0, 0.0, 0.0), # Self-illumination
-    ior=1.5,                  # Index of refraction
+    roughness=0.1,            # 0=鏡面, 1=マット
+    metallic=0.0,             # 0=誘電体, 1=金属
+    opacity=1.0,              # 透明度
+    emissive=(0.0, 0.0, 0.0), # 自己発光
+    ior=1.5,                  # 屈折率
 )
 ```
 
-## Metallic Surfaces
+## 金属サーフェス
 
 ```python
-# Predefined metals
+# 既定の金属
 gs.surfaces.Iron()
 gs.surfaces.Gold()
 gs.surfaces.Copper()
 gs.surfaces.Aluminium()
 
-# Custom metal
+# カスタム金属
 gs.surfaces.Metal(metal_type="gold", roughness=0.15)
 ```
 
-## Transparent Surfaces
+## 透明サーフェス
 
 ```python
 # Glass
@@ -65,24 +65,24 @@ gs.surfaces.Glass(
 gs.surfaces.Water()
 ```
 
-## Textures
+## テクスチャ
 
-### Color Texture
+### カラーテクスチャ
 
 ```python
 gs.textures.ColorTexture(color=(1.0, 0.0, 0.0))
 ```
 
-### Image Texture
+### 画像テクスチャ
 
 ```python
 gs.textures.ImageTexture(
     image_path="textures/checker.png",
-    encoding="srgb",  # or "linear" for non-color data
+    encoding="srgb",  # 非色情報の場合は "linear"
 )
 ```
 
-### Using Textures with Surfaces
+### サーフェスとテクスチャを組み合わせる
 
 ```python
 surface = gs.surfaces.Rough(
@@ -92,17 +92,17 @@ surface = gs.surfaces.Rough(
 )
 ```
 
-## Visualization Modes
+## 可視化モード
 
 ```python
-# Particle visualization (for fluids)
+# 粒子可視化（流体系向け）
 gs.surfaces.Rough(color=(0.6, 0.8, 1.0), vis_mode="particle")
 
-# Surface reconstruction
+# サーフェス再構成
 gs.surfaces.Glass(color=(0.7, 0.85, 1.0, 0.7), vis_mode="recon")
 ```
 
-## Environment Maps (Raytracer)
+## 環境マップ（Raytracer）
 
 ```python
 scene = gs.Scene(

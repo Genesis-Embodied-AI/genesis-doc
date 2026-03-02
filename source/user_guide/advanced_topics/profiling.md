@@ -1,8 +1,8 @@
-# Measure performance in Genesis and Quadrants
+# Genesis と Quadrants のプロファイリング
 
-## Measuring Quadrants kernel execution time, and checking launch latency
+## Quadrants カーネル実行時間の計測と launch レイテンシ確認
 
-Add pytorch profiler to the code, e.g.:
+例えば次のように、コードへ PyTorch profiler を追加します。
 
 ```python
     schedule=torch.profiler.schedule(
@@ -21,45 +21,47 @@ Add pytorch profiler to the code, e.g.:
     ) as profiler:
         for _ in range(steps):
             profiler.step()
-    # note that this must be OUTSIDE of the context manager
+    # これは context manager の外側で呼ぶ必要があります
     profiler.export_chrome_trace("trace.json")
 ```
-- within the code you wish to profile, call `profiler.step()` at regular times
-- after running, open the trace in http://ui.perfetto.dev/
+- 計測対象コード内で、一定タイミングごとに `profiler.step()` を呼びます
+- 実行後、http://ui.perfetto.dev/ でトレースを開きます
 
-**Notes:**
+**注意点:**
 
-- pytorch profiler can be used both for CPU and for GPU, even if torch is not used even a tiny bit in the program
-- you’ll need to call profiler.step() at least enough times to match what you have put in wait/warmup/active
-- generally you want:
-    - `wait` to be long enough to get past any initial steps you don’t want to look at
-    - `warmup` not sure if needs to be non-0, but I put 3, just in case
-    - `active` ⇒ 1 is generally enough, and will reduce memory used. You can experiment with larger values if you wish, of course
-    - `repeat` should be 1 in general: run the sequence of steps once, then stop profiling
-    - see official documentation [PyTorch profiler schedule documentation](https://docs.pytorch.org/docs/stable/profiler.html#torch.profiler.schedule)
-- for cpu code, both pyspy and pytorch profiler will give a hierarchical flame graph style view
-    - however, the step() ‘wait’ functionality means you’ll skip all the initialization stuff at the start, that you’re not interested in, and the ‘active’ functionality means you’ll get consistent times
-    - also, pytorch profiler shows the actual sequence of calls, rather than the statistically sampled distribution (I think)
-- for gpu code, you don’t directly get any sort of hierarchy
-    - you do however have very precise duration of each kernel launch time and duration
-    - and you can clearly see any non-hidden kernel launch overhead, which is visible as white gaps between each kernel
-    - if you do want to see the gpu kernels aligned with the python-side hierarchical view, which can help with understanding what the gpu kernel relates to, you can modify the code to call `sync()`, just before each step
-        - this will add some latency (e.g. 2x slower, for example)
-        - but means you can trust the alignment between the python hierarchical view and the gpu kernel view
+- PyTorch profiler は、プログラム内で torch を直接使っていなくても CPU/GPU の双方で利用できます
+- `wait/warmup/active` で設定した回数に達するまで `profiler.step()` を呼ぶ必要があります
+- 一般には次の設定が有効です:
+    - `wait`: 見たくない初期ステップを越えるのに十分長くする
+    - `warmup`: 0 でも動く可能性はあるが、念のため 3 などを設定
+    - `active`: 通常は 1 で十分（メモリ使用量を抑えられる）。必要なら増やして比較
+    - `repeat`: 通常は 1。1 回計測シーケンスを実行して終了
+    - 公式資料: [PyTorch profiler schedule documentation](https://docs.pytorch.org/docs/stable/profiler.html#torch.profiler.schedule)
+- CPU コードでは pyspy / pytorch profiler の両方で階層的フレームグラフが見られます
+    - `step()` の `wait` により不要な初期化部分を除外でき、`active` により安定した時間を取得できます
+    - また pytorch profiler は（おそらく）統計サンプリング分布ではなく実際の呼び出し系列を示します
+- GPU コードでは直接の階層ビューは得られません
+    - ただし各カーネル launch 時刻と実行時間は高精度で確認できます
+    - launch オーバーヘッドが隠れていない場合、カーネル間の白い隙間として明確に見えます
+    - Python 側階層ビューと GPU カーネルビューを厳密に揃えたい場合は、各 step 前に `sync()` を呼ぶ方法があります
+        - その分レイテンシは増えます（例: 2 倍程度遅くなることがある）
+        - 代わりに Python 側と GPU 側の対応を信頼できます
 
-For example, something like:
+例えば次のようにします。
 ```bash
-# Step the profiler after the physics step
+# 物理ステップ後に profiler を進める
 if self.profiler is not None:
-    qd.sync()  # Ensure all Quadrants GPU operations complete before profiling
+    qd.sync()  # profiling 前に Quadrants の GPU 処理完了を保証
     self.profiler.step()
 ```
 
-## Within Quadrants kernels
+## Quadrants カーネル内部の計測
 
-Torch profiler records the time spend in CUDA kernels, not Quadrants kernels. This is already one level deeper than what you could do with a CPU-only profiler (e.g. pyspy) + sync. But if you want to go deeper and profile code blocks inside individual GPU kernels per GPU-thread (block actually), you can use clock_counter for this.
+Torch profiler が記録するのは CUDA カーネル時間であり、Quadrants カーネルそのものではありません。
+これは CPU-only profiler（pyspy + sync など）よりは 1 段深い情報ですが、
+さらに GPU カーネル内部のコードブロックを（実際には GPU スレッド/ブロック単位で）計測したい場合は `clock_counter` を使えます。
 
-First, create an enum with the things you will want to measure, e.g.:
+まず計測対象を enum で定義します。
 
 ```bash
 from enum import IntEnum
@@ -73,7 +75,7 @@ class Time(IntEnum):
     StepLast = 6
 ```
 
-Pass in a tensor of qd.64, e.g. timers. Then, inside the kernel, do things like:
+次に `qd.i64` テンソル（例: `timers`）を渡し、カーネル内で次のように計測します。
 
 ```bash
 @qd.kernel
@@ -98,4 +100,4 @@ def k1(... previous args, times: qd.types.NDArray[qd.i64, 1]:
   start = end
 ```
 
-For an example of processing the results, see [genesis/examples/speed_benchmark/timers.py](genesis/examples/speed_benchmark/timers.py).
+結果処理の例は [genesis/examples/speed_benchmark/timers.py](genesis/examples/speed_benchmark/timers.py) を参照してください。
