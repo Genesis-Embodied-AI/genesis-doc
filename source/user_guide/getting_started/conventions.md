@@ -106,6 +106,7 @@ Genesis では STL/OBJ に対し、アセットの解釈方法をユーザーが
 
 Blender の Wavefront エクスポータ:
 https://docs.blender.org/manual/en/4.0/files/import_export/obj.html#object-properties
+
 Blender の STL エクスポータ:
 https://docs.blender.org/manual/fr/3.6/addons/import_export/mesh_stl.html#transform
 
