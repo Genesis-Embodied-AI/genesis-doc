@@ -1,3 +1,0 @@
-# 💠 Sparse Computation
-
-Coming soon...

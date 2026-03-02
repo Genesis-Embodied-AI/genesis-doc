@@ -1,4 +1,0 @@
-# 🛸 Drone
-
-
-Coming soon...

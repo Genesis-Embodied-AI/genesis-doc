@@ -6,6 +6,8 @@ Basically, everything happens inside a scene.
 scene
 simulator
 coupler
-force_field
-mesh
 ```
+
+<!-- weird to put the following here
+force_field
+mesh -->

@@ -3,6 +3,12 @@
 ```{figure} _static/images/teaser.png
 ```
 
+[![GitHub Repo stars](https://img.shields.io/github/stars/Genesis-Embodied-AI/Genesis?style=plastic&logo=GitHub&logoSize=auto)](https://github.com/Genesis-Embodied-AI/Genesis)
+[![PyPI version](https://badge.fury.io/py/genesis-world.svg?icon=si%3Apython)](https://pypi.org/project/genesis-world/)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fgenesis-embodied-ai.github.io%2F)](https://genesis-embodied-ai.github.io/)
+[![Discord](https://img.shields.io/discord/1322086972302430269?logo=discord)](https://discord.gg/nukCuhB47p)
+<a href="https://drive.google.com/uc?export=view&id=1ZS9nnbQ-t1IwkzJlENBYqYIIOOZhXuBZ"><img src="https://img.shields.io/badge/WeChat-07C160?style=for-the-badge&logo=wechat&logoColor=white" height="20" style="display:inline"></a>
+
 ## Genesisとは？
 
 Genesisは、汎用的な*ロボティクス/Embodied AI/Physical AI*アプリケーション向けに設計された物理プラットフォームです。同時に以下のような複数の側面を持ちます：
