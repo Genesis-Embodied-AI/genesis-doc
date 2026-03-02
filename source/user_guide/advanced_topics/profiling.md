@@ -100,4 +100,4 @@ def k1(... previous args, times: qd.types.NDArray[qd.i64, 1]:
   start = end
 ```
 
-結果処理の例は [genesis/examples/speed_benchmark/timers.py](genesis/examples/speed_benchmark/timers.py) を参照してください。
+結果処理の例は `examples/speed_benchmark/timers.py` を参照してください。

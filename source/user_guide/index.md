@@ -44,6 +44,7 @@ getting_started/usd_import
 getting_started/domain_randomization
 getting_started/viewer_plugin
 getting_started/miscellaneous
+getting_started/misc_guidelines
 getting_started/config_system
 ```
 
@@ -64,6 +65,7 @@ advanced_topics/support_field
 advanced_topics/checkpoints
 advanced_topics/mesh_processing
 advanced_topics/multi_gpu
+advanced_topics/parallel_RL_training
 advanced_topics/profiling
 ```
 

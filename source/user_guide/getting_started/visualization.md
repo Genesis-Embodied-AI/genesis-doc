@@ -219,7 +219,7 @@ python demo.py
 ### よくある質問（FAQ）
 
 - `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON` を実行した際の Pybind エラー
-    ```bash
+    ```text
     CMake Error at src/apps/CMakeLists.txt:12 (find_package):
     By not providing "Findpybind11.cmake" in CMAKE_MODULE_PATH this project has
     asked CMake to find a package configuration file provided by "pybind11",
@@ -234,19 +234,19 @@ python demo.py
     → おそらく `pip install -e ".[render]"` を忘れています。代わりに、単に `pip install "pybind11[global]"` を実行することもできます。
 
 - `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON` を実行した際の CUDA ランタイムコンパイルエラー
-    ```bash
+    ```text
     /usr/bin/ld: CMakeFiles/luisa-cuda-nvrtc-standalone-compiler.dir/cuda_nvrtc_compiler.cpp.o: in function `main':
     cuda_nvrtc_compiler.cpp:(.text.startup+0x173): undefined reference to `nvrtcGetOptiXIRSize'
     /usr/bin/ld: cuda_nvrtc_compiler.cpp:(.text.startup+0x197): undefined reference to `nvrtcGetOptiXIR'
     ```
     → システムレベルで CUDA ツールキットをインストールする必要があります（[公式インストールガイド](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)参照）。まず CUDA ツールキットを確認してください。
-    ```bash
+    ```text
     nvcc --version # これは nvidia-smi で確認した CUDA バージョンと一致するはず
     which nvcc # 期待している CUDA ツールキットを使用しているか確認
     ```
 
     `nvcc` が正しい出力を返さない場合、公式ガイドに従って CUDA ツールキットをインストールしてください。以下は CUDA 12.4 をインストールする例です。[こちら](https://developer.nvidia.com/cuda-12-4-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local)からインストーラーをダウンロードします。
-    ```bash
+    ```text
     wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
     sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
     wget https://developer.download.nvidia.com/compute/cuda/12.4.0/local_installers/cuda-repo-ubuntu2204-12-4-local_12.4.0-550.54.14-1_amd64.deb
@@ -257,7 +257,7 @@ python demo.py
     ```
 
     バイナリとランタイムライブラリのパスを設定するのを忘れないでください。`~/.bashrc`に以下を追加します（なお、CUDA のパスは最後尾に追加しています。理由は `/usr/local/cuda-12.4/bin` に別バージョンの `gcc` や `g++` が含まれており、バージョン 11 がビルドに必要なためです）。
-    ```bash
+    ```text
     PATH=${PATH:+${PATH}:}/usr/local/cuda-12.4/bin
     LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}/usr/local/cuda-12.4/lib64
     ```
@@ -265,7 +265,7 @@ python demo.py
     ターミナルを再起動するか `source ~/.bashrc` を実行してください。
 
     別のエラーとして次のようなものが出る場合があります。
-    ```bash
+    ```text
     <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_fatal_printf@GLIBC_PRIVATE'
     <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_audit_symbind_alt@GLIBC_PRIVATE'
     <your-env-path>/genesis-test1/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_exception_create@GLIBC_PRIVATE'
@@ -276,13 +276,13 @@ python demo.py
     ```
 
     これは、conda 環境内の CUDA ツールキットが原因かもしれません。以下を実行してシステムレベルの CUDA をインストールしてください。
-    ```bash
+    ```text
     which nvcc
     conda uninstall cuda-toolkit
     ```
 
     もしくは、conda のライブラリパスをランタイムライブラリパスに追加することで解消できます。
-    ```bash
+    ```text
     ls $CONDA_PREFIX/lib/libcudart.so # このファイルが存在するか確認
 
     # ~/.bashrc 内に追加
@@ -318,7 +318,7 @@ python demo.py
     ```
 
 - `examples/rendering/demo.py` を実行した際の ImportError:
-    ```bash
+    ```text
     [Genesis] [11:29:47] [ERROR] Failed to import LuisaRenderer. ImportError: /home/tsunw/miniconda3/envs/genesis-test1/bin/../lib/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by /home/tsunw/workspace/Genesis/genesis/ext/LuisaRender/build/bin/liblc-core.so)
     ```
 

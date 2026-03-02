@@ -115,5 +115,3 @@ $$ \mathbf F_{\text{rigid}} = -\dfrac{\Delta\mathbf p}{\Delta t}. $$
 | **Tool ↔ MPM**  | 各 Tool エンティティの `collide()` へ委譲 |
 
 表にない組み合わせは現時点で未対応です。
-
----
