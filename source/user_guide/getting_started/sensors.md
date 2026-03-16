@@ -30,6 +30,10 @@ Currently supported sensors:
 - `IMU` (accelerometer and gyroscope)
 - `Contact` (boolean per rigid link)
 - `ContactForce` (xyz force per rigid link)
+- `KinematicContactProbe` (penetration-based tactile probes)
+- `ElastomerDisplacement` (soft tactile displacement field)
+- `Proximity` (distance to tracked mesh surfaces)
+- `TemperatureGrid` (voxelized temperature field on a rigid link)
 - `Raycaster`
   - `Lidar`
   - `DepthCamera`
@@ -164,7 +168,9 @@ The IMU returns data as a **named tuple** with fields:
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/imu.mp4" type="video/mp4">
 </video>
 
-## Contact Sensors
+## Tactile Sensors
+
+### Contact Sensors
 
 The contact sensors retrieve contact information per rigid link from the rigid solver.
 `Contact` sensor will return a boolean, and `ContactForce` returns the net force vector in the local frame of the associated rigid link.
@@ -175,16 +181,84 @@ The full example script is available at `examples/sensors/contact_force_go2.py` 
 ```{figure} ../../_static/images/contact_force_sensor.png
 ```
 
-## KinematicContactProbe Sensor
-The `KinematicContactProbe` is a tactile sensor which queries contact depth along "probe" points associated with a rigid entity link. Instead of forces retrieved from the physics solver like the contact sensors above, this sensor estimates force purely on the contact penetration depth: `F = stiffness * penetration * probe_normal`.
+### KinematicContactProbe Sensor
+The `KinematicContactProbe` is a tactile sensor that samples contact depth at user-defined probe positions attached to a rigid link. Instead of returning solver contact forces, it computes a simple penetration-based estimate: `force = stiffness * penetration`
+
+```python
+probe = scene.add_sensor(
+    gs.sensors.KinematicContactProbe(
+        entity_idx=platform.idx,
+        link_idx_local=0,
+        probe_local_pos=probe_positions,
+        probe_local_normal=probe_normals,
+        probe_radius=probe_radii,
+        stiffness=5000.0,
+        draw_debug=True,
+    )
+)
+
+scene.build()
+
+data = probe.read()
+print(data.penetration)  # shape ([n_envs,] n_probes)
+print(data.force)        # shape ([n_envs,] n_probes, 3)
+```
+
+The full interactive example is available at `examples/sensors/kinematic_contact_probe.py`.
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/kin_probe_data.mp4" type="video/mp4">
 </video>
 
-An example script with teleop control is available at `examples/sensors/kinematic_contact_probe.py` to play around with.
+Because the probes are defined in the link-local frame, a regular grid can be used to imitate taxels on a tactile surface.
 
-A grid of tactile probes could easily be placed on a robot hand or end effector to imitate taxels (tactile pixels) of a tactile sensor.
+### ElastomerDisplacement Sensor
+The `ElastomerDisplacement` sensor models a soft tactile skin without the computational expense of actually simulating deformation. Each probe reports a 3D displacement vector caused by local indentation, shear, and twist.
+
+You can tune the response of the sensor with coefficients which determine the spatial effect (which is computed with `exp(-coeff * dist^2)`, so larger values make effects more local and smaller values spread them farther):
+- `dilate_coefficient`: spread of normal indentation.
+- `shear_coefficient`: spread of tangential slip.
+- `twist_coefficient`: spread of torsional displacement.
+
+```python
+tactile = scene.add_sensor(
+    gs.sensors.ElastomerDisplacement(
+        entity_idx=pusher.idx,
+        link_idx_local=0,
+        probe_local_pos=gu.generate_grid_points_on_plane(
+            lo=[-0.05, -0.05, -0.025],
+            hi=[0.05, 0.05, -0.025],
+            normal=(0.0, 0.0, -1.0),
+            nx=6,
+            ny=8,
+        ),
+        probe_local_normal=(0.0, 0.0, -1.0),
+        probe_radius=0.01,
+        dilate_coefficient=1e1,
+        shear_coefficient=1e-2,
+        twist_coefficient=1e-2,
+        draw_debug=True,
+    )
+)
+
+scene.build()
+
+displacement = tactile.read()
+print(displacement)  # shape ([n_envs,] n_probes, 3)
+```
+
+When `probe_local_pos` is provided as a 2D grid, Genesis uses an FFT-based algorithm to accelerate the computation for larger tactile arrays.
+
+Example script `examples/sensors/tactile_elastomer_sandbox.py` demos a spherical or box shaped pusher interacting with other objects
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/elastomer_sandbox.mp4" type="video/mp4">
+</video>
+  
+and `examples/sensors/tactile_elastomer_franka.py` sensorizes the robot arm's gripper fingers with taxels arranged in a grid.
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/elastomer_franka.mp4" type="video/mp4">
+</video>
+
 
 ## Raycaster Sensors: Lidar and Depth Camera
 
@@ -226,4 +300,88 @@ Here's what running `python examples/sensors/lidar_teleop.py --pattern depth` lo
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/depth_camera.mp4" type="video/mp4">
+</video>
+
+## Proximity Sensor
+
+The `Proximity` sensor reports the nearest distance from one or more local probe positions to a selected set of tracked rigid links. Unlike a raycaster, it does not depend on a ray direction. Instead, each probe returns the nearest point on any tracked mesh surface within `max_range`.
+
+In the public API, this sensor is created with `gs.sensors.ProximityOptions`:
+
+```python
+sensor = scene.add_sensor(
+    gs.sensors.ProximityOptions(
+        entity_idx=robot.idx,
+        link_idx_local=robot.get_link("palm").idx_local,
+        probe_local_pos=((0.0, 0.0, 0.0),),
+        track_link_idx=(duck.base_link_idx, box.base_link_idx),
+        max_range=0.5,
+        draw_debug=True,
+    )
+)
+
+scene.build()
+
+data = sensor.read()
+print(data.distance)  # shape ([n_envs,] n_probes)
+print(data.points)    # shape ([n_envs,] n_probes, 3)
+```
+
+If no tracked mesh is found within `max_range`, the reported distance is clamped to `max_range` and the returned points are the probe positions.
+
+The interactive example at `examples/sensors/proximity_shadowhand.py` mounts proximity probes on the palm and fingertips of a dexterous robot hand.
+
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/proximity.mp4" type="video/mp4">
+</video>
+
+
+## TemperatureGrid Sensor
+
+The `TemperatureGrid` sensor discretizes the bounding box of a rigid link into a 3D voxel grid and returns the temperature of each cell in Celsius. Heat transfer is driven by contact, conduction, radiation, convection, and optional per-cell heat generation.
+
+To use it, provide a `properties_dict` describing the thermal material properties of the links that may participate in heat exchange. Key `-1` can be used as a default entry for links that are not listed explicitly.
+
+```python
+properties_dict = {
+    -1: gs.sensors.TemperatureProperties(
+        base_temperature=22.0,
+        conductivity=100.0,
+        density=1000.0,
+        specific_heat=1.0,
+        emissivity=0.8,
+    ),
+    pusher.base_link_idx: gs.sensors.TemperatureProperties(
+        base_temperature=200.0,
+        conductivity=1000.0,
+        density=2000.0,
+        specific_heat=1.0,
+        emissivity=0.8,
+    ),
+}
+
+temperature_sensor = scene.add_sensor(
+    gs.sensors.TemperatureGrid(
+        entity_idx=platform.idx,
+        link_idx_local=0,
+        grid_size=(10, 10, 1),
+        properties_dict=properties_dict,
+        ambient_temperature=22.0,
+        convection_coefficient=0.0,
+        draw_debug=True,
+    )
+)
+
+scene.build()
+
+grid = temperature_sensor.read()
+print(grid)  # shape ([n_envs,] nx, ny, nz)
+```
+
+Set `simulate_all_link_temperatures=True` if you want Genesis to evolve temperatures for every link with thermal properties, not just the sensor-attached link.
+
+The example `examples/sensors/temperature_grid.py` visualizes a hot pusher heating a platform while objects are dropped onto the sensorized surface.
+
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/temperaturegrid.mp4" type="video/mp4">
 </video>
