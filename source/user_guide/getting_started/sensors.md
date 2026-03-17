@@ -182,8 +182,7 @@ The full example script is available at `examples/sensors/contact_force_go2.py` 
 ```
 
 ### KinematicContactProbe Sensor
-The `KinematicContactProbe` is a tactile sensor that samples contact depth at user-defined probe positions attached to a rigid link. Instead of returning solver contact forces, it computes a simple penetration-based estimate: `force = stiffness * penetration`
-
+ The `KinematicContactProbe` is a tactile sensor that samples contact depth at user-defined probe positions attached to a rigid link. Instead of returning solver contact forces, it computes a simple penetration-based force estimate per probe: a 3D vector whose magnitude is `stiffness * penetration` and whose direction is given by the probe normal, i.e. `force = stiffness * penetration * normal`.
 ```python
 probe = scene.add_sensor(
     gs.sensors.KinematicContactProbe(
@@ -249,12 +248,12 @@ print(displacement)  # shape ([n_envs,] n_probes, 3)
 
 When `probe_local_pos` is provided as a 2D grid, Genesis uses an FFT-based algorithm to accelerate the computation for larger tactile arrays.
 
-Example script `examples/sensors/tactile_elastomer_sandbox.py` demos a spherical or box shaped pusher interacting with other objects
+Example script `examples/sensors/tactile_elastomer_sandbox.py` demos a spherical or box shaped pusher interacting with other objects.
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/elastomer_sandbox.mp4" type="video/mp4">
 </video>
-  
-and `examples/sensors/tactile_elastomer_franka.py` sensorizes the robot arm's gripper fingers with taxels arranged in a grid.
+
+Another example script `examples/sensors/tactile_elastomer_franka.py` sensorizes the robot arm's gripper fingers with taxels arranged in a grid.
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/elastomer_franka.mp4" type="video/mp4">
 </video>
@@ -304,17 +303,15 @@ Here's what running `python examples/sensors/lidar_teleop.py --pattern depth` lo
 
 ## Proximity Sensor
 
-The `Proximity` sensor reports the nearest distance from one or more local probe positions to a selected set of tracked rigid links. Unlike a raycaster, it does not depend on a ray direction. Instead, each probe returns the nearest point on any tracked mesh surface within `max_range`.
-
-In the public API, this sensor is created with `gs.sensors.ProximityOptions`:
+The `Proximity` sensor reports the nearest distance from one or more local probe positions to a selected set of tracked rigid links. Each probe returns the nearest point on any tracked mesh surface within `max_range`.
 
 ```python
 sensor = scene.add_sensor(
-    gs.sensors.ProximityOptions(
+    gs.sensors.Proximity(
         entity_idx=robot.idx,
         link_idx_local=robot.get_link("palm").idx_local,
         probe_local_pos=((0.0, 0.0, 0.0),),
-        track_link_idx=(duck.base_link_idx, box.base_link_idx),
+        track_link_idx=(duck.base_link_idx, box.base_link_idx),  # global rigid link idx
         max_range=0.5,
         draw_debug=True,
     )
@@ -343,29 +340,27 @@ The `TemperatureGrid` sensor discretizes the bounding box of a rigid link into a
 To use it, provide a `properties_dict` describing the thermal material properties of the links that may participate in heat exchange. Key `-1` can be used as a default entry for links that are not listed explicitly.
 
 ```python
-properties_dict = {
-    -1: gs.sensors.TemperatureProperties(
-        base_temperature=22.0,
-        conductivity=100.0,
-        density=1000.0,
-        specific_heat=1.0,
-        emissivity=0.8,
-    ),
-    pusher.base_link_idx: gs.sensors.TemperatureProperties(
-        base_temperature=200.0,
-        conductivity=1000.0,
-        density=2000.0,
-        specific_heat=1.0,
-        emissivity=0.8,
-    ),
-}
-
 temperature_sensor = scene.add_sensor(
     gs.sensors.TemperatureGrid(
-        entity_idx=platform.idx,
+        entity_idx=entity.idx,
         link_idx_local=0,
         grid_size=(10, 10, 1),
-        properties_dict=properties_dict,
+        properties_dict={
+            -1: gs.sensors.TemperatureProperties(
+                base_temperature=22.0,
+                conductivity=100.0,
+                density=1000.0,
+                specific_heat=1.0,
+                emissivity=0.8,
+            ),
+            entity.base_link_idx: gs.sensors.TemperatureProperties(
+                base_temperature=200.0,
+                conductivity=1000.0,
+                density=2000.0,
+                specific_heat=1.0,
+                emissivity=0.8,
+            ),
+        },
         ambient_temperature=22.0,
         convection_coefficient=0.0,
         draw_debug=True,
