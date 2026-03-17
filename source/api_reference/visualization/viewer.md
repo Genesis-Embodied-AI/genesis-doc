@@ -69,7 +69,6 @@ viewer_options = gs.options.ViewerOptions(
     camera_fov=45,              # Field of view
     max_FPS=60,                 # Maximum frame rate
     run_in_thread=True,         # Run viewer in separate thread
-    enable_interaction=True,    # Enable mouse/keyboard interaction
 )
 ```
 

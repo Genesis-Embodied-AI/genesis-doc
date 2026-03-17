@@ -12,5 +12,5 @@ Note that specifying `XDG_CACHE_HOME` is sufficient on Linux, but not on Windows
 
 We provided some command line tools that you can execute in terminal once Genesis is installed. These include:
 
-- `gs view *.*`: Visualize a given asset (mesh/URDF/MJCF) (can be useful if you want to quickly check if your asset can be loaded and visualized correctly)
+- `gs view *.*`: Visualize a given asset (Mesh/URDF/MJCF/USD). For USD stages, all rigid entities are loaded and the joint controller shows sliders for every articulation, with section headers between entities.
 - `gs animate 'path/*.png'`: Combine all images that matches the given pattern into a video.
