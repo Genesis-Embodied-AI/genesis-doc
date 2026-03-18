@@ -249,11 +249,13 @@ print(displacement)  # shape ([n_envs,] n_probes, 3)
 When `probe_local_pos` is provided as a 2D grid, Genesis uses an FFT-based algorithm to accelerate the computation for larger tactile arrays.
 
 Example script `examples/sensors/tactile_elastomer_sandbox.py` demos a spherical or box shaped pusher interacting with other objects.
+
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/elastomer_sandbox.mp4" type="video/mp4">
 </video>
 
 Another example script `examples/sensors/tactile_elastomer_franka.py` sensorizes the robot arm's gripper fingers with taxels arranged in a grid.
+
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/elastomer_franka.mp4" type="video/mp4">
 </video>
