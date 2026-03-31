@@ -29,7 +29,11 @@ for _ in range(1000):
 当前支持的传感器：
 - `IMU`（加速度计和陀螺仪）
 - `Contact`（每个刚体连杆的布尔值）
-- `ContactForce`（每个刚体连杆的 xyz 力）
+- `ContactForce`（每个刚体连杆的 xyz 方向上的力）
+- `KinematicContactProbe` (基于穿透的触觉探针)
+- `ElastomerDisplacement` (软体触觉位移场)
+- `Proximity` (到被追踪网格表面的距离)
+- `TemperatureGrid` (刚体连杆上的体素化温度场)
 - `Raycaster`
   - `Lidar`
   - `DepthCamera`

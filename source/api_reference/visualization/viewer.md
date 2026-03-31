@@ -69,7 +69,6 @@ viewer_options = gs.options.ViewerOptions(
     camera_fov=45,              # 视野角度
     max_FPS=60,                 # 最大帧率
     run_in_thread=True,         # 在单独线程中运行 viewer
-    enable_interaction=True,    # 启用鼠标/键盘交互
 )
 ```
 

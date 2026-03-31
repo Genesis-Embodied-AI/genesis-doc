@@ -12,5 +12,5 @@ XDG_CACHE_HOME="$(mktemp -d)" GS_CACHE_FILE_PATH="$XDG_CACHE_HOME/genesis" QD_OF
 
 我们提供了一些命令行工具，您可以在安装 Genesis 后在终端中执行。这些包括：
 
-- `gs view *.*`：可视化给定资源（网格/URDF/MJCF）（如果您想快速检查资源是否能正确加载和可视化，这可能很有用）
+- `gs view *.*`：可视化给定的资源文件（支持 Mesh/URDF/MJCF/USD 格式）。对于 USD 场景文件，所有刚体实体都会被加载，关节控制器会为每个可动关节显示滑块控件，并在不同实体之间用分区标题进行分隔。
 - `gs animate 'path/*.png'`：将所有匹配给定模式的图像组合成视频。
