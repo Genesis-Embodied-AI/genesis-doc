@@ -16,8 +16,8 @@ sphinx_design
 psutil
 scikit-image
 quadrants
-pydantic == 2.7.1
-numpy == 1.26.4
+pydantic
+numpy
 six
 PyOpenGL
 freetype-py
@@ -25,6 +25,7 @@ pyglet
 libigl
 pygltflib
 mujoco
+frozendict
 pycollada
 opencv-python
 tetgen
