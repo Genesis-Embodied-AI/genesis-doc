@@ -114,3 +114,8 @@ scene = gs.Scene(
     )
 )
 ```
+
+## What's Next
+
+- [Visualization](./visualization) — viewer controls, camera placement, and rendering backends
+- [USD Import](./usd_import) — loading Universal Scene Description assets into Genesis

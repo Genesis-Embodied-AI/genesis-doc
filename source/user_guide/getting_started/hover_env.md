@@ -60,7 +60,7 @@ At this stage, we have defined the environments. To train the drone hovering pol
     First, ensure you have Genesis installed, then add all required Python dependencies using `pip`:
     ```bash
     pip install --upgrade pip
-    pip install tensorboard rsl-rl-lib==2.2.4
+    pip install tensorboard "rsl-rl-lib>=5.0.0"
     ```
 2. **Run Training Script**.
     Use the provided training script to start training the policy.

@@ -109,3 +109,8 @@ for step in range(500):
 - Emitters must be added before `scene.build()`
 - Particles recycle when `max_particles` is reached
 - Not compatible with differentiable simulation (`requires_grad=True`)
+
+## What's Next
+
+- [Beyond Rigid Bodies](./beyond_rigid_bodies) — fluids, cloth, and deformable body simulation
+- [Soft Robots](./soft_robots) — muscle-actuated soft and hybrid robots

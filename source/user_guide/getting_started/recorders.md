@@ -15,7 +15,7 @@ be stopped with `scene.stop_recording()`.
 
 You can record sensor data with `sensor.start_recording(recorder_options)` or any other kind of data using `scene.start_recording(data_func, recorder_options)` with a custom data function. For example:
 
-```
+```python
 def imu_data_func():
     data = imu.read()
     true_data = imu.read_ground_truth()
@@ -45,4 +45,9 @@ scene.start_recording(
 </video>
 
 See RecorderOptions in the API reference for currently available recorders.
-More example uses of recorders can also be seen in `examples/sensors/`. 
+More example uses of recorders can also be seen in `examples/sensors/`.
+
+## What's Next
+
+- [Sensors](./sensors) — contact, tactile, proximity, IMU, and temperature sensors
+- [Camera Sensors](./camera_sensors) — RGB, depth, segmentation, and normal rendering

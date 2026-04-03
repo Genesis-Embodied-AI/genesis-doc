@@ -105,3 +105,8 @@ scene = gs.Scene(
 2. Apply position/command DR at each episode reset
 3. Use `envs_idx` parameter for selective randomization
 4. Ensure tensor shapes match `(n_envs, ...)`
+
+## What's Next
+
+- [Parallel Simulation](./parallel_simulation) — running batched environments for RL training
+- [Locomotion](./locomotion) — training a locomotion policy end-to-end with domain randomization

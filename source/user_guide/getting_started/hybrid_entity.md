@@ -129,3 +129,8 @@ Genesis automatically:
 - Soft material must be MPM-based (`gs.materials.MPM.*`)
 - Higher `damping` reduces oscillation
 - Requires `mpm_options` with appropriate bounds
+
+## What's Next
+
+- [Soft Robots](./soft_robots) — muscle actuation for FEM and MPM soft bodies
+- [Beyond Rigid Bodies](./beyond_rigid_bodies) — fluids, cloth, and deformable body simulation

@@ -99,8 +99,8 @@ The code above is essentially the same as `examples/rigid/terrain_subterrain.py`
 Sometimes you already have a detailed CAD or photogrammetry mesh and just want collisions to run quickly.  The helper `genesis.utils.terrain.mesh_to_heightfield` samples the mesh with vertical rays and returns a NumPy height array together with the grid coordinates.
 
 ```python
-from genesis.utils.terrain import mesh_to_heightfield
 import os
+from genesis.utils.terrain import mesh_to_heightfield
 
 # path to your .obj / .glb / .stl terrain
 mesh_path = os.path.join(gs.__path__[0], "assets", "meshes", "terrain_45.obj")

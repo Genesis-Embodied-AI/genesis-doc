@@ -101,3 +101,8 @@ print(constraints)  # Active constraint pairs
 - **Connect**: 3-DOF constraint (translation only)
 - **Instant**: No force limits or compliance
 - **Runtime**: Can be added/removed dynamically
+
+## What's Next
+
+- [Control Your Robot](./control_your_robot) — joint-level position, velocity, and force control
+- [Inverse Kinematics & Motion Planning](./inverse_kinematics_motion_planning) — IK solving and pick-and-place workflows

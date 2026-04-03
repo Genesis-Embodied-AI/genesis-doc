@@ -127,3 +127,9 @@ for i in range(200):
     scene.step()
 ```
 When grasping the object, we used force control for the 2 gripper dofs, and applied a 0.5N grasping force. If everything goes right, you will see the object being grasped and lifted.
+
+## What's Next
+
+- [Advanced IK](./advanced_ik) — multi-target IK, null-space control, and solver tuning
+- [Constraints](./constraints) — weld and connect constraints for locking links together at runtime
+- [Path Planning](./path_planning) — collision-free motion planning with RRT

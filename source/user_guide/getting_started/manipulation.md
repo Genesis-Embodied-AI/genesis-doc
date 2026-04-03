@@ -31,7 +31,7 @@ In the first stage, we train a teacher policy using **Proximal Policy Optimizati
 **Setup:**
 
 ```bash
-pip install tensorboard rsl-rl-lib==2.2.4
+pip install tensorboard "rsl-rl-lib>=5.0.0"
 ```
 
 **Training:**

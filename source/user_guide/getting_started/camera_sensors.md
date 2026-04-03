@@ -128,3 +128,9 @@ scene = gs.Scene(renderer=gs.renderers.RayTracer())
 # For batch renderer
 scene = gs.Scene(renderer=gs.renderers.BatchRenderer())
 ```
+
+## What's Next
+
+- [Batch Renderer](./batch_renderer) — GPU-accelerated parallel rendering for RL training
+- [Raycaster Patterns](./raycaster_patterns) — LiDAR and depth camera ray pattern configuration
+- [Sensors](./sensors) — contact, tactile, proximity, IMU, and temperature sensors

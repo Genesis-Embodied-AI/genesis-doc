@@ -19,7 +19,7 @@ __version__ = gs.__version__
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "Genesis"
-copyright = "2024, Genesis Developers"
+copyright = "2024-2026, Genesis Developers"
 author = "Genesis Developers"
 release = __version__
 version = __version__
@@ -68,6 +68,23 @@ html_theme_options = {
     "logo": {
         "image_dark": "_static/bigger_text_white.png",
     },
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/Genesis-Embodied-AI/Genesis",
+            "icon": "fa-brands fa-github",
+        },
+        {
+            "name": "Discord",
+            "url": "https://discord.gg/nukCuhB47p",
+            "icon": "fa-brands fa-discord",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/genesis-world/",
+            "icon": "fa-brands fa-python",
+        },
+    ],
     "navbar_center": ["version-switcher", "navbar-nav"],
     "show_version_warning_banner": False,
     "switcher": {

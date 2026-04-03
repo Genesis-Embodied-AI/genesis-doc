@@ -133,3 +133,8 @@ scene.build(n_envs=4)
 data = lidar.read()
 print(data.points.shape)  # (4, n_h, n_v, 3) for batched envs
 ```
+
+## What's Next
+
+- [Sensors](./sensors) — contact, tactile, proximity, IMU, and temperature sensors
+- [Camera Sensors](./camera_sensors) — RGB, depth, segmentation, and normal rendering
