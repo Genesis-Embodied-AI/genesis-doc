@@ -13,7 +13,6 @@ sim_options
 coupler_options
 tool_options
 rigid_options
-avatar_options
 mpm_options
 sph_options
 pbd_options

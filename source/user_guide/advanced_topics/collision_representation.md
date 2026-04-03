@@ -1,3 +1,0 @@
-# 🎱 Collision Representataions
-
-Coming soon...

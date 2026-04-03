@@ -1,4 +1,0 @@
-# Camera
-```{toctree}
-camera
-```
