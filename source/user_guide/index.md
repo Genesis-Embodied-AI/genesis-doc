@@ -16,35 +16,78 @@ overview/mission
 :maxdepth: 1
 
 getting_started/hello_genesis
-getting_started/conventions
 getting_started/visualization
 getting_started/control_your_robot
 getting_started/parallel_simulation
+getting_started/interactive_debugging
+```
+
+
+```{toctree}
+:caption: Robot Control
+:maxdepth: 1
+
 getting_started/inverse_kinematics_motion_planning
 getting_started/advanced_ik
+getting_started/constraints
+getting_started/path_planning
+```
+
+
+```{toctree}
+:caption: Physics Simulation
+:maxdepth: 1
+
 getting_started/beyond_rigid_bodies
+getting_started/soft_robots
+getting_started/hybrid_entity
+getting_started/terrain
+getting_started/emitters
+```
+
+
+```{toctree}
+:caption: Sensing & Perception
+:maxdepth: 1
+
 getting_started/sensors
 getting_started/camera_sensors
 getting_started/raycaster_patterns
 getting_started/batch_renderer
 getting_started/recorders
-getting_started/interactive_debugging
+```
+
+
+```{toctree}
+:caption: RL Training
+:maxdepth: 1
+
 getting_started/locomotion
 getting_started/hover_env
 getting_started/drone_entity
 getting_started/manipulation
-getting_started/constraints
-getting_started/path_planning
-getting_started/terrain
-getting_started/soft_robots
-getting_started/hybrid_entity
-getting_started/emitters
+getting_started/domain_randomization
+```
+
+
+```{toctree}
+:caption: Assets & Rendering
+:maxdepth: 1
+
 getting_started/surfaces_textures
 getting_started/usd_import
-getting_started/domain_randomization
 getting_started/viewer_plugin
-getting_started/miscellaneous
+```
+
+
+```{toctree}
+:caption: Configuration & Conventions
+:maxdepth: 1
+
 getting_started/config_system
+getting_started/conventions
+getting_started/miscellaneous
+getting_started/misc_guidelines
 ```
 
 

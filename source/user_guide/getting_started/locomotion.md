@@ -52,7 +52,7 @@ Reward functions are critical for policy guidance. In this example, we use:
 ## Training
 At this stage, we have defined the environments. Now, we use the PPO implementation from rsl-rl to train the policy. First, install all Python dependencies via `pip`:
 ```
-pip install tensorboard rsl-rl-lib==2.2.4
+pip install tensorboard "rsl-rl-lib>=5.0.0"
 ```
 After installation, start training by running:
 ```

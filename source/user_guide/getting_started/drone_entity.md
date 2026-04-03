@@ -115,3 +115,8 @@ for _ in range(500):
     drone.set_propellels_rpm(rpms)
     scene.step()
 ```
+
+## What's Next
+
+- [Hover Environment](./hover_env) — building a complete drone hover RL environment
+- [Locomotion](./locomotion) — training locomotion policies with Genesis and RL

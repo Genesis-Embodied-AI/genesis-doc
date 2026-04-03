@@ -271,3 +271,8 @@ This is what you will see:
 * By default, we grow skin based on the shape of the skeleton, which is specified by `morph` (in this example, the `urdf/simple/two_link_arm.urdf`). The argument `func_instantiate_soft_from_rigid` of `gs.materials.Hybrid` defines concretely how skin should grow based on the rigid-bodied `morph`. There is a default implementation `default_func_instantiate_soft_from_rigid` in [genesis/engine/entities/hybrid_entity.py](https://github.com/Genesis-Embodied-AI/Genesis/tree/main/genesis/engine/entities/hybrid_entity.py). You can also implement your own function.
 * When `morph` is `Mesh` instead of `URDF`, the mesh specifies the soft outer body and the inner skeleton is grown based on the skin shape. This is defined by `func_instantiate_rigid_from_soft`. There is also a default implementation `default_func_instantiate_rigid_from_soft`, which basically implements skeletonization of 3D meshes.
 * The argument `func_instantiate_rigid_soft_association` of `gs.materials.Hybrid` determines how each skeletal part is associated with skin. The default implementation is to find the closest particles of the soft skin to the rigid skeletal parts.
+
+## What's Next
+
+- [Hybrid Entity](./hybrid_entity) — creating rigid-soft hybrid entities from URDF or mesh
+- [Beyond Rigid Bodies](./beyond_rigid_bodies) — fluids, cloth, and deformable body simulation

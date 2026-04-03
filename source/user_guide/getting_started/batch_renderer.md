@@ -108,3 +108,8 @@ colored = scene.visualizer.colorize_seg_idxc_arr(seg)
 - Prefer `use_rasterizer=True` for speed
 - Batch render all cameras with `scene.render_all_cameras()`
 - Typical setup: 256x256 resolution with 128-256 environments
+
+## What's Next
+
+- [Camera Sensors](./camera_sensors) — single-environment camera setup, backends, and rendering modes
+- [Parallel Simulation](./parallel_simulation) — running batched environments for RL training

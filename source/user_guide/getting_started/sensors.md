@@ -382,3 +382,9 @@ The example `examples/sensors/temperature_grid.py` visualizes a hot pusher heati
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/temperaturegrid.mp4" type="video/mp4">
 </video>
+
+## What's Next
+
+- [Camera Sensors](./camera_sensors) — RGB, depth, segmentation, and normal rendering
+- [Raycaster Patterns](./raycaster_patterns) — configuring LiDAR and depth camera ray patterns
+- [Recorders](./recorders) — recording sensor data alongside simulation videos
