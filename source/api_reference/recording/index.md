@@ -13,7 +13,9 @@ The recording system consists of:
 
 ## Quick Start
 
-### Recording Viewer Video
+### Recording Camera Video
+
+Record a video from a scene camera. Frames are captured automatically on each `cam.render()` call while recording is active.
 
 ```python
 import genesis as gs
@@ -22,16 +24,18 @@ gs.init()
 scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
 scene.add_entity(gs.morphs.Box(pos=(0, 0, 1), size=(1.0, 1.0, 1.0)))
+
+cam = scene.add_camera(res=(640, 480), pos=(3, 0, 2), lookat=(0, 0, 0.5))
+
 scene.build()
 
-# Start recording
-scene.start_recording()
+cam.start_recording()
 
 for i in range(200):
     scene.step()
+    cam.render()
 
-# Stop and save
-scene.stop_recording(save_to="simulation.mp4")
+cam.stop_recording(save_to_filename="simulation.mp4")
 ```
 
 ### Recording Custom Data
