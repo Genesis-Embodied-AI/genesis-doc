@@ -7,7 +7,7 @@ The Genesis simulation framework is built around a modular and extensible config
 To help you understand how these components work together, we start with a high-level template of how a Genesis scene is typically initialized. This template shows how simulation settings, solver options, and entity-level configurations are orchestrated.
 
 ```python
-# Initializate Genesis
+# Initialize Genesis
 gs.init(...)
 
 # Initialize scene
@@ -29,6 +29,7 @@ scene = gs.Scene(
     vis_options=VisOptions(...),
     viewer_options=ViewerOptions(...),
     renderer=Rasterizer(...),
+    show_viewer=True,
 )
 
 # Add entities
@@ -135,13 +136,13 @@ Surfaces define how an entity appears visually. They include rendering propertie
     - `Smooth`: Shortcut for a smooth surface with proper parameters.
     - `Reflective`: For collision geometry with a grey color by default.
     - `Collision`: Shortcut for a rough plastic surface with proper parameters.
-- `Metal`
-    - `Iron`: Shortcut for an metallic surface with `metal_type = 'iron'`.
-    - `Aluminium`: Shortcut for an metallic surface with `metal_type = 'aluminium'`.
-    - `Copper`: Shortcut for an metallic surface with `metal_type = 'copper'`.
-    - `Gold`: Shortcut for an metallic surface with `metal_type = 'gold'`.
-- `Glass`
-    - `Water`: Shortcut for a water surface (using Glass surface with proper values).
+- `Metal`: Metallic surface with configurable `metal_type`.
+- `Iron`: Shortcut for a metallic surface with `metal_type = 'iron'`.
+- `Aluminium`: Shortcut for a metallic surface with `metal_type = 'aluminium'`.
+- `Copper`: Shortcut for a metallic surface with `metal_type = 'copper'`.
+- `Gold`: Shortcut for a metallic surface with `metal_type = 'gold'`.
+- `Glass`: Transparent surface with configurable refraction.
+- `Water`: Shortcut for a water surface (using Glass with proper values).
 - `Emission`: Emission surface. This surface emits light.
 
 Defined in [genesis/options/surfaces.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/surfaces.py).

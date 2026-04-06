@@ -9,14 +9,6 @@ If you are connected to a display, you can visualize the scene using the interac
 Create a scene with a more detailed viewer and vis setting (this looks a bit complex, but it's just for illustration purposes):
 ```python
 scene = gs.Scene(
-    show_viewer    = True,
-    viewer_options = gs.options.ViewerOptions(
-        res           = (1280, 960),
-        camera_pos    = (3.5, 0.0, 2.5),
-        camera_lookat = (0.0, 0.0, 0.5),
-        camera_fov    = 40,
-        max_FPS       = 60,
-    ),
     vis_options = gs.options.VisOptions(
         show_world_frame = True, # visualize the coordinate frame of `world` at its origin
         world_frame_size = 1.0, # length of the world frame in meter
@@ -25,7 +17,15 @@ scene = gs.Scene(
         plane_reflection = True, # turn on plane reflection
         ambient_light    = (0.1, 0.1, 0.1), # ambient light setting
     ),
-    renderer = gs.renderers.Rasterizer(), # using rasterizer for camera rendering
+    viewer_options = gs.options.ViewerOptions(
+        res           = (1280, 960),
+        camera_pos    = (3.5, 0.0, 2.5),
+        camera_lookat = (0.0, 0.0, 0.5),
+        camera_fov    = 40,
+        max_FPS       = 60,
+    ),
+    renderer       = gs.renderers.Rasterizer(), # using rasterizer for camera rendering
+    show_viewer    = True,
 )
 ```
 Here we can specify the pose and fov of the viewer camera. The viewer will run as fast as possible if `max_FPS` is set to `None`. If `res` is set to None, genesis will automatically create a 4:3 window with the height set to half of your display height. Also note that in the above setting, we set to use rasterization backend for camera rendering. Genesis provides two rendering backends: `gs.renderers.Rasterizer()` and `gs.renderers.RayTracer()`. The viewer always uses the rasterizer. By default, camera also uses rasterizer.
@@ -101,14 +101,6 @@ import genesis as gs
 gs.init(backend=gs.cpu)
 
 scene = gs.Scene(
-    show_viewer = True,
-    viewer_options = gs.options.ViewerOptions(
-        res           = (1280, 960),
-        camera_pos    = (3.5, 0.0, 2.5),
-        camera_lookat = (0.0, 0.0, 0.5),
-        camera_fov    = 40,
-        max_FPS       = 60,
-    ),
     vis_options = gs.options.VisOptions(
         show_world_frame = True,
         world_frame_size = 1.0,
@@ -117,7 +109,15 @@ scene = gs.Scene(
         plane_reflection = True,
         ambient_light    = (0.1, 0.1, 0.1),
     ),
-    renderer=gs.renderers.Rasterizer(),
+    viewer_options = gs.options.ViewerOptions(
+        res           = (1280, 960),
+        camera_pos    = (3.5, 0.0, 2.5),
+        camera_lookat = (0.0, 0.0, 0.5),
+        camera_fov    = 40,
+        max_FPS       = 60,
+    ),
+    renderer     = gs.renderers.Rasterizer(),
+    show_viewer  = True,
 )
 
 plane = scene.add_entity(

@@ -280,7 +280,7 @@ For elements,
 * Dynamic element state without gradient (`elements_el_state_ng`)
     ```python
     qd.types.struct(
-        active=gs.qd_int,  # whether the element is actice
+        active=gs.qd_int,  # whether the element is active
     )
     ```
 * Static element information (`elements_el_info`)

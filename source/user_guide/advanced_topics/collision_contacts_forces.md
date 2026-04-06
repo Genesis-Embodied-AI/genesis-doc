@@ -74,7 +74,7 @@ GJK, along with EPA, is a widely used contact detection algorithm in many physic
 
 * Runs entirely on the GPU thanks to branch-free support-mapping primitives.
 * Requires only a *support function* per shape – no face adjacency or feature cache.
-* Gives seperation distance when the geometries are not in contact.
+* Gives separation distance when the geometries are not in contact.
 * Verified numerical robustness in many implementations.
 
 In Genesis, it is enabled when `use_gjk_collision` option in `RigidOptions` is set to be `True`. Also, Genesis enhances

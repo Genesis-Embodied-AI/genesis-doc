@@ -43,7 +43,7 @@ source ~/.bashrc
 
 ## (Optional) Ray Tracing Renderer
 
-If you need photo-realistic visuals, Genesis has a built-in a ray-tracing (path-tracing) based renderer developped using [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain specific language designed for rendering. See [Visualization & Rendering](../getting_started/visualization.md) for setup.
+If you need photo-realistic visuals, Genesis has a built-in a ray-tracing (path-tracing) based renderer developed using [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain specific language designed for rendering. See [Visualization & Rendering](../getting_started/visualization.md) for setup.
 
 ## (Optional) USD Assets
 
@@ -225,7 +225,7 @@ Genesis tries EGL rendering by default, so in most environments you don’t need
 
 ### [Ubuntu VM on Windows 11 via WSL2] Quadrants and Genesis do not find cudalib.so and falls back to CPU
 
-After installing Pytorch and Genesis, Quadrants falls back to CPU, while torch initalizes okay on CUDA.
+After installing Pytorch and Genesis, Quadrants falls back to CPU, while torch initializes okay on CUDA.
 
 Symptoms:
 

@@ -57,11 +57,11 @@ for step in range(1000):
     rpms[3] += 100  # Increase back-right
     rpms = np.clip(rpms, 0, max_rpm)
 
-    drone.set_propellels_rpm(rpms)  # Call ONCE per step
+    drone.set_propellers_rpm(rpms)  # Call ONCE per step
     scene.step()
 ```
 
-**Important:** `set_propellels_rpm()` must be called exactly once per simulation step.
+**Important:** `set_propellers_rpm()` must be called exactly once per simulation step.
 
 ## Physics Model
 
@@ -78,7 +78,7 @@ scene.build(n_envs=32)
 
 # Control shape: (n_envs, n_propellers)
 rpms = np.tile([hover_rpm] * 4, (32, 1))
-drone.set_propellels_rpm(rpms)
+drone.set_propellers_rpm(rpms)
 ```
 
 ## Available Models
@@ -112,7 +112,7 @@ for _ in range(500):
     correction = kp * error
     rpms = np.clip([base_rpm + correction] * 4, 0, 25000)
 
-    drone.set_propellels_rpm(rpms)
+    drone.set_propellers_rpm(rpms)
     scene.step()
 ```
 

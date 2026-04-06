@@ -79,14 +79,21 @@ rigid_options = gs.options.RigidOptions(
 )
 ```
 
-## Image Types
+## Broadphase Traversal
 
 ```python
-# Camera output types
-gs.IMAGE_TYPE.RGB           # Color image
-gs.IMAGE_TYPE.DEPTH         # Depth map
-gs.IMAGE_TYPE.SEGMENTATION  # Segmentation mask
-gs.IMAGE_TYPE.NORMAL        # Surface normals
+# Broadphase collision detection methods
+gs.broadphase_traversal.SAP          # Sweep and Prune
+gs.broadphase_traversal.ALL_VS_ALL   # Brute-force all pairs
+```
+
+## Parallelization Level
+
+```python
+# Multi-environment parallelization levels
+gs.PARA_LEVEL.NEVER    # No parallelization
+gs.PARA_LEVEL.PARTIAL  # Partial parallelization
+gs.PARA_LEVEL.ALL      # Full parallelization
 ```
 
 ## Equality Constraints
@@ -96,6 +103,13 @@ gs.IMAGE_TYPE.NORMAL        # Surface normals
 gs.EQUALITY_TYPE.CONNECT  # Connect constraint
 gs.EQUALITY_TYPE.WELD     # Weld constraint
 gs.EQUALITY_TYPE.JOINT    # Joint equality
+```
+
+## Entity State
+
+```python
+gs.ACTIVE    # Entity is active (1)
+gs.INACTIVE  # Entity is inactive (0)
 ```
 
 ## See Also

@@ -18,7 +18,6 @@ import genesis as gs
 gs.init()
 scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
-scene.build()
 
 # Rasterizer (default, fast)
 cam_raster = scene.add_camera(
@@ -34,6 +33,8 @@ cam_raytrace = scene.add_camera(
     lookat=(0, 0, 0),
     spp=256,  # Samples per pixel
 )
+
+scene.build()
 ```
 
 ## Renderer Components

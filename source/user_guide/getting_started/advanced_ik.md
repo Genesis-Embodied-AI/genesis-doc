@@ -8,23 +8,24 @@ In this example, we will use the left and right fingers of the robot gripper as 
 
 ```python
 import numpy as np
-
 import genesis as gs
+import genesis.utils.geom as gu
 
 ########################## init ##########################
 gs.init(seed=0, precision='32', logging_level='info')
 
 ########################## create a scene ##########################
 scene = gs.Scene(
-    viewer_options= gs.options.ViewerOptions(
-        camera_pos=(2.0, -2, 1.5),
-        camera_lookat=(0.0, 0.0, 0.0),
-        camera_fov=40,
+    viewer_options=gs.options.ViewerOptions(
+        camera_pos    = (2.0, -2, 1.5),
+        camera_lookat = (0.0, 0.0, 0.0),
+        camera_fov    = 40,
     ),
     rigid_options=gs.options.RigidOptions(
-        enable_joint_limit=False,
-        enable_collision=False,
+        enable_joint_limit = False,
+        enable_collision   = False,
     ),
+    show_viewer=True,
 )
 
 ########################## entities ##########################
@@ -36,26 +37,15 @@ robot = scene.add_entity(
     gs.morphs.MJCF(file='xml/franka_emika_panda/panda.xml'),
 )
 
-# two target links for visualization
-target_left = scene.add_entity(
-    gs.morphs.Mesh(
-        file='meshes/axis.obj',
-        scale=0.1,
-    ),
-    surface=gs.surfaces.Default(color=(1, 0.5, 0.5, 1)),
-)
-target_right = scene.add_entity(
-    gs.morphs.Mesh(
-        file='meshes/axis.obj',
-        scale=0.1,
-    ),
-    surface=gs.surfaces.Default(color=(0.5, 1.0, 0.5, 1)),
-)
-
 ########################## build ##########################
 scene.build()
 
+# Create debug frames for IK target visualization
 target_quat = np.array([0, 1, 0, 0])
+T_init = gu.trans_quat_to_T(np.zeros(3), target_quat)
+target_left_frame = scene.draw_debug_frame(T_init, axis_length=0.1, origin_size=0.01, axis_radius=0.005)
+target_right_frame = scene.draw_debug_frame(T_init, axis_length=0.1, origin_size=0.01, axis_radius=0.005)
+
 center = np.array([0.4, -0.2, 0.25])
 r = 0.1
 
@@ -66,9 +56,11 @@ for i in range(0, 2000):
     target_pos_left = center + np.array([np.cos(i/360*np.pi), np.sin(i/360*np.pi), 0]) * r
     target_pos_right = target_pos_left + np.array([0.0, 0.03, 0])
 
-    target_left.set_qpos(np.concatenate([target_pos_left, target_quat]))
-    target_right.set_qpos(np.concatenate([target_pos_right, target_quat]))
-    
+    # Update debug frame positions
+    T_left = gu.trans_quat_to_T(target_pos_left, target_quat)
+    T_right = gu.trans_quat_to_T(target_pos_right, target_quat)
+    scene.update_debug_objects((target_left_frame, target_right_frame), (T_left, T_right))
+
     q = robot.inverse_kinematics_multilink(
         links    = [left_finger, right_finger],
         poss     = [target_pos_left, target_pos_right],
@@ -89,10 +81,10 @@ This is what you will see:
 </video>
 
 Here are a few new things we hope you could learn in this example:
-- we used `robot.inverse_kinematics_multilink()` API for solving IK considering multiple target links. When using this API, we pass in a list of target link objects, a list of target positions, and a list of target orientations (quats).
+- We used `robot.inverse_kinematics_multilink()` API for solving IK considering multiple target links. When using this API, we pass in a list of target link objects, a list of target positions, and a list of target orientations (quats).
 - We used `rot_mask` to mask out directions of the axes we don't care. In this example, we want both fingers to point downward, i.e. their Z-axis should point downward. However, we are less interested in restricting their rotation in the horizontal plane. You can use this `rot_mask` flexibly to achieve your desired goal pose. Similarly, there's `pos_mask` you can use for masking out position along x/y/z axes.
-- Since this example doesn't involve any physics, after we set the position of the robot and the two target links, we don't need to call physical simulation via `scene.step()`; instead, we can only update the visualizer to reflect the change in the viewer (and camera, if any) by calling `scene.visualizer.update()`.
-- **What is qpos?** Note that we used `set_qpos` for setting state of the target links. `qpos` represents an entity's configuration in generalized coordinate. For a single arm, its `qpos` is identical to its `dofs_position`, and it has only 1 dof in all its joints (revolute + prismatic). For a free mesh that's connected to `world` via a free joint, this joint has 6 dofs (3 translational + 3 rotational), while its generalized coordinate `q` is a 7-vector, which is essentially its xyz translation + wxyz quaternion, therefore, its `qpos` is different than its `dofs_position`. You can use both `set_qpos()` and `set_dofs_position()` to set its state, but since here we know the desired quaternion, it's easier for us to compute the `qpos`. Shortly speaking, this difference comes from how we represent rotation, which can be represented as either a 3-vector (rotations around 3 axes) or a 4-vector (wxyz quaternion).
+- We used `scene.draw_debug_frame()` to create visual markers for the target poses. These debug objects are managed at the visualizer level and do not participate in the simulation. Instead of clearing and recreating them every frame, we use `scene.update_debug_objects()` to efficiently update their transforms in place.
+- Since this example doesn't involve any physics, after we set the position of the robot, we don't need to call physical simulation via `scene.step()`; instead, we can only update the visualizer to reflect the change in the viewer (and camera, if any) by calling `scene.visualizer.update()`.
 
 ### IK for parallel simulation
 
@@ -107,15 +99,16 @@ gs.init()
 
 ########################## create a scene ##########################
 scene = gs.Scene(
-    viewer_options= gs.options.ViewerOptions(
+    rigid_options=gs.options.RigidOptions(
+        enable_joint_limit = False,
+    ),
+    viewer_options=gs.options.ViewerOptions(
         camera_pos    = (0.0, -2, 1.5),
         camera_lookat = (0.0, 0.0, 0.5),
         camera_fov    = 40,
         max_FPS       = 200,
     ),
-    rigid_options=gs.options.RigidOptions(
-        enable_joint_limit = False,
-    ),
+    show_viewer=True,
 )
 
 ########################## entities ##########################

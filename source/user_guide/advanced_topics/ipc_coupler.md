@@ -78,7 +78,7 @@ scene.sim.coupler.set_ipc_link_filter(
 )
 
 cube = scene.add_entity(
-    morph=gs.morphs.Box(),
+    morph=gs.morphs.Box(size=(1.0, 1.0, 1.0)),
     material=gs.materials.FEM.Elastic(E=5e3, nu=0.45, rho=1000),
 )
 ```

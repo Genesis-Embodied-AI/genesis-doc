@@ -23,9 +23,6 @@ scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
 robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 
-# Build with parallel environments
-scene.build(n_envs=1024)
-
 # Add batch renderer camera
 cam = scene.add_camera(
     res=(84, 84),
@@ -33,10 +30,13 @@ cam = scene.add_camera(
     lookat=(0, 0, 0.5),
 )
 
+# Build with parallel environments
+scene.build(n_envs=1024)
+
 # Training loop
 for step in range(10000):
     # Get batched observations
-    obs = cam.render(rgb=True)  # Shape: (n_envs, H, W, 3)
+    obs, _, _, _ = cam.render(rgb=True)  # Shape: (n_envs, H, W, 3)
 
     # Policy inference...
     actions = policy(obs)
@@ -50,7 +50,7 @@ for step in range(10000):
 The BatchRenderer is configured through `BatchRendererOptions`:
 
 ```python
-batch_options = gs.options.BatchRendererOptions(
+batch_options = gs.options.renderers.BatchRenderer(
     # Configuration options
 )
 ```

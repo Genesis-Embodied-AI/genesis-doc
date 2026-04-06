@@ -19,7 +19,7 @@ import genesis as gs
 
 gs.init()
 scene = gs.Scene(
-    coupler_options=gs.options.CouplerOptions(
+    coupler_options=gs.options.LegacyCouplerOptions(
         # Coupler-specific options
     ),
 )
@@ -57,7 +57,7 @@ tool = scene.add_entity(
 
 # SPH fluid
 fluid = scene.add_entity(
-    gs.morphs.Box(pos=(0, 0, 0.5)),
+    gs.morphs.Box(pos=(0, 0, 0.5), size=(1.0, 1.0, 1.0)),
     material=gs.materials.SPH.Liquid(),
 )
 ```

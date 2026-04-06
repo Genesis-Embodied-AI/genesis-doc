@@ -87,7 +87,6 @@ getting_started/viewer_plugin
 getting_started/config_system
 getting_started/conventions
 getting_started/miscellaneous
-getting_started/misc_guidelines
 ```
 
 

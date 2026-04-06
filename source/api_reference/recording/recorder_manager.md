@@ -25,12 +25,12 @@ scene.build()
 
 # Add multiple recorders
 scene.add_recorder(
-    gs.recorders.NPZFileWriter(filepath="data.npz"),
+    gs.recorders.NPZFile(filename="data.npz"),
     data_func=lambda: robot.get_qpos(),
 )
 
 scene.add_recorder(
-    gs.recorders.MPLLinePlotter(title="Positions"),
+    gs.recorders.MPLLinePlot(title="Positions"),
     data_func=lambda: robot.get_qpos(),
 )
 

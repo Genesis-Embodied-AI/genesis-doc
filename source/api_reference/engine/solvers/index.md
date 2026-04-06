@@ -62,7 +62,7 @@ robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 
 # Soft object (MPM)
 soft = scene.add_entity(
-    gs.morphs.Box(pos=(0.5, 0, 0.5)),
+    gs.morphs.Box(pos=(0.5, 0, 0.5), size=(1.0, 1.0, 1.0)),
     material=gs.materials.MPM.Elastic(),
 )
 

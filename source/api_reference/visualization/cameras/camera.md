@@ -30,8 +30,7 @@ import genesis as gs
 gs.init()
 scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
-scene.add_entity(gs.morphs.Box(pos=(0, 0, 0.5)))
-scene.build()
+scene.add_entity(gs.morphs.Box(pos=(0, 0, 0.5), size=(1.0, 1.0, 1.0)))
 
 cam = scene.add_camera(
     res=(640, 480),
@@ -39,8 +38,10 @@ cam = scene.add_camera(
     lookat=(0, 0, 0.5),
 )
 
+scene.build()
+
 scene.step()
-rgb = cam.render(rgb=True)
+rgb, _, _, _ = cam.render(rgb=True)
 print(rgb.shape)  # (480, 640, 3)
 ```
 
@@ -49,7 +50,7 @@ print(rgb.shape)  # (480, 640, 3)
 ```python
 import cv2
 
-rgb = cam.render(rgb=True)
+rgb, _, _, _ = cam.render(rgb=True)
 cv2.imwrite("output.png", rgb[..., ::-1])  # RGB to BGR for OpenCV
 ```
 
@@ -58,7 +59,7 @@ cv2.imwrite("output.png", rgb[..., ::-1])  # RGB to BGR for OpenCV
 ```python
 import numpy as np
 
-depth = cam.render(depth=True)
+_, depth, _, _ = cam.render(depth=True)
 
 # Normalize for visualization
 depth_vis = (depth - depth.min()) / (depth.max() - depth.min())

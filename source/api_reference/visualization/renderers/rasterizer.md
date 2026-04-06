@@ -23,8 +23,6 @@ scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
 robot = scene.add_entity(gs.morphs.URDF(file="path/to/robot.urdf"))
 
-scene.build()
-
 # Add rasterizer camera (default)
 cam = scene.add_camera(
     res=(640, 480),
@@ -33,13 +31,15 @@ cam = scene.add_camera(
     fov=40,
 )
 
+scene.build()
+
 # Render images
 for i in range(100):
     scene.step()
 
-    rgb = cam.render(rgb=True)
-    depth = cam.render(depth=True)
-    segmentation = cam.render(segmentation=True)
+    rgb, _, _, _ = cam.render(rgb=True)
+    _, depth, _, _ = cam.render(depth=True)
+    _, _, segmentation, _ = cam.render(segmentation=True)
 ```
 
 ## Configuration
@@ -47,7 +47,7 @@ for i in range(100):
 The Rasterizer is configured through `RasterizerOptions`:
 
 ```python
-rasterizer_options = gs.options.RasterizerOptions(
+rasterizer_options = gs.options.renderers.Rasterizer(
     env_separate_rigid=True,   # Separate rendering per environment
 )
 ```
