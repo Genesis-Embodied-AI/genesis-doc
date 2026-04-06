@@ -19,15 +19,15 @@ gs.init(backend=gs.gpu)
 
 ########################## create a scene ##########################
 scene = gs.Scene(
-    show_viewer    = True,
+    rigid_options = gs.options.RigidOptions(
+        dt = 0.01,
+    ),
     viewer_options = gs.options.ViewerOptions(
         camera_pos    = (3.5, -1.0, 2.5),
         camera_lookat = (0.0, 0.0, 0.5),
         camera_fov    = 40,
     ),
-    rigid_options = gs.options.RigidOptions(
-        dt                = 0.01,
-    ),
+    show_viewer    = True,
 )
 
 ########################## entities ##########################
@@ -87,10 +87,10 @@ import genesis as gs
 gs.init(backend=gs.gpu)
 
 scene = gs.Scene(
-    show_viewer   = False,
     rigid_options = gs.options.RigidOptions(
-        dt                = 0.01,
+        dt = 0.01,
     ),
+    show_viewer   = False,
 )
 
 plane = scene.add_entity(

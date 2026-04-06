@@ -21,13 +21,13 @@ gs.init()
 
 # Create scene with interactive viewer
 scene = gs.Scene(
-    show_viewer=True,
     viewer_options=gs.options.ViewerOptions(
         camera_pos=(3, 0, 2),
         camera_lookat=(0, 0, 0.5),
         res=(1280, 720),
         max_FPS=60,
     ),
+    show_viewer=True,
 )
 
 scene.add_entity(gs.morphs.Plane())

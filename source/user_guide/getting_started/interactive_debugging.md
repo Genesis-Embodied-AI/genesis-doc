@@ -43,6 +43,6 @@ Here you would see all the `geoms` and `links` it has and associated information
 
 ```{figure} ../../_static/images/interactive_link.png
 ```
-Here you will see all the collision geoms (`geoms`) and visual geoms (`vgeoms`) included in the link, and other important information such as its `intertial_mass`, the link's global index in the scene (`idx`), which entity it belongs to (`entity`, which is the franka arm entity), its joint (`joint`), etc.
+Here you will see all the collision geoms (`geoms`) and visual geoms (`vgeoms`) included in the link, and other important information such as its `inertial_mass`, the link's global index in the scene (`idx`), which entity it belongs to (`entity`, which is the franka arm entity), its joint (`joint`), etc.
 
 We hope this informative interface can make your debugging process easier!

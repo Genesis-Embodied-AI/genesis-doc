@@ -33,18 +33,20 @@ gs.init(backend=gs.cpu)
 - **Precision level**: By default, genesis uses f32 precision. You can change to f64 if you want a higher precision level by setting `precision='64'`.
 - **Logging level**: Once genesis is initialized, you will see logger output on your terminal detailing your system info and genesis-related info like its current version. You can suppress logger output by setting `logging_level` to `'warning'`.
 - **Color scheme**: The default color theme used by genesis logger is optimized for dark background terminal, i.e. `theme='dark'`. You can change to `'light'` if you are using a terminal with a light background, or simply use `'dumb'` if you are a black-and-white person.
+- **Performance mode**: When `performance_mode=True`, Genesis bakes static tensor shapes into compiled kernels, yielding roughly 30% faster simulation. The trade-off is that kernels must be recompiled whenever the scene changes, which can take several minutes. With performance mode off (the default), kernels are shape-generic and only compiled once — rebuilds take just a few seconds once cached. In short, keep it off during research, fast iteration, debugging, and interactive data inspection; turn it on for policy training and production deployment.
 
 A more detailed example of an `gs.init()` call would look like this:
 ```python
 gs.init(
-    seed                = None,
-    precision           = '32',
-    debug               = False,
-    eps                 = 1e-12,
-    logging_level       = None,
     backend             = gs.gpu,
+    precision           = '32',
+    seed                = None,
+    eps                 = 1e-15,
+    debug               = False,
+    performance_mode    = False,
+    logging_level       = None,
     theme               = 'dark',
-    logger_verbose_time = False
+    logger_verbose_time = False,
 )
 ```
 
@@ -62,12 +64,12 @@ scene = gs.Scene(
         dt=0.01,
         gravity=(0, 0, -10.0),
     ),
-    show_viewer=True,
     viewer_options=gs.options.ViewerOptions(
         camera_pos=(3.5, 0.0, 2.5),
         camera_lookat=(0.0, 0.0, 0.5),
         camera_fov=40,
     ),
+    show_viewer=True,
 )
 ```
 This example sets simulation `dt` to be 0.01s for each step, configures gravity, and sets the initial camera pose for the interactive viewer.
@@ -91,7 +93,7 @@ franka = scene.add_entity(
         file  = 'xml/franka_emika_panda/panda.xml',
         pos   = (0, 0, 0),
         euler = (0, 0, 90), # we follow scipy's extrinsic x-y-z rotation convention, in degrees,
-        # quat  = (1.0, 0.0, 0.0, 0.0), # we use w-x-y-z convention for quaternions,
+        # quat = (1.0, 0.0, 0.0, 0.0), # we use w-x-y-z convention for quaternions,
         scale = 1.0,
     ),
 )
@@ -102,14 +104,14 @@ We currently support different types of shape primitives including:
 - `gs.morphs.Box`
 - `gs.morphs.Cylinder`
 - `gs.morphs.Sphere`
-
-In addition, for training locomotion tasks, we support various types of built-in terrains as well as terrains initialized from user-given height maps via `gs.morphs.Terrain`, which we will cover in the following tutorials.
+- `gs.morphs.Terrain`: built-in terrains and user-given height maps for locomotion tasks. See the [Terrain tutorial](terrain.md) for details.
+- `gs.morphs.Drone`: quadrotor drones with propeller physics
 
 We support loading from external files with different formats including :
 - `gs.morphs.MJCF`: mujoco `.xml` robot configuration files
-- `gs.morphs.URDF`: robot description files that end with `.urdf` (Unified Robotics Description Format)
+- `gs.morphs.URDF`: robot description files (`.urdf`), including `.xacro` files which are automatically preprocessed
 - `gs.morphs.USD`: Universal Scene Description files (`.usd`, `.usda`, `.usdc`, `.usdz`) for loading complex scenes with articulated robots and rigid objects. See the [USD Import tutorial](usd_import.md) for detailed information.
-- `gs.morphs.Mesh`: non-articulated mesh assets, supporting extensions including: `*.obj`, `*.ply`, `*.stl`, `*.glb`, `*.gltf`
+- `gs.morphs.Mesh`: non-articulated mesh assets, supporting extensions: `*.obj`, `*.stl`, `*.glb`, `*.gltf`. See [Conventions](conventions.md) for mesh orientation handling (Y-up vs Z-up).
 
 
 When loading from external files, you need to specify the file location using the `file` parameter. When parsing this, we support both *absolute* and *relative* file path. Note that since genesis also comes with an internal asset directory (`genesis/assets`), so if a relative path is used, we search not only relative path with respect to your current working directory, but also under `genesis/assets`. Therefore, in this example, we will retrieve the franka model from: `genesis/assets/xml/franka_emika_panda/panda.xml`.

@@ -79,6 +79,23 @@ rigid_options = gs.options.RigidOptions(
 )
 ```
 
+## Broadphase Traversal
+
+```python
+# Broadphase collision detection methods
+gs.broadphase_traversal.SAP          # Sweep and Prune
+gs.broadphase_traversal.ALL_VS_ALL   # Brute-force all pairs
+```
+
+## Parallelization Level
+
+```python
+# Multi-environment parallelization levels
+gs.PARA_LEVEL.NEVER    # No parallelization
+gs.PARA_LEVEL.PARTIAL  # Partial parallelization
+gs.PARA_LEVEL.ALL      # Full parallelization
+```
+
 ## Equality Constraints
 
 ```python
@@ -86,6 +103,19 @@ rigid_options = gs.options.RigidOptions(
 gs.EQUALITY_TYPE.CONNECT  # Connect constraint
 gs.EQUALITY_TYPE.WELD     # Weld constraint
 gs.EQUALITY_TYPE.JOINT    # Joint equality
+```
+
+## Entity State
+
+```python
+gs.ACTIVE    # Entity is active (1)
+gs.INACTIVE  # Entity is inactive (0)
+```
+
+## Numerical Constants
+
+```python
+gs.EPS  # Machine epsilon for the current precision (e.g. 1.19e-07 for float32)
 ```
 
 ## See Also

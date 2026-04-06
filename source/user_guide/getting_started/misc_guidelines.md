@@ -83,7 +83,7 @@
             - each group will be one RigidGeom
         - for mjcf, we convexlize based on mujoco's geoms. Each mj geom will be one RigidGeom
         - for urdf
-            - each urdf can contain multiple links, each link contains multiple geometries (collisions and visuals), and each geomtry will be one primitive or one external assset. Since `.obj` contains multiple sub-meshes, one urdf geomtry can have multiple meshes
+            - each urdf can contain multiple links, each link contains multiple geometries (collisions and visuals), and each geometry will be one primitive or one external asset. Since `.obj` contains multiple sub-meshes, one urdf geometry can have multiple meshes
             - we convexlize this lowest-level mesh and store as RigidGeom
     - control interface design
         - we will not explicitly have concept like `base pose`

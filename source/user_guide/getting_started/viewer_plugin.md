@@ -45,6 +45,7 @@ scene = gs.Scene(
         enable_help_text=False,         # hide the instructions text
         enable_default_keybinds=False,  # disable default viewer key shortcuts
     ),
+    show_viewer=True,
 )
 ```
 

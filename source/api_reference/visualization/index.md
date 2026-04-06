@@ -19,13 +19,14 @@ gs.init()
 
 # Create a scene with visualization
 scene = gs.Scene(
+    vis_options=gs.options.VisOptions(
+        show_world_frame=True,
+    ),
     viewer_options=gs.options.ViewerOptions(
         camera_pos=(3, 0, 2),
         camera_lookat=(0, 0, 0.5),
     ),
-    vis_options=gs.options.VisOptions(
-        show_world_frame=True,
-    ),
+    show_viewer=True,
 )
 
 # Add entities and build

@@ -7,7 +7,7 @@ The Genesis simulation framework is built around a modular and extensible config
 To help you understand how these components work together, we start with a high-level template of how a Genesis scene is typically initialized. This template shows how simulation settings, solver options, and entity-level configurations are orchestrated.
 
 ```python
-# Initializate Genesis
+# Initialize Genesis
 gs.init(...)
 
 # Initialize scene
@@ -29,6 +29,7 @@ scene = gs.Scene(
     vis_options=VisOptions(...),
     viewer_options=ViewerOptions(...),
     renderer=Rasterizer(...),
+    show_viewer=True,
 )
 
 # Add entities
