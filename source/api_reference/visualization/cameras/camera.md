@@ -59,7 +59,7 @@ cv2.imwrite("output.png", rgb[..., ::-1])  # RGB to BGR for OpenCV
 ```python
 import numpy as np
 
-depth = cam.render(depth=True)
+_, depth, _, _ = cam.render(depth=True)
 
 # Normalize for visualization
 depth_vis = (depth - depth.min()) / (depth.max() - depth.min())

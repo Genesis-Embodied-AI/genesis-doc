@@ -37,9 +37,9 @@ cam = scene.add_camera(
 for i in range(100):
     scene.step()
 
-    rgb = cam.render(rgb=True)
-    depth = cam.render(depth=True)
-    segmentation = cam.render(segmentation=True)
+    rgb, _, _, _ = cam.render(rgb=True)
+    _, depth, _, _ = cam.render(depth=True)
+    _, _, segmentation, _ = cam.render(segmentation=True)
 ```
 
 ## Configuration

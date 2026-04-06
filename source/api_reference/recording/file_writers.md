@@ -78,7 +78,7 @@ cam = scene.add_camera(
 )
 
 scene.start_recording(
-    data_func=lambda: cam.render(rgb=True),
+    data_func=lambda: cam.render(rgb=True)[0],
     rec_options=gs.recorders.VideoFile(
         filename="simulation.mp4",
     ),

@@ -36,7 +36,7 @@ cam = scene.add_camera(
 # Training loop
 for step in range(10000):
     # Get batched observations
-    obs = cam.render(rgb=True)  # Shape: (n_envs, H, W, 3)
+    obs, _, _, _ = cam.render(rgb=True)  # Shape: (n_envs, H, W, 3)
 
     # Policy inference...
     actions = policy(obs)
