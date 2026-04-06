@@ -41,7 +41,6 @@ gs.init(
     backend             = gs.gpu,
     precision           = '32',
     seed                = None,
-    eps                 = 1e-15,
     debug               = False,
     performance_mode    = False,
     logging_level       = None,

@@ -23,8 +23,6 @@ scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
 robot = scene.add_entity(gs.morphs.URDF(file="path/to/robot.urdf"))
 
-scene.build()
-
 # Add rasterizer camera (default)
 cam = scene.add_camera(
     res=(640, 480),
@@ -32,6 +30,8 @@ cam = scene.add_camera(
     lookat=(0, 0, 0.5),
     fov=40,
 )
+
+scene.build()
 
 # Render images
 for i in range(100):

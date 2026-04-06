@@ -112,12 +112,6 @@ gs.ACTIVE    # Entity is active (1)
 gs.INACTIVE  # Entity is inactive (0)
 ```
 
-## Numerical Constants
-
-```python
-gs.EPS  # Machine epsilon for the current precision (e.g. 1.19e-07 for float32)
-```
-
 ## See Also
 
 - {doc}`device` - Device and platform utilities

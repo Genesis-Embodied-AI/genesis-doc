@@ -23,15 +23,15 @@ scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
 robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 
-# Build with parallel environments
-scene.build(n_envs=1024)
-
 # Add batch renderer camera
 cam = scene.add_camera(
     res=(84, 84),
     pos=(2, 0, 1),
     lookat=(0, 0, 0.5),
 )
+
+# Build with parallel environments
+scene.build(n_envs=1024)
 
 # Training loop
 for step in range(10000):

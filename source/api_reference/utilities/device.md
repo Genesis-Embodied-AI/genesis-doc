@@ -58,7 +58,7 @@ After `gs.init()`, these are available:
 |----------|------|-------------|
 | `gs.device` | torch.device | PyTorch device for tensors |
 | `gs.backend` | gs.backend | Active compute backend |
-| `gs.EPS` | float | Numerical epsilon (e.g., 1e-15) |
+| `gs.EPS` | float | Machine epsilon for the current precision |
 
 ## Type Hints
 

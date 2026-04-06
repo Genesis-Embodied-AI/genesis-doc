@@ -13,7 +13,7 @@ The recording system consists of:
 
 ## Quick Start
 
-### Recording Video
+### Recording Viewer Video
 
 ```python
 import genesis as gs
@@ -21,20 +21,17 @@ import genesis as gs
 gs.init()
 scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
-box = scene.add_entity(gs.morphs.Box(pos=(0, 0, 1), size=(1.0, 1.0, 1.0)))
-
-# Start recording before build
-scene.start_recording(
-    data_func=lambda: {"pos": box.get_pos()},
-    rec_options=gs.recorders.NPZFile(filename="simulation.npz"),
-)
-
+scene.add_entity(gs.morphs.Box(pos=(0, 0, 1), size=(1.0, 1.0, 1.0)))
 scene.build()
+
+# Start recording
+scene.start_recording()
 
 for i in range(200):
     scene.step()
 
-scene.stop_recording()
+# Stop and save
+scene.stop_recording(save_to="simulation.mp4")
 ```
 
 ### Recording Custom Data

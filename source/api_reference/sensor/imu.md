@@ -102,15 +102,15 @@ The IMU supports realistic noise modeling based on Allan variance parameters:
 
 | Parameter | Description | Typical Value |
 |-----------|-------------|---------------|
-| `acc_noise` | White noise std | 0.001-0.01 m/s^2/sqrt(Hz) |
-| `acc_random_walk` | Bias drift std | 0.0001-0.001 m/s^3/sqrt(Hz) |
+| `acc_noise` | White noise std | 0.001-0.01 m/s^2 |
+| `acc_random_walk` | Bias drift std | 0.0001-0.001 m/s^3 |
 
 ### Gyroscope Noise
 
 | Parameter | Description | Typical Value |
 |-----------|-------------|---------------|
-| `gyro_noise` | White noise std | 0.0001-0.001 rad/s/sqrt(Hz) |
-| `gyro_random_walk` | Bias drift std | 0.00001-0.0001 rad/s^2/sqrt(Hz) |
+| `gyro_noise` | White noise std | 0.0001-0.001 rad/s |
+| `gyro_random_walk` | Bias drift std | 0.00001-0.0001 rad/s^2 |
 
 ## Example: Quadruped State Estimation
 

@@ -79,10 +79,9 @@ Genesis supports various mesh formats:
 |--------|-----------|-------|
 | OBJ | `.obj` | Wavefront OBJ |
 | STL | `.stl` | Stereolithography |
-| PLY | `.ply` | Polygon File Format |
 | GLB/GLTF | `.glb`, `.gltf` | GL Transmission Format |
 | DAE | `.dae` | COLLADA |
-| USD | `.usd`, `.usda`, `.usdc` | Universal Scene Description |
+| USD | `.usd`, `.usda`, `.usdc`, `.usdz` | Universal Scene Description (via `gs.morphs.USD`) |
 
 ```python
 # Load mesh entity
