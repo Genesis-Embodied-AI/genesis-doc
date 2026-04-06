@@ -163,6 +163,7 @@ print(imu.read())
 The IMU returns data as a **named tuple** with fields:
 - `lin_acc`: Linear acceleration in m/s² (3D vector)
 - `ang_vel`: Angular velocity in rad/s (3D vector)
+- `mag`: Magnetic field in Tesla (3D vector)
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/imu.mp4" type="video/mp4">
@@ -270,9 +271,9 @@ The number of rays and ray directions can be specified with a `RaycastPattern`.
 ```python
 lidar = scene.add_sensor(
     gs.sensors.Lidar(
-        pattern=gs.sensors.Spherical(),
+        pattern=gs.sensors.SphericalPattern(),
         entity_idx=robot.idx, # attach to a rigid entity
-        pos_offset=(0.3, 0.0, 0.1) # offset from attached entity
+        pos_offset=(0.3, 0.0, 0.1), # offset from attached entity
         return_world_frame=True, # whether to return points in world frame or local frame
     )
 )
@@ -321,9 +322,8 @@ sensor = scene.add_sensor(
 
 scene.build()
 
-data = sensor.read()
-print(data.distance)  # shape ([n_envs,] n_probes)
-print(data.points)    # shape ([n_envs,] n_probes, 3)
+distances = sensor.read()          # shape ([n_envs,] n_probes)
+points = sensor.nearest_points    # shape ([n_envs,] n_probes, 3)
 ```
 
 If no tracked mesh is found within `max_range`, the reported distance is clamped to `max_range` and the returned points are the probe positions.

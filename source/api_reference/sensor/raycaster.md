@@ -7,8 +7,8 @@ The `RaycasterSensor` provides ray-based distance measurements, useful for LIDAR
 The Raycaster sensor:
 
 - Casts rays from a link's frame into the scene
-- Returns distances to intersecting geometry
-- Supports configurable ray patterns (linear, planar, custom)
+- Returns hit points and distances to intersecting geometry
+- Supports configurable ray patterns (spherical, grid, custom)
 - Efficiently uses GPU-accelerated BVH traversal
 
 ## Usage
@@ -19,56 +19,49 @@ import genesis as gs
 gs.init()
 scene = gs.Scene()
 robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
-scene.add_entity(gs.morphs.Box(pos=(2, 0, 0.5)))  # Obstacle
-scene.build()
+scene.add_entity(gs.morphs.Box(pos=(2, 0, 0.5), size=(1.0, 1.0, 1.0)))  # Obstacle
 
 # Add raycaster sensor (using Lidar options)
 lidar = scene.add_sensor(
     gs.sensors.Lidar(
-        link=robot.get_link("sensor_link"),
+        pattern=gs.sensors.SphericalPattern(),
+        entity_idx=robot.idx,
+        pos_offset=(0.3, 0.0, 0.1),
+        return_world_frame=True,
     )
 )
+
+scene.build()
 
 # Simulation loop
 for i in range(100):
     scene.step()
 
-    # Get range data
-    ranges = lidar.get_data()  # (n_rays,) array of distances
-    print(f"Min range: {ranges.min():.2f} m")
+    # Get raycast data (RaycasterData NamedTuple)
+    data = lidar.read()
+    print(f"Min distance: {data.distances.min():.2f} m")
 ```
 
-## Configuration
+## Output Format
 
-```python
-gs.sensors.Raycaster(
-    link=link,              # RigidLink to attach sensor to
-    n_rays=360,             # Number of rays to cast
-    min_range=0.1,          # Minimum detection range (m)
-    max_range=10.0,         # Maximum detection range (m)
-    pattern="circular",     # Ray pattern type
+`read()` returns a `RaycasterData` NamedTuple:
 
-    # Angular range (for circular/linear patterns)
-    fov_horizontal=360.0,   # Horizontal field of view (degrees)
-    fov_vertical=0.0,       # Vertical field of view (degrees)
+| Field | Type | Shape | Description |
+|-------|------|-------|-------------|
+| `points` | `torch.Tensor` (float32) | `([n_envs,] *pattern_shape, 3)` | Intersection points in world or local frame |
+| `distances` | `torch.Tensor` (float32) | `([n_envs,] *pattern_shape)` | Distance to intersection (`max_range` if no hit) |
 
-    # Position offset from link frame
-    offset_pos=(0, 0, 0),
-    offset_quat=(0, 0, 0, 1),
-)
-```
+The `pattern_shape` depends on the ray pattern (e.g. `(n_horizontal, n_vertical)` for spherical, `(height, width)` for depth camera).
 
 ## Ray Patterns
 
 ### Circular (2D LIDAR)
 
 ```python
-lidar_2d = robot.add_sensor(
+lidar_2d = scene.add_sensor(
     gs.sensors.Raycaster(
-        link=base,
-        n_rays=360,
-        pattern="circular",
-        fov_horizontal=360.0,
+        pattern=gs.sensors.SphericalPattern(),
+        entity_idx=robot.idx,
     )
 )
 ```
@@ -76,13 +69,13 @@ lidar_2d = robot.add_sensor(
 ### Planar (3D LIDAR)
 
 ```python
-lidar_3d = robot.add_sensor(
+lidar_3d = scene.add_sensor(
     gs.sensors.Raycaster(
-        link=base,
-        n_rays=16 * 360,  # 16 vertical layers
-        pattern="planar",
-        fov_horizontal=360.0,
-        fov_vertical=30.0,
+        pattern=gs.sensors.SphericalPattern(
+            fov_horizontal=360.0,
+            fov_vertical=30.0,
+        ),
+        entity_idx=robot.idx,
     )
 )
 ```
@@ -100,20 +93,13 @@ rays = np.array([
     [0, -1, 0],   # Right
 ])
 
-sensor = robot.add_sensor(
+sensor = scene.add_sensor(
     gs.sensors.Raycaster(
-        link=base,
         ray_directions=rays,
+        entity_idx=robot.idx,
     )
 )
 ```
-
-## Output Format
-
-| Output | Shape | Description |
-|--------|-------|-------------|
-| `ranges` | `(n_rays,)` | Distance to intersection (max_range if no hit) |
-| `hits` | `(n_rays,)` | Boolean mask of valid intersections |
 
 ## Performance
 

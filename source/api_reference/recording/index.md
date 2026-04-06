@@ -21,18 +21,20 @@ import genesis as gs
 gs.init()
 scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
-scene.add_entity(gs.morphs.Box(pos=(0, 0, 1)))
-scene.build()
+box = scene.add_entity(gs.morphs.Box(pos=(0, 0, 1), size=(1.0, 1.0, 1.0)))
 
-# Start recording
-scene.start_recording()
+# Start recording before build
+scene.start_recording(
+    data_func=lambda: {"pos": box.get_pos()},
+    rec_options=gs.recorders.NPZFile(filename="simulation.npz"),
+)
+
+scene.build()
 
 for i in range(200):
     scene.step()
-    scene.visualizer.update()
 
-# Stop and save
-scene.stop_recording(save_to="simulation.mp4")
+scene.stop_recording()
 ```
 
 ### Recording Custom Data
@@ -50,7 +52,7 @@ def get_robot_state():
 scene.start_recording(
     data_func=get_robot_state,
     rec_options=gs.recorders.NPZFile(
-        filepath="robot_data.npz",
+        filename="robot_data.npz",
         hz=100,  # Recording frequency
     ),
 )

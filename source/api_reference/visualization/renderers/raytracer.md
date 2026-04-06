@@ -25,11 +25,9 @@ plane = scene.add_entity(
     surface=gs.surfaces.Plastic(),
 )
 box = scene.add_entity(
-    gs.morphs.Box(pos=(0, 0, 0.5)),
-    surface=gs.surfaces.Metal.Gold(),
+    gs.morphs.Box(pos=(0, 0, 0.5), size=(1.0, 1.0, 1.0)),
+    surface=gs.surfaces.Gold(),
 )
-
-scene.build()
 
 # Add raytracer camera
 cam = scene.add_camera(
@@ -41,9 +39,11 @@ cam = scene.add_camera(
     denoise=True,   # Enable denoising
 )
 
+scene.build()
+
 # Render high-quality image
 scene.step()
-rgb = cam.render(rgb=True)
+rgb, _, _, _ = cam.render(rgb=True)
 ```
 
 ## Configuration

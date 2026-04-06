@@ -18,7 +18,6 @@ import genesis as gs
 gs.init()
 scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
-scene.build()
 
 # Add a camera
 cam = scene.add_camera(
@@ -28,6 +27,8 @@ cam = scene.add_camera(
     fov=40,                # Field of view (degrees)
     up=(0, 0, 1),          # Up vector
 )
+
+scene.build()
 ```
 
 ## Rendering Images
@@ -37,13 +38,13 @@ cam = scene.add_camera(
 scene.step()
 
 # Render different output types
-rgb = cam.render(rgb=True)                    # RGB image
-depth = cam.render(depth=True)                # Depth map
-segmentation = cam.render(segmentation=True)  # Segmentation
-normal = cam.render(normal=True)              # Surface normals
+rgb, _, _, _ = cam.render(rgb=True)                    # RGB image
+_, depth, _, _ = cam.render(depth=True)                # Depth map
+_, _, seg, _ = cam.render(segmentation=True)           # Segmentation
+_, _, _, normal = cam.render(normal=True)              # Surface normals
 
 # Render multiple types at once
-outputs = cam.render(rgb=True, depth=True)
+rgb, depth, _, _ = cam.render(rgb=True, depth=True)
 ```
 
 ## Camera Parameters

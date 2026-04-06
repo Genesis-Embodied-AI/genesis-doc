@@ -29,7 +29,7 @@ scene = gs.Scene(
 # Add rigid entities
 plane = scene.add_entity(gs.morphs.Plane())
 robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
-box = scene.add_entity(gs.morphs.Box(pos=(0, 0, 1)))
+box = scene.add_entity(gs.morphs.Box(pos=(0, 0, 1), size=(1.0, 1.0, 1.0)))
 
 scene.build()
 

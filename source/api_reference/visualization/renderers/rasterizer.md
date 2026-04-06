@@ -47,7 +47,7 @@ for i in range(100):
 The Rasterizer is configured through `RasterizerOptions`:
 
 ```python
-rasterizer_options = gs.options.RasterizerOptions(
+rasterizer_options = gs.options.renderers.Rasterizer(
     env_separate_rigid=True,   # Separate rendering per environment
 )
 ```

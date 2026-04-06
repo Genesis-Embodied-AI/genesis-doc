@@ -30,7 +30,7 @@ scene.start_recording(
         "q2": robot.get_qpos()[2],
     },
     rec_options=gs.recorders.CSVFile(
-        filepath="joint_data.csv",
+        filename="joint_data.csv",
         hz=100,
     ),
 )
@@ -52,7 +52,7 @@ scene.start_recording(
         "qvel": robot.get_qvel(),
     },
     rec_options=gs.recorders.NPZFile(
-        filepath="trajectory.npz",
+        filename="trajectory.npz",
         hz=50,
     ),
 )
@@ -80,7 +80,7 @@ cam = scene.add_camera(
 scene.start_recording(
     data_func=lambda: cam.render(rgb=True),
     rec_options=gs.recorders.VideoFile(
-        filepath="simulation.mp4",
+        filename="simulation.mp4",
     ),
 )
 
@@ -95,7 +95,7 @@ scene.stop_recording()
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `filepath` | str | Required | Output file path |
+| `filename` | str | Required | Output file path |
 | `hz` | float | None | Recording frequency |
 | `async_mode` | bool | False | Background processing |
 

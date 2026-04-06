@@ -30,7 +30,7 @@ scene = gs.Scene(
 
 # Add entities and build
 scene.add_entity(gs.morphs.Plane())
-scene.add_entity(gs.morphs.Box(pos=(0, 0, 0.5)))
+scene.add_entity(gs.morphs.Box(pos=(0, 0, 0.5), size=(1.0, 1.0, 1.0)))
 scene.build()
 
 # Interactive viewing

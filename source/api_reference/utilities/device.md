@@ -2,20 +2,6 @@
 
 Functions for detecting and configuring the compute platform and device.
 
-## Platform Detection
-
-```python
-import genesis as gs
-
-# Get platform before init
-platform = gs.get_platform()
-print(platform)  # "Linux", "macOS", or "Windows"
-
-# After init, access global
-gs.init()
-print(gs.platform)  # Same result
-```
-
 ## Device Information
 
 ```python
@@ -70,7 +56,6 @@ After `gs.init()`, these are available:
 
 | Variable | Type | Description |
 |----------|------|-------------|
-| `gs.platform` | str | Platform: "Linux", "macOS", "Windows" |
 | `gs.device` | torch.device | PyTorch device for tensors |
 | `gs.backend` | gs.backend | Active compute backend |
 | `gs.EPS` | float | Numerical epsilon (e.g., 1e-15) |

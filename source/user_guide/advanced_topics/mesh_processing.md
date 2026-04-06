@@ -55,7 +55,7 @@ gs.morphs.Mesh(
 Genesis uses COACD library with configurable options:
 
 ```python
-gs.options.COACDOptions(
+gs.options.CoacdOptions(
     threshold=0.05,
     max_convex_hull=16,
     resolution=2000,

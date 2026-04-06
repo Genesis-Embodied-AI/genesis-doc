@@ -79,16 +79,6 @@ rigid_options = gs.options.RigidOptions(
 )
 ```
 
-## Image Types
-
-```python
-# Camera output types
-gs.IMAGE_TYPE.RGB           # Color image
-gs.IMAGE_TYPE.DEPTH         # Depth map
-gs.IMAGE_TYPE.SEGMENTATION  # Segmentation mask
-gs.IMAGE_TYPE.NORMAL        # Surface normals
-```
-
 ## Equality Constraints
 
 ```python

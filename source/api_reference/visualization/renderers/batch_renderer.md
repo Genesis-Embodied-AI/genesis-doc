@@ -50,7 +50,7 @@ for step in range(10000):
 The BatchRenderer is configured through `BatchRendererOptions`:
 
 ```python
-batch_options = gs.options.BatchRendererOptions(
+batch_options = gs.options.renderers.BatchRenderer(
     # Configuration options
 )
 ```
