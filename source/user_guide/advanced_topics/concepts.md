@@ -1,11 +1,11 @@
 # 🧩 Concepts
 
-## Systemat Architecture Overview
+## System Architecture Overview
 
 ```{figure} ../../_static/images/overview.png
 ```
 
-<!-- From an user perspective, building an environment using Genesis is to add `Entity` in `Scene`, where `Entity` is specified by
+<!-- From a user perspective, building an environment using Genesis is to add `Entity` in `Scene`, where `Entity` is specified by
 - `Morph`: the geometry of the entity, e.g., primitive shapes or URDF.
 - `Material`: the material of the entity, e.g., elastic object, liquid, sand, etc. Material is associated with the underlying solvers, e.g., there is MPM liquid and SPH liquid, those demonstrate different behaviors.
 - `Surface`: the texture, rendering surface parameters etc
