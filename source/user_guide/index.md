@@ -103,6 +103,8 @@ advanced_topics/sap_coupler
 advanced_topics/rigid_constraint_model
 advanced_topics/nonrigid_models
 advanced_topics/support_field
+advanced_topics/sensor_pipeline
+advanced_topics/custom_sensors
 advanced_topics/checkpoints
 advanced_topics/mesh_processing
 advanced_topics/multi_gpu
