@@ -1,4 +1,4 @@
-# 💡 What is Genesis
+# 🌱 What is Genesis
 
 ```{figure} ../../_static/images/teaser.png
 ```

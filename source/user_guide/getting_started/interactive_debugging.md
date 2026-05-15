@@ -1,4 +1,4 @@
-# 🧑‍💻 Interactive Information Access and Debugging
+# 🧑‍💻 Interactive Inspection
 
 We designed a very informative (and good-looking, hopefully) interface for accessing internal information and all the available attributes of objects created in Genesis, implemented via the `__repr__()` method for all the Genesis classes. This feature will be very useful if you are used to debugging via either `IPython` or `pdb` or `ipdb`.
 

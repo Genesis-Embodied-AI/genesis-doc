@@ -276,5 +276,5 @@ This is what you will see:
 
 ## What's Next
 
-- [Hybrid Entity](./hybrid_entity) — creating rigid-soft hybrid entities from URDF or mesh
-- [Beyond Rigid Bodies](./beyond_rigid_bodies) — fluids, cloth, and deformable body simulation
+- [Hybrid Entity](./hybrid_entity) - creating rigid-soft hybrid entities from URDF or mesh
+- [Beyond Rigid Bodies](./beyond_rigid_bodies) - fluids, cloth, and deformable body simulation

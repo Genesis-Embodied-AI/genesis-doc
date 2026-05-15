@@ -41,6 +41,7 @@ getting_started/path_planning
 getting_started/beyond_rigid_bodies
 getting_started/soft_robots
 getting_started/hybrid_entity
+getting_started/drone_entity
 getting_started/terrain
 getting_started/emitters
 ```
@@ -48,25 +49,19 @@ getting_started/emitters
 
 ```{toctree}
 :caption: Sensing & Perception
-:maxdepth: 1
+:maxdepth: 2
 
-getting_started/sensors
-getting_started/camera_sensors
-getting_started/raycaster_patterns
-getting_started/batch_renderer
+getting_started/sensors/index
 getting_started/recorders
 ```
 
 
 ```{toctree}
-:caption: RL Training
-:maxdepth: 1
+:caption: Policy Training
+:maxdepth: 2
 
-getting_started/locomotion
-getting_started/hover_env
-getting_started/drone_entity
-getting_started/manipulation
-getting_started/domain_randomization
+getting_started/policy_training/best_practices/index
+getting_started/policy_training/examples/index
 ```
 
 
@@ -92,23 +87,32 @@ getting_started/miscellaneous
 
 ```{toctree}
 :caption: Advanced Topics
-:maxdepth: 1
+:maxdepth: 2
 
 advanced_topics/concepts
-advanced_topics/naming_and_variables
-advanced_topics/collision_contacts_forces
-advanced_topics/solvers_and_coupling
-advanced_topics/ipc_coupler
-advanced_topics/sap_coupler
-advanced_topics/rigid_constraint_model
-advanced_topics/nonrigid_models
-advanced_topics/support_field
-advanced_topics/sensor_pipeline
-advanced_topics/custom_sensors
+advanced_topics/couplers/index
 advanced_topics/checkpoints
-advanced_topics/mesh_processing
 advanced_topics/multi_gpu
-advanced_topics/profiling
+advanced_topics/mesh_processing
 ```
 
-<!-- advanced_topics/drone -->
+
+```{toctree}
+:caption: Theory & Modelling
+:maxdepth: 2
+
+advanced_topics/rigid_collision/index
+advanced_topics/solvers_and_coupling
+advanced_topics/nonrigid_models
+advanced_topics/support_field
+```
+
+
+```{toctree}
+:caption: Extending Genesis
+:maxdepth: 2
+
+advanced_topics/naming_and_variables
+advanced_topics/sensors/index
+advanced_topics/profiling
+```

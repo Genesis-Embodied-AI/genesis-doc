@@ -1,4 +1,4 @@
-# Measure performance in Genesis and Quadrants
+# ⏱️ Profiling
 
 ## Measuring Quadrants kernel execution time, and checking launch latency
 

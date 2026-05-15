@@ -1,4 +1,4 @@
-# 🎥 Saving and Visualizing Data with Recorders
+# 📊 Recorders
 Genesis also provides data recording utilities for automatically processing data without slowing down the simulation.
 This can be used to stream formatted data to a file, or visualize the data live.
 
@@ -49,5 +49,5 @@ More example uses of recorders can also be seen in `examples/sensors/`.
 
 ## What's Next
 
-- [Sensors](./sensors) — contact, tactile, proximity, IMU, and temperature sensors
-- [Camera Sensors](./camera_sensors) — RGB, depth, segmentation, and normal rendering
+- [Sensors](./sensors/index) - contact, tactile, proximity, IMU, and temperature sensors
+- [Camera Sensors](./sensors/camera_sensors) - RGB, depth, segmentation, and normal rendering

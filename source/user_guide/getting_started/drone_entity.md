@@ -118,5 +118,5 @@ for _ in range(500):
 
 ## What's Next
 
-- [Hover Environment](./hover_env) — building a complete drone hover RL environment
-- [Locomotion](./locomotion) — training locomotion policies with Genesis and RL
+- [Hover Environment](./policy_training/examples/hover_env) - building a complete drone hover RL environment
+- [Locomotion](./policy_training/examples/locomotion) - training locomotion policies with Genesis and RL

@@ -351,7 +351,7 @@ for _ in range(400):
 ```
 
 A few remarks:
-1. The suction pad is modelled as an *ideal* weld — no compliance or force limit is enforced.  If you need a more physical behaviour you can instead create a `gs.constraints.DampedSpring` or control the gripper fingers.
+1. The suction pad is modelled as an *ideal* weld - no compliance or force limit is enforced.  If you need a more physical behaviour you can instead create a `gs.constraints.DampedSpring` or control the gripper fingers.
 2. Link indices are **scene-global**, therefore we wrap them in a single-element numpy array to satisfy the API contract.
 3. You can attach or detach multiple objects at once by passing arrays with more than one index.
 

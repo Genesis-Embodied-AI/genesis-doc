@@ -16,7 +16,7 @@ Under the hood, the scene consists of a simulator that encapsulates,
 
 From a user’s perspective, building an environment in Genesis involves adding `Entity` objects to a `Scene`. Each `Entity` is defined by:
 - `Morph`: the geometry of the entity, such as primitive shapes (e.g., cube, sphere) or articulated models (e.g., URDF, MJCF).
-- `Material`: the physical properties of the entity, such as elastic solids, liquids, or granular materials. The material type determines the underlying solver used—for example, both MPM and SPH can simulate liquids, but each exhibits different behaviors.
+- `Material`: the physical properties of the entity, such as elastic solids, liquids, or granular materials. The material type determines the underlying solver used-for example, both MPM and SPH can simulate liquids, but each exhibits different behaviors.
 - `Surface`: the visual and interaction-related surface properties, such as texture, roughness, or reflectivity.
 
 Behind the scenes, the `Scene` is powered by a `Simulator`, which includes:

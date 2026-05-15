@@ -63,7 +63,7 @@ version_match = os.environ.get("READTHEDOCS_VERSION")
 if version_match is None:
     version_match = "v" + __version__
 html_theme_options = {
-    "show_nav_level": 2,
+    "show_nav_level": 1,
     "use_edit_page_button": True,
     "logo": {
         "image_dark": "_static/bigger_text_white.png",

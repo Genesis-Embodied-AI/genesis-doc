@@ -1,4 +1,4 @@
-# 📦 Loading USD Scenes
+# 🌐 Loading USD Scenes
 
 Genesis supports loading complex scenes from Universal Scene Description (USD) files, enabling you to import articulated robots, rigid objects, and complete environments with proper physics properties and joint configurations. USD is an open-source framework developed by Pixar for describing, composing, simulating, and collaborating within 3D worlds.
 
