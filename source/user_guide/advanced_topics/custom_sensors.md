@@ -41,7 +41,8 @@ That gives you two supported placements:
 |---|---|
 | `SimpleSensor[OptionsT, MetadataT]` | Almost always. Per-step pipeline (raw data -> transform/filter -> hardware imperfections -> delay -> post-process). |
 | `SimpleSensor[OptionsT, MetadataT, DataT]` | Same as above, but `read()` returns an instance of `DataT` (a `NamedTuple`) instead of a single tensor. IMU is the canonical example. |
-| `Sensor[OptionsT, MetadataT]` | Only when the standard pipeline does not apply. The built-in cameras derive from `Sensor` directly because they own their rendering path. Overriding at this level means implementing `_update_shared_cache` yourself, and (if your implementation does not use the measured ring) setting the class attribute `uses_measured_pipeline = False` to skip ring allocation. Also the right choice when you want **full kernel control** and need a single kernel pass to write both the ground-truth slice and the measured-timeline slot with internal noise (see [Kernel-internal physics noise](#kernel-internal-physics-noise) below). |
+| `BaseCameraSensor[OptionsT]` | Camera-style sensors that render an RGB image lazily on `read()` (rasterizer, ray tracer, batched renderer, custom renderer). Inherits the lazy-render lifecycle, link-attachment with `pos/lookat/up`, and the `_post_process`/`_get_*` plumbing from `Sensor`. See [Camera-style sensors via BaseCameraSensor](#camera-style-sensors-via-basecamerasensor) below. |
+| `Sensor[OptionsT, MetadataT]` | Only when neither standard pipeline applies. Overriding at this level means implementing `_update_shared_cache` yourself, and (if your implementation does not use the measured ring) setting the class attribute `uses_measured_pipeline = False` to skip ring allocation. Also the right choice when you want **full kernel control** and need a single kernel pass to write both the ground-truth slice and the measured-timeline slot with internal noise (see [Kernel-internal physics noise](#kernel-internal-physics-noise) below). |
 
 For mixins, the convention is:
 
@@ -194,6 +195,41 @@ Two supported routes:
    responsible for populating them. Use this when the sensor needs a fundamentally non-standard pipeline (e.g.
    cameras and renderers).
 
+## Camera-style sensors via `BaseCameraSensor`
+
+`BaseCameraSensor` is a `Sensor`-direct subclass that codifies the lazy-render-on-read pattern shared by every Genesis camera (`RasterizerCameraSensor`, `RaytracerCameraSensor`, `BatchRendererCameraSensor`). Use it as the base for any custom sensor that produces an image by rendering the scene rather than by reading physics-time signals each step.
+
+**Advantages over deriving from `Sensor` directly**
+
+- Lazy render-on-read with per-step caching: multiple `read()` calls in the same simulation step share a single render. No need to implement `_update_shared_cache`.
+- Link attachment with `pos`/`lookat`/`up` (or an explicit `offset_T`): the camera follows a `RigidLink` each frame and hands you the world-space transform to apply to your renderer.
+- An RGB output of shape `((h, w, 3),)` and dtype `torch.uint8` declared from `options.res`, plus a `read(envs_idx=...) -> CameraData` returning a `NamedTuple(rgb=...)` (with the leading batch dim dropped when `n_envs == 0`).
+- The class is opted out of the measured-timeline ring, and `__init__` rejects `delay > 0`, `jitter > 0`, and `history_length > 0` so users cannot silently request features that this sensor type cannot honor.
+
+**What you must implement**
+
+Two hooks:
+
+```python
+class MyCameraSensor(BaseCameraSensor[MyCameraOptions]):
+    def _apply_camera_transform(self, camera_T: torch.Tensor) -> None:
+        # `camera_T` is a (4, 4) world-space transform. Apply it to your renderer's camera representation.
+        ...
+
+    def _render_current_state(self) -> None:
+        # Render the scene from the current pose into the per-sensor slot of the per-class image cache.
+        # Called at most once per simulation step per camera.
+        ...
+```
+
+See `RasterizerCameraSensor` for a complete worked example.
+
+**Limitations**
+
+- Return is fixed to `((h, w, 3),)` `torch.uint8`. For depth, segmentation, normals, or any non-RGB output, override `_get_return_format` / `_get_cache_dtype` (and adapt the cache backing store), or drop down to a bare `Sensor` subclass.
+- The standard `SimpleSensor` imperfection knobs (`noise`, `bias`, `random_walk`, `resolution`) are not available. Any sensor-imperfection model has to live inside `_render_current_state` or in a `_post_process` override.
+- `history_length > 0` is rejected. Multi-frame stacks must be assembled by the caller across successive `read()` calls.
+
 ## Per-class metadata: what goes in `<Name>SharedMetadata`
 
 Anything that is **per-sensor-class** (not per-instance) and is read by your hooks. Examples:
@@ -321,7 +357,7 @@ Every concrete sensor must implement `_get_return_format` (instance) and `_get_c
 | `RaycasterSensor` / `DepthCameraSensor` | yes | - | - | identity |
 | `TemperatureGridSensor` | yes (raw temperature kernel) | - | yes (RC filter; `if timeline is not None: data.copy_(alpha * data + (1 - alpha) * timeline.at(1))`) | identity |
 | `ElastomerDisplacementSensor` | yes | - | - | identity |
-| Camera (any `*CameraSensor`) | - | - | - | identity. Derives from `Sensor` directly; owns `_update_shared_cache`; `uses_measured_pipeline = False`. |
+| Camera (any `*CameraSensor`) | - | - | - | identity. Derives from `BaseCameraSensor`; see [Camera-style sensors via BaseCameraSensor](#camera-style-sensors-via-basecamerasensor). |
 
 `_apply_hardware_imperfections` is **inherited unchanged** by every `SimpleSensor`-derived sensor - the out-of-the-box implementation already handles `noise + bias + random_walk + resolution`. Override only when your sensor needs a non-standard imperfection model.
 
