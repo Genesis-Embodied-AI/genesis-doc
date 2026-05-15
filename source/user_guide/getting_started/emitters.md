@@ -112,5 +112,5 @@ for step in range(500):
 
 ## What's Next
 
-- [Beyond Rigid Bodies](./beyond_rigid_bodies) — fluids, cloth, and deformable body simulation
-- [Soft Robots](./soft_robots) — muscle-actuated soft and hybrid robots
+- [Beyond Rigid Bodies](./beyond_rigid_bodies) - fluids, cloth, and deformable body simulation
+- [Soft Robots](./soft_robots) - muscle-actuated soft and hybrid robots

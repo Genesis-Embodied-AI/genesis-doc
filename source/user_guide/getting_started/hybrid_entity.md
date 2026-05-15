@@ -1,4 +1,4 @@
-# 🔗 Hybrid Entity
+# 🧤 Hybrid Entity
 
 HybridEntity combines rigid and soft body physics for simulating deformable robots with rigid skeletons.
 
@@ -132,5 +132,5 @@ Genesis automatically:
 
 ## What's Next
 
-- [Soft Robots](./soft_robots) — muscle actuation for FEM and MPM soft bodies
-- [Beyond Rigid Bodies](./beyond_rigid_bodies) — fluids, cloth, and deformable body simulation
+- [Soft Robots](./soft_robots) - muscle actuation for FEM and MPM soft bodies
+- [Beyond Rigid Bodies](./beyond_rigid_bodies) - fluids, cloth, and deformable body simulation

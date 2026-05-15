@@ -69,4 +69,4 @@ v_ws, idx = s_field._func_support_world(dir_ws, i_geom, i_env)
 
 The Support Field is an **acceleration structure** exclusively used by the *convex–convex* narrow phase.  Other collision paths – SDF, terrain, plane–box – bypass it because they either rely on analytical support functions or distance fields.
 
-For details on how MPR integrates this structure see {doc}`Collision, Contacts & Forces <collision_contacts_forces>`.
+For details on how MPR integrates this structure see {doc}`Rigid Collision Detection <rigid_collision/collision_contacts_forces>`.

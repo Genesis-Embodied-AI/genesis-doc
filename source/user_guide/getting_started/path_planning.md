@@ -100,5 +100,5 @@ path, valid = robot.plan_path(
 
 ## What's Next
 
-- [Inverse Kinematics & Motion Planning](./inverse_kinematics_motion_planning) — IK solving and pick-and-place workflows
-- [Constraints](./constraints) — weld and connect constraints for locking links at runtime
+- [Inverse Kinematics & Motion Planning](./inverse_kinematics_motion_planning) - IK solving and pick-and-place workflows
+- [Constraints](./constraints) - weld and connect constraints for locking links at runtime

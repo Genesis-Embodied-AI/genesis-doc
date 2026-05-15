@@ -68,7 +68,7 @@ for i in range(horizon):
 ```
 When creating the `Liquid` material, we set `sampler='pbs'`. This configures how we want to sample particles given the `Box` morph. `pbs` stands for 'physics-based sampling', which runs some extra simulation steps to make sure the particles are arranged in a physically natural way. You can also use `'regular'` sampler to sample the particles simply using a grid lattice pattern. If you are using other solvers such as MPM, you can also use `'random'` sampler.
 
-You may also note that we passed in an extra attribute -- `surface`. This attribute is used to define all the visual properties of the entity. Here, we set the color of the water to be blueish, and chose to visualize it as particles by setting `vis_mod='particle'`.
+You may also note that we passed in an extra attribute - `surface`. This attribute is used to define all the visual properties of the entity. Here, we set the color of the water to be blueish, and chose to visualize it as particles by setting `vis_mod='particle'`.
 
 Once you run this successfully, you will see the water drops and spreads over the plane, but constrained within the solver boundary:
 

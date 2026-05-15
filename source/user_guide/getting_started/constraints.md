@@ -104,5 +104,5 @@ print(constraints)  # Active constraint pairs
 
 ## What's Next
 
-- [Control Your Robot](./control_your_robot) — joint-level position, velocity, and force control
-- [Inverse Kinematics & Motion Planning](./inverse_kinematics_motion_planning) — IK solving and pick-and-place workflows
+- [Control Your Robot](./control_your_robot) - joint-level position, velocity, and force control
+- [Inverse Kinematics & Motion Planning](./inverse_kinematics_motion_planning) - IK solving and pick-and-place workflows

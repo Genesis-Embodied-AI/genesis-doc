@@ -114,7 +114,7 @@ for i in range(1000):
     scene.step()
 ```
 
-Running the above script on a desktop with RTX 4090 and 14900K gives you a futuristic simulation speed -- over **43 million** frames per second, this is 430,000 faster than real-time. Enjoy!
+Running the above script on a desktop with RTX 4090 and 14900K gives you a futuristic simulation speed - over **43 million** frames per second, this is 430,000 faster than real-time. Enjoy!
 ```{figure} ../../_static/images/parallel_speed.png
 ```
 

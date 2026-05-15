@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Genesis simulation framework is built around a modular and extensible configuration system. This system allows users to flexibly compose and control different aspects of a simulation—ranging from low-level physics solvers to high-level rendering options—through structured configuration objects.
+The Genesis simulation framework is built around a modular and extensible configuration system. This system allows users to flexibly compose and control different aspects of a simulation-ranging from low-level physics solvers to high-level rendering options-through structured configuration objects.
 
 To help you understand how these components work together, we start with a high-level template of how a Genesis scene is typically initialized. This template shows how simulation settings, solver options, and entity-level configurations are orchestrated.
 
@@ -54,14 +54,14 @@ As shown above, a scene in Genesis is defined by a combination of:
 
 This configuration defines how the simulation is globally structured and how different physics solvers are coupled. These options control the "skeleton" of the simulation loop, e.g., time-stepping, stability, and solver interoperability.
 
-- `SimOptions`: Sets global simulation parameters—time step size, gravity, damping, and numerical integrator.
+- `SimOptions`: Sets global simulation parameters-time step size, gravity, damping, and numerical integrator.
 - `CouplerOptions`: Configures multi-physics interactions - for instance, how a rigid tool interacts with a soft deformable body or how a fluid flows through a porous material.
 
 Defined in [genesis/options/solvers.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/solvers.py).
 
 ## Solvers
 
-Solvers are the cores behind specific physical models. Each solver encapsulates a simulation algorithm for a particular material or system—rigid bodies, fluids, deformables, etc. Users can enable or disable solvers depending on the scenario.
+Solvers are the cores behind specific physical models. Each solver encapsulates a simulation algorithm for a particular material or system-rigid bodies, fluids, deformables, etc. Users can enable or disable solvers depending on the scenario.
 - `RigidOptions`: Rigid body dynamics with contact, collision, and constraints.
 - `MPMOptions`: Material Point Method solver for elastic, plastic, granular, fluidic materials.
 - `SPHOptions`: Smoothed Particle Hydrodynamics solver for fluids and granular flows.

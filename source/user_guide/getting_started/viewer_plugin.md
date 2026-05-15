@@ -1,4 +1,4 @@
-# 🎑 Viewer Interaction
+# ⌨️ Viewer Interaction
 
 The Genesis viewer supports mouse and keyboard interaction for camera controls, recording, visualization toggles, and more. 
 This functionality can easily be extended with custom keybindings and viewer plugins.
@@ -53,7 +53,7 @@ scene = gs.Scene(
 ## Viewer Plugins
 
 Viewer plugins extend the interactive scene viewer with custom input handling and visualization.
-They receive mouse and keyboard events, can draw debug geometry each frame, and run logic on every simulation step—ideal for tools like picking points on meshes or dragging bodies with the mouse.
+They receive mouse and keyboard events, can draw debug geometry each frame, and run logic on every simulation step-ideal for tools like picking points on meshes or dragging bodies with the mouse.
 
 Add plugins with `scene.viewer.add_plugin(plugin)` *before* `scene.build()`.
 Example scripts are available under `examples/viewer_plugin/`.
@@ -79,6 +79,40 @@ scene.viewer.add_plugin(
 
 <video preload="auto" controls="True" width="100%">
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/viewer_plugin_mouse_spring.mp4" type="video/mp4">
+</video>
+
+
+### ImGui Overlay Plugin
+
+The **`ImGuiOverlayPlugin`** adds a Dear ImGui overlay on top of the native pyrender viewer. It exposes interactive panels for:
+
+- Simulation controls (play / pause / step / reset).
+- An entity browser with per-DOF joint sliders, quaternion groups for free joints, and visualization-mode toggles (visual / collision / wireframe).
+- Camera position and lookat sliders, shadow / frame / frustum visibility toggles, and rasterizer render-flag overrides (normals overlay, wireframe overlay).
+- A scene-rebuild button that re-runs `scene.build()` with the current entity inventory - useful for iterating on URDFs / MJCFs without restarting the script.
+
+```python
+from genesis.ext.pyrender.overlay import ImGuiOverlayPlugin
+
+plugin = ImGuiOverlayPlugin()
+scene.viewer.add_plugin(plugin)
+```
+
+You can register your own panels alongside the built-in ones with `plugin.register_panel(callback)`. The callback receives the live ImGui module and can call any of its widgets:
+
+```python
+def custom_panel(imgui):
+    imgui.text("Custom Demo Panel")
+    if imgui.button("Trigger something"):
+        ...
+
+plugin.register_panel(custom_panel)
+```
+
+The full example script is at `examples/gui/imgui_joint_control.py`. It loads a Franka arm and a box, and demonstrates the entity browser, simulation controls, and a custom panel registered via `register_panel`.
+
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/viewer_plugin_imgui_overlay.mp4" type="video/mp4">
 </video>
 
 

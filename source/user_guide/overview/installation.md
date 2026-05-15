@@ -111,7 +111,7 @@ Even if the GPU appears accessible, your system might still default to CPU rende
    libEGL_mesa.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libEGL_mesa.so.0
    ```
 
-   This is not always a problem — **some systems can handle both**.
+   This is not always a problem - **some systems can handle both**.
    But if you're experiencing **slow rendering**, it's often best to remove Mesa.
 
 3. **(Optional but recommended)** Remove MESA to prevent fallback:

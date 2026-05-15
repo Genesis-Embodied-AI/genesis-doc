@@ -130,6 +130,6 @@ When grasping the object, we used force control for the 2 gripper dofs, and appl
 
 ## What's Next
 
-- [Advanced IK](./advanced_ik) — multi-target IK, null-space control, and solver tuning
-- [Constraints](./constraints) — weld and connect constraints for locking links together at runtime
-- [Path Planning](./path_planning) — collision-free motion planning with RRT
+- [Advanced IK](./advanced_ik) - multi-target IK, null-space control, and solver tuning
+- [Constraints](./constraints) - weld and connect constraints for locking links together at runtime
+- [Path Planning](./path_planning) - collision-free motion planning with RRT
