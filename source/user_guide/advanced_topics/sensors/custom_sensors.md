@@ -97,53 +97,42 @@ This is the only abstract hook of `SimpleSensor`. `_get_return_format` and `_get
 
 ### Optional overrides
 
-#### `_apply_transform(cls, shared_metadata, data, *, timeline)`
+#### `_apply_transform(cls, shared_metadata, data, timeline, *, is_measured)`
 
-Apply a coordinate transform and/or a stateful response model, in place, on `data` (a batch-first view `[B, cache_size, ...]`). Called twice per step: once on the ground-truth branch with the GT timeline ring, once on the measured branch with the measured timeline ring. Both rings hold post-transform, **PRE-hardware-imperfection** values, so recurrence reads (`timeline.at(1)` and earlier) are always clean of hardware noise.
+Apply a coordinate transform and/or a stateful response model, in place, on `data` (a batch-first view `[B, cache_size, ...]`). Called twice per step: once on the ground-truth branch with the GT timeline ring (`is_measured=False`), once on the measured branch with the measured timeline ring (`is_measured=True`). Both rings hold post-transform, **PRE-hardware-imperfection** values, so recurrence reads (`timeline.at(1)` and earlier) are always clean of hardware noise.
 
 - The coordinate-transform portion runs unconditionally on both branches.
 - The response-model portion (e.g. thermal dissipation, exponential moving average, low-pass) reads previous slots via `timeline.at(1)`, `timeline.at(2)`, etc. The current write target is `data` (alias of `timeline.at(0)`); do not double-write.
 - **Aliasing note:** `data is timeline.at(0, copy=False)` - they refer to the same memory. Use whichever reads more naturally.
+- Gate any sensor-element-specific pre-acquisition effect (RC time constant, mechanical bandwidth - things that belong to the sensor element and must not appear in GT) on `if is_measured:`. Branch-symmetric effects skip the gate.
 
 ```python
 @classmethod
-def _apply_transform(cls, shared_metadata, data, *, timeline):
+def _apply_transform(cls, shared_metadata, data, timeline, *, is_measured):
     # Coordinate transform: always runs on both branches.
     data.copy_(transform_by_quat(data, shared_metadata.world_to_local_quat))
 
-    # Stateful response model: reads the previous slot on the current branch's ring (one-pole low-pass with
-    # coefficient `alpha`, which the sensor's metadata subclass stored at build time).
-    prev = timeline.at(1)
-    data.mul_(1 - shared_metadata.alpha).add_(prev, alpha=shared_metadata.alpha)
+    # Sensor-element response model (RC time constant). Measured-only because GT must return the underlying
+    # physical phenomenon untouched by the sensor element.
+    if is_measured:
+        prev = timeline.at(1)
+        data.mul_(1 - shared_metadata.alpha).add_(prev, alpha=shared_metadata.alpha)
 ```
 
-`_apply_transform` runs symmetrically on both branches with the same code, so any contribution applies to both ground truth and measurement. For a response-model effect that should only affect the measurement (e.g. a sensor-element bandwidth that the ideal GT signal should not see), put it in `_post_process` with the `is_measured=True` branch - that hook receives the per-class return-space ring as `timeline` and can read previous post-everything outputs for stateful recurrence (see below).
+The default of running on both branches is what you want for any frame change or coordinate transform. Use the `is_measured` gate when the response is a property of the sensor element itself. For post-acquisition stateful effects (DSP filtering at the sensor output) use `_post_process` with `is_measured` instead - it sees the per-class return-space ring.
 
-#### `_post_process(cls, shared_metadata, tensor, *, timeline, is_measured) -> torch.Tensor`
+#### `_post_process(cls, shared_metadata, tensor, timeline, *, is_measured) -> torch.Tensor`
 
 Projection from intermediate space to return space. Override when the user-facing output type and/or shape differs from the pipeline-internal representation: bool threshold on `ContactSensor`, deadband + saturation on `ContactForceSensor`, etc. Return the post-cast tensor; the manager writes it into slot 0 of the per-class return-space ring, and (on the measured branch) then delay-samples that ring into the user-visible return cache.
 
 Called once per branch per step. `tensor` is the full per-class intermediate cache in intermediate space (the current step's input). `timeline` is the per-class return-space ring; it is rotated AFTER this call returns, so inside the override `timeline.at(0)` is the previous step's post-output, `timeline.at(1)` is the step before that, and so on - stateful overrides (e.g. a sensor-element bandwidth filter on the measured branch) use these for recurrence. `is_measured` distinguishes branches (`True` on the measured call, `False` on the GT call) so an override can apply readout-stage contributions on only one side.
 
-Designed for cast / clamp / threshold / mask / deadband / simple reductions and (optionally) stateful HW responses that should not contaminate `_apply_transform` recurrence. Stateless overrides do not need to touch `timeline` or `is_measured` - the standard cast pattern stays one line:
+Designed for cast / clamp / threshold / mask / deadband / simple reductions and (optionally) stateful post-acquisition DSP responses (anti-alias filter, decimation memory) that operate in **return space** on the projected signal. Pre-acquisition effects (RC filter on the underlying physical signal, mechanical bandwidth of the sensor element) belong in `_apply_transform` with `is_measured=True` instead - they need the intermediate-space ring. Stateless overrides do not need to touch `timeline` or `is_measured`:
 
 ```python
 @classmethod
-def _post_process(cls, shared_metadata, tensor, *, timeline, is_measured):
+def _post_process(cls, shared_metadata, tensor, timeline, *, is_measured):
     return tensor > shared_metadata.thresholds
-```
-
-Example of a stateful, measured-only sensor-element bandwidth filter (one-pole low-pass on the post-output value,
-fed by the previous post-everything snapshot from the return-space ring):
-
-```python
-@classmethod
-def _post_process(cls, shared_metadata, tensor, *, timeline, is_measured):
-    out = tensor.clone()
-    if is_measured:
-        prev = timeline.at(0)  # ring rotates after this call; at(0) is the previous step's post-output.
-        out.mul_(1 - shared_metadata.alpha).add_(prev, alpha=shared_metadata.alpha)
-    return out
 ```
 
 If you override `_post_process` you **must** also override `_get_intermediate_format` and/or `_get_intermediate_dtype`. The pipeline enforces this at class-definition time:
@@ -179,17 +168,17 @@ def _get_intermediate_dtype(cls) -> torch.dtype:
 
 When `_get_intermediate_format` and `_get_intermediate_dtype` both default, `_post_process` is identity, **and** no sensor in the class declares `delay > 0` or `history_length > 0` (the common case for most no-op sensors), the manager allocates **one** buffer and aliases the return cache as a view of the intermediate cache - no extra memory, no copy. Any of those triggers - overriding `_post_process`, non-zero delay, non-zero history - causes the manager to allocate a separate per-class return cache and a per-class return-space ring to back delay sampling and history reads.
 
-#### `_apply_physics_imperfections(cls, shared_metadata, measured_slot_0)`
+#### `_apply_physics_imperfections(cls, shared_metadata, measured_slot_0, timeline)`
 
-Apply physics-level imperfections in place on the measured ring's current slot, **before** `_apply_transform`. Default: no-op. Override when the imperfection represents a property of the simulated phenomenon itself (e.g. genuine drift in the physical quantity being sensed) and therefore must propagate through the response model on subsequent steps. The contribution becomes part of the measured ring's slot 0 and feeds the next step's transform recurrence.
+Apply physics-level imperfections in place on the **measured** ring's current slot, **before** `_apply_transform`. Default: no-op. Override when the simulator does not model a random fluctuation of the underlying phenomenon (genuine drift of the physical quantity, fine-scale turbulence on top of the deterministic field, etc.) and that fluctuation should propagate through the sensor's response model on subsequent steps. Measured-only by construction so GT keeps the raw simulated phenomenon - if you want the noise on both branches, write it into the simulator state instead.
 
-This is the right home for "physics random walk" - drift that lives in the simulated world rather than in the sensor's readout stage. Anything that should *not* feed the response model (sensor electronics noise, ADC quantization) belongs in `_apply_hardware_imperfections` instead.
+This hook is **called from inside the default `_update_current_timestep_data`**, immediately after the raw signal is mirrored into the measured slot. A sensor that needs `_update_raw_data` and `_apply_physics_imperfections` fused in a single kernel pass should override `_update_current_timestep_data` instead of this hook (see [Kernel-internal physics noise](#kernel-internal-physics-noise) below). Anything that belongs to the sensor's readout electronics (noise, ADC quantization) belongs in `_apply_hardware_imperfections`; anything that belongs to the sensor element (RC time constant, mechanical bandwidth) belongs in `_apply_transform` with the `is_measured=True` gate.
 
 #### `_apply_hardware_imperfections(cls, shared_metadata, measured_slot_0)`
 
 `SimpleSensor` already implements an opinionated interpretation of `noise`, `bias`, `random_walk`, and `resolution` as the perturbations the embedded sampler introduces at the sensor output. Applied to the per-step measured working buffer **before** `_post_process` (and before the post-`_post_process` snapshot is frozen into the per-class return-space ring); the timeline ring is never written to, so `_apply_transform` recurrence stays clean. This is the **measured-only** stage of the pipeline; nothing here is mirrored on the GT branch.
 
-Designed for stateless per-step perturbations. Stateful HW responses (sensor-element bandwidth, signal-dependent gain with memory) belong in `_post_process`, which sees the per-class return-space ring and can read its previous slots via `timeline.at(0)` and earlier (the return ring rotates after `_post_process` returns).
+Designed for stateless per-step perturbations. Stateful sensor-element effects (RC time constant, mechanical bandwidth) belong in `_apply_transform` with the `is_measured` gate (intermediate-space recurrence). Stateful post-acquisition DSP (anti-alias, decimation memory) belongs in `_post_process`, which sees the per-class return-space ring and can read its previous slots via `timeline.at(0)` and earlier (the return ring rotates after `_post_process` returns).
 
 Override when your sensor has a non-standard imperfection model. You typically still call `super()._apply_hardware_imperfections(...)` for the standard pieces and add your custom term on top:
 
@@ -204,7 +193,7 @@ def _apply_hardware_imperfections(cls, shared_metadata, measured_slot_0):
 
 #### `_update_current_timestep_data(cls, shared_metadata, current_ground_truth_data_T, ground_truth_data_timeline, measured_data_timeline)`
 
-Default behavior: call `_update_raw_data` to produce the ground-truth value into the contiguous `(cols, B)` kernel target `current_ground_truth_data_T`, then mirror it into the GT ring's slot 0 and the measured ring's slot 0. Override **only** when your sensor has **kernel-internal physical-response noise**, i.e. when the ground-truth signal and the measured signal must be produced by a single kernel pass with different paths inside. The default split (one kernel, then mirror) is correct for every other case. See [Kernel-internal physics noise](#kernel-internal-physics-noise) below.
+Default behavior: call `_update_raw_data` to produce the ground-truth value into the contiguous `(cols, B)` kernel target `current_ground_truth_data_T`, mirror it into the GT ring's slot 0 and the measured ring's slot 0, then call `_apply_physics_imperfections` in place on the measured slot. Override this method to fuse `_update_raw_data` and `_apply_physics_imperfections` in a single kernel pass: write the raw GT to `current_ground_truth_data_T` and to the GT ring slot, and write the noised value directly to the measured ring slot. The rest of the pipeline (`_apply_transform`, hardware imperfections, `_post_process`, delay sampling) still runs unchanged on top. See [Kernel-internal physics noise](#kernel-internal-physics-noise) below.
 
 #### `uses_ring_pipeline` (class attribute, `ClassVar[bool]`)
 
@@ -225,7 +214,7 @@ Some sensors have noise that is **intrinsic to the physics computation** - a sin
 
 Two supported routes:
 
-1. **Override `_update_current_timestep_data` on `SimpleSensor`.** Your kernel writes `current_ground_truth_data_T` (the contiguous `(cols, B)` GT slice) **and** `measured_data_timeline.at(0, copy=False)` (the measured slot 0, `(B, cols)`) in one pass, and (when allocated) `ground_truth_data_timeline.at(0, copy=False)` (the GT slot 0). The rest of the SimpleSensor pipeline (`_apply_physics_imperfections`, `_apply_transform` on both branches, delay sampling, `_apply_hardware_imperfections`, eager `_post_process`) still runs on top. Recommended when you also want any of the standard pipeline pieces (imperfection parameters, delay/jitter, `_post_process` projection).
+1. **Override `_update_current_timestep_data` on `SimpleSensor`.** Your kernel writes `current_ground_truth_data_T` (the contiguous `(cols, B)` GT slice) **and** `measured_data_timeline.at(0, copy=False)` (the measured slot 0, `(B, cols)`) in one pass, and (when allocated) `ground_truth_data_timeline.at(0, copy=False)` (the GT slot 0). Because `_apply_physics_imperfections` is packed inside this hook, your override naturally fuses raw + physical-response noise. The rest of the SimpleSensor pipeline (`_apply_transform` on both branches, delay sampling, `_apply_hardware_imperfections`, eager `_post_process`) still runs on top. Recommended when you also want any of the standard pipeline pieces (imperfection parameters, delay/jitter, `_post_process` projection).
 2. **Derive from `Sensor` directly and override `_update_shared_cache`.** Skips the SimpleSensor chain entirely. The override receives `(metadata, gt_T, gt_timeline, measured_timeline, intermediate_cache)` and is responsible for populating them. The manager handles `_post_process` projection, return-space ring writes, and delay sampling after the hook returns. Use this when the sensor needs a fundamentally non-standard pipeline (e.g. cameras and renderers).
 
 ## Camera-style sensors via `BaseCameraSensor`
