@@ -47,7 +47,6 @@ imu = scene.add_sensor(
         gyro_random_walk=(0.001, 0.001, 0.001),
         delay=0.01,
         jitter=0.01,
-        interpolate=True,
         draw_debug=True,
     )
 )
@@ -60,7 +59,6 @@ The IMU constructor exposes:
 - `acc_noise` / `gyro_noise` - Gaussian noise per axis.
 - `acc_random_walk` / `gyro_random_walk` - gradual drift over time.
 - `delay` / `jitter` - timing realism.
-- `interpolate` - smooth delayed measurements between ring slots.
 - `draw_debug` - visualize the sensor frame in the viewer.
 
 ## Motion control and simulation

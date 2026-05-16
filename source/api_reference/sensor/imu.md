@@ -76,7 +76,6 @@ gs.sensors.IMU(
     # Timing
     delay=0.0,                                 # Read delay in seconds
     jitter=0.0,                                # Random delay jitter in seconds
-    interpolate=False,                         # Interpolate delayed measurements
 
     draw_debug=True,
 )
