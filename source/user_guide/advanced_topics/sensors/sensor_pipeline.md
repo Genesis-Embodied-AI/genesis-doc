@@ -19,7 +19,7 @@ The robot's `read()` is a **memory lookup**. It does not trigger sensor acquisit
 
 This shapes every design decision in the pipeline. Imperfections split into two layers depending on where the imperfection physically lives:
 
-- **Physics-level imperfections** are properties of the physical phenomenon being sensed (e.g. genuine drift in the simulated process, low-pass coupling in a thermistor's surroundings). They accumulate through the sensor's response model and therefore must propagate through transform recurrence. They are written into the timeline ring and read by `_apply_transform` on the following step.
+- **Physics-level imperfections** are random fluctuations of the underlying physical phenomenon the simulator does not model (genuine drift of the simulated quantity, fine-scale turbulence on top of a deterministic field, etc.). They shape what the sensor *sees* beyond the simulated GT and propagate through the sensor's response model on subsequent steps, so they live on the **measured** timeline ring (GT keeps the raw simulated phenomenon). They are packed inside `_update_current_timestep_data` together with the raw-signal kernel so a sensor can fuse "raw + noise" in a single kernel pass.
 - **Hardware-level imperfections** are properties of the sensor's own readout stage (electronic noise, ADC quantization, sensor-output drift). They are applied at the sensor-output stage, on the per-step working buffer - never on the timeline ring. The post-`_post_process` snapshot is frozen into the return-space ring slot 0, so each captured snapshot carries the imperfection state that was sampled at that step. Transform recurrence reads only the timeline ring (clean of hardware noise), so a stateful response model (thermal dissipation, low-pass filter) is never amplified by hardware noise of the previous step.
 - **Delay (and its jitter)** is the staleness of the snapshot relative to "now". A sensor with `delay = D` (plus a random `jitter` drawn each step) means: at control-loop time `t`, the robot's read returns the post-everything value captured at time `t - D - jitter_t` (response-model output + the hardware imperfection sample that was drawn at that step). `delay` and `jitter` always travel together - jitter cannot exceed delay. Sampling is zero-order-hold (ZOH) by default, which is dtype-safe for arbitrary return types (bool, uint8, quantized float) and is the right semantics for a snapshot that is meant to look "frozen at capture". Sensors whose return space is a continuous-valued float and that benefit from a smoother sampling rule can override `_apply_delay`.
 - **Reads are idempotent within a step.** If a design implies they aren't, the abstraction is broken.
@@ -43,7 +43,7 @@ Camera (RasterizerCameraSensor, RaytracerCameraSensor, BatchRendererCameraSensor
 - it has its own rendering path and does not use the SimpleSensor pipeline.
 ```
 
-`Sensor` is the minimal customization contract - a single abstract per-step compute method (`_update_shared_cache`), four spec accessors (`_get_return_format` / `_get_intermediate_format` as instance methods for shape; `_get_cache_dtype` / `_get_intermediate_dtype` as classmethods for dtype), a `_post_process` projection (identity by default), and a class-level capability flag (`uses_ring_pipeline: ClassVar[bool] = True`) telling the manager whether to allocate the per-step timeline rings (GT + measured) for the class. `SimpleSensor` builds the standard pipeline on top, exposing five override hooks (`_update_raw_data`, `_update_current_timestep_data`, `_apply_physics_imperfections`, `_apply_transform`, `_apply_hardware_imperfections`) that concrete sensors override as needed. Signatures, contracts, and worked examples are in [Implementing Custom Sensors](custom_sensors.md). This page focuses on what those hooks *do* at runtime - the order in which they fire and the buffers they read and write.
+`Sensor` is the minimal customization contract - a single abstract per-step compute method (`_update_shared_cache`), four spec accessors (`_get_return_format` / `_get_intermediate_format` as instance methods for shape; `_get_cache_dtype` / `_get_intermediate_dtype` as classmethods for dtype), a `_post_process` projection (identity by default), and a class-level capability flag (`uses_ring_pipeline: ClassVar[bool] = True`) telling the manager whether to allocate the per-step timeline rings (GT + measured) for the class. `SimpleSensor` builds the standard pipeline on top, exposing five override hooks (`_update_raw_data`, `_update_current_timestep_data`, `_apply_physics_imperfections`, `_apply_transform`, `_apply_hardware_imperfections`) that concrete sensors override as needed. `_update_raw_data` and `_apply_physics_imperfections` are packed inside `_update_current_timestep_data` so a sensor that needs them fused in a single kernel pass can override that one hook. Signatures, contracts, and worked examples are in [Implementing Custom Sensors](custom_sensors.md). This page focuses on what those hooks *do* at runtime - the order in which they fire and the buffers they read and write.
 
 ## Per-step pipeline
 
@@ -53,12 +53,16 @@ Camera (RasterizerCameraSensor, RaytracerCameraSensor, BatchRendererCameraSensor
   _update_current_timestep_data
             │  raw -> GT intermediate cache  (kernel target, contiguous (cols, B))
             │  mirrored to GT timeline ring slot 0  +  measured timeline ring slot 0
+            │  _apply_physics_imperfections(measured slot 0)  [packed here so a
+            │  sensor with kernel-internal physical-response noise can fuse raw +
+            │  noise in a single kernel by overriding this hook]
             │
             ├──► [GT branch]
             │       │
             │       ▼
-            │   _apply_transform(GT slot 0, timeline=GT timeline ring)
-            │       │  (reads previous slots for stateful response models)
+            │   _apply_transform(GT slot 0, timeline=GT timeline ring, is_measured=False)
+            │       │  (reads previous slots for stateful response models;
+            │       │   is_measured=False skips sensor-element-specific effects)
             │       ▼
             │   GT slot 0 is the post-transform value; copied back into GT
             │   intermediate cache
@@ -75,12 +79,10 @@ Camera (RasterizerCameraSensor, RaytracerCameraSensor, BatchRendererCameraSensor
             └──► [measured branch]
                     │
                     ▼
-                _apply_physics_imperfections(measured slot 0)
-                    │  (default no-op; physics-level imperfections that should
-                    │   propagate through transform recurrence)
-                    ▼
-                _apply_transform(measured slot 0, timeline=measured timeline ring)
-                    │  (recurrence reads clean pre-hardware previous slots)
+                _apply_transform(measured slot 0, timeline=measured timeline ring, is_measured=True)
+                    │  (recurrence reads clean pre-hardware previous slots;
+                    │   is_measured=True activates sensor-element-specific effects
+                    │   such as RC time constant / mechanical bandwidth)
                     ▼
                 measured slot 0 holds post-physics, post-transform value
                     │
@@ -177,7 +179,7 @@ Two options classes feed the pipeline. `SensorOptions` carries the time-related 
 | `random_walk` | 0.0 | Std-dev of the random-walk step. The drift accumulator advances each step and is added to the output, then frozen into the return-space ring slot at capture time, so a delayed read sees the drift the sensor had at the moment it was captured. |
 | `resolution` | 0.0 | Quantization step. Output values are rounded to multiples of this. |
 
-`noise`, `bias`, `random_walk`, `resolution` are deliberately generic - they're imperfection *parameters*. `SimpleSensor._apply_hardware_imperfections` picks the "embedded sampler" interpretation laid out above (sensor-output stage). A direct `Sensor` subclass could interpret them differently or ignore them entirely (Camera does). Imperfections that need to propagate through the response model (e.g. genuine drift in the physical phenomenon being sensed) belong in an `_apply_physics_imperfections` override instead - that hook runs **before** `_apply_transform` so its contribution feeds the next step's recurrence.
+`noise`, `bias`, `random_walk`, `resolution` are deliberately generic - they're imperfection *parameters*. `SimpleSensor._apply_hardware_imperfections` picks the "embedded sampler" interpretation laid out above (sensor-output stage). A direct `Sensor` subclass could interpret them differently or ignore them entirely (Camera does). Imperfections that need to propagate through the response model (e.g. genuine drift in the physical phenomenon being sensed) belong in an `_apply_physics_imperfections` override instead - that hook runs inside `_update_current_timestep_data` on the measured timeline slot, **before** `_apply_transform` reads it, so its contribution feeds the next step's recurrence and can be fused with the raw-signal kernel in one pass.
 
 ### Why imperfections are baked in at capture time
 
