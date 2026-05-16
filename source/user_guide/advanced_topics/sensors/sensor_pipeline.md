@@ -129,7 +129,7 @@ The pipeline operates in **intermediate space** through every stage up to and in
 
 The separation is **structural, not aesthetic**. `_apply_transform(timeline=...)` lets filter overrides read previous slots of the timeline ring (e.g. `timeline.at(1)` for the previous frame); those slots must be in the **same data space** as the `data` argument the override receives, otherwise the filter mixes apples and oranges and silently produces wrong output. So the timeline ring holds intermediate-space values; the return cache and the return-space ring are in return space.
 
-When `_post_process` is identity AND no delay/history is configured, the manager allocates a single buffer and aliases `return_cache` as a view of the intermediate slice - no extra storage. When `_post_process` is overridden (ContactSensor: float to bool; ContactForceSensor: clamp + masked_fill), the return cache is a distinct buffer fed by the return-space ring. The author signals the intermediate / return distinction by overriding `_get_intermediate_format` and/or `_get_intermediate_dtype` (a no-op override returning the return-space value is acceptable when shape and dtype coincide).
+When `_post_process` is identity AND no delay/history is configured, the manager allocates a single buffer and aliases the per-class return cache as a view of the intermediate slice - no extra storage. When `_post_process` is overridden (ContactSensor: float to bool; ContactForceSensor: clamp + masked_fill), the return cache is a distinct buffer fed by the return-space ring. The author signals the intermediate / return distinction by overriding `_get_intermediate_format` and/or `_get_intermediate_dtype` (a no-op override returning the return-space value is acceptable when shape and dtype coincide).
 
 ### Why shape is per-instance and dtype is class-uniform
 
@@ -157,7 +157,7 @@ The manager owns all storage. Conceptually there are four scopes:
 Per simulation step the manager:
 
 1. Rotates the per-dtype timeline ring pair and the per-class return-space ring pair, freeing the oldest slot for the new snapshot.
-2. For each sensor class, invokes `_update_shared_cache` once, passing the per-class slices of the intermediate cache, both timeline rings (GT + measured; `None` for classes that opted out), and the per-class return cache. The hook produces the ground-truth signal in the GT intermediate cache and the measured snapshot (post-physics, post-transform, post-hardware-imperfections) in the per-step working buffer.
+2. For each sensor class, invokes `_update_shared_cache` once, passing the per-class slices of the intermediate cache and both timeline rings (GT + measured; `None` for classes that opted out). The hook produces the ground-truth signal in the GT intermediate cache and the measured snapshot (post-physics, post-transform, post-hardware-imperfections) in the per-step working buffer.
 3. Runs `_post_process` on both branches and writes the result to slot 0 of the per-class return-space ring pair. Skipped when no return-space ring is allocated (alias-view propagates the per-step write automatically).
 4. Reads slot 0 of the GT return ring into the GT return cache; per-sensor delay-samples the measured return ring into the measured return cache. For sensors with `delay = 0` and no jitter this is just slot-0 reads.
 

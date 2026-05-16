@@ -226,7 +226,7 @@ Some sensors have noise that is **intrinsic to the physics computation** - a sin
 Two supported routes:
 
 1. **Override `_update_current_timestep_data` on `SimpleSensor`.** Your kernel writes `current_ground_truth_data_T` (the contiguous `(cols, B)` GT slice) **and** `measured_data_timeline.at(0, copy=False)` (the measured slot 0, `(B, cols)`) in one pass, and (when allocated) `ground_truth_data_timeline.at(0, copy=False)` (the GT slot 0). The rest of the SimpleSensor pipeline (`_apply_physics_imperfections`, `_apply_transform` on both branches, delay sampling, `_apply_hardware_imperfections`, eager `_post_process`) still runs on top. Recommended when you also want any of the standard pipeline pieces (imperfection parameters, delay/jitter, `_post_process` projection).
-2. **Derive from `Sensor` directly and override `_update_shared_cache`.** Skips the SimpleSensor chain entirely. The override receives `(metadata, gt_T, gt_timeline, measured_timeline, intermediate_cache, return_cache)` and is responsible for populating them. Use this when the sensor needs a fundamentally non-standard pipeline (e.g. cameras and renderers).
+2. **Derive from `Sensor` directly and override `_update_shared_cache`.** Skips the SimpleSensor chain entirely. The override receives `(metadata, gt_T, gt_timeline, measured_timeline, intermediate_cache)` and is responsible for populating them. The manager handles `_post_process` projection, return-space ring writes, and delay sampling after the hook returns. Use this when the sensor needs a fundamentally non-standard pipeline (e.g. cameras and renderers).
 
 ## Camera-style sensors via `BaseCameraSensor`
 
