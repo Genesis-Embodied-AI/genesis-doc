@@ -152,7 +152,114 @@ for i in range(120):
     cam.render()
 cam.stop_recording(save_to_filename='video.mp4', fps=60)
 ```
-## Photo-realistic Ray Tracing Rendering
+## Photo-realistic Rendering with Nyx
+
+[Nyx](https://github.com/Genesis-Embodied-AI/nyx-for-genesis) is a GPU-accelerated path tracer purpose-built for Genesis. Unlike the LuisaRender backend covered below, Nyx is wired in as a **camera sensor** rather than as a scene-wide renderer: you attach a `NyxCameraOptions` sensor to the scene and read frames back from `cam.read().rgb`. It supports PBR materials, HDRI lighting, 3D Gaussian splat assets, attached / multi-camera setups, multi-environment rendering, and per-pixel object picking.
+
+### Installation
+
+Nyx ships as the `gs-nyx` package:
+
+```bash
+pip install gs-nyx
+```
+
+```{note}
+`gs-nyx` is currently distributed through an internal package index while the project is being prepared for public release. Public installation instructions will be published at the [Nyx repository](https://github.com/Genesis-Embodied-AI/nyx-for-genesis) once the wheel is on PyPI.
+```
+
+Verify the install by importing the plugin alongside Genesis:
+
+```python
+import genesis as gs
+import gs_nyx.nyx_py_renderer as npr
+import gs_nyx.nyx_py_sdk as nps
+from gs_nyx_plugin.nyx_camera_options import NyxCameraOptions
+```
+
+### A minimal example
+
+The snippet below renders a PBR ball on a plane lit purely by an HDRI environment map — the canonical "hello world" for Nyx, mirroring [`examples/01_hello_nyx.py`](https://github.com/Genesis-Embodied-AI/nyx-for-genesis/blob/main/examples/01_hello_nyx.py) in the Nyx repo.
+
+```{image} ../../_static/images/nyx_hello.png
+:alt: PBR ball rendered with Nyx under an HDRI environment map
+:align: center
+:width: 80%
+```
+
+```python
+import os
+from PIL import Image
+
+import genesis as gs
+import gs_nyx.nyx_py_renderer as npr
+import gs_nyx.nyx_py_sdk as nps
+from gs_nyx_plugin.nyx_camera_options import NyxCameraOptions
+
+
+HERE        = os.path.dirname(__file__)
+PBR_BALL    = os.path.join(HERE, "assets", "PBR_Ball.glb")
+ENV_MAP     = os.path.join(HERE, "assets", "kloppenheim_07_puresky_4k.hdr")
+OUTPUT_PATH = os.path.join(HERE, "out", "01_hello_nyx.png")
+
+
+def main():
+    gs.init()
+
+    scene = gs.Scene(
+        sim_options=gs.options.SimOptions(dt=0.01),
+        show_viewer=False,
+    )
+
+    scene.add_entity(morph=gs.morphs.Plane(plane_size=(10.0, 10.0)))
+    scene.add_entity(
+        morph=gs.morphs.Mesh(file=PBR_BALL, pos=(0.0, 0.0, 0.0)),
+        surface=gs.surfaces.Gold(),
+    )
+
+    # Describe how the env map is encoded
+    env_map            = nps.EnvironmentMapAsset()
+    env_map.texture    = ENV_MAP
+    env_map.layout     = nps.EEnvMapLayout.LongLat
+    env_map.multiplier = 8
+
+    # Attach a Nyx camera sensor
+    cam = scene.add_sensor(NyxCameraOptions(
+        res         = (1920, 1080),
+        pos         = (-1.0, 1.0, 1.2),
+        lookat      = (0.0, 0.0, 0.1),
+        fov         = 20.0,
+        spp         = 64,
+        render_mode = npr.ERenderMode.FastPathTracer,
+        env_maps    = (env_map,),
+    ))
+
+    scene.build(n_envs=1)
+    scene.step()  # rendering happens during the sim step
+
+    rgb = cam.read().rgb[0].cpu().numpy()
+    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+    Image.fromarray(rgb).save(OUTPUT_PATH)
+    print(f"Saved {OUTPUT_PATH}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Key things to notice:
+
+- **Nyx is a sensor.** It is registered with `scene.add_sensor(NyxCameraOptions(...))`, not as a global renderer backend.
+- **Rendering happens during `scene.step()`.** Read frames back via `cam.read().rgb` (a torch tensor, one image per environment).
+- **`spp`** (samples-per-pixel) and **`render_mode`** trade quality for speed; `FastPathTracer` is a good default for iteration.
+
+For advanced features (Gaussian splats, multi-camera setups, object picking, etc.) see the dedicated [Nyx Renderer](nyx_renderer.md) page and the [Nyx documentation site](https://genesis-embodied-ai.github.io/nyx-for-genesis/).
+
+```{note}
+**Roadmap.** We are working to unify rasterization and path tracing under Nyx as a single, sensor-based rendering interface. Nyx will gradually replace both the LuisaRender backend documented below and the default Pyrender-based rasterizer — over time, all camera-based rendering in Genesis will go through Nyx.
+```
+
+## Photo-realistic Rendering with Luisa (deprecating)
 
 Genesis provides a ray tracing rendering backend for photorealistic rendering. You can easily switch to using this backend by setting `renderer=gs.renderers.RayTracer()` when creating the scene. This camera allows more parameter adjustment, such as `spp`, `aperture`, `model`, etc.
 

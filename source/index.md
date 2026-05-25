@@ -88,6 +88,5 @@ If you used Genesis in your research, we would appreciate it if you could cite i
 
 user_guide/index
 api_reference/index
-roadmap/index
 
 ```
