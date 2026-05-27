@@ -1,4 +1,64 @@
-# 🧑‍💻 Interactive Inspection
+# 🧑‍💻 Interactive GUI & Debugging
+
+## ImGui Overlay Plugin
+
+The **`ImGuiOverlayPlugin`** adds a Dear ImGui overlay on top of the native pyrender viewer. It exposes interactive panels for:
+
+- Simulation controls (play / pause / step / reset).
+- An entity browser with per-DOF joint sliders, quaternion groups for free joints, and visualization-mode toggles (visual / collision / wireframe).
+- Camera position and lookat sliders, shadow / frame / frustum visibility toggles, and rasterizer render-flag overrides (normals overlay, wireframe overlay).
+- A scene-rebuild button that re-runs `scene.build()` with the current entity inventory - useful for iterating on URDFs / MJCFs without restarting the script.
+
+```python
+from genesis.ext.pyrender.overlay import ImGuiOverlayPlugin
+
+plugin = ImGuiOverlayPlugin()
+scene.viewer.add_plugin(plugin)
+```
+
+You can register your own panels alongside the built-in ones with `plugin.register_panel(callback)`. The callback receives the live ImGui module and can call any of its widgets:
+
+```python
+def custom_panel(imgui):
+    imgui.text("Custom Demo Panel")
+    if imgui.button("Trigger something"):
+        ...
+
+plugin.register_panel(custom_panel)
+```
+
+The full example script is at `examples/gui/imgui_joint_control.py`. It loads a Franka arm and a box, and demonstrates the entity browser, simulation controls, and a custom panel registered via `register_panel`.
+
+<video preload="auto" controls="True" width="100%">
+<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/viewer_plugin_imgui_overlay.mp4" type="video/mp4">
+</video>
+
+## Enabling the GUI panel in any example
+
+If you just want the panel on top of an existing example without writing any plugin boilerplate, set `enable_gui=True` on `ViewerOptions`. The viewer auto-attaches an `ImGuiOverlayPlugin` for you:
+
+```python
+scene = gs.Scene(
+    viewer_options=gs.options.ViewerOptions(
+        camera_pos=(0, -3.5, 2.5),
+        camera_lookat=(0.0, 0.0, 0.5),
+        camera_fov=40,
+        max_FPS=60,
+        enable_gui=True,
+    ),
+    show_viewer=True,
+)
+```
+
+A couple of things to know:
+
+- When `enable_gui=True`, the in-viewer help-text overlay (`[i]: show keyboard instructions`) and the default keyboard controls (camera arrow-key movement, etc.) are turned off automatically — the GUI panel replaces both, and ImGui's input capture would otherwise conflict with the default keybind plugin.
+- On a vanilla `gs.Scene`, the panel's scene-editing controls (Rebuild Scene, Add Entity, per-entity Remove) render in their disabled visual state with an explanatory tooltip — those features rely on `gs.InteractiveScene`'s `rebuild()` semantics. Construct your scene via `gs.InteractiveScene(...)` instead to enable them fully.
+- The panel requires the optional `imgui-bundle` dependency. Install it via the `render` extras: `pip install "genesis-world[render]"`. Genesis raises an actionable error pointing at this command if `enable_gui=True` is set without the dependency present.
+
+The full example script is at `examples/gui/control_with_gui.py` — it's the standard Franka PD-control demo with `enable_gui=True` set in `ViewerOptions`.
+
+## Interactive Inspection
 
 We designed a very informative (and good-looking, hopefully) interface for accessing internal information and all the available attributes of objects created in Genesis, implemented via the `__repr__()` method for all the Genesis classes. This feature will be very useful if you are used to debugging via either `IPython` or `pdb` or `ipdb`.
 
