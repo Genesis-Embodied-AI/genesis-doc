@@ -1,4 +1,4 @@
-# 🎯 Genesis Vision & Mission
+# 🎯 Genesis World Vision & Mission
 
 Simulation has played an crucial role in robotics research, providing a solid foundation for training robotic policies and generating data, leveraging the ever increasing power of computation. However, robotics researchers have long been limited by **usability issues** and **opaqueness** of available simulators. Existing GPU-accelerated simulators often come with steep learning curves due to intricate, **data-centric concepts**, **complex APIs**, and **complicated software stacks** - making mastering them a daunting task for researchers, especially for newcomers in the field. Furthermore, some simulators are closed-source, restricting transparency and limiting researchers' ability to understand, control, or iteratively improve the underlying physics solvers based on e.g. real-world observations and feedback.
 

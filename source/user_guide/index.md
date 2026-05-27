@@ -52,6 +52,7 @@ getting_started/emitters
 :maxdepth: 2
 
 getting_started/sensors/index
+getting_started/nyx_renderer
 getting_started/recorders
 ```
 

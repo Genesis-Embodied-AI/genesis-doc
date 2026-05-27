@@ -1,7 +1,6 @@
-# Genesis
+# Genesis World
 
-```{figure} _static/images/teaser.png
-```
+![Genesis World teaser](https://raw.githubusercontent.com/YilingQiao/Genesis/readme-assets/videos/HeroShot_Final.png)
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/Genesis-Embodied-AI/Genesis?style=plastic&logo=GitHub&logoSize=auto)](https://github.com/Genesis-Embodied-AI/Genesis)
 [![PyPI version](https://badge.fury.io/py/genesis-world.svg?icon=si%3Apython)](https://pypi.org/project/genesis-world/)
@@ -10,36 +9,30 @@
 <a href="https://drive.google.com/uc?export=view&id=1ZS9nnbQ-t1IwkzJlENBYqYIIOOZhXuBZ"><img src="https://img.shields.io/badge/WeChat-07C160?style=for-the-badge&logo=wechat&logoColor=white" height="20" style="display:inline"></a>
 
 
-## What is Genesis?
+## What is Genesis World?
 
-Genesis is a physics platform designed for general purpose *Robotics/Embodied AI/Physical AI* applications. It is simultaneously multiple things:
+**Genesis World** is a simulation platform for physical AI development. It combines a unified multi-physics engine, a photo-realistic renderer ([Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx)), and a cross-platform compiler ([Quadrants](https://github.com/Genesis-Embodied-AI/quadrants)) behind a Pythonic simulation interface. Genesis World is designed to scale from a single laptop kernel to datacenter-grade GPUs, while remaining easy to read, extend, and embed in research code.
 
-1. A **universal physics engine** re-built from the ground up, capable of simulating a wide range of materials and physical phenomena.
-2. A **lightweight**, **ultra-fast**, **pythonic**, and **user-friendly** robotics simulation platform.
-3. A powerful and fast **photo-realistic rendering system**.
-4. A **generative data engine** that transforms user-prompted natural language description into various modalities of data.
+It was previously named **Genesis** and started as an academic project in Dec 2024; its development is now officially supported by [Genesis AI](https://www.genesis.ai/). For more technical details, see our [blog post](https://www.genesis.ai/blog/the-role-of-simulation-in-scalable-robotics-genesis-world-10-and-the-path-forward).
 
-Powered by a universal physics engine re-designed and re-built from the ground up, Genesis integrates various physics solvers and their coupling into a unified framework. This core physics engine is further enhanced by a generative agent framework that operates at an upper level, aiming towards fully **automated data generation** for robotics and beyond.
-Currently, we are open-sourcing the underlying physics engine and the simulation platform. The generative framework will be released in the near future.
+Genesis World occupies four layers. Above sits whatever you build (robotics environments, ML pipelines, agentic simulation); below sits whatever compute backend you have.
 
-Genesis is built and will continuously evolve with the following ***long-term missions***:
-
-1. **Lowering the barrier** to using physics simulations and making robotics research accessible to everyone. (See our [commitment](https://genesis-world.readthedocs.io/en/latest/user_guide/overview/mission.html))
-2. **Unifying a wide spectrum of state-of-the-art physics solvers** into a single framework, allowing re-creating the whole physical world in a virtual realm with the highest possible physical, visual and sensory fidelity, using the most advanced simulation techniques.
-3. **Minimizing human effort** in collecting and generating data for robotics and other domains, letting the data flywheel spin on its own.
+- **Simulation Interface** — the user-facing API: asset parsing (URDF, MJCF, OBJ, GLB, USD, …), entity accessors, controllers, sensors, parallel and heterogeneous environments, and a built-in GUI.
+- **Physics** — a unified multi-physics engine integrating Rigid, FEM, MPM, Particle (PBD / SPH), [uipc](https://github.com/spiriMirror/libuipc), an explicit coupler, and SAP, all sharing one scene and one state.
+- **Render** — three rendering paths plug in as camera sensors: **[Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx)** (our in-house renderer designed for robotics), **Luisa** (DSL ray tracer), and **Pyrender** (rasterizer).
+- **Compiler** — **[Quadrants](https://github.com/Genesis-Embodied-AI/quadrants)** lowers Python kernel code to CUDA, AMD ROCm, Apple Metal, Vulkan, x86, and ARM64. It carries Genesis World's autodiff, GPU graphs, and fastcache machinery.
 
 ## Key Features
 
-Compared to prior simulation platforms, here we highlight several key features of Genesis:
+Compared to prior simulation platforms, here we highlight several key features of Genesis World:
 
-- 🐍 **100% Python**, both front-end interface and back-end physics engine, all natively developed in python.
+- 🐍 **Pythonic** and fully transparent. Genesis World is developed and fully open-source in Python, making code understanding and contribution way easier.
 - 👶 **Effortless installation** and **extremely simple** and **user-friendly** API design.
-- 🚀 **Parallelized simulation** with ***unprecedented speed***: Genesis is the **world's fastest physics engine**, delivering simulation speeds up to ***10~80x*** (yes, this is a bit sci-fi) faster than existing *GPU-accelerated* robotic simulators (Isaac Gym/Sim/Lab, Mujoco MJX, etc), ***without any compromise*** on simulation accuracy and fidelity.
+- 🚀 **Parallelized simulation** with ***unprecedented speed***: Genesis World is the **world's fastest physics engine**, delivering simulation speeds up to ***10~80x*** (yes, this is a bit sci-fi) faster than existing *GPU-accelerated* robotic simulators (Isaac Gym/Sim/Lab, Mujoco MJX, etc.), ***without any compromise*** on simulation accuracy and fidelity.
 - 💥 A **unified** framework that supports various state-of-the-art physics solvers, modeling **a vast range of materials** and physical phenomena.
-- 📸 Photo-realistic ray-tracing rendering with optimized performance.
-- 📐 **Differentiability**: Genesis is designed to be fully compatible with differentiable simulation. Currently, our MPM solver and Tool Solver are differentiable, and differentiability for other solvers will be added soon (starting with rigid-body simulation).
-- ☝🏻 Physically-accurate and differentiable **tactile sensor**.
-- 🌌 Native support for ***[Generative Simulation](https://arxiv.org/abs/2305.10455)***, allowing **language-prompted data generation** of various modalities: *interactive scenes*, *task proposals*, *rewards*, *assets*, *character motions*, *policies*, *trajectories*, *camera motions*, *(physically-accurate) videos*, and more.
+- 📸 Photo-realistic ray-tracing rendering via [Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx), with optimized performance for robotics applications.
+- 📐 **Differentiability**: Genesis World is designed to be fully compatible with differentiable simulation, with autodiff and backpropagation infrastructure provided by [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants).
+- ☝🏻 A **comprehensive sensor system** built into the simulation interface: physically-accurate and differentiable **tactile** sensors alongside **IMU**, **lidar**, **depth camera**, **contact force**, **surface distance**, and **temperature grid** sensors — all usable out of the box with parallel and heterogeneous environments.
 
 ## Getting Started
 
@@ -88,6 +81,5 @@ If you used Genesis in your research, we would appreciate it if you could cite i
 
 user_guide/index
 api_reference/index
-roadmap/index
 
 ```
