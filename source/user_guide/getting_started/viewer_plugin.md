@@ -58,6 +58,10 @@ They receive mouse and keyboard events, can draw debug geometry each frame, and 
 Add plugins with `scene.viewer.add_plugin(plugin)` *before* `scene.build()`.
 Example scripts are available under `examples/viewer_plugin/`.
 
+```{note}
+The **ImGui Overlay Plugin** (entity browser, joint sliders, sim controls, custom panels) is documented on the [Interactive GUI & Debugging](interactive_debugging.md) page.
+```
+
 
 ### Mouse Interaction Plugin
 

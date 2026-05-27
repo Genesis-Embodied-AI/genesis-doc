@@ -11,7 +11,7 @@
 
 ## What is Genesis World?
 
-**Genesis World** is a simulation platform for physical AI development. It combines a unified multi-physics engine, a photo-realistic renderer ([Nyx](https://github.com/Genesis-Embodied-AI/nyx-for-genesis)), and a cross-platform compiler ([Quadrants](https://github.com/Genesis-Embodied-AI/quadrants)) behind a Pythonic simulation interface. Genesis World is designed to scale from a single laptop kernel to datacenter-grade GPUs, while remaining easy to read, extend, and embed in research code.
+**Genesis World** is a simulation platform for physical AI development. It combines a unified multi-physics engine, a photo-realistic renderer ([Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx)), and a cross-platform compiler ([Quadrants](https://github.com/Genesis-Embodied-AI/quadrants)) behind a Pythonic simulation interface. Genesis World is designed to scale from a single laptop kernel to datacenter-grade GPUs, while remaining easy to read, extend, and embed in research code.
 
 It was previously named **Genesis** and started as an academic project in Dec 2024; its development is now officially supported by [Genesis AI](https://www.genesis.ai/). For more technical details, see our [blog post](https://www.genesis.ai/blog/the-role-of-simulation-in-scalable-robotics-genesis-world-10-and-the-path-forward).
 
@@ -19,7 +19,7 @@ Genesis World occupies four layers. Above sits whatever you build (robotics envi
 
 - **Simulation Interface** — the user-facing API: asset parsing (URDF, MJCF, OBJ, GLB, USD, …), entity accessors, controllers, sensors, parallel and heterogeneous environments, and a built-in GUI.
 - **Physics** — a unified multi-physics engine integrating Rigid, FEM, MPM, Particle (PBD / SPH), [uipc](https://github.com/spiriMirror/libuipc), an explicit coupler, and SAP, all sharing one scene and one state.
-- **Render** — three rendering paths plug in as camera sensors: **[Nyx](https://github.com/Genesis-Embodied-AI/nyx-for-genesis)** (our in-house renderer designed for robotics), **Luisa** (DSL ray tracer), and **Pyrender** (rasterizer).
+- **Render** — three rendering paths plug in as camera sensors: **[Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx)** (our in-house renderer designed for robotics), **Luisa** (DSL ray tracer), and **Pyrender** (rasterizer).
 - **Compiler** — **[Quadrants](https://github.com/Genesis-Embodied-AI/quadrants)** lowers Python kernel code to CUDA, AMD ROCm, Apple Metal, Vulkan, x86, and ARM64. It carries Genesis World's autodiff, GPU graphs, and fastcache machinery.
 
 ## Key Features
@@ -30,7 +30,7 @@ Compared to prior simulation platforms, here we highlight several key features o
 - 👶 **Effortless installation** and **extremely simple** and **user-friendly** API design.
 - 🚀 **Parallelized simulation** with ***unprecedented speed***: Genesis World is the **world's fastest physics engine**, delivering simulation speeds up to ***10~80x*** (yes, this is a bit sci-fi) faster than existing *GPU-accelerated* robotic simulators (Isaac Gym/Sim/Lab, Mujoco MJX, etc.), ***without any compromise*** on simulation accuracy and fidelity.
 - 💥 A **unified** framework that supports various state-of-the-art physics solvers, modeling **a vast range of materials** and physical phenomena.
-- 📸 Photo-realistic ray-tracing rendering via [Nyx](https://github.com/Genesis-Embodied-AI/nyx-for-genesis), with optimized performance for robotics applications.
+- 📸 Photo-realistic ray-tracing rendering via [Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx), with optimized performance for robotics applications.
 - 📐 **Differentiability**: Genesis World is designed to be fully compatible with differentiable simulation, with autodiff and backpropagation infrastructure provided by [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants).
 - ☝🏻 A **comprehensive sensor system** built into the simulation interface: physically-accurate and differentiable **tactile** sensors alongside **IMU**, **lidar**, **depth camera**, **contact force**, **surface distance**, and **temperature grid** sensors — all usable out of the box with parallel and heterogeneous environments.
 

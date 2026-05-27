@@ -6,7 +6,7 @@
 :width: 80%
 ```
 
-[Nyx](https://github.com/Genesis-Embodied-AI/nyx-for-genesis) is a GPU-accelerated path tracer built in-house for Genesis. It plugs into a scene as a **camera sensor** and produces photo-realistic frames suitable for robotics datasets, demos, and synthetic perception.
+[Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx) is a GPU-accelerated path tracer built in-house for Genesis. It plugs into a scene as a **camera sensor** and produces photo-realistic frames suitable for robotics datasets, demos, and synthetic perception.
 
 Highlights:
 
@@ -17,7 +17,7 @@ Highlights:
 - Per-pixel object picking
 - Exposed through the standard Genesis sensor interface (`scene.add_sensor(...)`)
 
-For installation and the minimal "hello Nyx" walkthrough, see [Photo-realistic Rendering with Nyx](visualization.md#photo-realistic-rendering-with-nyx) in the Visualization guide. For the full feature reference, options, and advanced recipes, see the **Nyx documentation**: <https://genesis-embodied-ai.github.io/nyx-for-genesis/>.
+For installation and the minimal "hello Nyx" walkthrough, see [Photo-realistic Rendering with Nyx](visualization.md#photo-realistic-rendering-with-nyx) in the Visualization guide. For the full feature reference, options, and advanced recipes, see the **Nyx documentation**: <https://genesis-embodied-ai.github.io/genesis-nyx/>.
 
 ## Example: rendering a Gaussian splat
 
@@ -29,7 +29,7 @@ Beyond standard meshes, Nyx can render captured **3D Gaussian splats** in the sa
 :width: 80%
 ```
 
-The snippet below is [`examples/05_gaussian_splat.py`](https://github.com/Genesis-Embodied-AI/nyx-for-genesis/blob/main/examples/05_gaussian_splat.py) from the Nyx repo. It renders a captured `plant.ply` splat on a `Plane` under the `green_sanctuary` HDRI.
+The snippet below is [`examples/05_gaussian_splat.py`](https://github.com/Genesis-Embodied-AI/genesis-nyx/blob/main/examples/05_gaussian_splat.py) from the Nyx repo. It renders a captured `plant.ply` splat on a `Plane` under the `green_sanctuary` HDRI.
 
 ```python
 import os
@@ -105,4 +105,4 @@ Things to notice:
 
 ## Where to go next
 
-More examples ship in the [Nyx examples folder](https://github.com/Genesis-Embodied-AI/nyx-for-genesis/tree/main/examples), covering attached cameras, materials, light types, object picking, and multi-camera / multi-environment rendering. For the full option reference and advanced features, head to the [Nyx documentation site](https://genesis-embodied-ai.github.io/nyx-for-genesis/).
+More examples ship in the [Nyx examples folder](https://github.com/Genesis-Embodied-AI/genesis-nyx/tree/main/examples), covering attached cameras, materials, light types, object picking, and multi-camera / multi-environment rendering. For the full option reference and advanced features, head to the [Nyx documentation site](https://genesis-embodied-ai.github.io/genesis-nyx/).
