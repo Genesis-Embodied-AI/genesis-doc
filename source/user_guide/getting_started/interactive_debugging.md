@@ -1,5 +1,15 @@
 # 🧑‍💻 Interactive GUI & Debugging
 
+:::{note}
+**Install the optional `imgui-bundle` dependency before using the GUI sections below.** The ImGui overlay panel ships behind Genesis's `render` extras — install with:
+
+```bash
+pip install "genesis-world[render]"
+```
+
+If you forget and set `enable_gui=True` (or call `ImGuiOverlayPlugin()` manually), Genesis raises an actionable error pointing you back at this command. Pre-built `imgui-bundle` wheels are not published for every Python / OS combination (e.g. Python 3.10, Linux aarch64); on those platforms install manually via `pip install imgui-bundle`, which builds from source and requires CMake.
+:::
+
 ## ImGui Overlay Plugin
 
 The **`ImGuiOverlayPlugin`** adds a Dear ImGui overlay on top of the native pyrender viewer. It exposes interactive panels for:
@@ -54,9 +64,8 @@ A couple of things to know:
 
 - When `enable_gui=True`, the in-viewer help-text overlay (`[i]: show keyboard instructions`) and the default keyboard controls (camera arrow-key movement, etc.) are turned off automatically — the GUI panel replaces both, and ImGui's input capture would otherwise conflict with the default keybind plugin.
 - On a vanilla `gs.Scene`, the panel's scene-editing controls (Rebuild Scene, Add Entity, per-entity Remove) render in their disabled visual state with an explanatory tooltip — those features rely on `gs.InteractiveScene`'s `rebuild()` semantics. Construct your scene via `gs.InteractiveScene(...)` instead to enable them fully.
-- The panel requires the optional `imgui-bundle` dependency. Install it via the `render` extras: `pip install "genesis-world[render]"`. Genesis raises an actionable error pointing at this command if `enable_gui=True` is set without the dependency present.
 
-The full example script is at `examples/gui/control_with_gui.py` — it's the standard Franka PD-control demo with `enable_gui=True` set in `ViewerOptions`.
+For a complete Franka PD-control example you can try this on, see `examples/rigid/control_franka.py` — add `enable_gui=True` to its `ViewerOptions` and run it to see the panel.
 
 ## Interactive Inspection
 
