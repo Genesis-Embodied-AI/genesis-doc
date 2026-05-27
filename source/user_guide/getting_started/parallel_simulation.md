@@ -56,7 +56,7 @@ for i in range(1000):
     scene.step()
 ```
 
-The above script is almost identical to the example you see in [Hello, Genesis](hello_genesis.md), except `scene.build()` is now appended with two extra parameters:
+The above script is almost identical to the example you see in [Hello, Genesis World](hello_genesis.md), except `scene.build()` is now appended with two extra parameters:
 - `n_envs`: this specifies how many batched environments you want to create
 - `env_spacing`: the spawned parallel envs share identical states. For visualization purpose, you can specify this parameter to ask the visualizer to distribute all the envs in a grid with a distance of (x, y) in meters between each env. Note that this only affects the visualization behavior, and doesn't change the actual position of the entities in each env.
 

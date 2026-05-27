@@ -22,12 +22,6 @@ Genesis World occupies four layers. Above sits whatever you build (robotics envi
 - **Render** — three rendering paths plug in as camera sensors: **[Nyx](https://github.com/Genesis-Embodied-AI/nyx-for-genesis)** (our in-house renderer designed for robotics), **Luisa** (DSL ray tracer), and **Pyrender** (rasterizer).
 - **Compiler** — **[Quadrants](https://github.com/Genesis-Embodied-AI/quadrants)** lowers Python kernel code to CUDA, AMD ROCm, Apple Metal, Vulkan, x86, and ARM64. It carries Genesis World's autodiff, GPU graphs, and fastcache machinery.
 
-Genesis World is built and will continuously evolve with the following ***long-term missions***:
-
-1. **Lowering the barrier** to using physics simulations and making robotics research accessible to everyone. (See our [commitment](https://genesis-world.readthedocs.io/en/latest/user_guide/overview/mission.html).)
-2. **Unifying a wide spectrum of state-of-the-art physics solvers** into a single framework, allowing re-creating the whole physical world in a virtual realm with the highest possible physical, visual, and sensory fidelity, using the most advanced simulation techniques.
-3. **Building a sensor-first simulation interface** so cameras, depth, IMU, lidar, tactile, contact, and other modalities live behind one consistent API across all rendering and physics backends.
-
 ## Key Features
 
 Compared to prior simulation platforms, here we highlight several key features of Genesis World:
