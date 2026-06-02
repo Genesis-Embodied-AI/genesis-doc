@@ -37,14 +37,14 @@ scene.build()
 for i in range(100):
     scene.step()
 
-    # Get raycast data (RaycasterData NamedTuple)
+    # Get raycast data (RaycasterReturnType NamedTuple)
     data = lidar.read()
     print(f"Min distance: {data.distances.min():.2f} m")
 ```
 
 ## Output Format
 
-`read()` returns a `RaycasterData` NamedTuple:
+`read()` returns a `RaycasterReturnType` NamedTuple:
 
 | Field | Type | Shape | Description |
 |-------|------|-------|-------------|

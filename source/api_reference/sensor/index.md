@@ -8,12 +8,12 @@ Available sensor types:
 
 | Sensor | Return Type | Fields | Shape |
 |--------|-------------|--------|-------|
-| **Camera** | `CameraData` | `rgb` (uint8) | `([n_envs,] h, w, 3)` |
+| **Camera** | `CameraReturnType` | `rgb` (uint8) | `([n_envs,] h, w, 3)` |
 | **ContactSensor** | `torch.Tensor` (bool) | - | `([n_envs,] 1)` |
 | **ContactForceSensor** | `torch.Tensor` (float32) | - | `([n_envs,] 3)` |
-| **IMUSensor** | `IMUData` | `lin_acc`, `ang_vel`, `mag` (float32) | `([n_envs,] 3)` each |
-| **RaycasterSensor** | `RaycasterData` | `points`, `distances` (float32) | `([n_envs,] *shape, 3)`, `([n_envs,] *shape)` |
-| **DepthCameraSensor** | `RaycasterData` | `points`, `distances` (float32) | `([n_envs,] h, w, 3)`, `([n_envs,] h, w)` |
+| **IMUSensor** | `IMUReturnType` | `lin_acc`, `ang_vel`, `mag` (float32) | `([n_envs,] 3)` each |
+| **RaycasterSensor** | `RaycasterReturnType` | `points`, `distances` (float32) | `([n_envs,] *shape, 3)`, `([n_envs,] *shape)` |
+| **DepthCameraSensor** | `RaycasterReturnType` | `points`, `distances` (float32) | `([n_envs,] h, w, 3)`, `([n_envs,] h, w)` |
 | **ProximitySensor** | `torch.Tensor` (float32) | - | `([n_envs,] n_probes)` |
 | **KinematicContactProbe** | `KinematicContactProbeData` | `penetration`, `force` (float32) | `([n_envs,] n_probes)`, `([n_envs,] n_probes, 3)` |
 | **ElastomerDisplacementSensor** | `torch.Tensor` (float32) | - | `([n_envs,] n_probes, 3)` |
