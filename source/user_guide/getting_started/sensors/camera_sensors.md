@@ -192,7 +192,7 @@ camera = scene.add_sensor(
 
 scene.build(n_envs=64)
 
-data = camera.read()  # CameraData(rgb=...)
+data = camera.read()  # CameraReturnType(rgb=...)
 ```
 
 ### Lighting

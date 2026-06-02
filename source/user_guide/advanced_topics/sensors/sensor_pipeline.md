@@ -159,9 +159,10 @@ The manager owns all storage. Conceptually there are four scopes:
 Per simulation step the manager:
 
 1. Rotates the per-dtype timeline ring pair and the per-class return-space ring pair, freeing the oldest slot for the new snapshot.
-2. For each sensor class, invokes `_update_shared_cache` once, passing the per-class slices of the intermediate cache and both timeline rings (GT + measured; `None` for classes that opted out). The hook produces the ground-truth signal in the GT intermediate cache and the measured snapshot (post-physics, post-transform, post-hardware-imperfections) in the per-step working buffer.
-3. Runs `_post_process` on both branches and writes the result to slot 0 of the per-class return-space ring pair. Skipped when no return-space ring is allocated (alias-view propagates the per-step write automatically).
-4. Reads slot 0 of the GT return ring into the GT return cache; per-sensor delay-samples the measured return ring into the measured return cache. For sensors with `delay = 0` and no jitter this is just slot-0 reads.
+2. Refreshes each shared context once (`SharedSensorContext.update`) before the per-class loop, so several sensor types reading the same context (e.g. `Raycaster` + `DepthCamera` sharing one collision BVH) rebuild it at most once per step rather than once each.
+3. For each sensor class, invokes `_update_shared_cache` once, passing the class's shared context (or `None`), the per-class slices of the intermediate cache, and both timeline rings (GT + measured; `None` for classes that opted out). The hook produces the ground-truth signal in the GT intermediate cache and the measured snapshot (post-physics, post-transform, post-hardware-imperfections) in the per-step working buffer.
+4. Runs `_post_process` on both branches and writes the result to slot 0 of the per-class return-space ring pair. Skipped when no return-space ring is allocated (alias-view propagates the per-step write automatically).
+5. Reads slot 0 of the GT return ring into the GT return cache; per-sensor delay-samples the measured return ring into the measured return cache. For sensors with `delay = 0` and no jitter this is just slot-0 reads.
 
 `read_sensors(envs_idx=...)` always returns a fresh tensor per class, independent of internal sensor storage. Non-history reads gather the current snapshot from the per-class return cache; history reads gather the last `N` snapshots from the appropriate return-space ring. The caller is free to mutate the result.
 

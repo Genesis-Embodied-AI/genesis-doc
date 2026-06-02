@@ -6,14 +6,15 @@ In almost every case, derive from `SimpleSensor` and override **only the hooks y
 
 ## What you write to add a sensor
 
-To add a new sensor you contribute four artifacts:
+To add a new sensor you contribute the following artifacts:
 
 | Artifact | Where | Role |
 |---|---|---|
 | `<Name>` (an options class) | `genesis/options/sensors/<name>.py` (or your plugin package) | Public, user-facing dataclass that carries every per-sensor parameter. Inherits `SimpleSensorOptions` (or the appropriate mixin). Generic-parameterized with the sensor class as a forward reference. |
 | `<Name>SharedMetadata` | next to the sensor implementation | Per-sensor-class runtime state shared across every instance of this sensor in the scene. Inherits `SimpleSensorMetadata` (or `SharedSensorMetadata` for non-Simple sensors). |
-| `<Name>Sensor` | next to the sensor implementation | The sensor class itself. Inherits `SimpleSensor[<Name>, <Name>SharedMetadata]` and overrides `_get_return_format` (instance, shape), `_get_cache_dtype` (classmethod, dtype), `_update_raw_data`, plus optionally `_update_current_timestep_data`, `_apply_physics_imperfections`, `_apply_transform`, `_apply_hardware_imperfections`, `_post_process` (paired with `_get_intermediate_format` and/or `_get_intermediate_dtype`). |
-| (optional) a `NamedTuple` data class | next to the sensor implementation | If your sensor returns multiple tensors (e.g. IMU returns `lin_acc`, `ang_vel`, `mag`), declare a NamedTuple and pass it as the third type parameter: `SimpleSensor[<Name>, <Name>SharedMetadata, <Name>Data]`. |
+| `<Name>Sensor` | next to the sensor implementation | The sensor class itself. Inherits `SimpleSensor[<Name>, None, <Name>SharedMetadata]` and overrides `_get_return_format` (instance, shape), `_get_cache_dtype` (classmethod, dtype), `_update_raw_data`, plus optionally `_update_current_timestep_data`, `_apply_physics_imperfections`, `_apply_transform`, `_apply_hardware_imperfections`, `_post_process` (paired with `_get_intermediate_format` and/or `_get_intermediate_dtype`). |
+| (optional) a `NamedTuple` return type | next to the sensor implementation | If your sensor returns multiple tensors (e.g. IMU returns `lin_acc`, `ang_vel`, `mag`), declare a NamedTuple and pass it as the fourth type parameter: `SimpleSensor[<Name>, None, <Name>SharedMetadata, <Name>ReturnType]`. |
+| (optional) a `SharedSensorContext` subclass | next to the sensor implementation | Only if this sensor type shares an expensive resource (e.g. a collision BVH) with *other* sensor types. Pass it as the second type parameter: `SimpleSensor[<Name>, <Name>Context, <Name>SharedMetadata, <Name>ReturnType]`. See [Shared context across sensor types](#shared-context-across-sensor-types) below. |
 
 Genesis pairs an options class with its sensor class automatically as soon as both modules have been imported - the user only ever creates the options instance and passes it to `scene.add_sensor(...)`.
 
@@ -30,7 +31,7 @@ That gives you two supported placements:
   my_sensor_plugin/
     __init__.py
     options.py     # class MyOptions(SimpleSensorOptions["MySensor"]): ...
-    sensor.py      # class MySensor(SimpleSensor[MyOptions, MyMetadata]): ...
+    sensor.py      # class MySensor(SimpleSensor[MyOptions, None, MyMetadata]): ...
   ```
 
   As long as your code imports `my_sensor_plugin.options` somewhere before constructing `MyOptions()`, Genesis will lazily import the sibling `my_sensor_plugin.sensor` module on the first call to `scene.add_sensor(MyOptions(...))` and the pairing resolves transparently.
@@ -39,10 +40,12 @@ That gives you two supported placements:
 
 | Base | When to use |
 |---|---|
-| `SimpleSensor[OptionsT, MetadataT]` | Almost always. Per-step pipeline (raw -> physics imperfections -> transform -> hardware imperfections -> post-process -> delay sampling). |
-| `SimpleSensor[OptionsT, MetadataT, DataT]` | Same as above, but `read()` returns an instance of `DataT` (a `NamedTuple`) instead of a single tensor. IMU is the canonical example. |
+| `SimpleSensor[OptionsT, None, MetadataT]` | Almost always. Per-step pipeline (raw -> physics imperfections -> transform -> hardware imperfections -> post-process -> delay sampling). |
+| `SimpleSensor[OptionsT, None, MetadataT, DataT]` | Same as above, but `read()` returns an instance of `DataT` (a `NamedTuple`) instead of a single tensor. IMU is the canonical example. |
 | `BaseCameraSensor[OptionsT]` | Camera-style sensors that render an RGB image lazily on `read()` (rasterizer, ray tracer, batched renderer, custom renderer). Inherits the lazy-render lifecycle, link-attachment with `pos/lookat/up`, and the `_post_process`/`_get_*` plumbing from `Sensor`. See [Camera-style sensors via BaseCameraSensor](#camera-style-sensors-via-basecamerasensor) below. |
-| `Sensor[OptionsT, MetadataT]` | Only when neither standard pipeline applies. Overriding at this level means implementing `_update_shared_cache` yourself, and (if your implementation does not use the timeline rings) setting the class attribute `uses_ring_pipeline = False` to skip ring allocation. Also the right choice when you want **full kernel control** and need a single kernel pass to write both the ground-truth slice and the measured-timeline slot with internal noise (see [Kernel-internal physics noise](#kernel-internal-physics-noise) below). |
+| `Sensor[OptionsT, None, MetadataT]` | Only when neither standard pipeline applies. Overriding at this level means implementing `_update_shared_cache` yourself, and (if your implementation does not use the timeline rings) setting the class attribute `uses_ring_pipeline = False` to skip ring allocation. Also the right choice when you want **full kernel control** and need a single kernel pass to write both the ground-truth slice and the measured-timeline slot with internal noise (see [Kernel-internal physics noise](#kernel-internal-physics-noise) below). |
+
+The **second** type parameter, `Sensor[OptionsT, ContextT, MetadataT, DataT]`, is the shared context (declare it `None` when the sensor has none): it lets several *different* sensor types share one resource (e.g. a collision BVH) through a `SharedSensorContext` subclass. See [Shared context across sensor types](#shared-context-across-sensor-types) for the full how-to.
 
 For mixins, the convention is:
 
@@ -52,7 +55,7 @@ For mixins, the convention is:
 
 ## The hooks of `SimpleSensor`
 
-All hooks are `@classmethod`s. They receive `shared_metadata` (the per-sensor-class state container) and the buffers they must populate. Hooks are called once per simulation step for the whole class at once - never per sensor instance, never per environment.
+All hooks are `@classmethod`s. They receive `shared_metadata` (the per-sensor-class state container) and the buffers they must populate; the three data-producing hooks (`_update_raw_data`, `_update_current_timestep_data`, and - for `Sensor`-direct subclasses - `_update_shared_cache`) additionally receive a leading `shared_context` (the cross-type shared resource, or `None` when the type declares no context). Hooks are called once per simulation step for the whole class at once - never per sensor instance, never per environment.
 
 ### Required overrides
 
@@ -82,13 +85,13 @@ def _get_cache_dtype(cls) -> torch.dtype:
 
 The split between an instance method for shape and a classmethod for dtype is deliberate: it lets the manager resolve the per-class dtype without instantiating any sensor, while still allowing the per-instance shape to depend on options.
 
-#### `_update_raw_data(cls, shared_metadata, raw_data_T)`
+#### `_update_raw_data(cls, shared_context, shared_metadata, raw_data_T)`
 
-The sensor-specific kernel that computes the **ground-truth** value of every sensor of this class for the current timestep. The output buffer `raw_data_T` has shape `(cols, B)` - **column-major**, batch dimension last - to be C-contiguous for per-class row slices when other sensors write to the same intermediate cache. Always populate the buffer in place.
+The sensor-specific kernel that computes the **ground-truth** value of every sensor of this class for the current timestep. `shared_context` is the cross-type shared resource (or `None`); most sensors ignore it. The output buffer `raw_data_T` has shape `(cols, B)` - **column-major**, batch dimension last - to be C-contiguous for per-class row slices when other sensors write to the same intermediate cache. Always populate the buffer in place.
 
 ```python
 @classmethod
-def _update_raw_data(cls, shared_metadata, raw_data_T):
+def _update_raw_data(cls, shared_context, shared_metadata, raw_data_T):
     pos = shared_metadata.solver.get_links_pos(shared_metadata.links_idx)   # (B, N, 3)
     raw_data_T.copy_(pos.reshape(pos.shape[0], -1).T)                       # (3*N, B)
 ```
@@ -191,7 +194,7 @@ def _apply_hardware_imperfections(cls, shared_metadata, measured_slot_0):
     measured_slot_0 += torch.normal(0.0, shared_metadata.signal_noise_coeff) * measured_slot_0.abs()
 ```
 
-#### `_update_current_timestep_data(cls, shared_metadata, current_ground_truth_data_T, ground_truth_data_timeline, measured_data_timeline)`
+#### `_update_current_timestep_data(cls, shared_context, shared_metadata, current_ground_truth_data_T, ground_truth_data_timeline, measured_data_timeline)`
 
 Default behavior: call `_update_raw_data` to produce the ground-truth value into the contiguous `(cols, B)` kernel target `current_ground_truth_data_T`, mirror it into the GT ring's slot 0 and the measured ring's slot 0, then call `_apply_physics_imperfections` in place on the measured slot. Override this method to fuse `_update_raw_data` and `_apply_physics_imperfections` in a single kernel pass: write the raw GT to `current_ground_truth_data_T` and to the GT ring slot, and write the noised value directly to the measured ring slot. The rest of the pipeline (`_apply_transform`, hardware imperfections, `_post_process`, delay sampling) still runs unchanged on top. See [Kernel-internal physics noise](#kernel-internal-physics-noise) below.
 
@@ -202,7 +205,7 @@ Class-level capability flag declaring whether the class participates in the ring
 Set it on the class itself, not on the instance - the manager reads it once at scene-build time to decide ring allocation per sensor class. Changing it after build has no effect because allocation is already done.
 
 ```python
-class MyCustomSensor(Sensor[MyOptions, MyMetadata]):
+class MyCustomSensor(Sensor[MyOptions, None, MyMetadata]):
     uses_ring_pipeline: ClassVar[bool] = False  # only if you implement `_update_shared_cache` from scratch
 ```
 
@@ -215,7 +218,7 @@ Some sensors have noise that is **intrinsic to the physics computation** - a sin
 Two supported routes:
 
 1. **Override `_update_current_timestep_data` on `SimpleSensor`.** Your kernel writes `current_ground_truth_data_T` (the contiguous `(cols, B)` GT slice) **and** `measured_data_timeline.at(0, copy=False)` (the measured slot 0, `(B, cols)`) in one pass, and (when allocated) `ground_truth_data_timeline.at(0, copy=False)` (the GT slot 0). Because `_apply_physics_imperfections` is packed inside this hook, your override naturally fuses raw + physical-response noise. The rest of the SimpleSensor pipeline (`_apply_transform` on both branches, delay sampling, `_apply_hardware_imperfections`, eager `_post_process`) still runs on top. Recommended when you also want any of the standard pipeline pieces (imperfection parameters, delay/jitter, `_post_process` projection).
-2. **Derive from `Sensor` directly and override `_update_shared_cache`.** Skips the SimpleSensor chain entirely. The override receives `(metadata, gt_T, gt_timeline, measured_timeline, intermediate_cache)` and is responsible for populating them. The manager handles `_post_process` projection, return-space ring writes, and delay sampling after the hook returns. Use this when the sensor needs a fundamentally non-standard pipeline (e.g. cameras and renderers).
+2. **Derive from `Sensor` directly and override `_update_shared_cache`.** Skips the SimpleSensor chain entirely. The override receives `(shared_context, metadata, gt_T, gt_timeline, measured_timeline, intermediate_cache)` and is responsible for populating them. The manager handles `_post_process` projection, return-space ring writes, and delay sampling after the hook returns. Use this when the sensor needs a fundamentally non-standard pipeline (e.g. cameras and renderers).
 
 ## Camera-style sensors via `BaseCameraSensor`
 
@@ -225,7 +228,7 @@ Two supported routes:
 
 - Lazy render-on-read with per-step caching: multiple `read()` calls in the same simulation step share a single render. No need to implement `_update_shared_cache`.
 - Link attachment with `pos`/`lookat`/`up` (or an explicit `offset_T`): the camera follows a `RigidLink` each frame and hands you the world-space transform to apply to your renderer.
-- An RGB output of shape `((h, w, 3),)` and dtype `torch.uint8` declared from `options.res`, plus a `read(envs_idx=...) -> CameraData` returning a `NamedTuple(rgb=...)` (with the leading batch dim dropped when `n_envs == 0`).
+- An RGB output of shape `((h, w, 3),)` and dtype `torch.uint8` declared from `options.res`, plus a `read(envs_idx=...) -> CameraReturnType` returning a `NamedTuple(rgb=...)` (with the leading batch dim dropped when `n_envs == 0`).
 - The class is opted out of the ring pipeline (`uses_ring_pipeline = False`), and `__init__` rejects `delay > 0`, `jitter > 0`, and `history_length > 0` so users cannot silently request features that this sensor type cannot honor.
 
 **What you must implement**
@@ -277,17 +280,59 @@ class MySharedMetadata(RigidSensorMetadataMixin, SimpleSensorMetadata):
 
 In your sensor's `build()`, append the per-sensor entries with `concat_with_tensor`. The manager calls `build()` once per sensor instance at scene-build time.
 
+## Shared context across sensor types
+
+`<Name>SharedMetadata` and a `SharedSensorContext` are both manager-held shared state, but they exist for two different optimizations and should not be conflated. They differ on two axes:
+
+- **Scope.** Metadata is *per-type* (shared by every instance of one sensor class); a context is *cross-type* (shared by several sensor classes).
+- **Structure and purpose.** Metadata is an *aggregation that grows with the number of sensors*: it concatenates per-sensor rows (probe positions, per-sensor strides, cache offsets, ...) so a single kernel can run over every sensor of the type at once - it removes per-sensor Python/launch overhead via **batching**. A context is a *singleton resource, O(1) in the number of sensors*: one collision BVH for the simulator, read by many sensors - it removes redundant work and memory via **sharing**. One is "stack N sensors' data so we can vectorize"; the other is "build one thing once and let everyone read it".
+
+The canonical context is the collision BVH that both `RaycasterSensor` and `DepthCameraSensor` cast against: building it once and letting both read it avoids rebuilding identical trees per type. Put such a resource in a `SharedSensorContext` subclass instead of duplicating it in each type's metadata. The manager creates **one** instance per context class, hands the same instance to every sensor type that declares it, and drives its whole lifecycle. A context is purely an optimization: results must be identical whether or not it is shared, so cross-sensor consistency stays the manager's responsibility, never the context's.
+
+Subclass `SharedSensorContext` and override the lifecycle hooks you need (all default to no-ops):
+
+```python
+from genesis.engine.sensors.base_sensor import SharedSensorContext
+
+class MyBVHContext(SharedSensorContext):
+    def __init__(self):
+        self.bvh = None
+
+    def build(self, sim):          # once, after the scene geometry exists (before any sensor build())
+        self.bvh = build_bvh(sim)
+
+    def update(self):              # once per step, before any consuming sensor reads it
+        self.bvh.refresh()
+
+    def reset(self, envs_idx):     # on scene.reset()
+        self.bvh.flag_rebuild()
+
+    def destroy(self):             # on teardown
+        self.bvh = None
+```
+
+Declare it as the **second** `Sensor[...]` type parameter, then read it in the data-producing hooks via the leading `shared_context` argument:
+
+```python
+class MySensor(SimpleSensor[MyOptions, MyBVHContext, MySharedMetadata, tuple]):
+    @classmethod
+    def _update_raw_data(cls, shared_context, shared_metadata, raw_data_T):
+        raw_data_T.copy_(query(shared_context.bvh, ...))
+```
+
+Two sensor types that declare the **same** context class share one instance - so `RaycasterSensor` and `DepthCameraSensor`, which both declare `RaycastContext`, build the BVH once rather than once each. A sensor type that declares `None` receives `shared_context=None`. The manager refreshes every context once per step *before* the per-type update loop, so a context read inside `_update_raw_data` is already up to date for the current step.
+
 ## Returning a NamedTuple instead of a tensor
 
 For multi-tensor returns (IMU style), define a `NamedTuple` and parameterize the sensor class:
 
 ```python
-class IMUData(NamedTuple):
+class IMUReturnType(NamedTuple):
     lin_acc: torch.Tensor
     ang_vel: torch.Tensor
     mag: torch.Tensor
 
-class IMUSensor(SimpleSensor[IMU, IMUSharedMetadata, IMUData]):
+class IMUSensor(SimpleSensor[IMU, None, IMUSharedMetadata, IMUReturnType]):
     def _get_return_format(self) -> tuple[tuple[int, ...], ...]:
         # Shapes must match the NamedTuple field order.
         return ((3,), (3,), (3,))
@@ -338,7 +383,7 @@ class MyProximityMetadata(RigidSensorMetadataMixin, SimpleSensorMetadata):
 
 class MyProximitySensor(
     RigidSensorMixin[MyProximityMetadata],
-    SimpleSensor[MyProximity, MyProximityMetadata],
+    SimpleSensor[MyProximity, None, MyProximityMetadata],
 ):
     def build(self):
         super().build()
@@ -356,7 +401,7 @@ class MyProximitySensor(
         return gs.tc_float
 
     @classmethod
-    def _update_raw_data(cls, shared_metadata, raw_data_T):
+    def _update_raw_data(cls, shared_context, shared_metadata, raw_data_T):
         pos = shared_metadata.solver.get_links_pos(shared_metadata.links_idx)   # (B, N, 3)
         dist = pos.norm(dim=-1).clamp(max=shared_metadata.max_range)            # (B, N)
         raw_data_T.copy_(dist.T)                                                # (N, B)

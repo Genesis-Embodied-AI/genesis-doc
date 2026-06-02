@@ -35,7 +35,7 @@ scene.build()
 for i in range(1000):
     scene.step()
 
-    # Get IMU readings (IMUData NamedTuple)
+    # Get IMU readings (IMUReturnType NamedTuple)
     data = imu.read()
     accel = data.lin_acc  # ([n_envs,] 3) acceleration in m/s^2
     gyro = data.ang_vel   # ([n_envs,] 3) angular velocity in rad/s
@@ -83,7 +83,7 @@ gs.sensors.IMU(
 
 ## Output Format
 
-`read()` and `read_ground_truth()` both return an `IMUData` NamedTuple:
+`read()` and `read_ground_truth()` both return an `IMUReturnType` NamedTuple:
 
 | Field | Type | Shape | Description |
 |-------|------|-------|-------------|
