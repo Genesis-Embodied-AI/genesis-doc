@@ -287,40 +287,58 @@ In your sensor's `build()`, append the per-sensor entries with `concat_with_tens
 - **Scope.** Metadata is *per-type* (shared by every instance of one sensor class); a context is *cross-type* (shared by several sensor classes).
 - **Structure and purpose.** Metadata is an *aggregation that grows with the number of sensors*: it concatenates per-sensor rows (probe positions, per-sensor strides, cache offsets, ...) so a single kernel can run over every sensor of the type at once - it removes per-sensor Python/launch overhead via **batching**. A context is a *singleton resource, O(1) in the number of sensors*: one collision BVH for the simulator, read by many sensors - it removes redundant work and memory via **sharing**. One is "stack N sensors' data so we can vectorize"; the other is "build one thing once and let everyone read it".
 
-The canonical context is the collision BVH that both `RaycasterSensor` and `DepthCameraSensor` cast against: building it once and letting both read it avoids rebuilding identical trees per type. Put such a resource in a `SharedSensorContext` subclass instead of duplicating it in each type's metadata. The manager creates **one** instance per context class, hands the same instance to every sensor type that declares it, and drives its whole lifecycle. A context is purely an optimization: results must be identical whether or not it is shared, so cross-sensor consistency stays the manager's responsibility, never the context's.
+The canonical context is the collision BVH that both `RaycasterSensor` and `DepthCameraSensor` cast against: building it once and letting both read it avoids rebuilding identical trees per type. Put such a resource in a `SharedSensorContext` subclass instead of duplicating it in each type's metadata. The manager creates **one** instance per context class - constructed with the sim as soon as a sensor that declares it is added, since the instance must exist to be handed to consuming sensors - and gives that same instance to every declaring type. It stays an empty shell until a consumer activates it, then the manager drives its per-step lifecycle (`update` / `reset` / `destroy`). A context is purely an optimization: results must be identical whether or not it is shared, so cross-sensor consistency stays the manager's responsibility, never the context's.
 
-Subclass `SharedSensorContext` and override the lifecycle hooks you need (all default to no-ops):
+`SharedSensorContext` is an abstract base built around `activate` / `is_active`; a subclass must implement every lifecycle method. A consuming sensor calls `activate()` from its own `build()`: the first call constructs the resource on the spot (the scene geometry is available by then) and is idempotent. `update` / `reset` must no-op while the context is inactive, and reading the resource before activation must raise - only a consumer that activated it may read it:
 
 ```python
 from genesis.engine.sensors.base_sensor import SharedSensorContext
 
 class MyBVHContext(SharedSensorContext):
-    def __init__(self):
-        self.bvh = None
+    def __init__(self, sim):
+        super().__init__(sim)          # stores the sim, marks the context inactive
+        self._bvh = None
 
-    def build(self, sim):          # once, after the scene geometry exists (before any sensor build())
-        self.bvh = build_bvh(sim)
+    @property
+    def bvh(self):                     # reading before activation must raise
+        if not self.is_active:
+            raise gs.GenesisException("MyBVHContext queried before activation.")
+        return self._bvh
 
-    def update(self):              # once per step, before any consuming sensor reads it
-        self.bvh.refresh()
+    def activate(self):                # idempotent; the first consumer's build() triggers the construction
+        if self.is_active:
+            return
+        self._active = True
+        self._bvh = build_bvh(self._sim)
 
-    def reset(self, envs_idx):     # on scene.reset()
-        self.bvh.flag_rebuild()
+    def update(self):                  # once per step, before any consuming sensor reads it
+        if not self.is_active:
+            return
+        self._bvh.refresh()
 
-    def destroy(self):             # on teardown
-        self.bvh = None
+    def reset(self, envs_idx):         # on scene.reset()
+        if not self.is_active:
+            return
+        self._bvh.flag_rebuild()
+
+    def destroy(self):                 # on teardown
+        self._bvh = None
 ```
 
-Declare it as the **second** `Sensor[...]` type parameter, then read it in the data-producing hooks via the leading `shared_context` argument:
+Declare it as the **second** `Sensor[...]` type parameter. The consuming sensor activates it from its `build()`, then reads it in the data-producing hooks via the leading `shared_context` argument:
 
 ```python
 class MySensor(SimpleSensor[MyOptions, MyBVHContext, MySharedMetadata, tuple]):
+    def build(self):
+        super().build()
+        self._shared_context.activate()    # idempotent; the first consumer builds the resource
+
     @classmethod
     def _update_raw_data(cls, shared_context, shared_metadata, raw_data_T):
         raw_data_T.copy_(query(shared_context.bvh, ...))
 ```
 
-Two sensor types that declare the **same** context class share one instance - so `RaycasterSensor` and `DepthCameraSensor`, which both declare `RaycastContext`, build the BVH once rather than once each. A sensor type that declares `None` receives `shared_context=None`. The manager refreshes every context once per step *before* the per-type update loop, so a context read inside `_update_raw_data` is already up to date for the current step.
+Two sensor types that declare the **same** context class share one instance - so `RaycasterSensor` and `DepthCameraSensor`, which both declare `RaycastContext`, activate and build the BVH once rather than once each. Because activation is consumer-driven, a type that needs the context only in one option mode activates it only then, so a scene that never needs it pays nothing. A sensor type that declares `None` receives `shared_context=None`. The manager refreshes every active context once per step *before* the per-type update loop, so a context read inside `_update_raw_data` is already up to date for the current step.
 
 ## Returning a NamedTuple instead of a tensor
 

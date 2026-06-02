@@ -159,7 +159,7 @@ The manager owns all storage. Conceptually there are four scopes:
 Per simulation step the manager:
 
 1. Rotates the per-dtype timeline ring pair and the per-class return-space ring pair, freeing the oldest slot for the new snapshot.
-2. Refreshes each shared context once (`SharedSensorContext.update`) before the per-class loop, so several sensor types reading the same context (e.g. `Raycaster` + `DepthCamera` sharing one collision BVH) rebuild it at most once per step rather than once each.
+2. Refreshes each active shared context once (`SharedSensorContext.update`) before the per-class loop, so several sensor types reading the same context (e.g. `Raycaster` + `DepthCamera` sharing one collision BVH) rebuild it at most once per step rather than once each. A context that no sensor has activated remains inactive and is not refreshed.
 3. For each sensor class, invokes `_update_shared_cache` once, passing the class's shared context (or `None`), the per-class slices of the intermediate cache, and both timeline rings (GT + measured; `None` for classes that opted out). The hook produces the ground-truth signal in the GT intermediate cache and the measured snapshot (post-physics, post-transform, post-hardware-imperfections) in the per-step working buffer.
 4. Runs `_post_process` on both branches and writes the result to slot 0 of the per-class return-space ring pair. Skipped when no return-space ring is allocated (alias-view propagates the per-step write automatically).
 5. Reads slot 0 of the GT return ring into the GT return cache; per-sensor delay-samples the measured return ring into the measured return cache. For sensors with `delay = 0` and no jitter this is just slot-0 reads.
