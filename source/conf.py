@@ -55,7 +55,7 @@ templates_path = ["_templates"]
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "pydata_sphinx_theme"
-html_logo = "_static/bigger_text.png"
+html_logo = "_static/logo.svg"
 html_favicon = "_static/option2_shadow_1.svg"
 
 json_url = "_static/version_switcher.json"
@@ -66,7 +66,7 @@ html_theme_options = {
     "show_nav_level": 1,
     "use_edit_page_button": True,
     "logo": {
-        "image_dark": "_static/bigger_text_white.png",
+        "image_dark": "_static/logo_dark.svg",
     },
     "icon_links": [
         {
