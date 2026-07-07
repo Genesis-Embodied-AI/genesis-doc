@@ -1,6 +1,6 @@
 # 🖥️ Multi-GPU Simulation
 
-Genesis supports multi-GPU execution for scaling simulations.
+Genesis World supports multi-GPU execution for scaling simulations.
 
 ## Single GPU Configuration
 

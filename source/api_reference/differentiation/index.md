@@ -1,6 +1,6 @@
 # Differentiable Simulation
 
-Genesis supports end-to-end differentiable physics simulation, enabling gradient-based optimization through the physics engine.
+Genesis World supports end-to-end differentiable physics simulation, enabling gradient-based optimization through the physics engine.
 
 ## Overview
 
@@ -64,12 +64,12 @@ scene = gs.Scene(
 )
 ```
 
-### Genesis Tensors
+### Genesis World Tensors
 
-Genesis uses custom tensors that extend PyTorch tensors:
+Genesis World uses custom tensors that extend PyTorch tensors:
 
 ```python
-# State outputs are genesis tensors
+# State outputs are Genesis World tensors
 pos = robot.get_pos()  # genesis.grad.Tensor
 
 # Supports standard PyTorch operations
@@ -158,5 +158,5 @@ for epoch in range(100):
 
 ## See Also
 
-- {doc}`tensor` - Genesis tensor class
+- {doc}`tensor` - Genesis World tensor class
 - {doc}`/api_reference/engine/states/index` - State management

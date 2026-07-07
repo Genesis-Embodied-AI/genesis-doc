@@ -119,7 +119,7 @@ creature = scene.add_entity(
 )
 ```
 
-Genesis automatically:
+Genesis World automatically:
 1. Extracts skeleton from mesh via skeletonization
 2. Creates rigid body from skeleton
 3. Maps soft particles to skeleton links

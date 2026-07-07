@@ -1,10 +1,10 @@
 # Lights
 
-Genesis supports various light sources for illuminating scenes during rendering. Light configuration affects both the interactive viewer and rendered images from cameras.
+Genesis World supports various light sources for illuminating scenes during rendering. Light configuration affects both the interactive viewer and rendered images from cameras.
 
 ## Overview
 
-Lighting in Genesis is configured through visualization options and can include:
+Lighting in Genesis World is configured through visualization options and can include:
 
 - **Directional lights**: Parallel rays simulating distant light sources (sun)
 - **Point lights**: Omnidirectional lights at specific positions

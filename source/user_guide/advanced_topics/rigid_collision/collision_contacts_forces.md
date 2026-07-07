@@ -1,6 +1,6 @@
 # 💥 Rigid Collision Detection
 
-Genesis provides a highly-efficient, feature-rich collision detection and contact generation pipeline for rigid bodies.  The Python implementation lives in `genesis/engine/solvers/rigid/collider_decomp.py`.  This page gives a *conceptual* overview of the algorithmic building blocks so that you can understand, extend or debug the code.
+Genesis World provides a highly-efficient, feature-rich collision detection and contact generation pipeline for rigid bodies.  The Python implementation lives in `genesis/engine/solvers/rigid/collider_decomp.py`.  This page gives a *conceptual* overview of the algorithmic building blocks so that you can understand, extend or debug the code.
 
 > **Scope.**  The focus is on rigid–rigid interactions.  Soft-body / particle collisions rely on different solvers are in other files like `genesis/engine/coupler.py`.
 
@@ -77,14 +77,14 @@ GJK, along with EPA, is a widely used contact detection algorithm in many physic
 * Gives separation distance when the geometries are not in contact.
 * Verified numerical robustness in many implementations.
 
-In Genesis, it is enabled when `use_gjk_collision` option in `RigidOptions` is set to be `True`. Also, Genesis enhances
+In Genesis World, it is enabled when `use_gjk_collision` option in `RigidOptions` is set to be `True`. Also, Genesis World enhances
 the robustness of GJK with following measures.
 
 * Thorough degeneracy check on simplex and polytope during runtime.
 * Robust face normal estimation.
 * Robust lower and upper bound estimation on the penetration depth.
 
-Genesis accelerates support queries with a **pre-computed Support Field** (see {doc}`Support Field <support_field>`).
+Genesis World accelerates support queries with a **pre-computed Support Field** (see {doc}`Support Field <support_field>`).
 
 Multi-contact generation is enabled by *small pose perturbations* around the first contact normal.  At most five
 contacts (`_n_contacts_per_pair = 5`) are stored per pair.
@@ -95,9 +95,9 @@ MPR is another contact detection algorithm widely adopted in physics engines. Ev
 of GJK, it does not give separation distance when the geometries are not colliding, and could be susceptible to numerical
 errors and degeneracies as it is not verified as much as GJK in many implementations.
 
-In Genesis, MPR is improved with a signed-distance-field fall-back when there is a deep penetration.
+In Genesis World, MPR is improved with a signed-distance-field fall-back when there is a deep penetration.
 
-As GJK, Genesis accelerates support queries of MPR with a pre-computed Support Field, and detect multiple contacts with
+As GJK, Genesis World accelerates support queries of MPR with a pre-computed Support Field, and detect multiple contacts with
 small pose perturbations around the first contact normal. Thus, at most five contacts (`_n_contacts_per_pair = 5`) are stored per pair.
 
 ### 3.2&nbsp; Non-convex Objects

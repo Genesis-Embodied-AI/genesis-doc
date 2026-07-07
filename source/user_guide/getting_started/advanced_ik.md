@@ -1,6 +1,6 @@
 # 🧗 Advanced and Parallel IK
 
-The IK solver in Genesis has a lot of powerful features. In this example, we will show how you can configure your IK solver to accept more flexible target pose, and how you can solve for robots in a batched setting.
+The IK solver in Genesis World has a lot of powerful features. In this example, we will show how you can configure your IK solver to accept more flexible target pose, and how you can solve for robots in a batched setting.
 
 ### IK with multiple end-effector links
 
@@ -88,7 +88,7 @@ Here are a few new things we hope you could learn in this example:
 
 ### IK for parallel simulation
 
-Genesis allows you to solve IK even when you are in batched environments. Let's spawn 16 parallel envs and let each of the robot's end-effector rotation at a different angular speed:
+Genesis World allows you to solve IK even when you are in batched environments. Let's spawn 16 parallel envs and let each of the robot's end-effector rotation at a different angular speed:
 
 ```python
 import numpy as np

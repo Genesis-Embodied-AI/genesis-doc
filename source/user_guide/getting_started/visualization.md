@@ -1,10 +1,10 @@
 # 📸 Visualization & Rendering
 
-Genesis's visualization system is managed by the `visualizer` of the scene you just created (i.e. `scene.visualizer`). There are two ways for visualizing the scene: 1). using the interactive viewer that runs in a separate thread, and 2). by manually adding cameras to the scene and render images using the camera.
+Genesis World's visualization system is managed by the `visualizer` of the scene you just created (i.e. `scene.visualizer`). There are two ways for visualizing the scene: 1). using the interactive viewer that runs in a separate thread, and 2). by manually adding cameras to the scene and render images using the camera.
 
 
 ## Viewer
-If you are connected to a display, you can visualize the scene using the interactive viewer. Genesis uses different `options` groups to configure different components in the scene. To configure the viewer, you can change the parameters in `viewer_options` when creating the scene. In addition, we use `vis_options` to specify visualization-related properties, which will be shared by the viewer and cameras (that we will add very soon).
+If you are connected to a display, you can visualize the scene using the interactive viewer. Genesis World uses different `options` groups to configure different components in the scene. To configure the viewer, you can change the parameters in `viewer_options` when creating the scene. In addition, we use `vis_options` to specify visualization-related properties, which will be shared by the viewer and cameras (that we will add very soon).
 
 Create a scene with a more detailed viewer and vis setting (this looks a bit complex, but it's just for illustration purposes):
 ```python
@@ -28,7 +28,7 @@ scene = gs.Scene(
     show_viewer    = True,
 )
 ```
-Here we can specify the pose and fov of the viewer camera. The viewer will run as fast as possible if `max_FPS` is set to `None`. If `res` is set to None, genesis will automatically create a 4:3 window with the height set to half of your display height. Also note that in the above setting, we set to use rasterization backend for camera rendering. Genesis provides two rendering backends: `gs.renderers.Rasterizer()` and `gs.renderers.RayTracer()`. The viewer always uses the rasterizer. By default, camera also uses rasterizer.
+Here we can specify the pose and fov of the viewer camera. The viewer will run as fast as possible if `max_FPS` is set to `None`. If `res` is set to None, Genesis World will automatically create a 4:3 window with the height set to half of your display height. Also note that in the above setting, we set to use rasterization backend for camera rendering. Genesis World provides two rendering backends: `gs.renderers.Rasterizer()` and `gs.renderers.RayTracer()`. The viewer always uses the rasterizer. By default, camera also uses rasterizer.
 
 
 Once the scene is created, you can access the viewer object via `scene.visualizer.viewer`, or simply `scene.viewer` as a shortcut. You can query or set the viewer camera pose:
@@ -67,7 +67,7 @@ If you used `GUI=True` and have a display connected, you should be able to see 4
 
 **Record videos using camera**
 
-Now, let's only render rgb images, and move the camera around and record a video. Genesis provides a handy util for recording videos:
+Now, let's only render rgb images, and move the camera around and record a video. Genesis World provides a handy util for recording videos:
 ```python
 # start camera recording. Once this is started, all the rgb images rendered will be recorded internally
 cam.start_recording()
@@ -154,7 +154,7 @@ cam.stop_recording(save_to_filename='video.mp4', fps=60)
 ```
 ## Photo-realistic Rendering with Nyx
 
-[Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx) is a GPU-accelerated path tracer purpose-built for Genesis. Unlike the LuisaRender backend covered below, Nyx is wired in as a **camera sensor** rather than as a scene-wide renderer: you attach a `NyxCameraOptions` sensor to the scene and read frames back from `cam.read().rgb`. It supports PBR materials, HDRI lighting, 3D Gaussian splat assets, attached / multi-camera setups, multi-environment rendering, and per-pixel object picking.
+[Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx) is a GPU-accelerated path tracer purpose-built for Genesis World. Unlike the LuisaRender backend covered below, Nyx is wired in as a **camera sensor** rather than as a scene-wide renderer: you attach a `NyxCameraOptions` sensor to the scene and read frames back from `cam.read().rgb`. It supports PBR materials, HDRI lighting, 3D Gaussian splat assets, attached / multi-camera setups, multi-environment rendering, and per-pixel object picking.
 
 ### Installation
 
@@ -168,7 +168,7 @@ pip install gs-nyx
 `gs-nyx` is currently distributed through an internal package index while the project is being prepared for public release. Public installation instructions will be published at the [Nyx repository](https://github.com/Genesis-Embodied-AI/genesis-nyx) once the wheel is on PyPI.
 ```
 
-Verify the install by importing the plugin alongside Genesis:
+Verify the install by importing the plugin alongside Genesis World:
 
 ```python
 import genesis as gs
@@ -256,12 +256,12 @@ Key things to notice:
 For advanced features (Gaussian splats, multi-camera setups, object picking, etc.) see the dedicated [Nyx Renderer](nyx_renderer.md) page and the [Nyx documentation site](https://genesis-embodied-ai.github.io/genesis-nyx/).
 
 ```{note}
-**Roadmap.** We are working to unify rasterization and path tracing under Nyx as a single, sensor-based rendering interface. Nyx will gradually replace both the LuisaRender backend documented below and the default Pyrender-based rasterizer — over time, all camera-based rendering in Genesis will go through Nyx.
+**Roadmap.** We are working to unify rasterization and path tracing under Nyx as a single, sensor-based rendering interface. Nyx will gradually replace both the LuisaRender backend documented below and the default Pyrender-based rasterizer — over time, all camera-based rendering in Genesis World will go through Nyx.
 ```
 
 ## Photo-realistic Rendering with Luisa (deprecating)
 
-Genesis provides a ray tracing rendering backend for photorealistic rendering. You can easily switch to using this backend by setting `renderer=gs.renderers.RayTracer()` when creating the scene. This camera allows more parameter adjustment, such as `spp`, `aperture`, `model`, etc.
+Genesis World provides a ray tracing rendering backend for photorealistic rendering. You can easily switch to using this backend by setting `renderer=gs.renderers.RayTracer()` when creating the scene. This camera allows more parameter adjustment, such as `spp`, `aperture`, `model`, etc.
 
 ### Setup
 
@@ -327,10 +327,10 @@ You should be able to get
 
 ## Batch rendering with gs-madrona
 
-Genesis provides a high-throughput batch rendering backend via gs-madrona. You can easily switch to gs-madrona backend by setting `renderer=gs.renderers.BatchRenderer(use_rasterizer=True/False)`
+Genesis World provides a high-throughput batch rendering backend via gs-madrona. You can easily switch to gs-madrona backend by setting `renderer=gs.renderers.BatchRenderer(use_rasterizer=True/False)`
 
 ### Pre-requisite
-Please first install the latest version of Genesis to date following the [official README instructions](https://github.com/Genesis-Embodied-AI/Genesis#quick-installation).
+Please first install the latest version of Genesis World to date following the [official README instructions](https://github.com/Genesis-Embodied-AI/Genesis#quick-installation).
 
 ### Easy install (x86 only)
 Pre-compiled binary wheels for Python>=3.10 are available on PyPI. They can be installed using any Python package manager (e.g. `uv` or `pip`):
@@ -344,12 +344,12 @@ pip install .
 ```
 
 ### Testing (Optional)
-1. Clone Genesis Simulator repository if not already done
+1. Clone Genesis World repository if not already done
 ```sh
 git clone https://github.com/Genesis-Embodied-AI/Genesis.git
 ```
 
-2. Run the following example script provided with Genesis
+2. Run the following example script provided with Genesis World
 ```sh
 python Genesis/examples/rigid/single_franka_batch_render.py
 ```

@@ -1,10 +1,10 @@
 # Tensor Utilities
 
-Genesis provides utilities for converting between different array and tensor formats.
+Genesis World provides utilities for converting between different array and tensor formats.
 
 ## Overview
 
-Genesis uses:
+Genesis World uses:
 - **Quadrants fields**: For GPU-accelerated physics computation
 - **PyTorch tensors**: For state access and differentiability
 - **NumPy arrays**: For data export and visualization
@@ -42,7 +42,7 @@ import torch
 # Create tensor on correct device
 tensor = torch.zeros(10, device=gs.device, dtype=gs.tc_float)
 
-# Or use Genesis wrapper
+# Or use Genesis World wrapper
 tensor = gs.utils.to_gs_tensor([1.0, 2.0, 3.0])
 ```
 
@@ -89,7 +89,7 @@ some_positions = robot.get_qpos(envs_idx=[0, 5, 10])
 
 ## Data Types
 
-| Genesis | PyTorch | NumPy | Description |
+| Genesis World | PyTorch | NumPy | Description |
 |---------|---------|-------|-------------|
 | `gs.tc_float` | `torch.float32` | `np.float32` | Default float |
 | `gs.tc_int` | `torch.int32` | `np.int32` | Default int |

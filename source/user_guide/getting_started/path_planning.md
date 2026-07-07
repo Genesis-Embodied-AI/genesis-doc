@@ -1,6 +1,6 @@
 # 🗺️ Path Planning
 
-Genesis provides RRT-based motion planning for collision-free robot paths.
+Genesis World provides RRT-based motion planning for collision-free robot paths.
 
 ## Basic Usage
 

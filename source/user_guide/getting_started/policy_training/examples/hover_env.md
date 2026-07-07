@@ -1,10 +1,10 @@
 # 🪂 Training Drone Hovering Policies with RL
 
-Genesis supports parallel simulation, making it ideal for training reinforcement learning (RL) drone hovering policies efficiently. In this tutorial, we will walk you through a complete training example for obtaining a basic hovering policy that enables a drone to maintain a stable hover position by reaching randomly generated target points.
+Genesis World supports parallel simulation, making it ideal for training reinforcement learning (RL) drone hovering policies efficiently. In this tutorial, we will walk you through a complete training example for obtaining a basic hovering policy that enables a drone to maintain a stable hover position by reaching randomly generated target points.
 
-This is a simple and minimal example that demonstrates a very basic RL training pipeline in Genesis, and with the following example you will be able to obtain a drone hovering policy that's deployable to a real drone very quickly.
+This is a simple and minimal example that demonstrates a very basic RL training pipeline in Genesis World, and with the following example you will be able to obtain a drone hovering policy that's deployable to a real drone very quickly.
 
-**Note**: This is *NOT* a comprehensive drone hovering policy training pipeline. It uses simplified reward terms to get you started easily, and does not exploit Genesis's speed on big batch sizes, so it only serves basic demonstration purposes.
+**Note**: This is *NOT* a comprehensive drone hovering policy training pipeline. It uses simplified reward terms to get you started easily, and does not exploit Genesis World's speed on big batch sizes, so it only serves basic demonstration purposes.
 
 **Acknowledgement**: This tutorial is inspired by [Champion-level drone racing using deep reinforcement learning (Nature 2023)](https://www.nature.com/articles/s41586-023-06419-4.pdf).
 
@@ -57,7 +57,7 @@ These reward functions are combined to provide comprehensive feedback to the pol
 ## Training
 At this stage, we have defined the environments. To train the drone hovering policy using PPO, follow these steps:
 1. **Install Dependencies**.
-    First, ensure you have Genesis installed, then add all required Python dependencies using `pip`:
+    First, ensure you have Genesis World installed, then add all required Python dependencies using `pip`:
     ```bash
     pip install --upgrade pip
     pip install tensorboard "rsl-rl-lib>=5.0.0"
@@ -100,4 +100,4 @@ To evaluate the trained drone hovering policy, follow these steps:
 <source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/hover_env.mp4" type="video/mp4">
 </video>
 
-By following this tutorial, you'll be able to train and evaluate a basic drone hovering policy using Genesis. Have fun and enjoy!
+By following this tutorial, you'll be able to train and evaluate a basic drone hovering policy using Genesis World. Have fun and enjoy!

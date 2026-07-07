@@ -1,10 +1,10 @@
 # Geometry Utilities
 
-Genesis provides utility functions for geometric transformations and calculations.
+Genesis World provides utility functions for geometric transformations and calculations.
 
 ## Quaternion Operations
 
-Genesis uses `(w, x, y, z)` quaternion convention (scalar-first).
+Genesis World uses `(w, x, y, z)` quaternion convention (scalar-first).
 
 ```python
 import numpy as np

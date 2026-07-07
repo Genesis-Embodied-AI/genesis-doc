@@ -5,7 +5,7 @@
 ```{figure} ../../_static/images/overview.png
 ```
 
-<!-- From a user perspective, building an environment using Genesis is to add `Entity` in `Scene`, where `Entity` is specified by
+<!-- From a user perspective, building an environment using Genesis World is to add `Entity` in `Scene`, where `Entity` is specified by
 - `Morph`: the geometry of the entity, e.g., primitive shapes or URDF.
 - `Material`: the material of the entity, e.g., elastic object, liquid, sand, etc. Material is associated with the underlying solvers, e.g., there is MPM liquid and SPH liquid, those demonstrate different behaviors.
 - `Surface`: the texture, rendering surface parameters etc
@@ -14,7 +14,7 @@ Under the hood, the scene consists of a simulator that encapsulates,
 - `Solver`: the physics solver that handles the core physics engine with different methods like rigid, material point method (MPM), finite element method (FEM), etc.
 - `Coupler`: the bridge across solvers that handle forces and any interaction in between. -->
 
-From a user’s perspective, building an environment in Genesis involves adding `Entity` objects to a `Scene`. Each `Entity` is defined by:
+From a user’s perspective, building an environment in Genesis World involves adding `Entity` objects to a `Scene`. Each `Entity` is defined by:
 - `Morph`: the geometry of the entity, such as primitive shapes (e.g., cube, sphere) or articulated models (e.g., URDF, MJCF).
 - `Material`: the physical properties of the entity, such as elastic solids, liquids, or granular materials. The material type determines the underlying solver used-for example, both MPM and SPH can simulate liquids, but each exhibits different behaviors.
 - `Surface`: the visual and interaction-related surface properties, such as texture, roughness, or reflectivity.
@@ -48,7 +48,7 @@ This means we are create a huge "array" (called field in Quadrants) with each en
 ```
 
 We provide some concrete examples in the following for better understanding,
-- In MPM simulation, suppose `vel=torch.zeros((mpm_entity.n_particles, 3))` (which only considers all particles of __this__ entity), [`mpm_entity.set_velocity(vel)`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L296) automatically abstract out the offsetting for global indexing. Under the hood, Genesis is actually doing something conceptually like `mpm_solver.particles[start:end].vel = vel`, where `start` is the offset ([`mpm_entity.particle_start`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L453)) and `end` is the offset plus the number of particles ([`mpm_entity.particle_end`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L457)).
+- In MPM simulation, suppose `vel=torch.zeros((mpm_entity.n_particles, 3))` (which only considers all particles of __this__ entity), [`mpm_entity.set_velocity(vel)`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L296) automatically abstract out the offsetting for global indexing. Under the hood, Genesis World is actually doing something conceptually like `mpm_solver.particles[start:end].vel = vel`, where `start` is the offset ([`mpm_entity.particle_start`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L453)) and `end` is the offset plus the number of particles ([`mpm_entity.particle_end`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/particle_entity.py#L457)).
 - In rigid body simulation, all `*_idx_local` mean the local indexing, with which the users interact. They will be converted to the global indexing through `entity.*_start + *_idx_local`. Suppose we want to get the 3rd dof position by [`rigid_entity.get_dofs_position(dofs_idx_local=[2])`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/rigid_entity/rigid_entity.py#L2201), this is actually accessing `rigid_solver.dofs_state[2+offset].pos` where `offset` is [`rigid_entity.dofs_start`](https://github.com/Genesis-Embodied-AI/Genesis/blob/53b475f49c025906a359bc8aff1270a3c8a1d4a8/genesis/engine/entities/rigid_entity/rigid_entity.py#L2717).
 
 (An interesting read of a relevant design pattern called [entity component system (ECS)](https://en.wikipedia.org/wiki/Entity_component_system))

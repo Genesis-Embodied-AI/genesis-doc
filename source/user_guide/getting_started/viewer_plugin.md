@@ -1,6 +1,6 @@
 # ⌨️ Viewer Interaction
 
-The Genesis viewer supports mouse and keyboard interaction for camera controls, recording, visualization toggles, and more. 
+The Genesis World viewer supports mouse and keyboard interaction for camera controls, recording, visualization toggles, and more. 
 This functionality can easily be extended with custom keybindings and viewer plugins.
 
 

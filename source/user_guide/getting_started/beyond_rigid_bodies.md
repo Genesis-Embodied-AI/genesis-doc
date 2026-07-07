@@ -1,6 +1,6 @@
 # 🌊 Beyond Rigid Bodies
 
-Genesis unified multiple physics solvers and supports simulation beyond rigid body dynamics. A `solver` is essentially a set of physics simulation algorithms to handle a specific set of materials. In this tutorial, we will go through 3 popular solvers and use them to simulate entities with different physical properties:
+Genesis World unified multiple physics solvers and supports simulation beyond rigid body dynamics. A `solver` is essentially a set of physics simulation algorithms to handle a specific set of materials. In this tutorial, we will go through 3 popular solvers and use them to simulate entities with different physical properties:
 - [Smooth Particle Hydrodynamics (SPH) Solver](#sph)
 - [Material Point Method (MPM) Solver](#mpm)
 - [Position Based Dynamics (PBD) Solver](#pbd)

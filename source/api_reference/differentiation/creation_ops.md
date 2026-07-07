@@ -1,6 +1,6 @@
 # Creation Operations
 
-Functions for creating Genesis tensors that are compatible with differentiable simulation.
+Functions for creating Genesis World tensors that are compatible with differentiable simulation.
 
 ## Overview
 
@@ -51,17 +51,17 @@ rand = torch.rand(10, device=gs.device, dtype=gs.tc_float)
 randn = torch.randn(10, device=gs.device, dtype=gs.tc_float)
 ```
 
-## Converting to Genesis Tensors
+## Converting to Genesis World Tensors
 
-Standard PyTorch tensors become Genesis tensors when combined with scene state:
+Standard PyTorch tensors become Genesis World tensors when combined with scene state:
 
 ```python
 # Standard PyTorch tensor
 external = torch.tensor([1.0, 2.0, 3.0], device=gs.device, requires_grad=True)
 
-# Combine with scene state -> Genesis tensor
+# Combine with scene state -> Genesis World tensor
 pos = robot.get_pos()
-combined = pos + external  # Result is Genesis tensor
+combined = pos + external  # Result is Genesis World tensor
 ```
 
 ## API Reference
@@ -74,5 +74,5 @@ combined = pos + external  # Result is Genesis tensor
 
 ## See Also
 
-- {doc}`tensor` - Genesis Tensor class
+- {doc}`tensor` - Genesis World Tensor class
 - {doc}`index` - Differentiable simulation overview

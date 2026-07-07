@@ -2,7 +2,7 @@
 
 ## Running Performance Benchmarks
 
-* One may need to temporarily disable caching when doing profiling and/or benchmarking. The most straightforward solution would be to completely wip out the persistent local cache folder. This is not recommended because its effect will persist beyond the scope of your experiment, slowing down start up of all your future simulations until your cache is finally recovered. One should rather redirect Genesis (and Quadrants) to some alternative temporary cache folder. This can be done editing any Python code, by setting a few environment variables:
+* One may need to temporarily disable caching when doing profiling and/or benchmarking. The most straightforward solution would be to completely wip out the persistent local cache folder. This is not recommended because its effect will persist beyond the scope of your experiment, slowing down start up of all your future simulations until your cache is finally recovered. One should rather redirect Genesis World (and Quadrants) to some alternative temporary cache folder. This can be done editing any Python code, by setting a few environment variables:
 ```bash
 XDG_CACHE_HOME="$(mktemp -d)" GS_CACHE_FILE_PATH="$XDG_CACHE_HOME/genesis" QD_OFFLINE_CACHE_FILE_PATH="$XDG_CACHE_HOME/quadrants" python [...]
 ```
@@ -10,7 +10,7 @@ Note that specifying `XDG_CACHE_HOME` is sufficient on Linux, but not on Windows
 
 # 🖥️ Command Line Tools
 
-We provided some command line tools that you can execute in terminal once Genesis is installed. These include:
+We provided some command line tools that you can execute in terminal once Genesis World is installed. These include:
 
 - `gs view *.*`: Visualize a given asset (Mesh/URDF/MJCF/USD). For USD stages, all rigid entities are loaded and the joint controller shows sliders for every articulation, with section headers between entities.
 - `gs animate 'path/*.png'`: Combine all images that matches the given pattern into a video.

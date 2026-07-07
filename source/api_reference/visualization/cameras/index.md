@@ -1,10 +1,10 @@
 # Cameras
 
-Cameras in Genesis are sensors that capture visual information from the simulation. They can render RGB images, depth maps, segmentation masks, and other visual data.
+Cameras in Genesis World are sensors that capture visual information from the simulation. They can render RGB images, depth maps, segmentation masks, and other visual data.
 
 ## Overview
 
-Genesis provides a unified `Camera` class that works with different rendering backends:
+Genesis World provides a unified `Camera` class that works with different rendering backends:
 
 - **Rasterizer cameras**: Fast rendering for real-time use
 - **Raytracer cameras**: Photorealistic rendering

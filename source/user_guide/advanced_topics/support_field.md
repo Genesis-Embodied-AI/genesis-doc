@@ -1,10 +1,10 @@
 # 🚀 Support Field
 
-Collision detection for convex shapes in Genesis relies heavily on *support functions*.  Every iteration of the Minkowski Portal Refinement (MPR) algorithm asks questions of the form:
+Collision detection for convex shapes in Genesis World relies heavily on *support functions*.  Every iteration of the Minkowski Portal Refinement (MPR) algorithm asks questions of the form:
 
 > _"Given a direction **d**, which vertex of the shape has the maximum dot-product **v·d**?"_
 
-A naïve implementation has to iterate over all vertices every time – wasteful for models containing thousands of points.  To avoid this, Genesis pre-computes a **Support Field** for every convex geometry during scene initialisation.  The implementation lives in `genesis/engine/solvers/rigid/support_field_decomp.py`.
+A naïve implementation has to iterate over all vertices every time – wasteful for models containing thousands of points.  To avoid this, Genesis World pre-computes a **Support Field** for every convex geometry during scene initialisation.  The implementation lives in `genesis/engine/solvers/rigid/support_field_decomp.py`.
 
 ---
 

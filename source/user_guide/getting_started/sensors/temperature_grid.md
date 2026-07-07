@@ -38,7 +38,7 @@ grid = temperature_sensor.read()
 print(grid)  # shape ([n_envs,] nx, ny, nz)
 ```
 
-Set `simulate_all_link_temperatures=True` if you want Genesis to evolve temperatures for every link with thermal properties, not just the sensor-attached link.
+Set `simulate_all_link_temperatures=True` if you want Genesis World to evolve temperatures for every link with thermal properties, not just the sensor-attached link.
 
 The example `examples/sensors/temperature_grid.py` visualizes a hot pusher heating a platform while objects are dropped onto the sensorized surface.
 

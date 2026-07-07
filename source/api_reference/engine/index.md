@@ -1,6 +1,6 @@
 # Physics Engine
 
-Genesis integrates multiple physics solvers into a unified framework, enabling simulation of diverse physical phenomena including rigid bodies, soft bodies, fluids, and their interactions.
+Genesis World integrates multiple physics solvers into a unified framework, enabling simulation of diverse physical phenomena including rigid bodies, soft bodies, fluids, and their interactions.
 
 ## Architecture Overview
 

@@ -1,6 +1,6 @@
 # 🦾 Inverse Kinematics & Motion Planning
 
-In this tutorial, we will go through several examples illustrating how to use solve inverse kinematics (IK) and motion planning in Genesis, and perform a simple grasping task.
+In this tutorial, we will go through several examples illustrating how to use solve inverse kinematics (IK) and motion planning in Genesis World, and perform a simple grasping task.
 
 Let's first create a scene, load your favorite robotic arm and a small cube, build the scene, and then set control gains:
 ```python
@@ -65,9 +65,9 @@ Next, let's move the robot's end-effector to a pre-grasping pose. This is done b
 - using IK to solve the joint position given a target end-effector pose
 - using a motion planner to reach the target position
   
-Motion planning in genesis uses OMPL library. You can install it following the instructions in the [installation](../overview/installation.md) page.
+Motion planning in Genesis World uses OMPL library. You can install it following the instructions in the [installation](../overview/installation.md) page.
 
-IK and motion planning in Genesis are as simple as it can get: each can be done via a single function call.
+IK and motion planning in Genesis World are as simple as it can get: each can be done via a single function call.
 ```python
 
 # get the end-effector link

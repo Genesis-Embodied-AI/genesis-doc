@@ -1,6 +1,6 @@
 # Solvers
 
-Solvers are the core physics computation engines in Genesis. Each solver implements a specific physics simulation method optimized for different types of materials and phenomena.
+Solvers are the core physics computation engines in Genesis World. Each solver implements a specific physics simulation method optimized for different types of materials and phenomena.
 
 ## Available Solvers
 
@@ -49,7 +49,7 @@ tool_solver
 
 ## Multi-Solver Simulation
 
-Genesis supports combining multiple solvers in a single scene:
+Genesis World supports combining multiple solvers in a single scene:
 
 ```python
 import genesis as gs

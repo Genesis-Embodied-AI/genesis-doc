@@ -1,6 +1,6 @@
 # Contact Sensors
 
-Genesis provides sensors for detecting and measuring contact forces. These are essential for manipulation tasks, grasping, and understanding physical interactions.
+Genesis World provides sensors for detecting and measuring contact forces. These are essential for manipulation tasks, grasping, and understanding physical interactions.
 
 ## ContactForceSensor
 

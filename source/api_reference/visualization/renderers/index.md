@@ -1,6 +1,6 @@
 # Renderers
 
-Genesis provides multiple rendering backends optimized for different use cases. Each renderer offers different trade-offs between speed and visual quality.
+Genesis World provides multiple rendering backends optimized for different use cases. Each renderer offers different trade-offs between speed and visual quality.
 
 ## Available Renderers
 

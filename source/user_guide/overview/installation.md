@@ -4,7 +4,7 @@
 * **OS**: Linux (*recommended*) / MacOS / Windows
 
 :::{note}
-Genesis is designed to be ***cross-platform***, supporting backend devices including *CPU*, *CUDA GPU* and *non-CUDA GPU*. That said, it is recommended to use **Linux** platform with **CUDA-compatible GPU** to achieve the best performance.
+Genesis World is designed to be ***cross-platform***, supporting backend devices including *CPU*, *CUDA GPU* and *non-CUDA GPU*. That said, it is recommended to use **Linux** platform with **CUDA-compatible GPU** to achieve the best performance.
 :::
 
 Supported features on various systems are as follows:
@@ -25,13 +25,13 @@ Supported features on various systems are as follows:
 ## Installation
 1. Install **PyTorch** following the [official instructions](https://pytorch.org/get-started/locally/).
 
-2. Install Genesis via PyPI:
+2. Install Genesis World via PyPI:
     ```bash
     pip install genesis-world
     ```
 
 :::{note}
-If you are using Genesis with CUDA, make sure appropriate nvidia-driver is installed on your machine.
+If you are using Genesis World with CUDA, make sure appropriate nvidia-driver is installed on your machine.
 :::
 
 ## (Optional) Surface Reconstruction
@@ -43,11 +43,11 @@ source ~/.bashrc
 
 ## (Optional) Ray Tracing Renderer
 
-If you need photo-realistic visuals, Genesis has a built-in a ray-tracing (path-tracing) based renderer developed using [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain specific language designed for rendering. See [Visualization & Rendering](../getting_started/visualization.md) for setup.
+If you need photo-realistic visuals, Genesis World has a built-in a ray-tracing (path-tracing) based renderer developed using [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain specific language designed for rendering. See [Visualization & Rendering](../getting_started/visualization.md) for setup.
 
 ## (Optional) USD Assets
 
-If you need to load USD assets into Genesis scenes, see [USD Import Setup](../getting_started/usd_import.md#installation) for installation instructions.
+If you need to load USD assets into Genesis World scenes, see [USD Import Setup](../getting_started/usd_import.md#installation) for installation instructions.
 
 ## Troubleshooting
 
@@ -55,7 +55,7 @@ If you need to load USD assets into Genesis scenes, see [USD Import Setup](../ge
 
 #### 'Genesis hasn't been initialized'
 
-Genesis is not initialized, trying to import any engine-related submodule will raise an exception, e.g.;
+Genesis World is not initialized, trying to import any engine-related submodule will raise an exception, e.g.;
 ```python
 Traceback (most recent call last):
   File "/home/jeremy/Downloads/Genesis_Jeremy/examples/./init_error.py", line 3, in <module>
@@ -69,7 +69,7 @@ Traceback (most recent call last):
 genesis.GenesisException: Genesis hasn't been initialized. Did you call `gs.init()`?
 ```
 
-This error is bug but expected. Any engine-related submodules must be imported after initializing Genesis to have the opportunity to configure low-level Quadrants features such as fast cache mechanism or Quadrants dynamic array mode. In practice, this limitation should not be a blocker for anybody, because engine-related classes are not meant to be instantiated manually. Still, it may be convenient to import them for type checking. If so, just use typing checking guard, e.g.:
+This error is bug but expected. Any engine-related submodules must be imported after initializing Genesis World to have the opportunity to configure low-level Quadrants features such as fast cache mechanism or Quadrants dynamic array mode. In practice, this limitation should not be a blocker for anybody, because engine-related classes are not meant to be instantiated manually. Still, it may be convenient to import them for type checking. If so, just use typing checking guard, e.g.:
 ```python
 from typing import TYPE_CHECKING
 
@@ -80,11 +80,11 @@ if TYPE_CHECKING:
 
 #### Circular Import Error
 
-Python would fail to (circular) import Genesis if the current directory is the source directory of Genesis. This is likely due to Genesis being installed WITHOUT enabling editable mode, either from PyPI Package Index or from source. The obvious workaround is moving out of the source directory of Genesis before running Python. The long-term solution is simply switching to editable install mode: first uninstall Python package `genesis-world`, then run `pip install -e '.[render]'` inside the source directory of Genesis.
+Python would fail to (circular) import the `genesis` package if the current directory is Genesis World's source directory. This is likely due to Genesis World being installed WITHOUT enabling editable mode, either from PyPI Package Index or from source. The obvious workaround is moving out of the source directory before running Python. The long-term solution is simply switching to editable install mode: first uninstall the Python package `genesis-world`, then run `pip install -e '.[render]'` inside the source directory.
 
 ### [Native Ubuntu] Slow Rendering (CPU aka. Software Fallback)
 
-Sometimes, when using `cam.render()` or viewer-related functions in Genesis, rendering becomes extremely slow. This is **not a Genesis issue**. Genesis relies on PyRender and EGL for GPU-based offscreen rendering. If your system isn’t correctly set up to use `libnvidia-egl`, it may **silently fall back to MESA (CPU) rendering**, severely affecting performance.
+Sometimes, when using `cam.render()` or viewer-related functions in Genesis World, rendering becomes extremely slow. This is **not a Genesis World issue**. Genesis World relies on PyRender and EGL for GPU-based offscreen rendering. If your system isn’t correctly set up to use `libnvidia-egl`, it may **silently fall back to MESA (CPU) rendering**, severely affecting performance.
 
 Even if the GPU appears accessible, your system might still default to CPU rendering unless explicitly configured.
 
@@ -159,7 +159,7 @@ Even if the GPU appears accessible, your system might still default to CPU rende
 
 5. **Set global NVIDIA rendering environment variables**
 
-Genesis tries EGL rendering by default, so in most environments you don’t need to manually set `PYOPENGL_PLATFORM`. However, setting these variables can help ensure stability in custom setups (e.g., Docker, headless servers):
+Genesis World tries EGL rendering by default, so in most environments you don’t need to manually set `PYOPENGL_PLATFORM`. However, setting these variables can help ensure stability in custom setups (e.g., Docker, headless servers):
 
    Add to `~/.bashrc` or `~/.zshrc`:
    ```bash
@@ -183,7 +183,7 @@ Genesis tries EGL rendering by default, so in most environments you don’t need
 
     For machines with Nvidia GPU, make sure that NVIDIA Container Toolkit is installed. The official guide is available [here](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
 
-    Some users may still be experiencing rendering issues on Windows when running Genesis inside a Docker container based on Genesis image. This is generally fixed by adding WSL libraries to Linux's search path for dynamic libraries, which is specified by the environment variable `LD_LIBRARY_PATH`, i.e.:
+    Some users may still be experiencing rendering issues on Windows when running Genesis World inside a Docker container based on Genesis image. This is generally fixed by adding WSL libraries to Linux's search path for dynamic libraries, which is specified by the environment variable `LD_LIBRARY_PATH`, i.e.:
     ```bash
     docker run --gpus all --rm -it \
     -e DISPLAY=$DISPLAY \
@@ -223,9 +223,9 @@ Genesis tries EGL rendering by default, so in most environments you don’t need
     export LIBGL_ALWAYS_SOFTWARE=1
     ```
 
-### [Ubuntu VM on Windows 11 via WSL2] Quadrants and Genesis do not find cudalib.so and falls back to CPU
+### [Ubuntu VM on Windows 11 via WSL2] Quadrants and Genesis World do not find cudalib.so and falls back to CPU
 
-After installing Pytorch and Genesis, Quadrants falls back to CPU, while torch initializes okay on CUDA.
+After installing Pytorch and Genesis World, Quadrants falls back to CPU, while torch initializes okay on CUDA.
 
 Symptoms:
 

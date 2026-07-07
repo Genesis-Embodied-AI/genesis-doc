@@ -1,6 +1,6 @@
 # Constants & Enums
 
-Genesis defines several enums and constants for physics simulation configuration.
+Genesis World defines several enums and constants for physics simulation configuration.
 
 ## Backend Selection
 
