@@ -94,7 +94,7 @@ Most of the code is pretty standard compared to instantiating regular deformable
 
 By default, there is only one muscle that spans the entire robot body with the muscle direction perpendicular to the ground `[0, 0, 1]`.
 
-In the next example, we show how to simulate a worm crawling forward by setting muscle groups and directions, as shown in the following. (The full script can be found in [tutorials/advanced_worm.py](https://github.com/Genesis-Embodied-AI/Genesis/tree/main/examples/tutorials/advanced_worm.py).)
+In the next example, we show how to simulate a worm crawling forward by setting muscle groups and directions, as shown in the following. (The full script can be found in [tutorials/advanced_worm.py](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/tutorials/advanced_worm.py).)
 
 ```python
 ########################## entities ##########################
@@ -270,7 +270,7 @@ This is what you will see:
 * You can specify hybrid robot with the material `gs.materials.Hybrid`, which consists of `gs.materials.Rigid` and `gs.materials.MPM.Muscle`. Note that only MPM is supported here and it must be the Muscle class since the hybrid material reuses internally the `muscle_group` implemented for `Muscle`.
 * When controlling the robot, given the actuation being from the inner rigid-bodied skeleton, there is a similar interface to rigid-bodied robot, e.g., `control_dofs_velocity`, `control_dofs_force`, `control_dofs_position`. Also, the control dimension is the same as the DoFs of the inner skeleton (in the above example, 2).
 * The skin is determined by the shape of the inner skeleton, where `thickness` determines the skin thickness when wrapping the skeleton.
-* By default, we grow skin based on the shape of the skeleton, which is specified by `morph` (in this example, the `urdf/simple/two_link_arm.urdf`). The argument `func_instantiate_soft_from_rigid` of `gs.materials.Hybrid` defines concretely how skin should grow based on the rigid-bodied `morph`. There is a default implementation `default_func_instantiate_soft_from_rigid` in [genesis/engine/entities/hybrid_entity.py](https://github.com/Genesis-Embodied-AI/Genesis/tree/main/genesis/engine/entities/hybrid_entity.py). You can also implement your own function.
+* By default, we grow skin based on the shape of the skeleton, which is specified by `morph` (in this example, the `urdf/simple/two_link_arm.urdf`). The argument `func_instantiate_soft_from_rigid` of `gs.materials.Hybrid` defines concretely how skin should grow based on the rigid-bodied `morph`. There is a default implementation `default_func_instantiate_soft_from_rigid` in [genesis/engine/entities/hybrid_entity.py](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/genesis/engine/entities/hybrid_entity.py). You can also implement your own function.
 * When `morph` is `Mesh` instead of `URDF`, the mesh specifies the soft outer body and the inner skeleton is grown based on the skin shape. This is defined by `func_instantiate_rigid_from_soft`. There is also a default implementation `default_func_instantiate_rigid_from_soft`, which basically implements skeletonization of 3D meshes.
 * The argument `func_instantiate_rigid_soft_association` of `gs.materials.Hybrid` determines how each skeletal part is associated with skin. The default implementation is to find the closest particles of the soft skin to the rigid skeletal parts.
 

@@ -12,7 +12,7 @@ Different solvers represent physical entities using various formats, such as par
 
 Overall, the naming following `<representation>_<computation-type>`. (We always follow plural form with an s in representation, e.g., `dofs`, `particles`, `elements`, etc.)
 
-Also, some useful generic data types (defined in [genesis/\_\_init\_\_.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/__init__.py)):
+Also, some useful generic data types (defined in [genesis/\_\_init\_\_.py](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/__init__.py)):
 ```python
 qd_vec2 = qd.types.vector(2, qd_float)
 qd_vec3 = qd.types.vector(3, qd_float)
@@ -257,7 +257,7 @@ For rendering,
     )
     ```
 
-Check [`genesis/solvers/mpm_solver.py`](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/engine/solvers/mpm_solver.py) for more details.
+Check [`genesis/solvers/mpm_solver.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/engine/solvers/mpm_solver.py) for more details.
 
 ## FEM Solver
 
@@ -321,7 +321,7 @@ For rendering,
     )
     ```
 
-Check [`genesis/solvers/fem_solver.py`](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/engine/solvers/fem_solver.py) for more details.
+Check [`genesis/solvers/fem_solver.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/engine/solvers/fem_solver.py) for more details.
 
 
 ## PBD Solver
@@ -373,7 +373,7 @@ For rendering,
     )
     ```
 
-Check [`genesis/solvers/pbd_solver.py`](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/engine/solvers/pbd_solver.py) for more details.
+Check [`genesis/solvers/pbd_solver.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/engine/solvers/pbd_solver.py) for more details.
 
 ## SPH Solver
 
@@ -421,6 +421,6 @@ For rendering,
     )
     ```
 
-Check [`genesis/solvers/sph_solver.py`](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/engine/solvers/sph_solver.py) for more details.
+Check [`genesis/solvers/sph_solver.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/engine/solvers/sph_solver.py) for more details.
 
 <!-- ## SF Solver -->

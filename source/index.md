@@ -2,7 +2,7 @@
 
 ![Genesis World teaser](https://raw.githubusercontent.com/YilingQiao/Genesis/readme-assets/videos/HeroShot_Final.png)
 
-[![GitHub Repo stars](https://img.shields.io/github/stars/Genesis-Embodied-AI/Genesis?style=plastic&logo=GitHub&logoSize=auto)](https://github.com/Genesis-Embodied-AI/Genesis)
+[![GitHub Repo stars](https://img.shields.io/github/stars/Genesis-Embodied-AI/genesis-world?style=plastic&logo=GitHub&logoSize=auto)](https://github.com/Genesis-Embodied-AI/genesis-world)
 [![PyPI version](https://badge.fury.io/py/genesis-world.svg?icon=si%3Apython)](https://pypi.org/project/genesis-world/)
 [![Website](https://img.shields.io/website?url=https%3A%2F%2Fgenesis-embodied-ai.github.io%2F)](https://genesis-embodied-ai.github.io/)
 [![Discord](https://img.shields.io/discord/1322086972302430269?logo=discord)](https://discord.gg/nukCuhB47p)
@@ -48,7 +48,7 @@ You also need to install **PyTorch** following the [official instructions](https
 
 ### Documentation
 
-Please refer to our [documentation site](https://genesis-world.readthedocs.io/en/latest/user_guide/index.html) to for detailed installation steps, tutorials and API references.
+Please refer to the [user guide](user_guide/index.md) for detailed installation steps, tutorials and API references.
 
 ## Contributing to Genesis World
 
@@ -58,9 +58,9 @@ We sincerely welcome *any forms of contributions* from the community to make the
 
 ## Support
 
-- Please use Github [Issues](https://github.com/Genesis-Embodied-AI/Genesis/issues) for bug reports and feature requests.
+- Please use Github [Issues](https://github.com/Genesis-Embodied-AI/genesis-world/issues) for bug reports and feature requests.
 
-- Please use GitHub [Discussions](https://github.com/Genesis-Embodied-AI/Genesis/discussions) for discussing ideas, and asking questions.
+- Please use GitHub [Discussions](https://github.com/Genesis-Embodied-AI/genesis-world/discussions) for discussing ideas, and asking questions.
 
 ## Citation
 
@@ -72,7 +72,7 @@ If you used Genesis World in your research, we would appreciate it if you could 
   title = {Genesis: A Generative and Universal Physics Engine for Robotics and Beyond},
   month = {December},
   year = {2024},
-  url = {https://github.com/Genesis-Embodied-AI/Genesis}
+  url = {https://github.com/Genesis-Embodied-AI/genesis-world}
 }
 ```
 
