@@ -69,7 +69,7 @@ Traceback (most recent call last):
 genesis.GenesisException: Genesis hasn't been initialized. Did you call `gs.init()`?
 ```
 
-This error is bug but expected. Any engine-related submodules must be imported after initializing Genesis World to have the opportunity to configure low-level Quadrants features such as fast cache mechanism or Quadrants dynamic array mode. In practice, this limitation should not be a blocker for anybody, because engine-related classes are not meant to be instantiated manually. Still, it may be convenient to import them for type checking. If so, just use typing checking guard, e.g.:
+This error is arguably a bug, but it is expected behavior. Any engine-related submodules must be imported after initializing Genesis World to have the opportunity to configure low-level Quadrants features such as fast cache mechanism or Quadrants dynamic array mode. In practice, this limitation should not be a blocker for anybody, because engine-related classes are not meant to be instantiated manually. Still, it may be convenient to import them for type checking. If so, just use typing checking guard, e.g.:
 ```python
 from typing import TYPE_CHECKING
 
