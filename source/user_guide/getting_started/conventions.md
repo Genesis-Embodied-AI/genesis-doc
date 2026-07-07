@@ -64,7 +64,7 @@ Blender’s internal coordinate system is Z-up. When exporting to Y-up formats, 
 ### glTF (.gltf / .glb)
 In Genesis World, [glTF assets are always interpreted as Y-up](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#coordinate-system-and-units). During import, Genesis World automatically converts glTF meshes from Y-up to Z-up. This behavior is fixed and cannot be overridden, ensuring compliance with the glTF specification. After import, the resulting meshes are guaranteed to be in Genesis World Z-up space.
 
-Blender leaves the option to export a gtTF as Z-up, by unchecking the **+Y-up** option. However, Blender is unable to provide the option to reimport the asset correctly. **Genesis World does not support importing glTF exported as Z-up**.
+Blender leaves the option to export a glTF as Z-up, by unchecking the **+Y-up** option. However, Blender is unable to provide the option to reimport the asset correctly. **Genesis World does not support importing glTF exported as Z-up**.
 
 ![Diagram](images/blender_gltf_export.png)
 

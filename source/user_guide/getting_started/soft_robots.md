@@ -171,7 +171,7 @@ Several things that worth noticing in this code snippet:
 
 ## Hybrid (rigid-and-soft) robot
 
-Another type of soft robot is using rigid-bodied inner skeleton to actuatuate soft-bodied outer skin, or more precisely speaking, hybrid robot. With both rigid-bodied and soft-bodied dynamics implemented already, Genesis World also supports hybrid robot. The following example is a hybrid robot with a two-link skeleton wrapped by soft skin pushing a rigid ball.
+Another type of soft robot is using rigid-bodied inner skeleton to actuate soft-bodied outer skin, or more precisely speaking, hybrid robot. With both rigid-bodied and soft-bodied dynamics implemented already, Genesis World also supports hybrid robot. The following example is a hybrid robot with a two-link skeleton wrapped by soft skin pushing a rigid ball.
 
 ```python
 import numpy as np

@@ -18,7 +18,7 @@ __version__ = gs.__version__
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "Genesis"
+project = "Genesis World"
 copyright = "2026 Genesis AI SAS"
 author = "Genesis Developers"
 release = __version__

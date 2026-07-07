@@ -12,7 +12,7 @@ h1, h2, h3, h4, h5, h6 {
 
 html[data-theme="light"] {
   --pst-color-background: #ffffff;
-  --pst-color-on-background: #ffffff;
+  --pst-color-on-background: var(--pst-color-text-base);
   --pst-color-surface: #f2f4f5;
   --pst-color-on-surface: #1a1d34;
   --pst-color-text-base: #1a1d34;
@@ -29,7 +29,7 @@ html[data-theme="light"] {
 
 html[data-theme="dark"] {
   --pst-color-background: #07070d;
-  --pst-color-on-background: #0e0f19;
+  --pst-color-on-background: var(--pst-color-text-base);
   --pst-color-surface: #10132a;
   --pst-color-on-surface: #ffffff;
   --pst-color-text-base: #c1c9cc;
