@@ -1,6 +1,6 @@
 # Recording & Playback
 
-Genesis provides a flexible recording system for capturing simulation data. This enables data logging, visualization, video generation, and analysis of simulation results.
+Genesis World provides a flexible recording system for capturing simulation data. This enables data logging, visualization, video generation, and analysis of simulation results.
 
 ## Overview
 

@@ -1,6 +1,6 @@
 # Plotters
 
-Genesis provides real-time plotting recorders for visualizing simulation data during execution.
+Genesis World provides real-time plotting recorders for visualizing simulation data during execution.
 
 ## Available Plotters
 

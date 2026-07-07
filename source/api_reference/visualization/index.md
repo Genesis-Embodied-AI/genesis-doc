@@ -1,6 +1,6 @@
 # Visualization & Rendering
 
-Genesis provides a comprehensive visualization system for rendering simulations. The system supports multiple rendering backends including fast rasterization for real-time viewing and ray tracing for photorealistic output.
+Genesis World provides a comprehensive visualization system for rendering simulations. The system supports multiple rendering backends including fast rasterization for real-time viewing and ray tracing for photorealistic output.
 
 ## Overview
 

@@ -29,7 +29,7 @@ The `out=` form keeps `self.commands` pointing at the same storage, which matter
 
 ## Use boolean masks for `envs_idx`
 
-`(condition).nonzero()[:, 0]` forces a GPU sync - the host needs to know how many indices came out to materialize a 1-D tensor. **Keep `envs_idx` as a boolean mask** all the way through and feed that mask directly to Genesis APIs and to `torch.where` / `masked_fill_`.
+`(condition).nonzero()[:, 0]` forces a GPU sync - the host needs to know how many indices came out to materialize a 1-D tensor. **Keep `envs_idx` as a boolean mask** all the way through and feed that mask directly to Genesis World APIs and to `torch.where` / `masked_fill_`.
 
 ```python
 # bad - GPU sync on .nonzero()
@@ -40,11 +40,11 @@ self.last_actions[reset_idx] = 0.0
 self.last_actions.masked_fill_(self.reset_buf[:, None], 0.0)
 ```
 
-Genesis solver and entity setters (`set_qpos`, `set_dofs_position`, `set_pos`, ...) accept a boolean mask for `envs_idx`. So does the unified `reset(envs_idx=mask)` entry point.
+Genesis World solver and entity setters (`set_qpos`, `set_dofs_position`, `set_pos`, ...) accept a boolean mask for `envs_idx`. So does the unified `reset(envs_idx=mask)` entry point.
 
 ## Read state through zero-copy accessors
 
-Reading entity state in the hot path is fine - *if* the accessor returns a zero-copy view into Genesis's underlying storage. The reads that support zero-copy on rigid entities, at the time of writing, are:
+Reading entity state in the hot path is fine - *if* the accessor returns a zero-copy view into Genesis World's underlying storage. The reads that support zero-copy on rigid entities, at the time of writing, are:
 
 | Read | Returns |
 |---|---|

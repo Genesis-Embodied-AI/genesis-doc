@@ -1,6 +1,6 @@
 # 🛰️ Sensor Pipeline
 
-Genesis sensors model the **robot-control view** of a sensor - what the application code actually queries from a robot's onboard software, not what the analog hardware does at the wire level. This page explains the abstraction, the per-step pipeline that produces the user-facing measurement, and the buffering scheme that lets `read()` be a constant-time memory lookup.
+Genesis World sensors model the **robot-control view** of a sensor - what the application code actually queries from a robot's onboard software, not what the analog hardware does at the wire level. This page explains the abstraction, the per-step pipeline that produces the user-facing measurement, and the buffering scheme that lets `read()` be a constant-time memory lookup.
 
 For how to write your own sensor, see [Implementing Custom Sensors](custom_sensors.md).
 
@@ -29,7 +29,7 @@ This shapes every design decision in the pipeline. Imperfections split into two 
 
 ```
 Sensor                       (minimal contract)
-└── SimpleSensor             (standard pipeline; most Genesis sensors derive from this)
+└── SimpleSensor             (standard pipeline; most Genesis World sensors derive from this)
     ├── ContactSensor
     ├── ContactForceSensor
     ├── IMUSensor

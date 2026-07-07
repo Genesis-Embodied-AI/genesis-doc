@@ -16,7 +16,7 @@ To add a new sensor you contribute the following artifacts:
 | (optional) a `NamedTuple` return type | next to the sensor implementation | If your sensor returns multiple tensors (e.g. IMU returns `lin_acc`, `ang_vel`, `mag`), declare a NamedTuple and pass it as the fourth type parameter: `SimpleSensor[<Name>, None, <Name>SharedMetadata, <Name>ReturnType]`. |
 | (optional) a `SharedSensorContext` subclass | next to the sensor implementation | Only if this sensor type shares an expensive resource (e.g. a collision BVH) with *other* sensor types. Pass it as the second type parameter: `SimpleSensor[<Name>, <Name>Context, <Name>SharedMetadata, <Name>ReturnType]`. See [Shared context across sensor types](#shared-context-across-sensor-types) below. |
 
-Genesis pairs an options class with its sensor class automatically as soon as both modules have been imported - the user only ever creates the options instance and passes it to `scene.add_sensor(...)`.
+Genesis World pairs an options class with its sensor class automatically as soon as both modules have been imported - the user only ever creates the options instance and passes it to `scene.add_sensor(...)`.
 
 ## Automatic registration (the plugin mechanism)
 
@@ -34,7 +34,7 @@ That gives you two supported placements:
     sensor.py      # class MySensor(SimpleSensor[MyOptions, None, MyMetadata]): ...
   ```
 
-  As long as your code imports `my_sensor_plugin.options` somewhere before constructing `MyOptions()`, Genesis will lazily import the sibling `my_sensor_plugin.sensor` module on the first call to `scene.add_sensor(MyOptions(...))` and the pairing resolves transparently.
+  As long as your code imports `my_sensor_plugin.options` somewhere before constructing `MyOptions()`, Genesis World will lazily import the sibling `my_sensor_plugin.sensor` module on the first call to `scene.add_sensor(MyOptions(...))` and the pairing resolves transparently.
 
 ## Picking the right base class
 
@@ -222,7 +222,7 @@ Two supported routes:
 
 ## Camera-style sensors via `BaseCameraSensor`
 
-`BaseCameraSensor` is a `Sensor`-direct subclass that codifies the lazy-render-on-read pattern shared by every Genesis camera (`RasterizerCameraSensor`, `RaytracerCameraSensor`, `BatchRendererCameraSensor`). Use it as the base for any custom sensor that produces an image by rendering the scene rather than by reading physics-time signals each step.
+`BaseCameraSensor` is a `Sensor`-direct subclass that codifies the lazy-render-on-read pattern shared by every Genesis World camera (`RasterizerCameraSensor`, `RaytracerCameraSensor`, `BatchRendererCameraSensor`). Use it as the base for any custom sensor that produces an image by rendering the scene rather than by reading physics-time signals each step.
 
 **Advantages over deriving from `Sensor` directly**
 

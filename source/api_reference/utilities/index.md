@@ -1,6 +1,6 @@
 # Utilities & Helpers
 
-Genesis provides various utility functions, constants, and helper classes for common operations.
+Genesis World provides various utility functions, constants, and helper classes for common operations.
 
 ## Overview
 

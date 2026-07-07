@@ -1,6 +1,6 @@
 # 🔩 Rigid Collision Resolution
 
-Genesis follows a **quadratic penalty formulation** very similar to that used by [MuJoCo](https://mujoco.readthedocs.io/) for enforcing rigid–body constraints.  This document summarises the mathematics and physical interpretation of the model.
+Genesis World follows a **quadratic penalty formulation** very similar to that used by [MuJoCo](https://mujoco.readthedocs.io/) for enforcing rigid–body constraints.  This document summarises the mathematics and physical interpretation of the model.
 
 ---
 
@@ -30,7 +30,7 @@ $$
 
 ## 2. Contact & friction model
 
-For every **contact pair** Genesis creates four constraints, which are the basis of the friction pyramid. Mathematically each direction **tᵢ** is
+For every **contact pair** Genesis World creates four constraints, which are the basis of the friction pyramid. Mathematically each direction **tᵢ** is
 
 $$
     \mathbf t\_i = \pm d_1\,\mu - \mathbf n \quad\text{or}\quad \pm d_2\,\mu - \mathbf n ,
@@ -60,7 +60,7 @@ obtained from the scalar `sol_params` (spring-damper style softness).  The diago
 
 ## 4. Equality constraints
 
-Genesis supports three kinds of **holonomic equalities**:
+Genesis World supports three kinds of **holonomic equalities**:
 
 | Type | DOF removed | Description |
 |------|-------------|-------------|

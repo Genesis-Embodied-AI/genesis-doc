@@ -1,6 +1,6 @@
 # States
 
-States in Genesis hold the runtime data for physics simulation, including positions, velocities, forces, and other solver-specific variables.
+States in Genesis World hold the runtime data for physics simulation, including positions, velocities, forces, and other solver-specific variables.
 
 ## Overview
 

@@ -1,6 +1,6 @@
 # 🚁 Drone Entity
 
-Genesis provides specialized drone simulation with propeller physics and motor control.
+Genesis World provides specialized drone simulation with propeller physics and motor control.
 
 ## Creating a Drone
 
@@ -119,4 +119,4 @@ for _ in range(500):
 ## What's Next
 
 - [Hover Environment](./policy_training/examples/hover_env) - building a complete drone hover RL environment
-- [Locomotion](./policy_training/examples/locomotion) - training locomotion policies with Genesis and RL
+- [Locomotion](./policy_training/examples/locomotion) - training locomotion policies with Genesis World and RL

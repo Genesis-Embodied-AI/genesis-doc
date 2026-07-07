@@ -1,12 +1,12 @@
 # 🌌 Nyx Renderer
 
 ```{image} /_static/images/nyx_rendering.gif
-:alt: Nyx renderer producing photo-real frames of a Genesis simulation
+:alt: Nyx renderer producing photo-real frames of a Genesis World simulation
 :align: center
 :width: 80%
 ```
 
-[Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx) is a GPU-accelerated path tracer built in-house for Genesis. It plugs into a scene as a **camera sensor** and produces photo-realistic frames suitable for robotics datasets, demos, and synthetic perception.
+[Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx) is a GPU-accelerated path tracer built in-house for Genesis World. It plugs into a scene as a **camera sensor** and produces photo-realistic frames suitable for robotics datasets, demos, and synthetic perception.
 
 Highlights:
 
@@ -15,7 +15,7 @@ Highlights:
 - 3D Gaussian splat ("light field") assets rendered alongside simulated geometry
 - Attached / multi-camera setups and multi-environment rendering
 - Per-pixel object picking
-- Exposed through the standard Genesis sensor interface (`scene.add_sensor(...)`)
+- Exposed through the standard Genesis World sensor interface (`scene.add_sensor(...)`)
 
 For installation and the minimal "hello Nyx" walkthrough, see [Photo-realistic Rendering with Nyx](visualization.md#photo-realistic-rendering-with-nyx) in the Visualization guide. For the full feature reference, options, and advanced recipes, see the **Nyx documentation**: <https://genesis-embodied-ai.github.io/genesis-nyx/>.
 
@@ -24,7 +24,7 @@ For installation and the minimal "hello Nyx" walkthrough, see [Photo-realistic R
 Beyond standard meshes, Nyx can render captured **3D Gaussian splats** in the same path-traced frame as simulated geometry. The splat is declared as a `LightFieldAsset` on the Nyx camera — every Nyx sensor's `light_fields` are collected at `scene.build()` and rendered each step.
 
 ```{image} /_static/images/nyx_gaussian_splat.png
-:alt: A captured plant Gaussian splat sitting on a Genesis plane, rendered by Nyx
+:alt: A captured plant Gaussian splat sitting on a Genesis World plane, rendered by Nyx
 :align: center
 :width: 80%
 ```
@@ -59,12 +59,12 @@ def main():
     scene.add_entity(morph=gs.morphs.Plane(plane_size=(2.0, 2.0)))
 
     # The splat is declared on the camera as a LightFieldAsset, not as a
-    # Genesis entity. Every Nyx sensor's light_fields are gathered at
+    # Genesis World entity. Every Nyx sensor's light_fields are gathered at
     # scene.build() and rendered alongside simulated geometry.
     plant          = nps.LightFieldAsset()
     plant.type     = nps.ELightFieldType.GaussianField
     plant.uri      = PLANT_PLY
-    # 90° rotation about Z stands the capture upright in Genesis' Z-up world.
+    # 90° rotation about Z stands the capture upright in Genesis World's Z-up world.
     plant.rotation = nps.quaternion(0.0, 0.0, -0.70710678, 0.70710678)
 
     # HDRI env map lighting the simulated plane. The splat already bakes in

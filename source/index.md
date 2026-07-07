@@ -38,7 +38,7 @@ Compared to prior simulation platforms, here we highlight several key features o
 
 ### Quick Installation
 
-Genesis is available via PyPI:
+Genesis World is available via PyPI:
 
 ```bash
 pip install genesis-world
@@ -50,11 +50,11 @@ You also need to install **PyTorch** following the [official instructions](https
 
 Please refer to our [documentation site](https://genesis-world.readthedocs.io/en/latest/user_guide/index.html) to for detailed installation steps, tutorials and API references.
 
-## Contributing to Genesis
+## Contributing to Genesis World
 
 The goal of the Genesis project is to build a fully transparent, user-friendly ecosystem where contributors from both robotics and computer graphics can **come together to collaboratively create a high-efficiency, realistic (both physically and visually) virtual world for robotics research and beyond**.
 
-We sincerely welcome *any forms of contributions* from the community to make the world a better place for robots. From **pull requests** for new features, **bug reports**, to even tiny **suggestions** that will make Genesis API more intuitive, all are wholeheartedly appreciated!
+We sincerely welcome *any forms of contributions* from the community to make the world a better place for robots. From **pull requests** for new features, **bug reports**, to even tiny **suggestions** that will make Genesis World API more intuitive, all are wholeheartedly appreciated!
 
 ## Support
 
@@ -64,7 +64,7 @@ We sincerely welcome *any forms of contributions* from the community to make the
 
 ## Citation
 
-If you used Genesis in your research, we would appreciate it if you could cite it. We are still working on a technical report, and before it's public, you could consider citing:
+If you used Genesis World in your research, we would appreciate it if you could cite it. We are still working on a technical report, and before it's public, you could consider citing:
 
 ```
 @misc{Genesis,

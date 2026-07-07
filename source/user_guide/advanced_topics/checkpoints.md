@@ -1,6 +1,6 @@
 # 💾 Checkpoints
 
-Genesis provides state save/load functionality for training resumption and episode resets.
+Genesis World provides state save/load functionality for training resumption and episode resets.
 
 ## Basic Save/Load
 

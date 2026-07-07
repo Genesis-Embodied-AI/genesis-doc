@@ -1,6 +1,6 @@
 # 🎥 Camera Sensors
 
-Genesis ships three camera sensor backends for rendering RGB images:
+Genesis World ships three camera sensor backends for rendering RGB images:
 
 | Sensor | Backend | Multi-Env | Best for |
 |---|---|---|---|

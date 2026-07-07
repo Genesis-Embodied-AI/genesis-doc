@@ -1,5 +1,5 @@
 # 📊 Recorders
-Genesis also provides data recording utilities for automatically processing data without slowing down the simulation.
+Genesis World also provides data recording utilities for automatically processing data without slowing down the simulation.
 This can be used to stream formatted data to a file, or visualize the data live.
 
 ```python

@@ -1,13 +1,13 @@
 # 🧑‍💻 Interactive GUI & Debugging
 
 :::{note}
-**Install the optional `imgui-bundle` dependency before using the GUI sections below.** The ImGui overlay panel ships behind Genesis's `render` extras — install with:
+**Install the optional `imgui-bundle` dependency before using the GUI sections below.** The ImGui overlay panel ships behind Genesis World's `render` extras — install with:
 
 ```bash
 pip install "genesis-world[render]"
 ```
 
-If you forget and set `enable_gui=True` (or call `ImGuiOverlayPlugin()` manually), Genesis raises an actionable error pointing you back at this command. Pre-built `imgui-bundle` wheels are not published for every Python / OS combination (e.g. Python 3.10, Linux aarch64); on those platforms install manually via `pip install imgui-bundle`, which builds from source and requires CMake.
+If you forget and set `enable_gui=True` (or call `ImGuiOverlayPlugin()` manually), Genesis World raises an actionable error pointing you back at this command. Pre-built `imgui-bundle` wheels are not published for every Python / OS combination (e.g. Python 3.10, Linux aarch64); on those platforms install manually via `pip install imgui-bundle`, which builds from source and requires CMake.
 :::
 
 ## ImGui Overlay Plugin
@@ -69,7 +69,7 @@ For a complete Franka PD-control example you can try this on, see `examples/rigi
 
 ## Interactive Inspection
 
-We designed a very informative (and good-looking, hopefully) interface for accessing internal information and all the available attributes of objects created in Genesis, implemented via the `__repr__()` method for all the Genesis classes. This feature will be very useful if you are used to debugging via either `IPython` or `pdb` or `ipdb`.
+We designed a very informative (and good-looking, hopefully) interface for accessing internal information and all the available attributes of objects created in Genesis World, implemented via the `__repr__()` method for all the Genesis World classes. This feature will be very useful if you are used to debugging via either `IPython` or `pdb` or `ipdb`.
 
 Let's use `IPython` in this example. Install it via `pip install ipython` if you don't have it. Let's go through a simple example here:
 ```python

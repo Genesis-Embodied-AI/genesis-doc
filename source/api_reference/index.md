@@ -1,6 +1,6 @@
 # API Reference
 
-This section provides comprehensive documentation for the Genesis API. The reference is organized by functionality to help you find the classes and functions you need.
+This section provides comprehensive documentation for the Genesis World API. The reference is organized by functionality to help you find the classes and functions you need.
 
 ## Core Components
 

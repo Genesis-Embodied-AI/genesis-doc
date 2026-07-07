@@ -1,6 +1,6 @@
 # 🧶 IPC Coupler
 
-Genesis provides Incremental Potential Contact (IPC) coupling for high-fidelity deformable-rigid interactions.
+Genesis World provides Incremental Potential Contact (IPC) coupling for high-fidelity deformable-rigid interactions.
 
 ## Requirements
 

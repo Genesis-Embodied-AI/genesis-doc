@@ -1,6 +1,6 @@
 # File Writers
 
-Genesis provides file writers for exporting simulation data to various formats.
+Genesis World provides file writers for exporting simulation data to various formats.
 
 ## Available Writers
 

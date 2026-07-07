@@ -1,6 +1,6 @@
 # 🖲️ Sensors
 
-In Genesis, a sensor extracts information from the scene without affecting it. Sensors model the **robot-control view** of an onboard sensor: each is sampled at its own rate, stamped with optional noise / drift / delay / jitter, and read back as a tensor. Reads are idempotent within a step - two `read()` calls inside one control-loop timestep return the same value.
+In Genesis World, a sensor extracts information from the scene without affecting it. Sensors model the **robot-control view** of an onboard sensor: each is sampled at its own rate, stamped with optional noise / drift / delay / jitter, and read back as a tensor. Reads are idempotent within a step - two `read()` calls inside one control-loop timestep return the same value.
 
 Setting `history_length=N` on the options returns the last `N` snapshots stacked along a new axis (shape becomes `(B, N, *return_shape)`, index 0 = current). Each snapshot keeps the imperfection state it had at capture time, so delayed reads are physically consistent.
 
@@ -45,7 +45,7 @@ imu_batch = data[gs.sensors.types.IMU]
 contact_batch = data[gs.sensors.types.Contact]
 ```
 
-For the design of the sensor pipeline and how to add your own sensor type, see {doc}`Extending Genesis → Sensors <../../advanced_topics/sensors/index>`.
+For the design of the sensor pipeline and how to add your own sensor type, see {doc}`Extending Genesis World → Sensors <../../advanced_topics/sensors/index>`.
 
 Example scripts live under `examples/sensors/`.
 

@@ -1,6 +1,6 @@
 # 🔺 Mesh Processing
 
-Genesis provides mesh utilities for loading, simplification, convex decomposition, and collision processing.
+Genesis World provides mesh utilities for loading, simplification, convex decomposition, and collision processing.
 
 ## Loading Meshes
 
@@ -52,7 +52,7 @@ gs.morphs.Mesh(
 )
 ```
 
-Genesis uses COACD library with configurable options:
+Genesis World uses COACD library with configurable options:
 
 ```python
 gs.options.CoacdOptions(
@@ -65,7 +65,7 @@ gs.options.CoacdOptions(
 
 ## Collision Processing
 
-Genesis automatically processes collision meshes:
+Genesis World automatically processes collision meshes:
 
 1. **Repair**: Removes duplicate faces
 2. **Convexification check**: Tests if simple convex hull is sufficient
@@ -114,7 +114,7 @@ mesh.particlize(p_size=0.01, sampler="random")
 
 ## Primitive Meshes
 
-Genesis provides built-in primitives:
+Genesis World provides built-in primitives:
 
 ```python
 gs.morphs.Sphere(radius=0.5)
@@ -125,7 +125,7 @@ gs.morphs.Plane()
 
 ## Caching
 
-Genesis caches processed meshes for faster loading:
+Genesis World caches processed meshes for faster loading:
 
 | Cache Type | Extension | Purpose |
 |------------|-----------|---------|

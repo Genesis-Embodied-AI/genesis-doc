@@ -2,12 +2,12 @@
 
 ## Overview
 
-The Genesis simulation framework is built around a modular and extensible configuration system. This system allows users to flexibly compose and control different aspects of a simulation-ranging from low-level physics solvers to high-level rendering options-through structured configuration objects.
+The Genesis World simulation framework is built around a modular and extensible configuration system. This system allows users to flexibly compose and control different aspects of a simulation-ranging from low-level physics solvers to high-level rendering options-through structured configuration objects.
 
-To help you understand how these components work together, we start with a high-level template of how a Genesis scene is typically initialized. This template shows how simulation settings, solver options, and entity-level configurations are orchestrated.
+To help you understand how these components work together, we start with a high-level template of how a Genesis World scene is typically initialized. This template shows how simulation settings, solver options, and entity-level configurations are orchestrated.
 
 ```python
-# Initialize Genesis
+# Initialize Genesis World
 gs.init(...)
 
 # Initialize scene
@@ -40,7 +40,7 @@ scene.add_entity(
 )
 ```
 
-As shown above, a scene in Genesis is defined by a combination of:
+As shown above, a scene in Genesis World is defined by a combination of:
 
 - [Simulation & Coupling](#simulation--coupling): Defines global simulation parameters and how different solvers interact.
 - [Solvers](#solvers): Configure physical behaviors for different simulation methods (e.g., rigid bodies, fluids, cloth).

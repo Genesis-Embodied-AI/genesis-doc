@@ -84,7 +84,7 @@ displacement = tactile.read()
 print(displacement)  # shape ([n_envs,] n_probes, 3)
 ```
 
-When `probe_local_pos` is provided as a 2D grid, Genesis uses an FFT-based algorithm to accelerate the computation for larger tactile arrays.
+When `probe_local_pos` is provided as a 2D grid, Genesis World uses an FFT-based algorithm to accelerate the computation for larger tactile arrays.
 
 Example script `examples/sensors/tactile_elastomer_sandbox.py` demos a spherical or box-shaped pusher interacting with other objects.
 

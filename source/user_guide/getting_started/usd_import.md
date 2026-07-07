@@ -1,12 +1,12 @@
 # 🌐 Loading USD Scenes
 
-Genesis supports loading complex scenes from Universal Scene Description (USD) files, enabling you to import articulated robots, rigid objects, and complete environments with proper physics properties and joint configurations. USD is an open-source framework developed by Pixar for describing, composing, simulating, and collaborating within 3D worlds.
+Genesis World supports loading complex scenes from Universal Scene Description (USD) files, enabling you to import articulated robots, rigid objects, and complete environments with proper physics properties and joint configurations. USD is an open-source framework developed by Pixar for describing, composing, simulating, and collaborating within 3D worlds.
 
-This tutorial will guide you through loading USD files in Genesis, configuring parsing options, and working with USD-based scenes. The parser is designed to work seamlessly with assets exported from popular tools like NVIDIA Isaac Sim, while also supporting standard USD physics schemas.
+This tutorial will guide you through loading USD files in Genesis World, configuring parsing options, and working with USD-based scenes. The parser is designed to work seamlessly with assets exported from popular tools like NVIDIA Isaac Sim, while also supporting standard USD physics schemas.
 
 ## Installation
 
-To load USD assets into Genesis scenes, install the required dependencies:
+To load USD assets into Genesis World scenes, install the required dependencies:
 
 ```bash
 pip install -e .[usd]
@@ -21,9 +21,9 @@ pip install --extra-index-url https://pypi.nvidia.com/ omniverse-kit
 export OMNI_KIT_ACCEPT_EULA=yes
 ```
 
-**Note:** The `OMNI_KIT_ACCEPT_EULA` environment variable must be set to accept the EULA. This is a one-time operation. Once set, it will not prompt again. If USD baking is disabled, Genesis will only parse materials of type `UsdPreviewSurface`.
+**Note:** The `OMNI_KIT_ACCEPT_EULA` environment variable must be set to accept the EULA. This is a one-time operation. Once set, it will not prompt again. If USD baking is disabled, Genesis World will only parse materials of type `UsdPreviewSurface`.
 
-If you encounter the Genesis warning "Baking process failed: ...", here are some troubleshooting tips:
+If you encounter the Genesis World warning "Baking process failed: ...", here are some troubleshooting tips:
 
 - **EULA Acceptance**: The first launch may require accepting the Omniverse EULA. Accept it in runtime or set `OMNI_KIT_ACCEPT_EULA=yes` to accept it automatically.
 
@@ -35,7 +35,7 @@ If you encounter the Genesis warning "Baking process failed: ...", here are some
 
 ## Overview
 
-Genesis's USD parser supports the following features:
+Genesis World's USD parser supports the following features:
 
 ### Joint Types
 
@@ -73,7 +73,7 @@ Let's start with a simple example that loads a USD file containing an articulate
 import genesis as gs
 from huggingface_hub import snapshot_download
 
-# Initialize Genesis
+# Initialize Genesis World
 gs.init(backend=gs.cpu)
 
 # Create a scene
@@ -86,7 +86,7 @@ scene = gs.Scene(
     show_viewer=True,
 )
 
-# Download a USD asset (example from Genesis assets)
+# Download a USD asset (example from Genesis World assets)
 asset_path = snapshot_download(
     repo_type="dataset",
     repo_id="Genesis-Intelligence/assets",
@@ -106,7 +106,7 @@ entities = scene.add_stage(
 scene.build()
 ```
 
-USD files can contain multiple rigid entities (articulations and rigid bodies) in a single file. Genesis provides two methods for loading USD:
+USD files can contain multiple rigid entities (articulations and rigid bodies) in a single file. Genesis World provides two methods for loading USD:
 
 - **`scene.add_stage()`**: Automatically discovers and loads **all** rigid entities in the USD file. This is the recommended method for loading complete USD scenes with multiple entities.
 
@@ -118,9 +118,9 @@ The `gs.morphs.USD` class provides extensive configuration options for controlli
 
 ### Joint Dynamics Configuration
 
-Genesis can parse joint properties from USD attributes. 
+Genesis World can parse joint properties from USD attributes. 
 
-Because some joint physics properties are not part of the USD standard, Genesis provides default attribute name candidates that accommodate well-established exporters, notably Isaac Sim, which uses custom attributes like `physxJoint:jointFriction` and `physxLimit:angular:stiffness`.
+Because some joint physics properties are not part of the USD standard, Genesis World provides default attribute name candidates that accommodate well-established exporters, notably Isaac Sim, which uses custom attributes like `physxJoint:jointFriction` and `physxLimit:angular:stiffness`.
 
 For example, the following code configures the attribute name candidates for joint friction. The parser will try these candidates in order and use the first one that is found.
 
@@ -139,7 +139,7 @@ gs.morphs.USD(
 
 Supported attributes are listed in the following table:
 
-| Genesis Attribute Name | Source / Default Attribute Name Candidates | Description |
+| Genesis World Attribute Name | Source / Default Attribute Name Candidates | Description |
 |----------------|-------------|-------------|
 | `dofs_frictionloss` | `["physxJoint:jointFriction", "physics:jointFriction", "jointFriction", "friction"]` | Joint friction (passive property) |
 | `dofs_armature` | `["physxJoint:armature", "physics:armature", "armature"]` | Joint armature (passive property) |
@@ -152,7 +152,7 @@ Note that, attribute name within bracket (`[...]`) is unofficial USD attribute, 
 
 ### Geometry Parsing Options
 
-Genesis can parse collision and visual geometries from USD files. You can configure regex patterns to identify which prims should be treated as collision-only or visual-only geometry. The parser uses `re.match()` to check if a prim's name matches each pattern from the start of the string.
+Genesis World can parse collision and visual geometries from USD files. You can configure regex patterns to identify which prims should be treated as collision-only or visual-only geometry. The parser uses `re.match()` to check if a prim's name matches each pattern from the start of the string.
 
 **Recognition Rules:**
 
@@ -249,8 +249,8 @@ gs.morphs.USD(
 
 ## Next Steps
 
-- Learn about [controlling robots](control_your_robot.md) in Genesis
+- Learn about [controlling robots](control_your_robot.md) in Genesis World
 - Explore [inverse kinematics](inverse_kinematics_motion_planning.md) for USD-loaded robots
 - Check out [parallel simulation](parallel_simulation.md) for training with USD assets
 - See the [API reference](../../api_reference/options/morph/file_morph/file_morph.md) for detailed USD morph options
-- See the [conventions](conventions.md) for more details on the coordinate system and mathematical conventions used throughout Genesis.
+- See the [conventions](conventions.md) for more details on the coordinate system and mathematical conventions used throughout Genesis World.

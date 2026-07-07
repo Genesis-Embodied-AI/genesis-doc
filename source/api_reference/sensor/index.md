@@ -1,6 +1,6 @@
 # Sensors
 
-Genesis provides a variety of sensors for perceiving the simulation state. Sensors are attached to entities and provide data such as visual observations, force measurements, and inertial readings.
+Genesis World provides a variety of sensors for perceiving the simulation state. Sensors are attached to entities and provide data such as visual observations, force measurements, and inertial readings.
 
 ## Overview
 

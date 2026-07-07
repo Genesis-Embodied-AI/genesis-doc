@@ -5,7 +5,7 @@
 
 The biggest advantage of using GPU to accelerate simulation is to enable scene-level parallelism, so that we can train robots in thousands of environments simultaneously.
 
-In Genesis, creating parallel simulation is as simple as you would imagine: when building your scene, you simply add an additional parameter `n_envs` to tell the simulator how many environments you want. That's it.
+In Genesis World, creating parallel simulation is as simple as you would imagine: when building your scene, you simply add an additional parameter `n_envs` to tell the simulator how many environments you want. That's it.
 
 Note that in order to mimic the name convention in learning literature, we will also use the term `batching` to indicate the parallelization operation.
 
@@ -78,7 +78,7 @@ franka.control_dofs_position(
 This call will only send a zero-position command to 3 selected environments.
 
 ### Enjoy a futuristic speed!
-Genesis supports up to tens of thousands of parallel environments, and unlocks unprecedented simulation speed this way. Now, let's turn off the viewer, and change batch size to 30000 (consider using a smaller one if your GPU has a relatively small vram):
+Genesis World supports up to tens of thousands of parallel environments, and unlocks unprecedented simulation speed this way. Now, let's turn off the viewer, and change batch size to 30000 (consider using a smaller one if your GPU has a relatively small vram):
 
 ```python
 import torch
@@ -119,5 +119,5 @@ Running the above script on a desktop with RTX 4090 and 14900K gives you a futur
 ```
 
 :::{tip}
-**FPS logging:** By default, genesis logger will display real-time simulation speed in the terminal. You can disable this behavior by setting `scene.profiling_options.show_FPS=False` when creating the scene.
+**FPS logging:** By default, Genesis World logger will display real-time simulation speed in the terminal. You can disable this behavior by setting `scene.profiling_options.show_FPS=False` when creating the scene.
 :::

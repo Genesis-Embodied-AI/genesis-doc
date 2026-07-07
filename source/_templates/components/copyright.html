@@ -1,0 +1,7 @@
+{# Overrides PyData's copyright component to match the genesis.ai footer
+   ("© 2026 Genesis AI SAS") — i.e. no "Copyright" word or trailing period. #}
+{% if show_copyright and copyright %}
+  <p class="copyright">
+    {% trans copyright=copyright|e %}© {{ copyright }}{% endtrans %}
+  </p>
+{% endif %}

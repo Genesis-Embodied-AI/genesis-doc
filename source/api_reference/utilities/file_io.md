@@ -1,10 +1,10 @@
 # File I/O Utilities
 
-Genesis provides utilities for file operations, path handling, and loading robot/scene descriptions.
+Genesis World provides utilities for file operations, path handling, and loading robot/scene descriptions.
 
 ## Cache Directories
 
-Genesis caches compiled kernels and processed assets:
+Genesis World caches compiled kernels and processed assets:
 
 ```python
 import genesis as gs
@@ -73,7 +73,7 @@ robot = scene.add_entity(gs.morphs.MJCF(
 
 ## Mesh Loading
 
-Genesis supports various mesh formats:
+Genesis World supports various mesh formats:
 
 | Format | Extension | Notes |
 |--------|-----------|-------|
@@ -94,11 +94,11 @@ mesh = scene.add_entity(gs.morphs.Mesh(
 
 ## Asset Paths
 
-Genesis looks for assets in:
+Genesis World looks for assets in:
 
 1. Absolute path (if provided)
 2. Relative to current working directory
-3. Genesis assets directory
+3. Genesis World assets directory
 
 ```python
 # Absolute path
@@ -107,7 +107,7 @@ robot = scene.add_entity(gs.morphs.URDF(file="/home/user/robot.urdf"))
 # Relative path
 robot = scene.add_entity(gs.morphs.URDF(file="robots/my_robot.urdf"))
 
-# Genesis built-in assets
+# Genesis World built-in assets
 plane = scene.add_entity(gs.morphs.Plane())
 ```
 

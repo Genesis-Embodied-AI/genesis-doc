@@ -1,10 +1,10 @@
 # Tensor
 
-The `genesis.grad.Tensor` class extends `torch.Tensor` to support end-to-end gradient flow through Genesis simulations.
+The `genesis.grad.Tensor` class extends `torch.Tensor` to support end-to-end gradient flow through Genesis World simulations.
 
 ## Overview
 
-Genesis Tensors:
+Genesis World Tensors:
 
 - Extend PyTorch tensors with scene tracking
 - Enable automatic gradient propagation through physics
@@ -13,7 +13,7 @@ Genesis Tensors:
 
 ## Usage
 
-Genesis Tensors are automatically created when you access state:
+Genesis World Tensors are automatically created when you access state:
 
 ```python
 import genesis as gs
@@ -31,9 +31,9 @@ robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 scene.build()
 
 # These return genesis.grad.Tensor
-pos = robot.get_pos()       # Genesis Tensor
-vel = robot.get_vel()       # Genesis Tensor
-qpos = robot.get_qpos()     # Genesis Tensor
+pos = robot.get_pos()       # Genesis World Tensor
+vel = robot.get_vel()       # Genesis World Tensor
+qpos = robot.get_qpos()     # Genesis World Tensor
 ```
 
 ## Gradient Flow

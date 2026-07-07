@@ -1,6 +1,6 @@
 # 🔒 Constraints
 
-Genesis supports runtime constraints for manipulation tasks like suction grasping.
+Genesis World supports runtime constraints for manipulation tasks like suction grasping.
 
 ## Weld Constraints
 

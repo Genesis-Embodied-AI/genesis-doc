@@ -1,6 +1,6 @@
 # 🍮 SAP Coupler
 
-Genesis provides Semi-Analytic Primal (SAP) coupling for accurate rigid-FEM contact handling.
+Genesis World provides Semi-Analytic Primal (SAP) coupling for accurate rigid-FEM contact handling.
 
 ## Requirements
 

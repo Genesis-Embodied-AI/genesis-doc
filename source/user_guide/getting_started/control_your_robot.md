@@ -42,7 +42,7 @@ franka = scene.add_entity(
 scene.build()
 ```
 
-This robot arm will fall down due to gravity, if we don't give it any actuation force. Genesis has a built-in PD controller ([proportional–integral–derivative controller](https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller) ) that takes as input target joint position or velocity. You can also directly set torque/force applied to each joint.
+This robot arm will fall down due to gravity, if we don't give it any actuation force. Genesis World has a built-in PD controller ([proportional–integral–derivative controller](https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller) ) that takes as input target joint position or velocity. You can also directly set torque/force applied to each joint.
 
 In the context of robotic simulation, `joint` and `dof` (degree-of-freedom) are two related but different concepts. Since we are dealing with a Franka arm, which has 7 revolute joints in the arm and 2 prismatic joints in its gripper, all the joints have 1 dof only, leading to a 9-dof articulated body. In a more general case, there will be joint types such as free joint (6 dofs) or ball joint (3 dofs) that have more than one degrees of freedom. In general, you can think of each dof as a motor and can be controlled independently.
 
@@ -103,7 +103,7 @@ for i in range(150):
 ```
 If you have viewer turned on, you will see the robot changes state every 50 steps.
 
-Next, let's try to control the robot using the built in PD controller. The API design in Genesis follows a structured pattern. We used `set_dofs_position` to hard set the dofs position. Now we simply changed `set_*` to `control_*` to use the controller counterpart APIs. Here we illustrate different ways for controlling the robot:
+Next, let's try to control the robot using the built in PD controller. The API design in Genesis World follows a structured pattern. We used `set_dofs_position` to hard set the dofs position. Now we simply changed `set_*` to `control_*` to use the controller counterpart APIs. Here we illustrate different ways for controlling the robot:
 ```python
 # PD control
 for i in range(1250):
@@ -283,7 +283,7 @@ for i in range(1250):
 
 ## Pick & Place with a Suction Cup
 
-In many industrial settings robots pick objects using a suction pad that behaves like an "instant" rigid grasp.  In Genesis you can reproduce the same behaviour by temporarily welding two rigid bodies together.
+In many industrial settings robots pick objects using a suction pad that behaves like an "instant" rigid grasp.  In Genesis World you can reproduce the same behaviour by temporarily welding two rigid bodies together.
 
 The *rigid solver* inside the scene gives you direct access to this functionality through
 `add_weld_constraint()` and `delete_weld_constraint()`.  The API takes two numpy arrays that list the

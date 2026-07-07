@@ -2,7 +2,7 @@
 An `Options` object is a group of parameters for setting a specific component in the scene.
 
 :::{tip}
-We build multiple classes based on this concept throughout Genesis, such as `gs.options.SimOptions`, `gs.morphs`, `gs.renderers`, `gs.surfaces`, and `gs.textures`. Note that many of them, although inheriting from `Options`, are accessible directly under the `gs` namespace for convenience.
+We build multiple classes based on this concept throughout Genesis World, such as `gs.options.SimOptions`, `gs.morphs`, `gs.renderers`, `gs.surfaces`, and `gs.textures`. Note that many of them, although inheriting from `Options`, are accessible directly under the `gs` namespace for convenience.
 
 :::
 
