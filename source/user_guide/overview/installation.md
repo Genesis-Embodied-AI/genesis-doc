@@ -55,7 +55,7 @@ If you need to load USD assets into Genesis World scenes, see [USD Import Setup]
 
 #### 'Genesis hasn't been initialized'
 
-Genesis World is not initialized, trying to import any engine-related submodule will raise an exception, e.g.;
+If Genesis World hasn't been initialized, trying to import any engine-related submodule will raise an exception, e.g.;
 ```python
 Traceback (most recent call last):
   File "/home/jeremy/Downloads/Genesis_Jeremy/examples/./init_error.py", line 3, in <module>
