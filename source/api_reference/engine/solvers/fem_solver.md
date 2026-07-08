@@ -1,22 +1,23 @@
 # FEMSolver
 
-The `FEMSolver` implements the Finite Element Method for simulating deformable solids with high accuracy.
+The `FEMSolver` implements the Finite Element Method for simulating deformable solids on tetrahedral meshes.
 
 ## Overview
 
 The FEM solver:
 
-- Uses tetrahedral mesh elements
-- Supports various constitutive models
-- Handles large deformations (geometric nonlinearity)
-- GPU-accelerated assembly and solve
+- Uses tetrahedral mesh elements.
+- Supports several constitutive models (linear, stable Neo-Hookean, linear corotated).
+- Handles large deformations (geometric nonlinearity).
+- Offers an explicit integrator by default and an optional implicit solver.
 
-## Supported Materials
+## Supported materials
 
 | Material | Description |
 |----------|-------------|
-| `FEM.Elastic` | Linear/nonlinear elasticity |
+| `FEM.Elastic` | Elastic solid with selectable constitutive model |
 | `FEM.Muscle` | Active muscle contraction |
+| `FEM.Cloth` | Thin-shell cloth |
 
 ## Usage
 
@@ -31,13 +32,13 @@ scene = gs.Scene(
     ),
 )
 
-# Add FEM entity
+# Add an FEM entity
 soft_body = scene.add_entity(
     gs.morphs.Mesh(file="soft_object.obj"),
     material=gs.materials.FEM.Elastic(
-        E=1e5,
-        nu=0.4,
-        rho=1000,
+        E=1e5,     # Young's modulus, Pa
+        nu=0.4,    # Poisson's ratio
+        rho=1000,  # density, kg/m^3
     ),
 )
 
@@ -51,26 +52,32 @@ for i in range(1000):
 
 Key options in `FEMOptions`:
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `dt` | float | Internal timestep |
-| `damping` | float | Rayleigh damping coefficient |
-| `iterations` | int | Solver iterations |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `dt` | float | inherited | Substep duration in seconds. Inherits from `SimOptions` if not set. |
+| `damping` | float | `0.0` | Damping factor. |
+| `use_implicit_solver` | bool | `False` | Use the implicit solver, which is more stable at large time steps. |
+| `enable_vertex_constraints` | bool | `False` | Allow vertex constraints under the implicit solver. |
 
-## Boundary Conditions
+## Vertex constraints
 
-Apply fixed boundary conditions:
+Pin vertices to fixed targets or to a rigid link with `set_vertex_constraints`. Under the implicit solver, set `enable_vertex_constraints=True` first.
 
 ```python
-# Fix bottom vertices
-soft_body.fix_vertices(z_min=0.01)
+# Pin the given vertices at their current positions
+soft_body.set_vertex_constraints(verts_idx_local=[0, 1, 2])
 
-# Apply external forces
-soft_body.apply_force(vertex_ids, force_vector)
+# Pull vertices toward a target with a soft spring constraint
+soft_body.set_vertex_constraints(
+    verts_idx_local=[0, 1, 2],
+    target_poss=[(0.0, 0.0, 0.5)] * 3,
+    is_soft_constraint=True,
+    stiffness=1e3,
+)
 ```
 
-## See Also
+## See also
 
-- {doc}`/api_reference/entity/fem_entity` - FEMEntity
-- {doc}`/api_reference/material/fem/index` - FEM materials
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/fem_options` - Full options
+- {doc}`/api_reference/entity/fem_entity` — FEMEntity.
+- {doc}`/api_reference/material/fem/index` — FEM materials.
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/fem_options` — full options.

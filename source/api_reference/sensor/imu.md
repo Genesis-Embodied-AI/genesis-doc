@@ -149,7 +149,7 @@ for i in range(1000):
 ## API Reference
 
 ```{eval-rst}
-.. autoclass:: genesis.engine.sensors.IMUSensor
+.. autoclass:: genesis.engine.sensors.imu.IMUSensor
    :members:
    :undoc-members:
    :show-inheritance:

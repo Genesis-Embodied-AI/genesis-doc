@@ -72,8 +72,7 @@ lidar_2d = scene.add_sensor(
 lidar_3d = scene.add_sensor(
     gs.sensors.Raycaster(
         pattern=gs.sensors.SphericalPattern(
-            fov_horizontal=360.0,
-            fov_vertical=30.0,
+            fov=(360.0, 30.0),  # (horizontal, vertical) field of view, degrees
         ),
         entity_idx=robot.idx,
     )
@@ -82,20 +81,31 @@ lidar_3d = scene.add_sensor(
 
 ### Custom Pattern
 
-```python
-import numpy as np
+There is no `ray_directions` argument on `Raycaster`. To cast an arbitrary set of rays, subclass `gs.sensors.RaycastPattern` and fill in `_ray_dirs` (unit direction vectors in the sensor frame), then pass an instance as `pattern`.
 
-# Define custom ray directions
-rays = np.array([
-    [1, 0, 0],    # Forward
-    [0, 1, 0],    # Left
-    [-1, 0, 0],   # Back
-    [0, -1, 0],   # Right
-])
+```python
+import torch
+import genesis as gs
+
+class CrossPattern(gs.sensors.RaycastPattern):
+    def _get_return_shape(self):
+        return (4,)
+
+    def compute_ray_dirs(self):
+        self._ray_dirs[:] = torch.tensor(
+            [
+                [1.0, 0.0, 0.0],   # forward
+                [0.0, 1.0, 0.0],   # left
+                [-1.0, 0.0, 0.0],  # back
+                [0.0, -1.0, 0.0],  # right
+            ],
+            dtype=gs.tc_float,
+            device=gs.device,
+        )
 
 sensor = scene.add_sensor(
     gs.sensors.Raycaster(
-        ray_directions=rays,
+        pattern=CrossPattern(),
         entity_idx=robot.idx,
     )
 )
@@ -112,7 +122,7 @@ The Raycaster uses a GPU-accelerated Linear BVH (LBVH) for efficient ray-scene i
 ## API Reference
 
 ```{eval-rst}
-.. autoclass:: genesis.engine.sensors.RaycasterSensor
+.. autoclass:: genesis.engine.sensors.raycaster.RaycasterSensor
    :members:
    :undoc-members:
    :show-inheritance:

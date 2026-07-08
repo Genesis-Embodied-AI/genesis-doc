@@ -85,6 +85,10 @@ See {doc}`/api_reference/options/surface/index` for all surface types.
 
 ## API Reference
 
+```{note}
+The ``Raytracer`` class requires the optional ray-tracing extra (LuisaRender). If that dependency is not installed, the module ``genesis.vis.raytracer`` cannot be imported and the API documentation below will not render.
+```
+
 ```{eval-rst}
 .. autoclass:: genesis.vis.raytracer.Raytracer
    :members:

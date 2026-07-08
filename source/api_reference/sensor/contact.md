@@ -97,7 +97,7 @@ in_contact = contact.read()  # ([n_envs,] 1) boolean tensor
 ### ContactForceSensor
 
 ```{eval-rst}
-.. autoclass:: genesis.engine.sensors.ContactForceSensor
+.. autoclass:: genesis.engine.sensors.contact_force.ContactForceSensor
    :members:
    :undoc-members:
    :show-inheritance:
@@ -106,7 +106,7 @@ in_contact = contact.read()  # ([n_envs,] 1) boolean tensor
 ### ContactSensor
 
 ```{eval-rst}
-.. autoclass:: genesis.engine.sensors.ContactSensor
+.. autoclass:: genesis.engine.sensors.contact_force.ContactSensor
    :members:
    :undoc-members:
    :show-inheritance:

@@ -44,13 +44,13 @@ for i in range(100):
 
 ## Configuration
 
-The Rasterizer is configured through `RasterizerOptions`:
+`gs.options.renderers.Rasterizer` takes no parameters:
 
 ```python
-rasterizer_options = gs.options.renderers.Rasterizer(
-    env_separate_rigid=True,   # Separate rendering per environment
-)
+rasterizer = gs.options.renderers.Rasterizer()
 ```
+
+Rendering behavior such as shadows, lights, and per-environment isolation (`env_separate_rigid`) is configured on `gs.options.VisOptions`, not on the renderer.
 
 ## Output Types
 

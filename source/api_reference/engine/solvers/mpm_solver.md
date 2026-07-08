@@ -6,11 +6,11 @@ The `MPMSolver` implements the Material Point Method (MPM) for simulating a wide
 
 MPM combines:
 
-- **Lagrangian particles**: Track material points
-- **Eulerian grid**: Solve momentum equations
-- **Particle-grid transfers**: MLS-MPM for stability
+- **Lagrangian particles:** track material points.
+- **Eulerian grid:** solve the momentum equations.
+- **Particle-grid transfers:** MLS-MPM for stability.
 
-## Supported Materials
+## Supported materials
 
 | Material | Description |
 |----------|-------------|
@@ -56,15 +56,16 @@ for i in range(1000):
 
 Key options in `MPMOptions`:
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `dt` | float | Internal timestep |
-| `lower_bound` | tuple | Grid lower corner |
-| `upper_bound` | tuple | Grid upper corner |
-| `grid_density` | int | Grid cells per unit |
-| `particle_size` | float | Particle spacing |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `dt` | float | inherited | Substep duration in seconds. Inherits from `SimOptions` if not set. |
+| `lower_bound` | tuple | `(-1, -1, 0)` | Lower corner of the simulation domain. |
+| `upper_bound` | tuple | `(1, 1, 1)` | Upper corner of the simulation domain. |
+| `grid_density` | float | `64` | Grid cells per meter. |
+| `particle_size` | float | auto | Particle diameter in meters; derived from `grid_density` if not set. |
+| `enable_CPIC` | bool | `False` | Enable CPIC for coupling with thin objects. |
 
-## Grid Setup
+## Grid setup
 
 MPM requires a background grid for computation:
 
@@ -76,19 +77,19 @@ mpm_options = gs.options.MPMOptions(
 )
 ```
 
-## Material Parameters
+## Material parameters
 
-### Elastic Material
+### Elastic material
 
 ```python
 material = gs.materials.MPM.Elastic(
-    E=1e5,       # Young's modulus (Pa)
-    nu=0.3,      # Poisson's ratio
-    rho=1000,    # Density (kg/m^3)
+    E=1e5,     # Young's modulus, Pa
+    nu=0.3,    # Poisson's ratio
+    rho=1000,  # density, kg/m^3
 )
 ```
 
-### Granular (Sand)
+### Granular (sand)
 
 ```python
 material = gs.materials.MPM.Sand(
@@ -99,8 +100,8 @@ material = gs.materials.MPM.Sand(
 )
 ```
 
-## See Also
+## See also
 
-- {doc}`/api_reference/entity/mpm_entity` - MPMEntity
-- {doc}`/api_reference/material/mpm/index` - MPM materials
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/mpm_options` - Full options
+- {doc}`/api_reference/entity/mpm_entity` — MPMEntity.
+- {doc}`/api_reference/material/mpm/index` — MPM materials.
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/mpm_options` — full options.

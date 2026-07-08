@@ -74,7 +74,7 @@ if pos.scene is not None:
 ## API Reference
 
 ```{eval-rst}
-.. autoclass:: genesis.grad.Tensor
+.. autoclass:: genesis.grad.tensor.Tensor
    :members:
    :undoc-members:
    :show-inheritance:

@@ -47,11 +47,30 @@ for step in range(10000):
 
 ## Configuration
 
-The BatchRenderer is configured through `BatchRendererOptions`:
+The BatchRenderer is configured through `gs.options.renderers.BatchRenderer`, which exposes a single parameter:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `use_rasterizer` | bool | `False` | Whether to use the rasterizer backend instead of ray tracing. |
 
 ```python
-batch_options = gs.options.renderers.BatchRenderer(
-    # Configuration options
+renderer = gs.options.renderers.BatchRenderer(use_rasterizer=False)
+```
+
+## Lighting
+
+The batch renderer manages its own lights, added through `scene.visualizer.add_light` after the scene is created. All arguments are required:
+
+```python
+scene.visualizer.add_light(
+    pos=(0.0, 0.0, 10.0),      # light position, used for non-directional lights
+    dir=(0.0, 0.0, -1.0),      # direction the light travels along (normalized internally)
+    color=(1.0, 1.0, 1.0),     # RGB, each channel in [0, 1]
+    intensity=1.0,
+    directional=True,          # parallel rays if True, positional light if False
+    castshadow=True,
+    cutoff=45.0,               # spotlight cutoff angle in degrees
+    attenuation=0.0,           # falloff with distance for positional lights
 )
 ```
 
@@ -64,6 +83,7 @@ With `n_envs > 1`, camera outputs are batched:
 | `rgb` | `(n_envs, H, W, 3)` | Batched RGB images |
 | `depth` | `(n_envs, H, W)` | Batched depth maps |
 | `segmentation` | `(n_envs, H, W)` | Batched segmentation |
+| `normal` | `(n_envs, H, W, 3)` | Batched surface normals |
 
 ## Performance Tips
 

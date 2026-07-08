@@ -1,21 +1,23 @@
 # SPHSolver
 
-The `SPHSolver` implements Smoothed Particle Hydrodynamics for fluid simulation.
+The `SPHSolver` implements Smoothed Particle Hydrodynamics for liquid simulation.
 
 ## Overview
 
-SPH approximates fluid dynamics using particles:
+SPH approximates fluid dynamics with particles:
 
-- Pressure forces from density
-- Viscosity forces from velocity differences
-- Surface tension (optional)
-- Free surface handling
+- Pressure forces from local density.
+- Viscosity forces from velocity differences.
+- Surface tension.
+- Free-surface handling.
 
-## Supported Materials
+Two pressure solvers are available through `pressure_solver`: weakly compressible SPH (`"WCSPH"`, the default) and divergence-free SPH (`"DFSPH"`).
+
+## Supported materials
 
 | Material | Description |
 |----------|-------------|
-| `SPH.Liquid` | General liquid simulation |
+| `SPH.Liquid` | General liquid |
 
 ## Usage
 
@@ -31,22 +33,16 @@ scene = gs.Scene(
     ),
 )
 
-# Add fluid
+# Rigid floor
+plane = scene.add_entity(gs.morphs.Plane())
+
+# Add a block of fluid
 fluid = scene.add_entity(
     gs.morphs.Box(pos=(0, 0, 0.5), size=(0.4, 0.4, 0.4)),
     material=gs.materials.SPH.Liquid(
-        rho=1000,     # Density
-        mu=0.01,
+        rho=1000,   # rest density, kg/m^3
+        mu=0.005,   # viscosity
     ),
-)
-
-# Add rigid container
-container = scene.add_entity(
-    gs.morphs.Box(
-        pos=(0, 0, 0.5),
-        size=(0.5, 0.5, 0.5),
-    ),
-    vis_mode="collision",
 )
 
 scene.build()
@@ -59,23 +55,28 @@ for i in range(1000):
 
 Key options in `SPHOptions`:
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `lower_bound` | tuple | Domain lower corner |
-| `upper_bound` | tuple | Domain upper corner |
-| `particle_size` | float | Particle spacing |
-| `dt` | float | Internal timestep |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `lower_bound` | tuple | `(-100, -100, 0)` | Lower corner of the simulation domain. |
+| `upper_bound` | tuple | `(100, 100, 100)` | Upper corner of the simulation domain. |
+| `particle_size` | float | `0.02` | Particle diameter in meters. |
+| `pressure_solver` | str | `"WCSPH"` | Pressure solver: `"WCSPH"` or `"DFSPH"`. |
+| `dt` | float | inherited | Substep duration in seconds. Inherits from `SimOptions` if not set. |
 
-## Parameters
+## Material parameters
 
-| Parameter | Description | Typical Range |
-|-----------|-------------|---------------|
-| `rho` | Rest density | 1000 kg/m^3 (water) |
-| `mu` | Dynamic viscosity | 0.001-0.1 |
-| `stiffness` | Pressure stiffness | 1000-10000 |
+`SPH.Liquid` parameters and typical values:
 
-## See Also
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `rho` | `1000.0` | Rest density in kg/m³ (water). |
+| `stiffness` | `50000.0` | State stiffness in N/m²; controls how pressure rises with compression. |
+| `exponent` | `7.0` | State exponent; controls how nonlinearly pressure scales with density. |
+| `mu` | `0.005` | Dynamic viscosity. |
+| `gamma` | `0.01` | Surface tension. |
 
-- {doc}`/api_reference/entity/sph_entity` - SPHEntity
-- {doc}`/api_reference/material/sph/index` - SPH materials
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/sph_options` - Full options
+## See also
+
+- {doc}`/api_reference/entity/sph_entity` — SPHEntity.
+- {doc}`/api_reference/material/sph/index` — SPH materials.
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/sph_options` — full options.

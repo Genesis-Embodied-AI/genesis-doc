@@ -99,8 +99,8 @@ cam.set_pose(
     lookat=(0, 0, 0),
 )
 
-# Follow an entity
-cam.follow_entity(robot, offset=(2, 0, 1))
+# Follow an entity, keeping the camera's z position fixed at 1.0
+cam.follow_entity(robot, fixed_axis=(None, None, 1.0), smoothing=0.5)
 ```
 
 ## Components
