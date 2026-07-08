@@ -83,7 +83,12 @@ One sentence defining what it is and when to use it.
 
 **One page, one job.** If a page is teaching a concept, don't bury an API dump in it. If it's a reference, don't turn it into a tutorial. Link between them instead.
 
-**Don't duplicate the full script twice.** Several current pages show a snippet-by-snippet walkthrough and then repeat the entire script at the bottom. Pick one: either build the example incrementally *or* show the whole script once and annotate it. If a complete runnable file is valuable, link to it in the `examples/` directory rather than pasting it.
+**Teach concepts; link the code.** A tutorial's job is to explain what a commented example file cannot: *why* each step exists, the mental model behind it, the conventions in play, and what goes wrong without it. Its job is *not* to narrate code line by line — the reader can read code. Concretely:
+
+- **The runnable example file is the single source of truth for the complete code.** Link it prominently (for example, `examples/tutorials/hello_genesis.py`). Never paste a long script in full, and never paste it *twice* (a walkthrough followed by the whole script at the bottom is the pattern to kill).
+- **Pull short excerpts into the page — one per teaching point.** An excerpt anchors an explanation; it does not reproduce the file. If an excerpt has nothing to teach, cut it.
+- **Comments say _what_; prose says _why_.** Don't write prose that restates the next line of code ("`scene.build()` builds the scene"). Explain the reason, the trade-off, or the gotcha instead.
+- A short, self-contained script (under ~15 lines) may be shown once in full as the minimal working example. Anything longer is excerpted, with the full file linked.
 
 **Keep paragraphs short.** Three or four sentences maximum. Break dense material into lists, tables, or steps. A wall of text is where information goes to hide.
 
@@ -124,6 +129,8 @@ force = contact_sensor.read()
 ```
 
 **Minimal first, complete later.** The opening example should contain the fewest lines that demonstrate the point — nothing decorative. Introduce configuration and options only once the core idea has landed.
+
+**Prefer excerpts from the real example file over hand-typed snippets.** Code copied from a tested example in `examples/` stays correct; hand-typed code drifts out of sync with the API and rots silently. When you show an excerpt, copy it from the file you link as the source of truth (see §3).
 
 **Follow the same conventions as the codebase itself:**
 - Tag every fenced block with a language: ` ```python `, ` ```bash `. Never leave a block untagged, and never write ` ```Python ` with a capital P — the label is lowercase.
