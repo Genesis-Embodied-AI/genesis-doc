@@ -1,6 +1,6 @@
 # SAP coupler
 
-The Semi-Analytic Primal (SAP) coupler resolves contact between rigid bodies and FEM soft bodies with a convex, semi-analytic solver derived from the model Drake uses ([paper](https://arxiv.org/abs/2110.10107)). Reach for it when a rigid robot manipulates a moderately deformable volumetric object — grasping, pressing, lifting — and you need contact forces that stay stable and accurate under sustained load.
+The Semi-Analytic Primal (SAP) coupler resolves contact between rigid bodies and FEM soft bodies with a convex, semi-analytic solver derived from the model Drake uses ([paper](https://arxiv.org/abs/2110.10107)). Reach for it when a rigid robot manipulates a moderately deformable volumetric object (grasping, pressing, lifting) and you need contact forces that stay stable and accurate under sustained load.
 
 SAP handles two solvers: `Rigid` and `FEM`. For cloth and highly deformable bodies, use the {doc}`IPC coupler <ipc_coupler>` instead; for multi-solver scenes (MPM, SPH, PBD) or differentiable simulation, use the default coupler described in {doc}`Solvers and coupling </user_guide/advanced_topics/solvers_and_coupling>`.
 
@@ -86,7 +86,7 @@ Three parameters select the contact discretization per pair. Each accepts one of
 
 ## Grasping a deformable object
 
-[`examples/sap_coupling/franka_grasp_fem_sphere.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/franka_grasp_fem_sphere.py) has a Franka arm grasp and lift an FEM sphere — the workload SAP is built for. A rigid-cube variant lives in [`franka_grasp_rigid_cube.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/franka_grasp_rigid_cube.py).
+[`examples/sap_coupling/franka_grasp_fem_sphere.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/franka_grasp_fem_sphere.py) has a Franka arm grasp and lift an FEM sphere, the workload SAP is built for. A rigid-cube variant lives in [`franka_grasp_rigid_cube.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/franka_grasp_rigid_cube.py).
 
 A steady grasp demands tighter convergence than the defaults, because a loose solve lets the object creep out of the fingers over many steps. The example tightens both the PCG threshold and the SAP tolerances, and disables self-collision on the arm so the fingers can close fully:
 
@@ -114,6 +114,6 @@ To hold a target vertex of an FEM body in place — a fixed constraint rather th
 
 ## See also
 
-- {doc}`IPC coupler <ipc_coupler>` — barrier-based contact for cloth and highly deformable bodies.
-- {doc}`Solvers and coupling </user_guide/advanced_topics/solvers_and_coupling>` — how solvers and couplers fit together.
-- {doc}`FEM options </api_reference/options/simulator_coupler_and_solver_options/fem_options>` and {doc}`FEM elastic material </api_reference/material/fem/elastic>` — configuring the deformable bodies SAP couples.
+- {doc}`IPC coupler <ipc_coupler>`: barrier-based contact for cloth and highly deformable bodies.
+- {doc}`Solvers and coupling </user_guide/advanced_topics/solvers_and_coupling>`: how solvers and couplers fit together.
+- {doc}`FEM options </api_reference/options/simulator_coupler_and_solver_options/fem_options>` and {doc}`FEM elastic material </api_reference/material/fem/elastic>`: configuring the deformable bodies SAP couples.

@@ -2,7 +2,7 @@
 
 A raycaster measures the scene geometrically: it casts a fixed pattern of rays from the sensor's frame, finds where each ray first hits scene geometry, and returns the hit points and their distances. Two concrete sensors share this machinery and differ only in how you interpret the result:
 
-- `gs.sensors.Lidar` returns the raw hit set — a point cloud and per-ray distances — for range sensing, mapping, and obstacle avoidance.
+- `gs.sensors.Lidar` returns the raw hit set (a point cloud and per-ray distances) for range sensing, mapping, and obstacle avoidance.
 - `gs.sensors.DepthCamera` casts a pinhole-camera ray grid and reshapes the distances into a depth image.
 
 The ray count and directions come from a **pattern** (`gs.sensors.RaycastPattern`). Two runnable examples are the source of truth for this page: a teleoperated sensor mounted on a Go2 in [`examples/sensors/lidar_teleop.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/lidar_teleop.py), and depth cameras on rigid and deforming geometry in [`examples/sensors/depth_camera_custom_vverts.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/depth_camera_custom_vverts.py).
@@ -44,7 +44,7 @@ The lidar needs geometry to cast against: a raycaster raises at build time if th
 
 ## How ray casting works
 
-A pattern is a purely local description of the rays: it fixes a start point and a unit direction for each ray in the sensor's own frame, independent of where the sensor ends up in the world. The pattern's `return_shape` — for example `(n_horizontal, n_vertical)` for a spherical scan — sets the layout every read preserves.
+A pattern is a purely local description of the rays: it fixes a start point and a unit direction for each ray in the sensor's own frame, independent of where the sensor ends up in the world. The pattern's `return_shape` (for example `(n_horizontal, n_vertical)` for a spherical scan) sets the layout every read preserves.
 
 At each `read()`, Genesis World places the pattern in the world by composing the attached link's pose with the sensor's `pos_offset` and `euler_offset`, then casts every ray against an acceleration structure built over the scene's geometry. Each ray reports the first surface it hits. A ray that hits nothing within `max_range`, or closer than `min_range`, reports `no_hit_value` (which defaults to `max_range`) so the returned tensors keep a fixed shape.
 
@@ -89,7 +89,7 @@ gs.sensors.SphericalPattern(
 )
 ```
 
-To model a real unit, set the fov and ray counts from its datasheet — for example a Velodyne VLP-16 is `fov=(360.0, 30.0), n_points=(1800, 16)`.
+To model a real unit, set the fov and ray counts from its datasheet. For example, a Velodyne VLP-16 is `fov=(360.0, 30.0), n_points=(1800, 16)`.
 
 ### DepthCameraPattern
 
@@ -107,7 +107,7 @@ gs.sensors.DepthCameraPattern(
 
 ### GridPattern
 
-Parallel rays cast from a plane in a single direction — a height map under the sensor, for instance:
+Parallel rays cast from a plane in a single direction, a height map under the sensor, for instance:
 
 ```python
 gs.sensors.GridPattern(
@@ -182,7 +182,7 @@ result.distances.shape  # (4, 128, 64)
 
 ## See also
 
-- {doc}`Sensors overview <index>` — the sensor pipeline, noise, delay, and batched reads.
-- {doc}`Camera sensors <camera_sensors>` — rendered RGB, depth, and segmentation through a camera.
-- {doc}`Recorders </user_guide/getting_started/recorders>` — save depth images and point clouds alongside the simulation.
-- {doc}`Conventions </user_guide/getting_started/conventions>` — the Z-up frame and unit conventions the returned points follow.
+- {doc}`Sensors overview <index>`: the sensor pipeline, noise, delay, and batched reads.
+- {doc}`Camera sensors <camera_sensors>`: rendered RGB, depth, and segmentation through a camera.
+- {doc}`Recorders </user_guide/getting_started/recorders>`: save depth images and point clouds alongside the simulation.
+- {doc}`Conventions </user_guide/getting_started/conventions>`: the Z-up frame and unit conventions the returned points follow.

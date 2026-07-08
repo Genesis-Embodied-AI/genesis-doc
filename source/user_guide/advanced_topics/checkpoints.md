@@ -11,11 +11,11 @@ All of these operate on a built scene. Build first, then snapshot.
 
 ## The state model
 
-A snapshot captures only the *dynamic* state — the fields that change as the simulation steps. It does not capture the scene's *structure*: the entities, their morphs, the solver options, or the number of environments. That structure is fixed by how you build the scene, and restoring a snapshot assumes it is already in place.
+A snapshot captures only the *dynamic* state: the fields that change as the simulation steps. It does not capture the scene's *structure*: the entities, their morphs, the solver options, or the number of environments. That structure is fixed by how you build the scene, and restoring a snapshot assumes it is already in place.
 
 - **`SimState`:** the object returned by `scene.get_state()`. It holds one per-solver state object for each active solver, batched over environments.
 - **Dynamic state:** positions, velocities, and the internal fields each solver integrates. This is what a checkpoint saves and restores.
-- **Static structure:** entities, morphs, geometry, and solver configuration. Not saved — you must reconstruct it before restoring, and it must match.
+- **Static structure:** entities, morphs, geometry, and solver configuration. Not saved. You must reconstruct it before restoring, and it must match.
 
 Because structure is not part of the snapshot, a checkpoint is only valid for a scene built the same way. Restoring into a scene with different entities or solver options is undefined.
 
@@ -76,7 +76,7 @@ for step in range(episode_length):
 
 ## Saving to disk
 
-`save_checkpoint` writes the full physics state — the scene's own fields plus every active solver's fields — to a single pickle file. Restoring requires a scene that was built the same way:
+`save_checkpoint` writes the full physics state (the scene's own fields plus every active solver's fields) to a single pickle file. Restoring requires a scene that was built the same way:
 
 ```python
 # Process A: run and save.
@@ -125,7 +125,7 @@ On disk, a checkpoint is a pickled dictionary. The `arrays` entry is a flat map 
 
 ## Reproducibility notes
 
-- **Configuration must match.** A checkpoint restores fields by name into an already-built scene. The entities, solver options, and environment count must match the scene that produced it. There is no compatibility check — a mismatch fails or silently corrupts state.
+- **Configuration must match.** A checkpoint restores fields by name into an already-built scene. The entities, solver options, and environment count must match the scene that produced it. There is no compatibility check: a mismatch fails or silently corrupts state.
 - **Precision limits exactness.** Genesis World uses 32-bit floats by default (see {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`). A save/load round trip is therefore accurate to roughly single-precision, not bit-exact. Build with `precision="64"` if you need tighter reproducibility.
 - **Serialize before pickling a `SimState`.** A `SimState` returned by `get_state()` holds live references back into the scene and its autograd graph. Call `state.serializable()` first to detach the tensors and drop those references, then pickle it yourself. `save_checkpoint` handles this for you.
 
@@ -140,7 +140,7 @@ with open("state.pkl", "wb") as f:
 
 ## See also
 
-- {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>` — how state is batched over environments.
-- {doc}`Scene API </api_reference/scene/scene>` — the full signatures of `get_state`, `reset`, `save_checkpoint`, and `load_checkpoint`.
+- {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>`: how state is batched over environments.
+- {doc}`Scene API </api_reference/scene/scene>`: the full signatures of `get_state`, `reset`, `save_checkpoint`, and `load_checkpoint`.
 </content>
 </invoke>

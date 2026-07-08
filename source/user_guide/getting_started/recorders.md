@@ -19,14 +19,14 @@ That single call captures IMU readings every step and writes them to `imu_data.n
 
 Every scene owns a **RecorderManager**. Each call to `start_recording` registers one **recorder** with that manager, pairing two things:
 
-- A **data function** — a zero-argument callable that returns the data to capture (a scalar, an array, or a `dict` of them).
-- A **recorder options** object from `gs.recorders` — the *what to do with it*: a file writer or a plotter.
+- A **data function:** a zero-argument callable that returns the data to capture (a scalar, an array, or a `dict` of them).
+- A **recorder options** object from `gs.recorders`, the *what to do with it*: a file writer or a plotter.
 
 From then on, the manager drives the recorder for you:
 
 1. On `scene.build()`, every registered recorder is built and started (files are opened, plot windows appear).
 2. On each `scene.step()`, the manager calls the data function and hands the result to the recorder at the configured rate.
-3. On `scene.stop_recording()` — or when the scene is destroyed — every recorder flushes and closes cleanly.
+3. On `scene.stop_recording()` (or when the scene is destroyed), every recorder flushes and closes cleanly.
 
 Because the manager reads the data function itself, you never call it in your loop. You describe the recording once, before build, and step normally.
 
@@ -45,7 +45,7 @@ imu.start_recording(gs.recorders.NPZFile(filename="imu_data.npz"))
 
 ## Recording arbitrary data
 
-To record anything else — or to combine or preprocess sensor output — use `scene.start_recording` with your own data function. It takes the callable first and the recorder options second:
+To record anything else, or to combine or preprocess sensor output, use `scene.start_recording` with your own data function. It takes the callable first and the recorder options second:
 
 ```python
 def data_func():
@@ -100,7 +100,7 @@ Pass any of these to `start_recording` as the recorder options. All are exported
 | `MPLImagePlot` | Live image | `(H, W)`, `(H, W, 1/3/4)` |
 | `MPLVectorFieldPlot` | 3D vectors projected to a plane, colored by magnitude | `(N, 3)` at fixed `positions` |
 
-`PyQtGraph` and `matplotlib` are optional dependencies. The example probes for them and falls back gracefully — see `IS_PYQTGRAPH_AVAILABLE` / `IS_MATPLOTLIB_AVAILABLE` in `genesis.recorders.plotters`.
+`PyQtGraph` and `matplotlib` are optional dependencies. The example probes for them and falls back gracefully. See `IS_PYQTGRAPH_AVAILABLE` / `IS_MATPLOTLIB_AVAILABLE` in `genesis.recorders.plotters`.
 
 For more usage: camera video and image recording in [`examples/manipulation/grasp_env.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/manipulation/grasp_env.py), joint-torque plotting in [`examples/sensors/joint_torque_franka.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/joint_torque_franka.py), and tactile vector fields in [`examples/sensors/tactile_franka.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/tactile_franka.py).
 
@@ -108,9 +108,9 @@ For more usage: camera video and image recording in [`examples/manipulation/gras
 
 Every recorder options object accepts a few shared settings:
 
-- `hz` — how often to sample, in samples per second. If omitted, the data function runs every step. Genesis World snaps `hz` to the nearest integer multiple of the timestep and warns if it had to adjust.
-- `save_on_reset` (file writers) — when `True`, `scene.reset()` flushes the current file and appends an incrementing counter to the filename, starting a fresh recording per episode.
-- `buffer_size` and `buffer_full_wait_time` — bound the background queue used when recording off-thread.
+- `hz`: how often to sample, in samples per second. If omitted, the data function runs every step. Genesis World snaps `hz` to the nearest integer multiple of the timestep and warns if it had to adjust.
+- `save_on_reset` (file writers): when `True`, `scene.reset()` flushes the current file and appends an incrementing counter to the filename, starting a fresh recording per episode.
+- `buffer_size` and `buffer_full_wait_time`: bound the background queue used when recording off-thread.
 
 ```python
 scene.start_recording(
@@ -121,7 +121,7 @@ scene.start_recording(
 
 ## Stopping recording
 
-Recording stops automatically when the scene is destroyed, so short scripts need no explicit teardown. Call `scene.stop_recording()` to stop and flush every recorder early — for example, to finalize a file before the program continues:
+Recording stops automatically when the scene is destroyed, so short scripts need no explicit teardown. Call `scene.stop_recording()` to stop and flush every recorder early, for example to finalize a file before the program continues:
 
 ```python
 scene.stop_recording()  # flushes files, closes plot windows
@@ -129,6 +129,6 @@ scene.stop_recording()  # flushes files, closes plot windows
 
 ## See also
 
-- {doc}`Recording API reference </api_reference/recording/index>` — `RecorderManager`, `Recorder`, and every recorder options class.
-- {doc}`Sensors <sensors/index>` — the contact, tactile, proximity, IMU, and temperature sensors you can record from.
-- {doc}`Camera sensors <sensors/camera_sensors>` — RGB, depth, segmentation, and normal outputs, which pair with `VideoFile` and `MPLImagePlot`.
+- {doc}`Recording API reference </api_reference/recording/index>`: `RecorderManager`, `Recorder`, and every recorder options class.
+- {doc}`Sensors <sensors/index>`: the contact, tactile, proximity, IMU, and temperature sensors you can record from.
+- {doc}`Camera sensors <sensors/camera_sensors>`: RGB, depth, segmentation, and normal outputs, which pair with `VideoFile` and `MPLImagePlot`.

@@ -104,7 +104,7 @@ reads the same values you would recover by slicing the solver's global field wit
 
 ## See also
 
-- {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` — the minimal build-and-step program.
-- {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>` — running many environments at once.
-- {doc}`Solvers and coupling <solvers_and_coupling>` — configuring solvers and the coupler.
-- {doc}`Naming and variables <naming_and_variables>` — the map from quantities to solver fields.
+- {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`: the minimal build-and-step program.
+- {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>`: running many environments at once.
+- {doc}`Solvers and coupling <solvers_and_coupling>`: configuring solvers and the coupler.
+- {doc}`Naming and variables <naming_and_variables>`: the map from quantities to solver fields.

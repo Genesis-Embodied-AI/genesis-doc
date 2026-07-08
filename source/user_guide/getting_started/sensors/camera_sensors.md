@@ -1,6 +1,6 @@
 # Camera sensors
 
-A camera sensor renders the scene to an RGB image off-screen and returns it through the sensor pipeline. Add one with `scene.add_sensor(...)`, step the simulation, and call `read()` to get pixels back as a tensor — no viewer window required.
+A camera sensor renders the scene to an RGB image off-screen and returns it through the sensor pipeline. Add one with `scene.add_sensor(...)`, step the simulation, and call `read()` to get pixels back as a tensor. No viewer window required.
 
 A camera sensor is distinct from two things it is easy to confuse it with:
 
@@ -42,14 +42,14 @@ print(data.rgb.shape)  # (600, 500, 3) — (H, W, 3), H and W from res=(W, H)
 
 ## What `read()` returns
 
-`read()` renders the current scene state if it is stale, then returns a `CameraReturnType` — a `NamedTuple` whose single field is the color image:
+`read()` renders the current scene state if it is stale, then returns a `CameraReturnType`, a `NamedTuple` whose single field is the color image:
 
 ```python
 data = camera.read()
 rgb = data.rgb  # shape ([n_envs,] H, W, 3), dtype uint8, values 0–255
 ```
 
-The image is `(H, W, 3)` with `H = res[1]` and `W = res[0]` — note that `res` is `(width, height)` but the array is row-major `(height, width)`, matching NumPy image conventions. The leading `n_envs` axis is present only when the scene is built with environments (`scene.build(n_envs=...)`); an unbatched `scene.build()` drops it.
+The image is `(H, W, 3)` with `H = res[1]` and `W = res[0]`. Note that `res` is `(width, height)` but the array is row-major `(height, width)`, matching NumPy image conventions. The leading `n_envs` axis is present only when the scene is built with environments (`scene.build(n_envs=...)`); an unbatched `scene.build()` drops it.
 
 Pass `envs_idx` to read a subset of environments:
 
@@ -78,7 +78,7 @@ Three backends render RGB. They share the common options below and differ in spe
 | `RaytracerCameraOptions` | LuisaRender | single environment | photo-realistic offline renders |
 | `BatchRendererCameraOptions` | Madrona (GPU) | parallel | high-throughput RL training (CUDA only) |
 
-Select a backend by choosing the matching options class — no separate scene `renderer` argument is required for the rasterizer. For photo-realistic path tracing, prefer the Nyx renderer described in {doc}`/user_guide/getting_started/visualization`.
+Select a backend by choosing the matching options class; no separate scene `renderer` argument is required for the rasterizer. For photo-realistic path tracing, prefer the Nyx renderer described in {doc}`/user_guide/getting_started/visualization`.
 
 Common parameters (all backends):
 
@@ -151,6 +151,6 @@ Camera sensors do not support `history_length`. They render lazily on `read()` a
 
 ## See also
 
-- {doc}`/user_guide/getting_started/visualization` — the viewer, the visualization camera's four image channels, video recording, and rendering backends.
-- {doc}`Sensors <index>` — the sensor pipeline, batched reads, and other sensor families.
-- {doc}`Raycaster sensors <raycaster>` — depth camera and lidar with configurable ray patterns.
+- {doc}`/user_guide/getting_started/visualization`: the viewer, the visualization camera's four image channels, video recording, and rendering backends.
+- {doc}`Sensors <index>`: the sensor pipeline, batched reads, and other sensor families.
+- {doc}`Raycaster sensors <raycaster>`: depth camera and lidar with configurable ray patterns.

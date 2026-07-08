@@ -1,8 +1,8 @@
 # The configuration system
 
-Genesis World is configured through **options objects** — small, typed parameter groups under `gs.options.*` that you pass to `gs.Scene(...)` and to `scene.add_entity(...)`. Rather than a scene taking dozens of loose keyword arguments, each concern (the global simulator, one physics solver, the viewer, a renderer) gets its own object with its own defaults. This page explains what those objects are, how they compose into a scene, and how a setting given in two places is resolved.
+Genesis World is configured through **options objects**: small, typed parameter groups under `gs.options.*` that you pass to `gs.Scene(...)` and to `scene.add_entity(...)`. Rather than a scene taking dozens of loose keyword arguments, each concern (the global simulator, one physics solver, the viewer, a renderer) gets its own object with its own defaults. This page explains what those objects are, how they compose into a scene, and how a setting given in two places is resolved.
 
-If you have not built a scene yet, read {doc}`hello_genesis` first — it uses `SimOptions` and `ViewerOptions` in passing. This page is the conceptual reference behind that usage.
+If you have not built a scene yet, read {doc}`hello_genesis` first. It uses `SimOptions` and `ViewerOptions` in passing. This page is the conceptual reference behind that usage.
 
 ## A scene is assembled from options
 
@@ -35,14 +35,14 @@ The options split into three roles, plus a set of per-entity options passed to `
 
 All `gs.options.*` classes derive from `gs.options.Options`, a [Pydantic](https://docs.pydantic.dev/) model. Two properties of that base matter in practice:
 
-- **Fields are typed and validated on construction.** A value of the wrong type, or out of range, raises immediately with a readable message — not deep inside the first `scene.step()`.
+- **Fields are typed and validated on construction.** A value of the wrong type, or out of range, raises immediately with a readable message, not deep inside the first `scene.step()`.
 - **Unknown fields are rejected.** The base sets `extra="forbid"`, so a misspelled argument such as `gravty=(0, 0, -9.81)` raises `Unrecognized attribute 'gravty'` instead of being silently ignored.
 
 You never instantiate `Options` directly; you always use a concrete subclass. See the {doc}`Options API </api_reference/options/index>` for the full class list.
 
 ## Simulator options override solver options
 
-`SimOptions` holds settings that are global by default — most importantly the timestep `dt` (seconds) and `gravity` (N/kg, pointing down `-Z`). Each solver also exposes those same settings on its own options object, where they default to `None`.
+`SimOptions` holds settings that are global by default: most importantly the timestep `dt` (seconds) and `gravity` (N/kg, pointing down `-Z`). Each solver also exposes those same settings on its own options object, where they default to `None`.
 
 The rule is: **a value set on a solver's options overrides the global `SimOptions` value, for that solver only.** A solver whose field is left at `None` inherits the global value. This lets most scenes set `dt` once while allowing a single solver to run at a different rate.
 
@@ -80,7 +80,7 @@ Each of these is an optional argument to `gs.Scene(...)`. Pass an instance to co
 The scene- and solver-level options are documented in the {doc}`simulator, coupler, and solver options reference </api_reference/options/simulator_coupler_and_solver_options/index>`; the viewer and renderer in the {doc}`vis </api_reference/options/vis/index>` and {doc}`renderer </api_reference/options/renderer/index>` references.
 
 :::{note}
-Not every solver runs in every scene. A solver is only active once you add an entity whose material targets it — adding a rigid entity activates the rigid solver, and so on. Options for an inactive solver are simply unused.
+Not every solver runs in every scene. A solver is only active once you add an entity whose material targets it: adding a rigid entity activates the rigid solver, and so on. Options for an inactive solver are simply unused.
 :::
 
 ## Per-entity options
@@ -95,12 +95,12 @@ franka = scene.add_entity(
 )
 ```
 
-- **Morph** — the entity's geometry and initial pose. See {doc}`hello_genesis` for loading morphs and the {doc}`morph API </api_reference/options/morph/index>`.
-- **Material** — how the entity responds to physical forces, and which solver simulates it. See {doc}`beyond_rigid_bodies`.
-- **Surface** — how the entity looks when rendered. See {doc}`surfaces_textures`.
+- **Morph:** the entity's geometry and initial pose. See {doc}`hello_genesis` for loading morphs and the {doc}`morph API </api_reference/options/morph/index>`.
+- **Material:** how the entity responds to physical forces, and which solver simulates it. See {doc}`beyond_rigid_bodies`.
+- **Surface:** how the entity looks when rendered. See {doc}`surfaces_textures`.
 
 ## See also
 
-- {doc}`hello_genesis` — the minimal scene that uses these options.
-- {doc}`visualization` — configuring the viewer, cameras, and renderer in depth.
-- {doc}`Options API reference </api_reference/options/index>` — every option class and its fields.
+- {doc}`hello_genesis`: the minimal scene that uses these options.
+- {doc}`visualization`: configuring the viewer, cameras, and renderer in depth.
+- {doc}`Options API reference </api_reference/options/index>`: every option class and its fields.

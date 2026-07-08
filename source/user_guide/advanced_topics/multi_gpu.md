@@ -6,8 +6,8 @@ Reach for multiple GPUs only after you have saturated one. A single modern GPU r
 
 Two runnable examples are the source of truth for the patterns below:
 
-- [`examples/rigid/multi_gpu.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/multi_gpu.py) — one simulation process per GPU, launched with `multiprocessing`.
-- [`examples/ddp_multi_gpu.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/ddp_multi_gpu.py) — data-parallel training over several GPUs with PyTorch DDP and `torchrun`.
+- [`examples/rigid/multi_gpu.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/multi_gpu.py): one simulation process per GPU, launched with `multiprocessing`.
+- [`examples/ddp_multi_gpu.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/ddp_multi_gpu.py): data-parallel training over several GPUs with PyTorch DDP and `torchrun`.
 
 ## The one-process-per-GPU model
 
@@ -43,7 +43,7 @@ for i in range(num_gpus):
     p.start()
 ```
 
-The body of `main()` is a normal simulation — `gs.init(backend=gs.gpu)`, build a scene, step it — with nothing GPU-index-specific in it. The isolation is entirely in the environment variables the parent sets per child.
+The body of `main()` is a normal simulation (`gs.init(backend=gs.gpu)`, build a scene, step it) with nothing GPU-index-specific in it. The isolation is entirely in the environment variables the parent sets per child.
 
 This pattern fits embarrassingly parallel work: independent rollouts, sweeps, or data generation where the processes never need to exchange gradients. When they do, use DDP instead.
 
@@ -124,7 +124,7 @@ Set the device environment variables before `gs.init()`. They are read once at i
 :::
 
 :::{note}
-Pinning the rendering GPU with `EGL_DEVICE_ID` is not reliable on every machine — `examples/ddp_multi_gpu.py` leaves it unset for that reason. On-GPU rendering is not required for headless simulation or training, so omit it unless you specifically render images per rank and have confirmed it works on your hardware.
+Pinning the rendering GPU with `EGL_DEVICE_ID` is not reliable on every machine. `examples/ddp_multi_gpu.py` leaves it unset for that reason. On-GPU rendering is not required for headless simulation or training, so omit it unless you specifically render images per rank and have confirmed it works on your hardware.
 :::
 
 :::{tip}
@@ -133,6 +133,6 @@ Batch as many environments as fit on one GPU before adding a second. Watch memor
 
 ## See also
 
-- {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>` — batching environments on one GPU, and the `([n_envs,] ...)` shape convention.
-- {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` — the single-GPU program that each process in these patterns runs.
-- {doc}`Scene API </api_reference/scene/scene>` — `build`, `step`, and the `n_envs` and `env_spacing` arguments.
+- {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>`: batching environments on one GPU, and the `([n_envs,] ...)` shape convention.
+- {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`: the single-GPU program that each process in these patterns runs.
+- {doc}`Scene API </api_reference/scene/scene>`: `build`, `step`, and the `n_envs` and `env_spacing` arguments.

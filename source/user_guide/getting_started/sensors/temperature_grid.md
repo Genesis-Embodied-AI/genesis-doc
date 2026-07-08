@@ -81,7 +81,7 @@ Each field has a fixed unit:
 - **Frame and layout.** The grid is defined in the link's local frame and spans its bounding box, so it moves and rotates with the link. Cell `(0, 0, 0)` is the corner of the bounding box; `grid_size=(10, 10, 1)` is a single-layer 10×10 sheet, useful for a flat surface like the platform above.
 - **Units.** All temperatures are in degrees Celsius, on input (`base_temperature`, `ambient_temperature`) and on output (`read()`). `ambient_temperature` defaults to 21 °C.
 - **Convection.** `convection_coefficient` is the surface cooling coefficient *h* in W/(m²·K) and defaults to 1.0. Set it to 0.0 to disable convective cooling, as the example does.
-- **Unlisted links.** With `simulate_all_link_temperatures=False` (the default), links other than the sensor's own are treated as adiabatic — they exchange no heat and stay at their `base_temperature`. Set it to `True` to evolve the temperature of every link that has thermal properties; the per-link values are then available on the `link_temperatures` attribute.
+- **Unlisted links.** With `simulate_all_link_temperatures=False` (the default), links other than the sensor's own are treated as adiabatic: they exchange no heat and stay at their `base_temperature`. Set it to `True` to evolve the temperature of every link that has thermal properties; the per-link values are then available on the `link_temperatures` attribute.
 - **Heat generation.** Pass `heat_generation` (a per-cell array matching `grid_size`, in W/m²) to inject heat into specific cells, for example to model a heating element embedded in the link.
 
 :::{tip}
@@ -95,5 +95,5 @@ A hot pusher and dropped objects heat a sensorized platform, whose temperature g
 
 ## See also
 
-- {doc}`Sensors <index>` — the sensor pipeline, batched reads, and history.
-- {doc}`Recorders <../recorders>` — saving sensor data alongside the simulation.
+- {doc}`Sensors <index>`: the sensor pipeline, batched reads, and history.
+- {doc}`Recorders <../recorders>`: saving sensor data alongside the simulation.

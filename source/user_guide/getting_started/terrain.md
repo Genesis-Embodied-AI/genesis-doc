@@ -1,12 +1,12 @@
 # Terrain
 
-`gs.morphs.Terrain` adds a static rigid ground defined by a **height field** — a 2D grid of elevations. It is the standard ground for locomotion work: instead of a flat {py:class}`~genesis.options.morphs.Plane`, a robot walks over slopes, stairs, and obstacles. You build a terrain one of two ways: let Genesis World procedurally generate a grid of **sub-terrains**, or supply your own height field.
+`gs.morphs.Terrain` adds a static rigid ground defined by a **height field**: a 2D grid of elevations. It is the standard ground for locomotion work: instead of a flat {py:class}`~genesis.options.morphs.Plane`, a robot walks over slopes, stairs, and obstacles. You build a terrain one of two ways: let Genesis World procedurally generate a grid of **sub-terrains**, or supply your own height field.
 
 The three runnable examples referenced on this page ship with Genesis World:
 
-- [`examples/rigid/terrain_subterrain.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/terrain_subterrain.py) — procedural sub-terrain grid
-- [`examples/rigid/terrain_height_field.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/terrain_height_field.py) — a user-supplied height field
-- [`examples/rigid/terrain_from_mesh.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/terrain_from_mesh.py) — a height field derived from a triangle mesh
+- [`examples/rigid/terrain_subterrain.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/terrain_subterrain.py): procedural sub-terrain grid
+- [`examples/rigid/terrain_height_field.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/terrain_height_field.py): a user-supplied height field
+- [`examples/rigid/terrain_from_mesh.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/terrain_from_mesh.py): a height field derived from a triangle mesh
 
 ## Minimal example
 
@@ -38,8 +38,8 @@ A single string for `subterrain_types` is applied to every tile. The next sectio
 
 A terrain is a static rigid entity backed by a height field: a 2D array `height_field[i, j]` of integer height samples on a regular grid. Two scales convert that grid into meters in the scene's right-handed, Z-up frame:
 
-- `horizontal_scale` — meters between adjacent grid points (the cell size). Default `0.25`.
-- `vertical_scale` — meters per height-field unit. Default `0.005`.
+- `horizontal_scale`: meters between adjacent grid points (the cell size). Default `0.25`.
+- `vertical_scale`: meters per height-field unit. Default `0.005`.
 
 So grid cell `(i, j)` sits at world position `(i * horizontal_scale, j * horizontal_scale, height_field[i, j] * vertical_scale)`, offset by the morph's `pos`. Genesis World turns this grid into two representations at build time: a height map and SDF for collision queries, and a watertight triangle mesh for rendering.
 
@@ -49,11 +49,11 @@ The terrain's collision SDF resolution is computed automatically and ignores any
 
 ## Procedural sub-terrains
 
-For locomotion, you rarely author a height field by hand. Instead, tile the ground with **sub-terrains** — the approach popularized by Isaac Gym — where each tile is filled by a named generator. Three parameters control the grid:
+For locomotion, you rarely author a height field by hand. Instead, tile the ground with **sub-terrains** (the approach popularized by Isaac Gym), where each tile is filled by a named generator. Three parameters control the grid:
 
-- `n_subterrains=(nx, ny)` — number of tiles in x and y. Default `(3, 3)`.
-- `subterrain_size=(sx, sy)` — size of each tile in meters. Default `(12.0, 12.0)`.
-- `subterrain_types` — a single generator name applied to all tiles, or a 2D list matching `n_subterrains`.
+- `n_subterrains=(nx, ny)`: number of tiles in x and y. Default `(3, 3)`.
+- `subterrain_size=(sx, sy)`: size of each tile in meters. Default `(12.0, 12.0)`.
+- `subterrain_types`: a single generator name applied to all tiles, or a 2D list matching `n_subterrains`.
 
 ```python
 terrain = scene.add_entity(
@@ -89,7 +89,7 @@ Set `randomize=True` to give the generators that involve randomness fresh parame
 
 ## Custom height field
 
-Pass a `height_field` array to build the terrain from your own data — for example a digital elevation model, or a NumPy array you generate. When `height_field` is set, the sub-terrain parameters above are ignored.
+Pass a `height_field` array to build the terrain from your own data, for example a digital elevation model, or a NumPy array you generate. When `height_field` is set, the sub-terrain parameters above are ignored.
 
 ```python
 import numpy as np
@@ -111,7 +111,7 @@ terrain = scene.add_entity(
 
 Values are in height-field units, not meters: an entry of `200` with `vertical_scale=0.005` sits at `1.0 m`.
 
-After the scene is built, the height field actually used is available on the terrain geometry as `terrain.geoms[0].metadata["height_field"]`. This is useful for verifying geometry — for instance, drawing a debug sphere at every sample:
+After the scene is built, the height field actually used is available on the terrain geometry as `terrain.geoms[0].metadata["height_field"]`. This is useful for verifying geometry, for instance drawing a debug sphere at every sample:
 
 ```python
 height_field = terrain.geoms[0].metadata["height_field"]
@@ -152,10 +152,10 @@ terrain = scene.add_entity(
 
 ## Caching generated terrains
 
-Generating a terrain — the height field, the collision mesh, and the visual mesh — runs every time the scene is built. Pass `name="my_terrain"` to generate it only once for a given set of options and load it from cache on later builds. This holds even when `randomize=True`, so it is the way to reconstruct a randomized terrain exactly across runs.
+Generating a terrain (the height field, the collision mesh, and the visual mesh) runs every time the scene is built. Pass `name="my_terrain"` to generate it only once for a given set of options and load it from cache on later builds. This holds even when `randomize=True`, so it is the way to reconstruct a randomized terrain exactly across runs.
 
 ## See also
 
-- {doc}`gs.morphs.Terrain API reference </api_reference/options/morph/file_morph/terrain>` — every keyword argument.
-- {doc}`Hello, Genesis World <hello_genesis>` — the init–scene–build–step loop these examples assume.
-- {doc}`Locomotion training <policy_training/examples/locomotion>` — training a walking policy, where terrain becomes the training ground.
+- {doc}`gs.morphs.Terrain API reference </api_reference/options/morph/file_morph/terrain>`: every keyword argument.
+- {doc}`Hello, Genesis World <hello_genesis>`: the init–scene–build–step loop these examples assume.
+- {doc}`Locomotion training <policy_training/examples/locomotion>`: training a walking policy, where terrain becomes the training ground.

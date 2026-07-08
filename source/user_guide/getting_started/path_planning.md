@@ -2,7 +2,7 @@
 
 `plan_path` finds a collision-free trajectory through a robot's joint space, from its current configuration to a goal configuration. It is a kinematic planner: it reasons about which joint angles collide with the scene, not about forces or dynamics. The result is a list of waypoints you then execute with the controller of your choice.
 
-This page covers `plan_path` on its own. For the full pick-and-place workflow that pairs it with inverse kinematics and gripper control, see {doc}`inverse_kinematics_motion_planning`, whose runnable script — [`examples/tutorials/IK_motion_planning_grasp.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/IK_motion_planning_grasp.py) — is the source of truth for the excerpts below.
+This page covers `plan_path` on its own. For the full pick-and-place workflow that pairs it with inverse kinematics and gripper control, see {doc}`inverse_kinematics_motion_planning`, whose runnable script ([`examples/tutorials/IK_motion_planning_grasp.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/IK_motion_planning_grasp.py)) is the source of truth for the excerpts below.
 
 ## Mental model
 
@@ -108,7 +108,7 @@ if not is_valid:
     print("no collision-free path found within the retry budget")
 ```
 
-When the mask is not requested, a failed plan still returns a path-shaped tensor — check the flag rather than assuming the waypoints are usable.
+When the mask is not requested, a failed plan still returns a path-shaped tensor. Check the flag rather than assuming the waypoints are usable.
 
 ## Planning across parallel environments
 
@@ -139,7 +139,7 @@ path, valid = franka.plan_path(
 
 ## See also
 
-- {doc}`inverse_kinematics_motion_planning` — full pick-and-place: IK, planning, and gripper control together
-- {doc}`advanced_ik` — multi-target IK, null-space control, and solver tuning
-- {doc}`control_your_robot` — position, velocity, and force control in depth
-- {doc}`constraints` — weld and connect constraints for locking links at runtime
+- {doc}`inverse_kinematics_motion_planning`: full pick-and-place: IK, planning, and gripper control together
+- {doc}`advanced_ik`: multi-target IK, null-space control, and solver tuning
+- {doc}`control_your_robot`: position, velocity, and force control in depth
+- {doc}`constraints`: weld and connect constraints for locking links at runtime

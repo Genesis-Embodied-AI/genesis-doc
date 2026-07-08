@@ -51,7 +51,7 @@ scene.viewer.register_keybinds(
 )
 ```
 
-`register_keybinds` requires a built scene — it raises if called before `scene.build()`. Register keys after building, as in the example above.
+`register_keybinds` requires a built scene. It raises if called before `scene.build()`. Register keys after building, as in the example above.
 
 A `Keybind` takes a unique `name`, a `key` from the `kb.Key` enum, and a `key_action`:
 
@@ -79,17 +79,17 @@ scene = gs.Scene(
 
 ## Viewer plugins
 
-A viewer plugin is an object the viewer calls back into as things happen. The viewer dispatches window events (mouse, keyboard, resize) to each plugin, calls it once per simulation step, and once per rendered frame. This lets a plugin maintain its own state, respond to input, and draw debug geometry — all without touching the render loop directly.
+A viewer plugin is an object the viewer calls back into as things happen. The viewer dispatches window events (mouse, keyboard, resize) to each plugin, calls it once per simulation step, and once per rendered frame. This lets a plugin maintain its own state, respond to input, and draw debug geometry, all without touching the render loop directly.
 
 Add a plugin with `scene.viewer.add_plugin(plugin)` **before** `scene.build()`; the viewer calls the plugin's `build()` hook once the scene is built. The built-in `MouseInteractionPlugin` is ready to use; anything more specific you write by subclassing `ViewerPlugin`.
 
 :::{note}
-The ImGui overlay plugin — the entity browser, joint sliders, and simulation controls — is enabled with `ViewerOptions(enable_gui=True)` and documented on the {doc}`Interactive GUI and debugging <interactive_debugging>` page.
+The ImGui overlay plugin (the entity browser, joint sliders, and simulation controls) is enabled with `ViewerOptions(enable_gui=True)` and documented on the {doc}`Interactive GUI and debugging <interactive_debugging>` page.
 :::
 
 ### Event handling and the interaction model
 
-Every event hook returns one of two things: `EVENT_HANDLED` (an alias for `True`) to consume the event, or `None` to pass it on. When a plugin consumes an event, later plugins and the default viewer controls do not see it — this is how a plugin claims, say, left-click for itself while leaving the scroll wheel to the camera. Return `None` for events you do not care about.
+Every event hook returns one of two things: `EVENT_HANDLED` (an alias for `True`) to consume the event, or `None` to pass it on. When a plugin consumes an event, later plugins and the default viewer controls do not see it. This is how a plugin claims, say, left-click for itself while leaving the scroll wheel to the camera. Return `None` for events you do not care about.
 
 Subclass `genesis.vis.viewer_plugins.ViewerPlugin` and override only the hooks you need:
 
@@ -166,7 +166,7 @@ class PickerPlugin(RaycasterViewerPlugin):
         return None
 ```
 
-For a complete plugin built this way, see [`examples/viewer_plugin/mesh_point_selector.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/viewer_plugin/mesh_point_selector.py). Its `MeshPointSelectorPlugin` — defined in that script, not part of the public API — raycasts on each click to select points on a rigid mesh, draws them as spheres in `on_draw()`, and on close writes them to a CSV in link-local coordinates. That last step is useful for finding local positions when placing sensors on an entity. It converts each world-space hit into the link frame so a selected point tracks the body as it moves:
+For a complete plugin built this way, see [`examples/viewer_plugin/mesh_point_selector.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/viewer_plugin/mesh_point_selector.py). Its `MeshPointSelectorPlugin` (defined in that script, not part of the public API) raycasts on each click to select points on a rigid mesh, draws them as spheres in `on_draw()`, and on close writes them to a CSV in link-local coordinates. That last step is useful for finding local positions when placing sensors on an entity. It converts each world-space hit into the link frame so a selected point tracks the body as it moves:
 
 ```python
 # In on_mouse_press, after a hit:
@@ -179,9 +179,9 @@ local_pos = gu.inv_transform_by_trans_quat(world_pos, link_pos, link_quat)
 <source src="../../_static/videos/viewer_plugin_mesh_point.mp4" type="video/mp4">
 </video>
 
-Debug geometry is drawn from `on_draw()`, which runs every frame. Call `self.scene.clear_debug_objects()` at the top and re-issue your draws so stale geometry does not accumulate — `draw_debug_sphere`, `draw_debug_spheres`, and `draw_debug_arrow` are the usual primitives. Register any mode-toggle or quit keys with `scene.viewer.register_keybinds()` so they show up in the instructions overlay alongside the defaults.
+Debug geometry is drawn from `on_draw()`, which runs every frame. Call `self.scene.clear_debug_objects()` at the top and re-issue your draws so stale geometry does not accumulate. `draw_debug_sphere`, `draw_debug_spheres`, and `draw_debug_arrow` are the usual primitives. Register any mode-toggle or quit keys with `scene.viewer.register_keybinds()` so they show up in the instructions overlay alongside the defaults.
 
 ## See also
 
-- {doc}`Interactive GUI and debugging <interactive_debugging>` — the ImGui overlay, joint sliders, and simulation controls.
-- {doc}`Visualization <visualization>` — cameras, rendering, and recording video.
+- {doc}`Interactive GUI and debugging <interactive_debugging>`: the ImGui overlay, joint sliders, and simulation controls.
+- {doc}`Visualization <visualization>`: cameras, rendering, and recording video.

@@ -30,7 +30,7 @@ sim_options=gs.options.SimOptions(
 )
 ```
 
-**2. Configure the solver on the scene.** Each solver reads its own options object — `MPMOptions`, `SPHOptions`, `FEMOptions`, `PBDOptions`. Particle-grid solvers (MPM, SPH) require a simulation domain; entities that leave `lower_bound`/`upper_bound` (in meters, Z-up) are clamped to it.
+**2. Configure the solver on the scene.** Each solver reads its own options object: `MPMOptions`, `SPHOptions`, `FEMOptions`, `PBDOptions`. Particle-grid solvers (MPM, SPH) require a simulation domain; entities that leave `lower_bound`/`upper_bound` (in meters, Z-up) are clamped to it.
 
 ```python
 mpm_options=gs.options.MPMOptions(
@@ -70,7 +70,7 @@ Three MPM objects falling and deforming: an elastic cube, a liquid cube, and an 
 
 ## FEM: accurate elasticity and muscles
 
-The Finite Element Method discretizes an entity into a tetrahedral mesh and solves the elasticity equations on it. Choose FEM over MPM when mesh-level accuracy matters — stiff elastic bodies, volumetric muscles, and contact-rich soft-body manipulation. `gs.materials.FEM.Elastic` exposes the physical parameters directly, such as Young's modulus `E` (Pa) and Poisson ratio `nu`.
+The Finite Element Method discretizes an entity into a tetrahedral mesh and solves the elasticity equations on it. Choose FEM over MPM when mesh-level accuracy matters: stiff elastic bodies, volumetric muscles, and contact-rich soft-body manipulation. `gs.materials.FEM.Elastic` exposes the physical parameters directly, such as Young's modulus `E` (Pa) and Poisson ratio `nu`.
 
 FEM underpins the {doc}`soft robots tutorial <soft_robots>`, which actuates a volumetric muscle. FEM entities also couple to rigid arms for grasping; see [`examples/coupling/fem_cube_linked_with_arm.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/coupling/fem_cube_linked_with_arm.py).
 
@@ -96,7 +96,7 @@ Two PBD cloth sheets: one pinned at four corners, a second dropping onto it pinn
 </video>
 
 :::{warning}
-Skinning a flat 2D cloth mesh with `vis_mode="visual"` can produce degenerate barycentric weights, which shows up as distorted rendering — especially with a non-zero `euler`. Use `vis_mode="particle"` for flat sheets until this is resolved.
+Skinning a flat 2D cloth mesh with `vis_mode="visual"` can produce degenerate barycentric weights, which shows up as distorted rendering, especially with a non-zero `euler`. Use `vis_mode="particle"` for flat sheets until this is resolved.
 :::
 
 ## SPH: free-surface liquids
@@ -128,7 +128,7 @@ The `Liquid` material accepts a `sampler` that controls how particles fill the m
 
 ## Next steps
 
-- {doc}`Soft robots <soft_robots>` — actuate MPM and FEM muscles.
-- {doc}`Hybrid entities <hybrid_entity>` — couple a rigid skeleton to a soft skin.
-- {doc}`Particle emitters <emitters>` — stream MPM, SPH, or PBD particles into a scene.
-- {doc}`Solvers and coupling </user_guide/advanced_topics/solvers_and_coupling>` — how solvers exchange forces across material boundaries. Runnable pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling), and the IPC contact solver for stiff soft-body contact in [`examples/IPC_Solver`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/IPC_Solver).
+- {doc}`Soft robots <soft_robots>`: actuate MPM and FEM muscles.
+- {doc}`Hybrid entities <hybrid_entity>`: couple a rigid skeleton to a soft skin.
+- {doc}`Particle emitters <emitters>`: stream MPM, SPH, or PBD particles into a scene.
+- {doc}`Solvers and coupling </user_guide/advanced_topics/solvers_and_coupling>`: how solvers exchange forces across material boundaries. Runnable pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling), and the IPC contact solver for stiff soft-body contact in [`examples/IPC_Solver`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/IPC_Solver).

@@ -38,7 +38,7 @@ points = sensor.nearest_points   # shape ([n_envs,] n_probes, 3), world frame
 
 A probe is a point fixed in a link's local frame. `probe_local_pos` is a sequence of `(x, y, z)` offsets in meters, one per probe, all mounted on the link named by `link_idx_local` on the entity `entity_idx`. Mounting several probes on fingertips and the palm, as the example does, gives a cheap spatial picture of how the hand is approaching an object.
 
-`track_link_idx` lists the links to measure against, as **global** link indices in solver link space — not link-local indices. Read them off the entities you want to track: `duck.base_link_idx` for a single-link mesh, or `entity.get_link(name).idx` for a specific link of an articulated entity. The sensor queries the triangle faces of every mesh geom on those links, so distances are to actual surfaces, not bounding boxes or centers.
+`track_link_idx` lists the links to measure against, as **global** link indices in solver link space, not link-local indices. Read them off the entities you want to track: `duck.base_link_idx` for a single-link mesh, or `entity.get_link(name).idx` for a specific link of an articulated entity. The sensor queries the triangle faces of every mesh geom on those links, so distances are to actual surfaces, not bounding boxes or centers.
 
 ## Reading the sensor
 
@@ -54,7 +54,7 @@ The matching nearest points are a separate attribute rather than part of `read()
 points = sensor.nearest_points  # shape ([n_envs,] n_probes, 3), world frame
 ```
 
-Both leading dimensions follow the batched-optional convention: the `[n_envs,]` axis is present only when the scene is built with multiple environments. `nearest_points` is written on each step, so read it after at least one `scene.step()` — before the first step it holds zeros.
+Both leading dimensions follow the batched-optional convention: the `[n_envs,]` axis is present only when the scene is built with multiple environments. `nearest_points` is written on each step, so read it after at least one `scene.step()`; before the first step it holds zeros.
 
 ## Behavior and units
 
@@ -69,5 +69,5 @@ Your browser does not support the video tag.
 
 ## See also
 
-- {doc}`Sensors overview <index>` — how sensors are sampled, read, and configured with noise, delay, and history.
-- {doc}`Raycaster sensors <raycaster>` — distance measurements by casting rays instead of querying nearest surface points.
+- {doc}`Sensors overview <index>`: how sensors are sampled, read, and configured with noise, delay, and history.
+- {doc}`Raycaster sensors <raycaster>`: distance measurements by casting rays instead of querying nearest surface points.

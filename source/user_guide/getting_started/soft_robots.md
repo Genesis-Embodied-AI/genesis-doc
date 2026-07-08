@@ -4,8 +4,8 @@ A soft robot is a deformable body with **muscle fibers** embedded in it. Instead
 
 Genesis World simulates muscles with two deformable solvers, and you pick one through the entity's material:
 
-- `gs.materials.MPM.Muscle` — the Material Point Method solver, actuated per **particle**.
-- `gs.materials.FEM.Muscle` — the Finite Element Method solver, actuated per tetrahedral **element**.
+- `gs.materials.MPM.Muscle`: the Material Point Method solver, actuated per **particle**.
+- `gs.materials.FEM.Muscle`: the Finite Element Method solver, actuated per tetrahedral **element**.
 
 Both share the same control interface, so you can swap solvers without rewriting your control loop. The {doc}`beyond_rigid_bodies` tutorial covers the underlying solvers in more depth.
 
@@ -15,7 +15,7 @@ MPM and FEM are compute-heavy. Run them on the GPU by passing `backend=gs.gpu` t
 
 ## Minimal example
 
-The complete runnable script is [`examples/tutorials/advanced_muscle.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/advanced_muscle.py). It drops two spheres — one MPM, one FEM — into a zero-gravity scene and pulses them with a sine wave so you can compare the solvers side by side.
+The complete runnable script is [`examples/tutorials/advanced_muscle.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/advanced_muscle.py). It drops two spheres (one MPM, one FEM) into a zero-gravity scene and pulses them with a sine wave so you can compare the solvers side by side.
 
 <video preload="auto" controls="True" width="100%">
 <source src="../../_static/videos/muscle.mp4" type="video/mp4">
@@ -47,7 +47,7 @@ for i in range(1000):
     scene.step()
 ```
 
-Everything else — the plane, the scene, `build`, `step` — is the standard flow from {doc}`hello_genesis`.
+Everything else (the plane, the scene, `build`, `step`) is the standard flow from {doc}`hello_genesis`.
 
 :::{note}
 The constitutive `model` names differ between solvers. MPM uses `"corotation"` or `"neohooken"`; FEM uses `"linear"` or `"stable_neohookean"`. (`"stable_neohooken"` is a deprecated spelling of the FEM model and will warn.)
@@ -104,8 +104,8 @@ scene.build(n_envs=3)
 
 `set_muscle` takes two per-unit arrays, where a *unit* is a particle for MPM and an element for FEM:
 
-- `muscle_group` — an integer in `[0, n_groups)` per unit, naming which muscle each unit belongs to.
-- `muscle_direction` — a fiber direction per unit (or one shared vector). Genesis does **not** normalize it; pass unit vectors.
+- `muscle_group`: an integer in `[0, n_groups)` per unit, naming which muscle each unit belongs to.
+- `muscle_direction`: a fiber direction per unit (or one shared vector). Genesis does **not** normalize it; pass unit vectors.
 
 The worm example carves the body into upper/lower and fore/hind quarters by particle position, then points every fiber along `+Y`:
 
@@ -148,7 +148,7 @@ The full script is [`examples/tutorials/advanced_worm.py`](https://github.com/Ge
 
 ## Hybrid rigid-soft robots
 
-A hybrid robot drives a soft outer skin with a rigid inner skeleton — the skeleton carries the degrees of freedom, and the skin deforms around it. Build one with `gs.materials.Hybrid`, which pairs a `gs.materials.Rigid` skeleton with a soft material that must be `gs.materials.MPM.Muscle`:
+A hybrid robot drives a soft outer skin with a rigid inner skeleton: the skeleton carries the degrees of freedom, and the skin deforms around it. Build one with `gs.materials.Hybrid`, which pairs a `gs.materials.Rigid` skeleton with a soft material that must be `gs.materials.MPM.Muscle`:
 
 ```python
 robot = scene.add_entity(
@@ -167,7 +167,7 @@ robot = scene.add_entity(
 )
 ```
 
-Because the actuation comes from the rigid skeleton, you control a hybrid robot through the ordinary rigid interface — `control_dofs_velocity`, `control_dofs_position`, `control_dofs_force` — with as many values as the skeleton has degrees of freedom:
+Because the actuation comes from the rigid skeleton, you control a hybrid robot through the ordinary rigid interface (`control_dofs_velocity`, `control_dofs_position`, `control_dofs_force`) with as many values as the skeleton has degrees of freedom:
 
 ```python
 for i in range(1000):
@@ -184,5 +184,5 @@ The full script is [`examples/tutorials/advanced_hybrid_robot.py`](https://githu
 
 ## See also
 
-- {doc}`hybrid_entity` — building rigid-soft hybrid entities from a URDF or a mesh.
-- {doc}`beyond_rigid_bodies` — the MPM, FEM, SPH, and PBD solvers behind fluids, cloth, and deformable bodies.
+- {doc}`hybrid_entity`: building rigid-soft hybrid entities from a URDF or a mesh.
+- {doc}`beyond_rigid_bodies`: the MPM, FEM, SPH, and PBD solvers behind fluids, cloth, and deformable bodies.

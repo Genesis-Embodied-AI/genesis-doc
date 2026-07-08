@@ -2,12 +2,12 @@
 
 Every mesh you load into Genesis World serves two different jobs, and they want opposite things. The **visual mesh** should look right, so it keeps every triangle the artist authored. The **collision mesh** feeds the physics solver, which is fastest and most stable when geometry is simple, watertight, and convex. A raw mesh from a scanner or an art tool is usually none of those things.
 
-To bridge the gap, Genesis processes the collision geometry of a rigid entity automatically when you load it — watertightening, decimating, and convex-decomposing it — while leaving the visual mesh untouched. This page explains what that pipeline does, the options that control it, and when to reach for each one.
+To bridge the gap, Genesis processes the collision geometry of a rigid entity automatically when you load it (watertightening, decimating, and convex-decomposing it) while leaving the visual mesh untouched. This page explains what that pipeline does, the options that control it, and when to reach for each one.
 
 The two runnable examples referenced throughout are the source of truth for the code:
 
-- [`examples/rigid/nonconvex_mesh.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/nonconvex_mesh.py) — loading a mesh and seeing objects rest on it.
-- [`examples/rigid/convex_decomposition.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/convex_decomposition.py) — collision behavior of decomposed meshes.
+- [`examples/rigid/nonconvex_mesh.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/nonconvex_mesh.py): loading a mesh and seeing objects rest on it.
+- [`examples/rigid/convex_decomposition.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/convex_decomposition.py): collision behavior of decomposed meshes.
 
 ## Loading a mesh
 
@@ -55,7 +55,7 @@ gs.morphs.Mesh(
 )
 ```
 
-- **`decimate`:** defaults to `True` when `convexify` is `True`, and `False` otherwise — a non-convex collision mesh is usually kept precisely because it has surface detail worth preserving.
+- **`decimate`:** defaults to `True` when `convexify` is `True`, and `False` otherwise. A non-convex collision mesh is usually kept precisely because it has surface detail worth preserving.
 - **`decimate_face_num`:** the target triangle count, default 500. Keep it above 100; below that, too much geometry is lost to be reliable.
 - **`decimate_aggressiveness`:** how hard the simplifier works to hit the target, an integer 0–8 (default 2). At 0 it is lossless, at 2 it preserves all features, at 5 it may noticeably alter the shape, and at 8 it hits the target regardless of fidelity.
 
@@ -63,7 +63,7 @@ If you load a mesh with more than 5000 faces without decimating, Genesis warns y
 
 ## Convex decomposition
 
-The collision solver treats every collision shape as convex. A single convex hull is enough for a mug or a box, but a concave shape — a bowl, a tank hull, a tool with a handle — would lose its cavities if wrapped in one hull. Convex decomposition instead splits the mesh into a set of convex pieces that together approximate the original, using the [CoACD](https://github.com/SarahWeiii/CoACD) library.
+The collision solver treats every collision shape as convex. A single convex hull is enough for a mug or a box, but a concave shape (a bowl, a tank hull, a tool with a handle) would lose its cavities if wrapped in one hull. Convex decomposition instead splits the mesh into a set of convex pieces that together approximate the original, using the [CoACD](https://github.com/SarahWeiii/CoACD) library.
 
 ```python
 gs.morphs.Mesh(
@@ -111,7 +111,7 @@ See the [CoACD documentation](https://github.com/SarahWeiii/CoACD) for the full 
 
 ## Meshes for deformable simulation
 
-Deformable solvers need a volumetric mesh, not a surface. When a mesh drives an FEM entity, Genesis tetrahedralizes it — filling the interior with tetrahedra — after an isotropic remeshing pass that regularizes edge lengths so the tetrahedralization is well-conditioned. This happens automatically:
+Deformable solvers need a volumetric mesh, not a surface. When a mesh drives an FEM entity, Genesis tetrahedralizes it (filling the interior with tetrahedra) after an isotropic remeshing pass that regularizes edge lengths so the tetrahedralization is well-conditioned. This happens automatically:
 
 ```python
 entity = scene.add_entity(
@@ -136,6 +136,6 @@ Mesh processing is expensive, so Genesis caches each result on disk keyed by a S
 
 ## See also
 
-- {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` — morphs, file formats, and loading entities.
-- {doc}`Conventions </user_guide/getting_started/conventions>` — coordinate frames and Y-up versus Z-up mesh handling.
-- {doc}`Beyond rigid bodies </user_guide/getting_started/beyond_rigid_bodies>` — deformable and particle-based materials.
+- {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`: morphs, file formats, and loading entities.
+- {doc}`Conventions </user_guide/getting_started/conventions>`: coordinate frames and Y-up versus Z-up mesh handling.
+- {doc}`Beyond rigid bodies </user_guide/getting_started/beyond_rigid_bodies>`: deformable and particle-based materials.

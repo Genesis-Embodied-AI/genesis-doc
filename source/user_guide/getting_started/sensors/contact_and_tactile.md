@@ -67,7 +67,7 @@ Configuration:
 
 ## Joint torque
 
-`JointTorque` measures the generalized effort delivered at each actuator's output shaft — torque for revolute dofs, force for prismatic dofs. It is a proprioceptive way to sense interaction: an external contact shows up as a change in the effort the joints must supply, without any dedicated contact sensor on the touching link.
+`JointTorque` measures the generalized effort delivered at each actuator's output shaft: torque for revolute dofs, force for prismatic dofs. It is a proprioceptive way to sense interaction: an external contact shows up as a change in the effort the joints must supply, without any dedicated contact sensor on the touching link.
 
 The reading models the effort at the gearbox interface:
 
@@ -93,16 +93,16 @@ tau = joint_torque.read()  # shape ([n_envs,] n_dofs)
 
 ## Tactile probes
 
-Tactile probes turn a link's surface into a grid of sensing points, or **taxels**. You describe the layout once with `probe_local_pos` — a set of `(x, y, z)` offsets in the link-local frame — and the probes move rigidly with the link. Because the layout is link-local, a regular grid imitates a taxel array on a fingertip or a sensor pad.
+Tactile probes turn a link's surface into a grid of sensing points, or **taxels**. You describe the layout once with `probe_local_pos` (a set of `(x, y, z)` offsets in the link-local frame), and the probes move rigidly with the link. Because the layout is link-local, a regular grid imitates a taxel array on a fingertip or a sensor pad.
 
 Genesis World provides a helper for laying out a planar grid, `genesis.utils.geom.generate_grid_points_on_plane(lo, hi, normal, nx, ny)`, which returns an `(ny, nx, 3)` array of positions. Probe layout and reading follow the same shape either way: `n_probes` is the flattened probe count.
 
 Two families share this interface but estimate contact differently:
 
-- **SDF-query probes** — `ContactProbe`, `ContactDepthProbe`, and `KinematicTaxel` — query the signed distance from each probe to nearby collision geometry directly. They need no list of target links.
-- **Point-cloud probes** — `ElastomerTaxel` and `ProximityTaxel` — sample a point cloud from the meshes named in `track_link_idx` (global link indices) and measure against those points. `n_sample_points` sets the sample budget.
+- **SDF-query probes** (`ContactProbe`, `ContactDepthProbe`, and `KinematicTaxel`) query the signed distance from each probe to nearby collision geometry directly. They need no list of target links.
+- **Point-cloud probes** (`ElastomerTaxel` and `ProximityTaxel`) sample a point cloud from the meshes named in `track_link_idx` (global link indices) and measure against those points. `n_sample_points` sets the sample budget.
 
-Both interactive demos below let you select the sensor type with `--sensor {depth,kinematic,elastomer,proximity}`. Readings are geometric estimates, not solver impulses, and are uncalibrated — treat them as relative signals unless you tune the coefficients to your setup.
+Both interactive demos below let you select the sensor type with `--sensor {depth,kinematic,elastomer,proximity}`. Readings are geometric estimates, not solver impulses, and are uncalibrated. Treat them as relative signals unless you tune the coefficients to your setup.
 
 - [`examples/sensors/tactile_franka.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/tactile_franka.py) sensorizes both Franka fingertips and lets you teleoperate a grasp.
 - [`examples/sensors/tactile_sandbox.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/tactile_sandbox.py) presses controllable objects into a fixed taxel pad (box or dome), across four parallel environments.
@@ -223,6 +223,6 @@ Your browser does not support the video tag.
 
 ## See also
 
-- {doc}`Sensors overview <index>` — sampling rate, `read_ground_truth()`, batched `scene.read_sensors()`, noise, delay, and `history_length`.
-- {doc}`Proximity <proximity>` — nearest-distance probes to tracked mesh surfaces, without a force estimate.
-- {doc}`Extending Genesis World → Sensors </user_guide/advanced_topics/sensors/index>` — the sensor pipeline and how to add your own sensor type.
+- {doc}`Sensors overview <index>`: sampling rate, `read_ground_truth()`, batched `scene.read_sensors()`, noise, delay, and `history_length`.
+- {doc}`Proximity <proximity>`: nearest-distance probes to tracked mesh surfaces, without a force estimate.
+- {doc}`Extending Genesis World → Sensors </user_guide/advanced_topics/sensors/index>`: the sensor pipeline and how to add your own sensor type.

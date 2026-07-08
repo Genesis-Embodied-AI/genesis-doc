@@ -50,7 +50,7 @@ emitter = scene.add_emitter(
 )
 ```
 
-- `material` selects the solver and the physical behavior. It must be one of `gs.materials.MPM.Base`, `gs.materials.SPH.Base`, `gs.materials.PBD.Particle`, or `gs.materials.PBD.Liquid` (or a subclass — `SPH.Liquid`, `MPM.Liquid`, `MPM.Sand`, `PBD.Liquid`). Passing an unsupported material raises at `add_emitter` time.
+- `material` selects the solver and the physical behavior. It must be one of `gs.materials.MPM.Base`, `gs.materials.SPH.Base`, `gs.materials.PBD.Particle`, or `gs.materials.PBD.Liquid` (or a subclass: `SPH.Liquid`, `MPM.Liquid`, `MPM.Sand`, `PBD.Liquid`). Passing an unsupported material raises at `add_emitter` time.
 - `max_particles` caps how many particles the emitter holds. Once emission reaches the cap, the oldest particles are recycled, so a long-running stream stays bounded in memory. Default is `20000`.
 - `surface` controls appearance only. If omitted, the emitter uses `gs.surfaces.Default(color=(0.6, 0.8, 1.0, 1.0))`. `vis_mode="visual"` is not supported for emitters; use the default `"particle"`, or `"recon"` to render a reconstructed fluid surface.
 
@@ -70,7 +70,7 @@ emitter.emit(
 
 `pos` is the world-space nozzle position in meters (Z-up). `direction` is normalized internally, so only its orientation matters, not its length. `speed` is the emission speed in m/s and also sets each particle's initial velocity along `direction`.
 
-When you leave `droplet_length` unset, the emitter sizes each segment from the motion in one step, `speed * dt`. If that length is shorter than one particle, the emitter accumulates it and emits nothing until enough has built up — so a slow stream still forms whole particles rather than dropping them.
+When you leave `droplet_length` unset, the emitter sizes each segment from the motion in one step, `speed * dt`. If that length is shorter than one particle, the emitter accumulates it and emits nothing until enough has built up, so a slow stream still forms whole particles rather than dropping them.
 
 ## Droplet shapes
 
@@ -101,7 +101,7 @@ for i in range(1000):
 
 ## Omnidirectional emission
 
-`emit_omni()` releases particles radially from a spherical shell instead of a directed nozzle — a burst or fountain rather than a stream. Each particle's velocity points outward from the center at `speed`:
+`emit_omni()` releases particles radially from a spherical shell instead of a directed nozzle: a burst or fountain rather than a stream. Each particle's velocity points outward from the center at `speed`:
 
 ```python
 emitter.emit_omni(
@@ -113,7 +113,7 @@ emitter.emit_omni(
 
 ## Multiple emitters
 
-Each emitter owns its own particle entity, so add as many as you need — different materials, positions, and surfaces coexist in one scene. Call `emit()` on each within the same step loop.
+Each emitter owns its own particle entity, so add as many as you need: different materials, positions, and surfaces coexist in one scene. Call `emit()` on each within the same step loop.
 
 ```python
 emitter_a = scene.add_emitter(
@@ -145,5 +145,5 @@ Emitters are not available in differentiable mode. Building the scene with `requ
 
 ## See also
 
-- {doc}`Beyond rigid bodies <beyond_rigid_bodies>` — the SPH, MPM, and PBD solvers that emitted particles feed into.
-- {doc}`Soft robots <soft_robots>` — muscle-actuated soft and hybrid entities built on the same particle solvers.
+- {doc}`Beyond rigid bodies <beyond_rigid_bodies>`: the SPH, MPM, and PBD solvers that emitted particles feed into.
+- {doc}`Soft robots <soft_robots>`: muscle-actuated soft and hybrid entities built on the same particle solvers.

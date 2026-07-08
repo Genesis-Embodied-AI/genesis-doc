@@ -109,7 +109,7 @@ Two overrides are required of every concrete sensor, and `SimpleSensor` adds a t
 
 The split between an instance method for shape and a classmethod for dtype is deliberate. It lets the manager resolve the per-class dtype without instantiating a sensor, while still letting the per-instance shape depend on options.
 
-`raw_data_T` has shape `(cols, B)` — column-major, with the batch dimension `B` last — so that per-class row slices are C-contiguous when several sensor classes write into the same intermediate cache. Always populate it in place:
+`raw_data_T` has shape `(cols, B)` (column-major, with the batch dimension `B` last) so that per-class row slices are C-contiguous when several sensor classes write into the same intermediate cache. Always populate it in place:
 
 ```python
 @classmethod
@@ -182,7 +182,7 @@ def _post_process(cls, shared_metadata, tensor, timeline, *, is_measured):
     return tensor > shared_metadata.thresholds  # float intermediate, bool return
 ```
 
-Overriding `_post_process` *requires* also overriding `_get_intermediate_format` and/or `_get_intermediate_dtype`; the framework raises `TypeError` at class-definition time otherwise. The reason is structural: the intermediate buffer must be a distinct buffer, because the timeline ring lives in intermediate space and mixing data spaces would corrupt any `_apply_transform` filter that reads previous slots. When the projection genuinely preserves shape and dtype, override one of them as a no-op returning the return-space value — the override is the explicit acknowledgment that the buffers are distinct.
+Overriding `_post_process` *requires* also overriding `_get_intermediate_format` and/or `_get_intermediate_dtype`; the framework raises `TypeError` at class-definition time otherwise. The reason is structural: the intermediate buffer must be a distinct buffer, because the timeline ring lives in intermediate space and mixing data spaces would corrupt any `_apply_transform` filter that reads previous slots. When the projection genuinely preserves shape and dtype, override one of them as a no-op returning the return-space value: the override is the explicit acknowledgment that the buffers are distinct.
 
 - **`_get_intermediate_format(self)`:** shape of the internal buffer; defaults to `_get_return_format()`.
 - **`_get_intermediate_dtype(cls)`:** dtype of the internal buffer; defaults to `_get_cache_dtype()`. `ContactSensor` overrides it to `gs.tc_float` because its kernel is float but its return is bool.
@@ -314,5 +314,5 @@ To pick the right hooks, mirror the closest built-in sensor. Every one implement
 
 ## See also
 
-- {doc}`sensor_pipeline` — how the pipeline executes at runtime, and the intermediate-versus-return separation in full.
-- {doc}`/user_guide/getting_started/sensors/index` — using the built-in sensors.
+- {doc}`sensor_pipeline`: how the pipeline executes at runtime, and the intermediate-versus-return separation in full.
+- {doc}`/user_guide/getting_started/sensors/index`: using the built-in sensors.

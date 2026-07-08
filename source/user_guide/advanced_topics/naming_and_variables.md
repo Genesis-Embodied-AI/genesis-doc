@@ -10,7 +10,7 @@ Every entity carries three identifiers, each for a different job:
 
 - **`name`:** a human-readable string. You pass it to `scene.add_entity(..., name=...)`, or Genesis World generates one from the morph type and a UID prefix. Names are how you look an entity up later.
 - **`uid`:** a globally unique ID assigned at creation. It never collides across entities and is stable for the life of the object. Its `short()` form (a 7-character prefix) is what appears in terminal logs.
-- **`idx`:** the entity's integer position in the scene's creation order. This is an *index*, not an identifier you should hand-write — it exists so the engine can address the entity's data.
+- **`idx`:** the entity's integer position in the scene's creation order. This is an *index*, not an identifier you should hand-write. It exists so the engine can address the entity's data.
 
 The naming tutorial [`examples/tutorials/entity_name.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/entity_name.py) shows all three in use. Look up an entity by name or by short UID:
 
@@ -24,7 +24,7 @@ scene.get_entity(uid=box.uid.short())  # short-UID lookup (substring of the full
 scene.entity_names  # tuple of every entity's name, in creation order
 ```
 
-Prefer `name` for lookups you write by hand, and reserve `uid` for disambiguating entities that share a generated name. The same `name` / `uid` pair identifies links and joints within a rigid entity — `entity.get_link(name=...)` and `entity.get_joint(name=...)` work the same way.
+Prefer `name` for lookups you write by hand, and reserve `uid` for disambiguating entities that share a generated name. The same `name` / `uid` pair identifies links and joints within a rigid entity. `entity.get_link(name=...)` and `entity.get_joint(name=...)` work the same way.
 
 | Identifier | Type | Assigned by | Use it to |
 |---|---|---|---|
@@ -34,7 +34,7 @@ Prefer `name` for lookups you write by hand, and reserve `uid` for disambiguatin
 
 ## Local and global indices
 
-A rigid solver stores the state of *every* entity in flat, shared arrays — one row per **dof** (degree of freedom), one per link, one per configuration variable `q`, and so on. So there are two ways to number the same dof:
+A rigid solver stores the state of *every* entity in flat, shared arrays: one row per **dof** (degree of freedom), one per link, one per configuration variable `q`, and so on. So there are two ways to number the same dof:
 
 - **Global index (`*_idx`):** the dof's absolute row in the solver's arrays, counting across all entities. A two-armed scene numbers the second arm's dofs after the first arm's.
 - **Local index (`*_idx_local`):** the dof's position *within its own entity*, always starting at zero. The first dof of any entity is local index `0`, regardless of what was added before it.
@@ -73,7 +73,7 @@ franka.set_qpos(qpos, qs_idx_local=...)
 - **`envs_idx` has no local form.** Environment (**env**) selection is scene-wide, so batched methods take a single `envs_idx` that indexes environments directly. See {doc}`parallel simulation </user_guide/getting_started/parallel_simulation>` for how the batch dimension works.
 
 :::{note}
-The properties named without a suffix — a joint's `dof_start`, a link's `idx`, an entity's `idx` — are global. The `_local` suffix is only ever added to opt *into* entity-relative numbering. When in doubt, an index is global.
+The properties named without a suffix (a joint's `dof_start`, a link's `idx`, an entity's `idx`) are global. The `_local` suffix is only ever added to opt *into* entity-relative numbering. When in doubt, an index is global.
 :::
 
 ## Field and loop-variable naming in the source
@@ -99,10 +99,10 @@ The conventions above surface names you also see when reading solver code. If yo
 | `i_g` | geometry (`i_ga`, `i_gb` for the two geometries in a collision pair) |
 | `i_v` | vertex |
 
-For the concrete field layouts of each solver — the full state and info structs — read the solver files themselves, starting from [`rigid_solver.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/engine/solvers/rigid/rigid_solver.py) and the entity classes under [`genesis/engine/entities/`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/genesis/engine/entities).
+For the concrete field layouts of each solver (the full state and info structs), read the solver files themselves, starting from [`rigid_solver.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/engine/solvers/rigid/rigid_solver.py) and the entity classes under [`genesis/engine/entities/`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/genesis/engine/entities).
 
 ## See also
 
-- {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` — where `name` and entities are first introduced.
-- {doc}`Control your robot </user_guide/getting_started/control_your_robot>` — local dof indices in a full control loop.
-- {doc}`RigidJoint API </api_reference/entity/rigid_entity/rigid_joint>` and {doc}`RigidEntity API </api_reference/entity/rigid_entity/rigid_entity>` — the `dofs_idx` / `dofs_idx_local` properties and the `*_idx_local` methods.
+- {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`: where `name` and entities are first introduced.
+- {doc}`Control your robot </user_guide/getting_started/control_your_robot>`: local dof indices in a full control loop.
+- {doc}`RigidJoint API </api_reference/entity/rigid_entity/rigid_joint>` and {doc}`RigidEntity API </api_reference/entity/rigid_entity/rigid_entity>`: the `dofs_idx` / `dofs_idx_local` properties and the `*_idx_local` methods.

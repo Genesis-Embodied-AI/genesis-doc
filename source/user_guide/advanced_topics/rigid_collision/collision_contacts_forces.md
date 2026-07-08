@@ -1,6 +1,6 @@
 # Rigid collision: contacts and forces
 
-Every simulation step, Genesis World finds which rigid bodies touch, generates a contact manifold for each touching pair, and hands those contacts to the constraint solver. This page explains how detection works conceptually and how to read the resulting contacts and contact forces back into Python. Force resolution — how contacts turn into accelerations — is covered in {doc}`rigid_constraint_model`.
+Every simulation step, Genesis World finds which rigid bodies touch, generates a contact manifold for each touching pair, and hands those contacts to the constraint solver. This page explains how detection works conceptually and how to read the resulting contacts and contact forces back into Python. Force resolution (how contacts turn into accelerations) is covered in {doc}`rigid_constraint_model`.
 
 The detection code lives under `genesis/engine/solvers/rigid/collider/`, driven by the collider's `detection()` method.
 
@@ -15,7 +15,7 @@ Detection runs in two phases each step, from a cheap approximate cull to an exac
 - **Static pairs:** two geometries both fixed relative to the world.
 - **Hibernation:** contacts between sleeping bodies, unless one side is awake.
 
-**Narrow phase.** Each surviving pair is resolved to an exact contact manifold — a contact normal, a penetration depth, and one or more contact points. The algorithm depends on the geometry pair:
+**Narrow phase.** Each surviving pair is resolved to an exact contact manifold: a contact normal, a penetration depth, and one or more contact points. The algorithm depends on the geometry pair:
 
 | Geometry pair | Path |
 |---|---|
@@ -30,7 +30,7 @@ The number of candidate pairs the broad phase may emit is bounded by the `max_co
 
 ## Reading contacts
 
-Read the contacts from the most recent `scene.step()` with `get_contacts()` on any {doc}`rigid entity </api_reference/entity/rigid_entity/rigid_entity>`. It returns a dict of parallel arrays — one entry per contact that involves the entity.
+Read the contacts from the most recent `scene.step()` with `get_contacts()` on any {doc}`rigid entity </api_reference/entity/rigid_entity/rigid_entity>`. It returns a dict of parallel arrays, one entry per contact that involves the entity.
 
 ```python
 import genesis as gs
@@ -67,7 +67,7 @@ contacts = ball.get_contacts(with_entity=plane)  # only ball–plane contacts
 ```
 
 :::{note}
-With multiple environments, every field carries a leading `n_envs` axis and is padded to the largest contact count across environments, so the same array is rectangular. `valid_mask` — shape `(n_envs, n_contacts)` — marks which rows are real; filter with it before using the data. A single-environment scene returns the fields already trimmed, with no `valid_mask`.
+With multiple environments, every field carries a leading `n_envs` axis and is padded to the largest contact count across environments, so the same array is rectangular. `valid_mask` (shape `(n_envs, n_contacts)`) marks which rows are real; filter with it before using the data. A single-environment scene returns the fields already trimmed, with no `valid_mask`.
 :::
 
 ## Net contact force per link
@@ -82,10 +82,10 @@ This is the aggregate the constraint solver accumulated, so it reflects the reso
 
 ## When to use a contact sensor instead
 
-`get_contacts()` and `get_links_net_contact_force()` pull the whole contact set on demand, which is convenient for scripting and debugging. For a per-link signal you sample every step in a control or training loop — with history, noise, and delay handled for you — attach a contact sensor instead. `ContactForce` reports the net force on a link in its own frame, and the tactile probes estimate dense per-taxel forces. See {doc}`/user_guide/getting_started/sensors/contact_and_tactile`.
+`get_contacts()` and `get_links_net_contact_force()` pull the whole contact set on demand, which is convenient for scripting and debugging. For a per-link signal you sample every step in a control or training loop (with history, noise, and delay handled for you), attach a contact sensor instead. `ContactForce` reports the net force on a link in its own frame, and the tactile probes estimate dense per-taxel forces. See {doc}`/user_guide/getting_started/sensors/contact_and_tactile`.
 
 ## See also
 
-- {doc}`rigid_constraint_model` — how contacts, joint limits, and equality constraints are solved for the resulting motion.
-- {doc}`/user_guide/advanced_topics/support_field` — the acceleration structure behind MPR and GJK support queries.
-- {doc}`/user_guide/getting_started/sensors/contact_and_tactile` — contact and tactile sensors for per-step readings.
+- {doc}`rigid_constraint_model`: how contacts, joint limits, and equality constraints are solved for the resulting motion.
+- {doc}`/user_guide/advanced_topics/support_field`: the acceleration structure behind MPR and GJK support queries.
+- {doc}`/user_guide/getting_started/sensors/contact_and_tactile`: contact and tactile sensors for per-step readings.

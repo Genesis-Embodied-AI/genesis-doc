@@ -1,10 +1,10 @@
 # Surfaces and textures
 
-A **surface** describes how an entity *looks* when rendered — its color, glossiness, transparency, and texture maps. It is separate from the entity's shape and its physics. When you add an entity you pass up to three independent descriptions:
+A **surface** describes how an entity *looks* when rendered: its color, glossiness, transparency, and texture maps. It is separate from the entity's shape and its physics. When you add an entity you pass up to three independent descriptions:
 
-- a {doc}`morph </api_reference/options/morph/index>` — geometry and initial pose,
-- a {doc}`material </api_reference/material/index>` — physical behavior (mass, stiffness, friction),
-- a {doc}`surface </api_reference/options/surface/index>` — visual appearance, the subject of this page.
+- a {doc}`morph </api_reference/options/morph/index>`: geometry and initial pose,
+- a {doc}`material </api_reference/material/index>`: physical behavior (mass, stiffness, friction),
+- a {doc}`surface </api_reference/options/surface/index>`: visual appearance, the subject of this page.
 
 Changing a surface never changes how an entity moves or collides; it only changes the rendered image. If you omit the surface, Genesis World uses `gs.surfaces.Default` (a Disney principled BSDF) and honors any material the asset file already defines.
 
@@ -56,7 +56,7 @@ surface = gs.surfaces.Default(
 
 Two constraints follow from how the shortcuts map onto channels:
 
-- A shortcut and its texture cannot both be set. Passing `color=...` together with `diffuse_texture=...` raises an error — the texture already carries the color.
+- A shortcut and its texture cannot both be set. Passing `color=...` together with `diffuse_texture=...` raises an error. The texture already carries the color.
 - A shortcut only applies to channels the surface actually has. `metallic` is meaningful on `Default`/`BSDF`; `Metal`, `Glass`, and the plastics ignore it because their reflectance is fixed by their type.
 
 A fourth color component is treated as opacity, so `color=(r, g, b, a)` is the concise way to make a surface semi-transparent:
@@ -70,9 +70,9 @@ gs.surfaces.Smooth(color=(1.0, 1.0, 1.0, 0.5))
 
 When a property varies across a surface — a wood grain, a painted logo, a roughness map — supply a texture instead of a constant. Textures live under `gs.textures`:
 
-- `gs.textures.ColorTexture(color=...)` — a single uniform color. Equivalent to the `color` shortcut, useful when an argument requires a texture object.
-- `gs.textures.ImageTexture(image_path=..., encoding=...)` — an image map sampled over the mesh's UV coordinates.
-- `gs.textures.BatchTexture` — a stack of textures, one per environment, for {doc}`parallel rendering <parallel_simulation>`.
+- `gs.textures.ColorTexture(color=...)`: a single uniform color. Equivalent to the `color` shortcut, useful when an argument requires a texture object.
+- `gs.textures.ImageTexture(image_path=..., encoding=...)`: an image map sampled over the mesh's UV coordinates.
+- `gs.textures.BatchTexture`: a stack of textures, one per environment, for {doc}`parallel rendering <parallel_simulation>`.
 
 Assign a texture to the channel it drives. The base color goes to `diffuse_texture`; data maps go to `roughness_texture`, `normal_texture`, `opacity_texture`, and so on:
 
@@ -85,14 +85,14 @@ surface = gs.surfaces.Rough(
 ```
 
 :::{warning}
-Set `encoding="linear"` for any map that stores data rather than a color — roughness, metallic, normal, and opacity maps. The default `encoding="srgb"` applies gamma correction that is correct for color images but corrupts data maps. `.hdr` and `.exr` files are forced to `linear` automatically.
+Set `encoding="linear"` for any map that stores data rather than a color: roughness, metallic, normal, and opacity maps. The default `encoding="srgb"` applies gamma correction that is correct for color images but corrupts data maps. `.hdr` and `.exr` files are forced to `linear` automatically.
 :::
 
 An image path is resolved against your working directory first, then against the bundled asset directory (`genesis/assets`), so `"textures/checker.png"` loads the checker image that ships with Genesis World. A loaded asset (a `.glb` or textured `.obj`, for example) brings its own surface; pass a `surface` to `add_entity` only when you want to override it.
 
 ## Lighting a ray-traced scene
 
-In the {doc}`Nyx <nyx_renderer>` ray tracer, lights are not a special object — they are ordinary entities with an `Emission` surface. An environment map is the same idea applied to the background: an emissive image wrapped around the scene provides ambient illumination.
+In the {doc}`Nyx <nyx_renderer>` ray tracer, lights are not a special object: they are ordinary entities with an `Emission` surface. An environment map is the same idea applied to the background: an emissive image wrapped around the scene provides ambient illumination.
 
 This excerpt from `examples/rendering/demo.py` sets an HDRI-style environment map and one area light:
 
@@ -131,6 +131,6 @@ The accepted values are `"visual"`, `"collision"`, `"particle"`, `"sdf"`, and `"
 
 ## Next steps
 
-- {doc}`Visualization <visualization>` — cameras, the viewer, and choosing a renderer.
-- {doc}`Nyx renderer <nyx_renderer>` — the ray tracer and its options in depth.
-- {doc}`USD import <usd_import>` — loading assets that carry their own surfaces.
+- {doc}`Visualization <visualization>`: cameras, the viewer, and choosing a renderer.
+- {doc}`Nyx renderer <nyx_renderer>`: the ray tracer and its options in depth.
+- {doc}`USD import <usd_import>`: loading assets that carry their own surfaces.

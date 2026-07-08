@@ -82,7 +82,7 @@ The skin is generated automatically: for each rigid link with a collision geomet
 
 ## Control
 
-You control a hybrid entity through its rigid dofs, using the same methods as a plain `RigidEntity` — they are forwarded to the rigid part:
+You control a hybrid entity through its rigid dofs, using the same methods as a plain `RigidEntity`. They are forwarded to the rigid part:
 
 ```python
 for i in range(1000):
@@ -123,5 +123,5 @@ A hybrid entity can also be built from a bare `gs.morphs.Mesh`: Genesis World sk
 
 ## See also
 
-- {doc}`Soft robots <soft_robots>` — muscle actuation for standalone FEM and MPM soft bodies.
-- {doc}`Beyond rigid bodies <beyond_rigid_bodies>` — fluids, cloth, and other deformable simulation.
+- {doc}`Soft robots <soft_robots>`: muscle actuation for standalone FEM and MPM soft bodies.
+- {doc}`Beyond rigid bodies <beyond_rigid_bodies>`: fluids, cloth, and other deformable simulation.

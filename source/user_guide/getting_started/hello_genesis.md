@@ -4,7 +4,7 @@
 :alt: A Franka arm resting on the ground plane in the Genesis World viewer
 ```
 
-This tutorial builds the smallest complete Genesis World program: load a Franka arm above a ground plane and let it fall under gravity. It is under fifteen lines, and it already contains every step common to any Genesis World simulation — initialize, create a scene, add entities, build, and step.
+This tutorial builds the smallest complete Genesis World program: load a Franka arm above a ground plane and let it fall under gravity. It is under fifteen lines, and it already contains every step common to any Genesis World simulation: initialize, create a scene, add entities, build, and step.
 
 The complete runnable script is [`examples/tutorials/hello_genesis.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/hello_genesis.py):
 
@@ -35,10 +35,10 @@ The rest of this page explains what each step is for.
 gs.init(backend=gs.cpu)
 ```
 
-- **Backend.** `gs.cpu` runs anywhere. For GPU-accelerated {doc}`parallel simulation <parallel_simulation>`, use `gs.cuda`, `gs.amdgpu`, or `gs.metal` — or `gs.gpu`, which picks the right one for your machine (CUDA where available, Metal on Apple Silicon).
+- **Backend.** `gs.cpu` runs anywhere. For GPU-accelerated {doc}`parallel simulation <parallel_simulation>`, use `gs.cuda`, `gs.amdgpu`, or `gs.metal`. `gs.gpu` picks the right one for your machine (CUDA where available, Metal on Apple Silicon).
 - **Precision.** Genesis World uses 32-bit floats by default. Pass `precision="64"` when you need double precision.
 - **Logging.** On init, Genesis World logs system and version information. Set `logging_level="warning"` to quiet it, and `theme="light"` for light-background terminals.
-- **Performance mode.** With `performance_mode=True`, Genesis World bakes static tensor shapes into its compiled kernels for roughly 30% faster simulation, at the cost of recompiling whenever the scene changes — several minutes per change. Leave it off for research, debugging, and interactive work; turn it on for policy training and production runs.
+- **Performance mode.** With `performance_mode=True`, Genesis World bakes static tensor shapes into its compiled kernels for roughly 30% faster simulation, at the cost of recompiling whenever the scene changes (several minutes per change). Leave it off for research, debugging, and interactive work; turn it on for policy training and production runs.
 
 ## Create a scene
 
@@ -68,7 +68,7 @@ Here `dt` is the simulation timestep in seconds, `gravity` points down along `-Z
 
 Objects and robots are {doc}`entities </api_reference/entity/index>`. Genesis World is object-oriented: you interact with an entity through its own methods and attributes, not through a global handle or id.
 
-The first argument to `add_entity` is a {doc}`morph </api_reference/options/morph/index>` — a combined description of an entity's geometry *and* initial pose. You can build a morph from a shape primitive or load one from a file:
+The first argument to `add_entity` is a {doc}`morph </api_reference/options/morph/index>`: a combined description of an entity's geometry *and* initial pose. You can build a morph from a shape primitive or load one from a file:
 
 ```python
 plane = scene.add_entity(gs.morphs.Plane())
@@ -79,10 +79,10 @@ franka = scene.add_entity(
 
 Shape primitives include `Plane`, `Box`, `Cylinder`, `Sphere`, `Terrain` (see the {doc}`terrain tutorial <terrain>`), and `Drone`. Supported file formats include:
 
-- `gs.morphs.MJCF` — MuJoCo `.xml` models
-- `gs.morphs.URDF` — robot descriptions (`.urdf`, and `.xacro`, which is preprocessed automatically)
-- `gs.morphs.USD` — Universal Scene Description (`.usd`, `.usda`, `.usdc`, `.usdz`); see the {doc}`USD import tutorial <usd_import>`
-- `gs.morphs.Mesh` — non-articulated meshes (`.obj`, `.stl`, `.glb`, `.gltf`); see {doc}`Conventions <conventions>` for Y-up vs. Z-up handling
+- `gs.morphs.MJCF`: MuJoCo `.xml` models
+- `gs.morphs.URDF`: robot descriptions (`.urdf`, and `.xacro`, which is preprocessed automatically)
+- `gs.morphs.USD`: Universal Scene Description (`.usd`, `.usda`, `.usdc`, `.usdz`); see the {doc}`USD import tutorial <usd_import>`
+- `gs.morphs.Mesh`: non-articulated meshes (`.obj`, `.stl`, `.glb`, `.gltf`); see {doc}`Conventions <conventions>` for Y-up vs. Z-up handling
 
 A morph also accepts pose and scale. Orientation is either `euler` (SciPy extrinsic x-y-z, in degrees) or `quat` (`(w, x, y, z)`):
 

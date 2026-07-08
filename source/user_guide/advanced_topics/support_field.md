@@ -12,7 +12,7 @@ $$
 s_S(d) = \arg\max_{x \in S} \; x \cdot d
 $$
 
-Geometrically, $s_S(d)$ is the point you reach by sliding a plane with normal $d$ inward from infinity until it first touches the shape — the shape's extreme point along $d$.
+Geometrically, $s_S(d)$ is the point you reach by sliding a plane with normal $d$ inward from infinity until it first touches the shape: the shape's extreme point along $d$.
 
 This single primitive is enough to drive the two narrow-phase algorithms Genesis uses:
 
@@ -41,7 +41,7 @@ Genesis dispatches each support query by geometry type. The dispatch lives in `s
 | Terrain | `_func_support_prism` | Extreme vertex of the active prism cell. |
 | Convex mesh | `_func_support_world` | Table lookup into the precomputed support field. |
 
-Primitives have analytical support functions: the extreme point follows directly from a formula, so no search is needed. A general convex mesh has no such formula. The naive answer is to project every vertex onto $d$ and take the maximum, which costs $O(N)$ per query for a mesh of $N$ vertices — and both GJK and MPR issue many queries per contact pair, per step. The support field exists to remove that cost.
+Primitives have analytical support functions: the extreme point follows directly from a formula, so no search is needed. A general convex mesh has no such formula. The naive answer is to project every vertex onto $d$ and take the maximum, which costs $O(N)$ per query for a mesh of $N$ vertices, and both GJK and MPR issue many queries per contact pair, per step. The support field exists to remove that cost.
 
 ## The support field for convex meshes
 
@@ -58,7 +58,7 @@ $$
 
 and to the direction $d = (\sin\phi\cos\theta,\; \sin\phi\sin\theta,\; \cos\phi)$, with angles in radians.
 
-For each geometry, Genesis projects all of its vertices onto every sample direction and records the winning vertex — its position in the mesh's local frame and its index. The results for all geometries are packed into flat arrays, so a single query needs no host round-trip.
+For each geometry, Genesis projects all of its vertices onto every sample direction and records the winning vertex: its position in the mesh's local frame and its index. The results for all geometries are packed into flat arrays, so a single query needs no host round-trip.
 
 ### Query
 
@@ -70,7 +70,7 @@ v_, vid = _func_support_mesh(support_field_info, d_mesh, i_g)
 v = gu.qd_transform_by_trans_quat(v_, pos, quat)
 ```
 
-The lookup itself inverts the grid mapping — `theta = atan2(d_y, d_x)`, `phi = acos(d_z)` — to find the continuous cell coordinates, then evaluates the four cells bracketing them (`floor` and `ceil` of each coordinate) and keeps the vertex with the largest dot product. This is a fixed, four-cell search regardless of mesh size, so the query is $O(1)$ in the vertex count.
+The lookup itself inverts the grid mapping (`theta = atan2(d_y, d_x)`, `phi = acos(d_z)`) to find the continuous cell coordinates, then evaluates the four cells bracketing them (`floor` and `ceil` of each coordinate) and keeps the vertex with the largest dot product. This is a fixed, four-cell search regardless of mesh size, so the query is $O(1)$ in the vertex count.
 
 The four-cell neighborhood also lets the field report how many distinct vertices tie for the maximum (`_func_count_supports_world`). GJK uses that count to detect directions where the support point is ambiguous and perturb the query, which keeps the algorithm numerically stable on flat faces and shared edges.
 
@@ -99,4 +99,4 @@ Only convex meshes use the support field. Primitives use their analytical suppor
 
 ## See also
 
-- {doc}`rigid_collision/index` — where GJK and MPR fit in the rigid collision pipeline, from broad-phase pruning to contact generation.
+- {doc}`rigid_collision/index`: where GJK and MPR fit in the rigid collision pipeline, from broad-phase pruning to contact generation.

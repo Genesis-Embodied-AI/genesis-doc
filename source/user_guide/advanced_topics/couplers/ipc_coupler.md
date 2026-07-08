@@ -69,7 +69,7 @@ The example downloads a coarse `grid20x20.obj` cloth mesh rather than a dense on
 You do not register links with the coupler directly. Instead, each entity's {doc}`Rigid material </api_reference/material/rigid>` declares how it participates through `coup_type`:
 
 - **`two_way_soft_constraint`:** Genesis and IPC exchange forces through a soft position-and-orientation constraint. Use it for a floating-base robot or any rigid body whose motion Genesis controls but that must also feel contact.
-- **`external_articulation`:** joint-level coupling for articulated robots — IPC couples at the dof level rather than per link. Use it for a fixed-base arm.
+- **`external_articulation`:** joint-level coupling for articulated robots: IPC couples at the dof level rather than per link. Use it for a fixed-base arm.
 - **`ipc_only`:** IPC owns the body's dynamics (gravity and collision) and copies the resulting transform back to Genesis one-way. Use it for passive rigid props.
 
 When `coup_type` is `None` (the default), Genesis picks one from the entity type: `external_articulation` for fixed-base robots, `two_way_soft_constraint` for floating-base robots, and `ipc_only` for non-articulated objects.
@@ -145,6 +145,6 @@ For an interactive version you can teleoperate from the keyboard, see [`examples
 
 ## See also
 
-- {doc}`Couplers overview <index>` — how to choose between the legacy, SAP, and IPC couplers.
-- {doc}`SAP coupler <sap_coupler>` — the semi-analytic alternative for rigid-FEM contact.
-- {doc}`Non-rigid models </user_guide/advanced_topics/nonrigid_models>` — FEM, cloth, and other deformable materials.
+- {doc}`Couplers overview <index>`: how to choose between the legacy, SAP, and IPC couplers.
+- {doc}`SAP coupler <sap_coupler>`: the semi-analytic alternative for rigid-FEM contact.
+- {doc}`Non-rigid models </user_guide/advanced_topics/nonrigid_models>`: FEM, cloth, and other deformable materials.

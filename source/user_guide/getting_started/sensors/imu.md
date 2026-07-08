@@ -26,7 +26,7 @@ for _ in range(1000):
     acc = data.lin_acc  # m/s^2, shape ([n_envs,] 3)
 ```
 
-`read()` returns an `IMUReturnType` — a `NamedTuple` with three fields, each a tensor of shape `([n_envs,] 3)`:
+`read()` returns an `IMUReturnType`, a `NamedTuple` with three fields, each a tensor of shape `([n_envs,] 3)`:
 
 | Field | Meaning | Units |
 |---|---|---|
@@ -36,9 +36,9 @@ for _ in range(1000):
 
 ## Frame and conventions
 
-All three fields are expressed in the **sensor's body frame** — the frame of the attached link, rotated by any `euler_offset` you supply. They are not in the world frame, so they rotate with the link.
+All three fields are expressed in the **sensor's body frame**, the frame of the attached link, rotated by any `euler_offset` you supply. They are not in the world frame, so they rotate with the link.
 
-The accelerometer reports **specific force**: coordinate acceleration minus gravity. A sensor at rest therefore reads roughly `(0, 0, 9.81)` m/s² — the reaction to gravity along its local up axis — not zero. This matches real hardware, which cannot distinguish free fall from weightlessness.
+The accelerometer reports **specific force**: coordinate acceleration minus gravity. A sensor at rest therefore reads roughly `(0, 0, 9.81)` m/s² (the reaction to gravity along its local up axis), not zero. This matches real hardware, which cannot distinguish free fall from weightlessness.
 
 When `pos_offset` moves the sensor off the link's origin, Genesis World adds the tangential and centripetal terms (`α × r` and `ω × (ω × r)`), so a spinning link produces the acceleration an IMU would actually feel at that offset.
 
@@ -62,7 +62,7 @@ With `draw_debug=True`, the viewer shows three arrows at the sensor: red for acc
 
 ## Modeling sensor imperfections
 
-By default the IMU is ideal. Each channel — `acc_*`, `gyro_*`, and `mag_*` — takes the same family of parameters to reproduce real-hardware error, applied per axis:
+By default the IMU is ideal. Each channel (`acc_*`, `gyro_*`, and `mag_*`) takes the same family of parameters to reproduce real-hardware error, applied per axis:
 
 ```python
 imu = scene.add_sensor(
@@ -94,8 +94,8 @@ imu = scene.add_sensor(
 
 Two timing parameters, shared across channels, are given in seconds:
 
-- `delay` — how far behind real time a read lags. Must be a multiple of the simulation timestep `dt`.
-- `jitter` — a random extra delay sampled uniformly in `[0, jitter)` each step. Cannot exceed `delay`.
+- `delay`: how far behind real time a read lags. Must be a multiple of the simulation timestep `dt`.
+- `jitter`: a random extra delay sampled uniformly in `[0, jitter)` each step. Cannot exceed `delay`.
 
 The magnetometer also reads a global field, set by `magnetic_field` (default `(0.0, 0.0, 0.5)` T in the world frame) and returned in the body frame.
 
@@ -119,5 +119,5 @@ Your browser does not support the video tag; the clip shows the IMU arrows track
 
 ## See also
 
-- {doc}`Sensors <index>` — the shared read/record pipeline, `history_length`, and batched `read_sensors()`.
-- {doc}`/user_guide/getting_started/recorders` — save IMU streams alongside the simulation.
+- {doc}`Sensors <index>`: the shared read/record pipeline, `history_length`, and batched `read_sensors()`.
+- {doc}`/user_guide/getting_started/recorders`: save IMU streams alongside the simulation.

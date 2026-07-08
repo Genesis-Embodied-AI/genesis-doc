@@ -23,7 +23,7 @@ Genesis World also ships an older path tracer, `gs.renderers.RayTracer()` (Luisa
 
 ## Installation and a minimal example
 
-Nyx is distributed as the separate `gs-nyx` package. For installation and a minimal "hello world" render — a PBR ball lit by an HDRI environment map — see [Photorealistic rendering with Nyx](visualization.md#photorealistic-rendering-with-nyx) in the Visualization guide. The full option reference lives in the [Nyx documentation](https://genesis-embodied-ai.github.io/genesis-nyx/).
+Nyx is distributed as the separate `gs-nyx` package. For installation and a minimal "hello world" render (a PBR ball lit by an HDRI environment map), see [Photorealistic rendering with Nyx](visualization.md#photorealistic-rendering-with-nyx) in the Visualization guide. The full option reference lives in the [Nyx documentation](https://genesis-embodied-ai.github.io/genesis-nyx/).
 
 Feature highlights:
 

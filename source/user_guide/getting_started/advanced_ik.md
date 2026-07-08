@@ -29,7 +29,7 @@ Each target need not be a full 6-DoF pose. `pos_mask` and `rot_mask` are length-
 
 Orientations follow the `(w, x, y, z)` quaternion convention, so `target_quat = np.array([0, 1, 0, 0])` points the finger's z-axis straight down.
 
-This example is purely kinematic — it demonstrates the solver, not the physics. After solving, it writes the result directly to the robot and refreshes the display rather than stepping the simulation:
+This example is purely kinematic: it demonstrates the solver, not the physics. After solving, it writes the result directly to the robot and refreshes the display rather than stepping the simulation:
 
 ```python
 # Note that this IK is for visualization purposes, so here we do not call scene.step(), but only update the state and the visualizer
@@ -46,7 +46,7 @@ The target frames in the video are drawn with `scene.draw_debug_frame()` and mov
 
 ## IK across parallel environments
 
-When a scene is built with multiple environments, the same solver runs across all of them in one call — useful for generating demonstrations or driving policy rollouts without a Python loop over environments. The example spawns 16 environments and rotates each robot's end-effector at a different angular speed.
+When a scene is built with multiple environments, the same solver runs across all of them in one call, useful for generating demonstrations or driving policy rollouts without a Python loop over environments. The example spawns 16 environments and rotates each robot's end-effector at a different angular speed.
 
 The only structural change from single-environment IK is the batch dimension. Build the scene with `n_envs`, then give the solver batched targets whose leading dimension is `n_envs`:
 
@@ -80,7 +80,7 @@ robot.set_qpos(q)
 scene.step()
 ```
 
-The returned `q` has shape `([n_envs,] n_dofs)` — batched when the scene has multiple environments, a plain `(n_dofs,)` vector otherwise. The same rule applies to the inputs: `pos` is `([n_envs,] 3)` and `quat` is `([n_envs,] 4)`. The masks stay length-3 and are shared across the batch. `inverse_kinematics_multilink` batches the same way, with each entry of `poss`/`quats` carrying the leading `n_envs` dimension.
+The returned `q` has shape `([n_envs,] n_dofs)`: batched when the scene has multiple environments, a plain `(n_dofs,)` vector otherwise. The same rule applies to the inputs: `pos` is `([n_envs,] 3)` and `quat` is `([n_envs,] 4)`. The masks stay length-3 and are shared across the batch. `inverse_kinematics_multilink` batches the same way, with each entry of `poss`/`quats` carrying the leading `n_envs` dimension.
 
 ```{video} ../../_static/videos/batched_IK.mp4
 :width: 100%

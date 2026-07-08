@@ -12,7 +12,7 @@ The runnable script for this tutorial is [`examples/tutorials/parallel_simulatio
 
 A single environment cannot keep a GPU busy. A GPU has thousands of cores, and stepping one Franka arm leaves almost all of them idle. Genesis World closes that gap by simulating many identical environments at once, so the same physics kernels operate on a batch of states in one pass. The learning literature calls this **batching**; we use "environment" (**env**) for one copy of the scene and `n_envs` for the count.
 
-The scene is defined exactly as in {doc}`hello_genesis` — a plane and a Franka arm. Parallelism is not a property of the entities; it is turned on when you build the scene.
+The scene is defined exactly as in {doc}`hello_genesis`: a plane and a Franka arm. Parallelism is not a property of the entities; it is turned on when you build the scene.
 
 ## Building parallel environments
 
@@ -31,7 +31,7 @@ scene.build(n_envs=B, env_spacing=(1.0, 1.0))
 ```
 
 - `n_envs` is the batch size. With `n_envs=0` (the default) the scene has no batch dimension; with `n_envs > 0`, a batch dimension of that size is prepended to every state you set or read.
-- `env_spacing` is a `(x, y)` offset in meters used to lay the environments out on a grid in the viewer. It affects visualization only — the environments start from identical states, and the spacing does not change any entity's simulated position.
+- `env_spacing` is a `(x, y)` offset in meters used to lay the environments out on a grid in the viewer. It affects visualization only. The environments start from identical states, and the spacing does not change any entity's simulated position.
 
 The environments are independent: each has its own copy of every entity's state, and stepping the scene advances all of them together with one `scene.step()` call.
 
@@ -66,7 +66,7 @@ franka.control_dofs_position(
 )
 ```
 
-The same `envs_idx` argument is available on the state-reading methods (for example `get_dofs_position`) and on the other `control_dofs_*` and `set_dofs_*` methods, so you can reset or query individual environments — the typical pattern when environments finish episodes at different times during training.
+The same `envs_idx` argument is available on the state-reading methods (for example `get_dofs_position`) and on the other `control_dofs_*` and `set_dofs_*` methods, so you can reset or query individual environments, the typical pattern when environments finish episodes at different times during training.
 
 ## Scaling up
 
@@ -78,5 +78,5 @@ Genesis World prints the real-time simulation speed (FPS) to the terminal by def
 
 ## See also
 
-- {doc}`hello_genesis` — the single-environment scene this tutorial parallelizes.
-- {doc}`control_your_robot` — the full set of `control_dofs_*` and `set_dofs_*` methods, all of which accept a batch dimension and `envs_idx`.
+- {doc}`hello_genesis`: the single-environment scene this tutorial parallelizes.
+- {doc}`control_your_robot`: the full set of `control_dofs_*` and `set_dofs_*` methods, all of which accept a batch dimension and `envs_idx`.

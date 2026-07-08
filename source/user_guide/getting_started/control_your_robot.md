@@ -127,7 +127,7 @@ With the viewer on, the arm snaps to a new configuration every 50 steps.
 
 Switching from `set_*` to the matching `control_*` method turns a state
 assignment into an actuated command. A position target is held until you replace
-it — you do not resend it every step.
+it. You do not resend it every step.
 
 ```python
 franka.control_dofs_position(
@@ -226,6 +226,6 @@ object instead.
 
 ## See also
 
-- {doc}`hello_genesis` — the minimal scene this tutorial builds on.
-- {doc}`inverse_kinematics_motion_planning` — solving for joint targets from a desired end-effector pose.
-- {doc}`/api_reference/entity/index` — the full entity control API.
+- {doc}`hello_genesis`: the minimal scene this tutorial builds on.
+- {doc}`inverse_kinematics_motion_planning`: solving for joint targets from a desired end-effector pose.
+- {doc}`/api_reference/entity/index`: the full entity control API.

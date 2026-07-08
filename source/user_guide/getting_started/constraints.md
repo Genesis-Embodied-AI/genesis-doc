@@ -1,6 +1,6 @@
 # Rigid-body constraints
 
-A **constraint** ties two rigid links together so the solver keeps a geometric relationship between them — coincident points, a fixed relative pose, or coupled joint values. Most constraints are declared once in a model file and hold for the whole simulation. One kind, the **weld** constraint, can be added and removed while the simulation runs, which is what makes it the tool for modeling a suction gripper picking up and releasing an object.
+A **constraint** ties two rigid links together so the solver keeps a geometric relationship between them: coincident points, a fixed relative pose, or coupled joint values. Most constraints are declared once in a model file and hold for the whole simulation. One kind, the **weld** constraint, can be added and removed while the simulation runs, which is what makes it the tool for modeling a suction gripper picking up and releasing an object.
 
 This page covers the runtime weld API on the rigid solver, and how the file-declared constraint types relate to it.
 
@@ -8,7 +8,7 @@ The complete runnable example is [`examples/rigid/suction_cup.py`](https://githu
 
 ## Weld constraints at runtime
 
-A weld constraint pins two links so their relative pose is frozen at the values they have the instant you add it — all six degrees of freedom, translation and rotation. It is the constraint you toggle to model suction or a magnetic gripper: engage it when the end-effector reaches the object, delete it to let go.
+A weld constraint pins two links so their relative pose is frozen at the values they have the instant you add it: all six degrees of freedom, translation and rotation. It is the constraint you toggle to model suction or a magnetic gripper: engage it when the end-effector reaches the object, delete it to let go.
 
 The API lives on the rigid solver, not on an entity, because a weld couples links that belong to two different entities. Reach it through `scene.sim.rigid_solver` after the scene is built:
 
@@ -84,5 +84,5 @@ A connect or joint constraint enters the simulation with its host model. There i
 
 ## See also
 
-- {doc}`Control your robot <control_your_robot>` — joint-level position, velocity, and force control.
-- {doc}`Inverse kinematics and motion planning <inverse_kinematics_motion_planning>` — the IK solving and path planning the suction example uses to reach the object.
+- {doc}`Control your robot <control_your_robot>`: joint-level position, velocity, and force control.
+- {doc}`Inverse kinematics and motion planning <inverse_kinematics_motion_planning>`: the IK solving and path planning the suction example uses to reach the object.

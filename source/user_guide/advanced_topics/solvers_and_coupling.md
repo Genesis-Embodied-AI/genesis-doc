@@ -89,8 +89,8 @@ The available pair flags on `LegacyCouplerOptions` are `rigid_mpm`, `rigid_sph`,
 
 ## See also
 
-- {doc}`Beyond rigid bodies </user_guide/getting_started/beyond_rigid_bodies>` — choose a solver and run a minimal example for each.
-- {doc}`Non-rigid dynamics <nonrigid_models>` — the governing equations and integration scheme behind each solver.
-- {doc}`Couplers <couplers/index>` — the SAP and IPC contact backends, their requirements, and parameters.
-- {doc}`Concepts <concepts>` — how entity state maps onto each solver's global data fields.
+- {doc}`Beyond rigid bodies </user_guide/getting_started/beyond_rigid_bodies>`: choose a solver and run a minimal example for each.
+- {doc}`Non-rigid dynamics <nonrigid_models>`: the governing equations and integration scheme behind each solver.
+- {doc}`Couplers <couplers/index>`: the SAP and IPC contact backends, their requirements, and parameters.
+- {doc}`Concepts <concepts>`: how entity state maps onto each solver's global data fields.
 - Runnable cross-solver pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling).

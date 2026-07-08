@@ -4,8 +4,8 @@
 
 Two runnable examples are the source of truth for this page:
 
-- [`examples/usd/import_stage.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/usd/import_stage.py) — load a single articulated asset and animate its joints.
-- [`examples/usd/kitchen.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/usd/kitchen.py) — load a multi-entity kitchen scene with per-asset processing options.
+- [`examples/usd/import_stage.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/usd/import_stage.py): load a single articulated asset and animate its joints.
+- [`examples/usd/kitchen.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/usd/kitchen.py): load a multi-entity kitchen scene with per-asset processing options.
 
 ## Installation
 
@@ -51,7 +51,7 @@ for _ in range(1000):
     scene.step()
 ```
 
-`add_stage` returns a `list` of the {doc}`entities </api_reference/entity/index>` it created — one per rigid body or articulation found in the file. The refrigerator is a single articulation, so the list has one element; a room scene returns many. See {doc}`hello_genesis` for the initialize / scene / build / step lifecycle that every Genesis World program shares.
+`add_stage` returns a `list` of the {doc}`entities </api_reference/entity/index>` it created, one per rigid body or articulation found in the file. The refrigerator is a single articulation, so the list has one element; a room scene returns many. See {doc}`hello_genesis` for the initialize / scene / build / step lifecycle that every Genesis World program shares.
 
 ## `add_stage` vs. `add_entity`
 
@@ -111,7 +111,7 @@ scene.add_stage(
 
 ## Joint dynamics attributes
 
-Some joint properties — friction, armature, passive stiffness and damping — are not part of the core USD physics schema, so exporters store them under custom attribute names. Isaac Sim, for example, writes `physxJoint:jointFriction` and `physxLimit:angular:stiffness`. Genesis World reads each property from a list of candidate attribute names, trying them in order and using the first that exists:
+Some joint properties (friction, armature, passive stiffness and damping) are not part of the core USD physics schema, so exporters store them under custom attribute names. Isaac Sim, for example, writes `physxJoint:jointFriction` and `physxLimit:angular:stiffness`. Genesis World reads each property from a list of candidate attribute names, trying them in order and using the first that exists:
 
 ```python
 gs.morphs.USD(
@@ -176,7 +176,7 @@ If you see a `Baking process failed: ...` warning, the usual causes are an unacc
 
 ## See also
 
-- {doc}`conventions` — coordinate frame, units, and Y-up ↔ Z-up handling.
-- {doc}`control_your_robot` and {doc}`inverse_kinematics_motion_planning` — actuating and planning for a USD-loaded articulation.
-- {doc}`parallel_simulation` — running USD assets across many environments on the GPU.
-- {doc}`/api_reference/options/morph/index` — the full `gs.morphs` reference, including every `USD` option.
+- {doc}`conventions`: coordinate frame, units, and Y-up ↔ Z-up handling.
+- {doc}`control_your_robot` and {doc}`inverse_kinematics_motion_planning`: actuating and planning for a USD-loaded articulation.
+- {doc}`parallel_simulation`: running USD assets across many environments on the GPU.
+- {doc}`/api_reference/options/morph/index`: the full `gs.morphs` reference, including every `USD` option.

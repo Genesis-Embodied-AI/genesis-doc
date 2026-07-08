@@ -137,7 +137,7 @@ The fingers stay under force control from the grasp step, so the cube rises with
 
 ## See also
 
-- {doc}`advanced_ik` — multi-target IK, null-space control, and solver tuning
-- {doc}`constraints` — weld and connect constraints for locking links together at runtime
-- {doc}`path_planning` — collision-free motion planning with RRT
-- {doc}`control_your_robot` — position, velocity, and force control in depth
+- {doc}`advanced_ik`: multi-target IK, null-space control, and solver tuning
+- {doc}`constraints`: weld and connect constraints for locking links together at runtime
+- {doc}`path_planning`: collision-free motion planning with RRT
+- {doc}`control_your_robot`: position, velocity, and force control in depth

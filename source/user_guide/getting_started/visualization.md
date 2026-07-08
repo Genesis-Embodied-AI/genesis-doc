@@ -5,7 +5,7 @@ This tutorial covers how to see a Genesis World scene: the interactive viewer fo
 Every scene owns a `visualizer` (`scene.visualizer`) that drives both paths. There are two ways to look at a scene:
 
 - **The viewer** is an interactive window that runs in its own thread and follows the simulation in real time. Use it while developing on a machine with a display.
-- **Camera sensors** render frames on demand and return them as arrays. They are not tied to the viewer or a display, so they work headless — on a render farm, in a container, or over SSH.
+- **Camera sensors** render frames on demand and return them as arrays. They are not tied to the viewer or a display, so they work headless: on a render farm, in a container, or over SSH.
 
 The complete runnable script is [`examples/tutorials/visualization.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/visualization.py). This page explains the pieces; run the file to see them together.
 
@@ -67,7 +67,7 @@ With `GUI=True`, the camera opens an OpenCV window that displays each rendered f
 
 ## Rendering images
 
-Build the scene, then call `cam.render()`. The camera can produce four image types — color, depth, segmentation mask, and surface normals. Only RGB is rendered by default; enable the others with keyword flags. `render()` always returns the four in the same order, with disabled types returned as `None`:
+Build the scene, then call `cam.render()`. The camera can produce four image types: color, depth, segmentation mask, and surface normals. Only RGB is rendered by default; enable the others with keyword flags. `render()` always returns the four in the same order, with disabled types returned as `None`:
 
 ```python
 scene.build()
@@ -116,9 +116,9 @@ If you omit `save_to_filename`, Genesis World generates a name from the calling 
 
 `gs.Scene(renderer=...)` selects how camera sensors turn the scene into pixels. Genesis World provides:
 
-- `gs.renderers.Rasterizer()` — the default. Fast, and what the viewer always uses.
-- `gs.renderers.RayTracer()` — a path tracer for photorealistic stills (see [below](#photorealistic-rendering-with-luisa-deprecating)).
-- `gs.renderers.BatchRenderer(...)` — high-throughput rendering across many environments (see [Batch rendering with gs-madrona](#batch-rendering-with-gs-madrona)).
+- `gs.renderers.Rasterizer()`: the default. Fast, and what the viewer always uses.
+- `gs.renderers.RayTracer()`: a path tracer for photorealistic stills (see [below](#photorealistic-rendering-with-luisa-deprecating)).
+- `gs.renderers.BatchRenderer(...)`: high-throughput rendering across many environments (see [Batch rendering with gs-madrona](#batch-rendering-with-gs-madrona)).
 
 **Nyx** is the recommended path toward photorealistic rendering. Unlike the backends above, it attaches as a camera *sensor* rather than a scene-wide renderer.
 
@@ -150,7 +150,7 @@ from gs_nyx_plugin.nyx_camera_options import NyxCameraOptions
 
 #### A minimal example
 
-The snippet below renders a PBR ball on a plane lit purely by an HDRI environment map — the canonical "hello world" for Nyx, mirroring [`examples/01_hello_nyx.py`](https://github.com/Genesis-Embodied-AI/genesis-nyx/blob/main/examples/01_hello_nyx.py) in the Nyx repo.
+The snippet below renders a PBR ball on a plane lit purely by an HDRI environment map, the canonical "hello world" for Nyx, mirroring [`examples/01_hello_nyx.py`](https://github.com/Genesis-Embodied-AI/genesis-nyx/blob/main/examples/01_hello_nyx.py) in the Nyx repo.
 
 ```{image} ../../_static/images/nyx_hello.png
 :alt: PBR ball rendered with Nyx under an HDRI environment map
@@ -229,7 +229,7 @@ Three things distinguish Nyx from the other backends:
 For advanced features such as Gaussian splats, multi-camera setups, and object picking, see the {doc}`Nyx renderer <nyx_renderer>` page and the [Nyx documentation site](https://genesis-embodied-ai.github.io/genesis-nyx/).
 
 :::{note}
-**Roadmap.** We are unifying rasterization and path tracing under Nyx as a single, sensor-based rendering interface. Nyx will gradually replace both the Luisa backend below and the default rasterizer — over time, all camera-based rendering in Genesis World will go through Nyx.
+**Roadmap.** We are unifying rasterization and path tracing under Nyx as a single, sensor-based rendering interface. Nyx will gradually replace both the Luisa backend below and the default rasterizer. Over time, all camera-based rendering in Genesis World will go through Nyx.
 :::
 
 ### Photorealistic rendering with Luisa (deprecating)
@@ -281,7 +281,7 @@ Prebuilt LuisaRender binaries for common CUDA and Python combinations are availa
 
 For high-throughput rendering across many parallel environments, use the gs-madrona backend by passing `renderer=gs.renderers.BatchRenderer(use_rasterizer=True)` (set `use_rasterizer=False` to path-trace instead).
 
-Install the package first — prebuilt wheels are available on PyPI for x86 and Python >= 3.10:
+Install the package first. Prebuilt wheels are available on PyPI for x86 and Python >= 3.10:
 
 ```bash
 pip install gs-madrona
