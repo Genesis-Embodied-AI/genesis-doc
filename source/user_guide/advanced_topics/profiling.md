@@ -1,101 +1,138 @@
-# ⏱️ Profiling
+# Profiling simulation performance
 
-## Measuring Quadrants kernel execution time, and checking launch latency
+This page covers how to measure where a Genesis World simulation spends its time. There are three questions worth asking, in order of increasing depth:
 
-Add pytorch profiler to the code, e.g.:
+- **Throughput:** how many steps per second does the whole scene run? This is the headline number, reported as FPS.
+- **Launch latency:** is the GPU actually busy, or is the CPU stalling between kernel launches? This is what limits large parallel simulations that are not yet GPU-bound.
+- **Per-kernel time:** which solver kernels dominate a step? This tells you what to optimize.
+
+The first is built in and always available. The other two use the PyTorch profiler, which works even in a simulation that never touches PyTorch.
+
+Before you measure anything, read {doc}`/user_guide/getting_started/miscellaneous`: Genesis World caches compiled kernels, so the first run of a scene pays a compilation cost that later runs skip. Benchmark against a warm cache, or your numbers will be dominated by compilation.
+
+## Reading the FPS counter
+
+By default, Genesis World prints the achieved step rate to the terminal as the simulation runs. The output looks like this:
+
+```text
+Running at 43,000,000.00 FPS (1,433.33 FPS per env, 30000 envs).
+```
+
+Three numbers, all reported per window of wall-clock time:
+
+- **Total FPS:** steps per second summed across every environment. This is the throughput figure to compare against benchmarks.
+- **Per-env FPS:** the total divided by the number of environments. Useful when comparing scenes with different batch sizes.
+- **Environments:** the value of `n_envs` passed to `scene.build()`. It is omitted when the scene has no batch dimension.
+
+The rate is measured over fixed wall-clock windows and lightly smoothed with an exponential moving average, so it settles to a stable value rather than jumping every step.
+
+### Configuring the counter
+
+The counter is controlled by `gs.options.ProfilingOptions`, passed to the scene:
 
 ```python
-    schedule=torch.profiler.schedule(
-        wait=80,
-        warmup=3,
-        active=1,
-        repeat=1
-    )
-    with torch.profiler.profile(
-        activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-        schedule=schedule,
-        record_shapes=False,
-        profile_memory=False,
-        with_stack=True,
-        with_flops=False,
-    ) as profiler:
-        for _ in range(steps):
-            profiler.step()
-    # note that this must be OUTSIDE of the context manager
-    profiler.export_chrome_trace("trace.json")
-```
-- within the code you wish to profile, call `profiler.step()` at regular times
-- after running, open the trace in http://ui.perfetto.dev/
-
-**Notes:**
-
-- pytorch profiler can be used both for CPU and for GPU, even if torch is not used even a tiny bit in the program
-- you’ll need to call profiler.step() at least enough times to match what you have put in wait/warmup/active
-- generally you want:
-    - `wait` to be long enough to get past any initial steps you don’t want to look at
-    - `warmup` not sure if needs to be non-0, but I put 3, just in case
-    - `active` ⇒ 1 is generally enough, and will reduce memory used. You can experiment with larger values if you wish, of course
-    - `repeat` should be 1 in general: run the sequence of steps once, then stop profiling
-    - see official documentation [PyTorch profiler schedule documentation](https://docs.pytorch.org/docs/stable/profiler.html#torch.profiler.schedule)
-- for cpu code, both pyspy and pytorch profiler will give a hierarchical flame graph style view
-    - however, the step() ‘wait’ functionality means you’ll skip all the initialization stuff at the start, that you’re not interested in, and the ‘active’ functionality means you’ll get consistent times
-    - also, pytorch profiler shows the actual sequence of calls, rather than the statistically sampled distribution (I think)
-- for gpu code, you don’t directly get any sort of hierarchy
-    - you do however have very precise duration of each kernel launch time and duration
-    - and you can clearly see any non-hidden kernel launch overhead, which is visible as white gaps between each kernel
-    - if you do want to see the gpu kernels aligned with the python-side hierarchical view, which can help with understanding what the gpu kernel relates to, you can modify the code to call `sync()`, just before each step
-        - this will add some latency (e.g. 2x slower, for example)
-        - but means you can trust the alignment between the python hierarchical view and the gpu kernel view
-
-For example, something like:
-```bash
-# Step the profiler after the physics step
-if self.profiler is not None:
-    qd.sync()  # Ensure all Quadrants GPU operations complete before profiling
-    self.profiler.step()
+scene = gs.Scene(
+    profiling_options=gs.options.ProfilingOptions(
+        show_FPS=True,       # print the step rate each window; default True
+        FPS_tracker_alpha=0.95,  # EMA momentum for the smoothed rate
+    ),
+)
 ```
 
-## Within Quadrants kernels
+- **`show_FPS`:** whether to print the rate at all. Set it to `False` for quiet runs, or when the log lines interfere with your own output.
+- **`FPS_tracker_alpha`:** the smoothing momentum, between 0 and 1. Higher values react more slowly and read more steadily; lower values track sudden changes in speed more closely.
 
-Torch profiler records the time spend in CUDA kernels, not Quadrants kernels. This is already one level deeper than what you could do with a CPU-only profiler (e.g. pyspy) + sync. But if you want to go deeper and profile code blocks inside individual GPU kernels per GPU-thread (block actually), you can use clock_counter for this.
+The scene exposes the live options as `scene.profiling_options`, so you can toggle the counter after construction:
 
-First, create an enum with the things you will want to measure, e.g.:
-
-```bash
-from enum import IntEnum
-
-class Time(IntEnum):
-    LineSearch = 1
-    Step2 = 2
-    UpdateConstraint = 3
-    HessianIncremental = 4
-    UpdateGradient = 5
-    StepLast = 6
+```python
+scene.profiling_options.show_FPS = False
 ```
 
-Pass in a tensor of qd.64, e.g. timers. Then, inside the kernel, do things like:
+See {doc}`/user_guide/getting_started/config_system` for how `ProfilingOptions` fits alongside the other options objects.
 
-```bash
-@qd.kernel
-def k1(... previous args, times: qd.types.NDArray[qd.i64, 1]:
-	start = qd.clock_counter()
-	linesearch()
-	end = qd.clock_counter()
-  if i_b == 0:
-      times[Time.LineSearch, it] = end - start
-  start = end
+## Measuring throughput
 
-  step2()
-	end = qd.clock_counter()
-  if i_b == 0:
-      times[Time.Step2, it] = end - start
-  start = end
+The scripts in [`examples/speed_benchmark`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/speed_benchmark) are the reference for measuring throughput on your own hardware. They are the source of truth for a clean benchmark setup; the excerpts below only highlight the choices that matter.
 
-  update_constraint()
-	end = qd.clock_counter()
-  if i_b == 0:
-      times[Time.UpdateConstraint, it] = end - start
-  start = end
+[`examples/speed_benchmark/franka.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/franka.py) runs a Franka arm across tens of thousands of environments:
+
+```python
+gs.init(backend=gs.gpu, performance_mode=True)
+
+scene = gs.Scene(
+    rigid_options=gs.options.RigidOptions(dt=0.01),
+    show_viewer=False,
+)
+# ... add plane and franka ...
+
+scene.build(n_envs=30000, env_spacing=(1.0, 1.0))
 ```
 
-For an example of processing the results, see [genesis/examples/speed_benchmark/timers.py](genesis/examples/speed_benchmark/timers.py).
+Three choices make this a throughput benchmark rather than an interactive session:
+
+- **`performance_mode=True`** bakes static tensor shapes into the compiled kernels for faster stepping, at the cost of recompiling whenever the scene changes. It is worth it for a fixed benchmark or a training run, not for iterative development.
+- **`show_viewer=False`** runs headless. Rendering a window caps throughput at display rates and defeats the purpose.
+- **A large `n_envs`** keeps the GPU saturated. Throughput scales with the batch until you run out of VRAM.
+
+[`examples/speed_benchmark/anymal_c.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/anymal_c.py) is the equivalent for a legged robot. For the reasoning behind these settings and other ways to raise throughput, see {doc}`/user_guide/getting_started/parallel_simulation` and {doc}`/user_guide/getting_started/policy_training/best_practices/efficient_environment`.
+
+## Timing GPU kernels with the PyTorch profiler
+
+The FPS counter tells you *how fast*, not *why*. To see individual GPU kernels and the gaps between them, attach the PyTorch profiler around the steps you care about. It records CUDA activity whether or not your simulation uses PyTorch tensors.
+
+[`examples/speed_benchmark/timers.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/timers.py) wraps a fixed number of steps in a profiler:
+
+```python
+with torch.profiler.profile(
+    on_trace_ready=torch.profiler.tensorboard_trace_handler("./benchmark"),
+    schedule=torch.profiler.schedule(wait=0, warmup=0, active=1),
+    record_shapes=False,
+    profile_memory=False,
+    with_stack=True,
+    with_flops=False,
+):
+    for step in range(500):
+        scene.step()
+```
+
+The `schedule` selects which steps to record so you can skip the ones you do not care about. Its phases are:
+
+- **`wait`:** steps to ignore at the start, past any one-time initialization.
+- **`warmup`:** steps to run while the profiler primes itself but discards the trace.
+- **`active`:** steps actually recorded. One is usually enough and keeps memory low.
+
+When you use a multi-phase schedule, advance it by calling `profiler.step()` once per iteration so the profiler knows which phase it is in. See the [PyTorch profiler schedule documentation](https://docs.pytorch.org/docs/stable/profiler.html#torch.profiler.schedule) for details. The resulting trace opens in [TensorBoard](https://www.tensorflow.org/tensorboard) or, if you export a Chrome trace, in [Perfetto](https://ui.perfetto.dev/).
+
+### Reading the trace
+
+On the GPU timeline you get the precise duration of every kernel launch. White gaps between kernels are launch overhead: the GPU sitting idle while the CPU catches up. On a large parallel simulation those gaps should be negligible; if they dominate, the simulation is CPU-bound and no amount of extra environments will help until the stalls are removed. Diagnosing and removing these stalls is the subject of {doc}`/user_guide/getting_started/policy_training/best_practices/efficient_environment`.
+
+The GPU timeline has no call hierarchy of its own, so it can be hard to tell which Python-side operation a kernel belongs to. Insert a synchronization before each step to force that alignment:
+
+```python
+qd.sync()  # block until all Quadrants GPU work completes, so the CPU and GPU timelines line up
+scene.step()
+```
+
+:::{warning}
+Synchronizing every step serializes the CPU and GPU and can roughly halve throughput. Use it to understand a trace, then remove it before measuring speed.
+:::
+
+## Per-solver kernel timings
+
+To go below CUDA kernels and time blocks of work inside the rigid solver, [`examples/speed_benchmark/timers.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/timers.py) reads the constraint solver's `timers` array and plots per-environment timings in the terminal:
+
+```python
+from genesis.utils.misc import qd_to_torch
+
+timers = qd_to_torch(scene.rigid_solver.constraint_solver.constraint_state.timers)
+```
+
+Run it with `--profiling` to attach the PyTorch profiler instead, or without to collect and plot the per-solver timings. This reaches into solver internals and is aimed at contributors optimizing the physics kernels rather than at typical simulation code.
+
+## See also
+
+- {doc}`/user_guide/getting_started/parallel_simulation`: scaling to many environments for throughput.
+- {doc}`/user_guide/getting_started/policy_training/best_practices/efficient_environment`: removing CPU–GPU stalls in a training loop.
+- {doc}`/user_guide/getting_started/miscellaneous`: benchmarking against a disposable cache.
+- {doc}`/user_guide/getting_started/config_system`: how `ProfilingOptions` fits with the other options objects.
