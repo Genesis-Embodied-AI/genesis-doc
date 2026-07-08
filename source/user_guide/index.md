@@ -7,9 +7,7 @@ This guide takes you from installation through the core concepts, tutorials, and
 :maxdepth: 1
 
 overview/what_is_genesis
-overview/why_a_new_simulator
 overview/installation
-overview/mission
 ```
 
 

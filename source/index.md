@@ -21,7 +21,7 @@ Genesis World began as an academic project in December 2024, under the name **Ge
 - **Differentiable.** Autodiff and backpropagation are provided through the [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants) compiler.
 - **Comprehensive sensors.** Tactile, IMU, lidar, depth-camera, contact-force, surface-distance, and temperature-grid sensors work out of the box in parallel and heterogeneous environments.
 
-For a closer look at each layer, see {doc}`/user_guide/overview/what_is_genesis` and {doc}`/user_guide/overview/why_a_new_simulator`.
+For a closer look at the stack and the design philosophy behind it, see {doc}`/user_guide/overview/what_is_genesis`.
 
 ## Getting started
 
@@ -35,7 +35,7 @@ From there, the {doc}`user guide </user_guide/index>` covers installation in det
 
 ## Contributing
 
-Genesis World aims to be a transparent, community-driven ecosystem where roboticists and graphics researchers build a fast, physically and visually realistic virtual world together. Contributions of every size are welcome — pull requests for new features, bug reports, and suggestions that make the API more intuitive. See {doc}`our mission </user_guide/overview/mission>` for the longer story.
+Genesis World aims to be a transparent, community-driven ecosystem where roboticists and graphics researchers build a fast, physically and visually realistic virtual world together. Contributions of every size are welcome — pull requests for new features, bug reports, and suggestions that make the API more intuitive. See the {doc}`introduction </user_guide/overview/what_is_genesis>` for the longer story.
 
 ## Support
 
