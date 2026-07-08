@@ -42,7 +42,7 @@ Set `history_length=N` on the options to keep the last `N` snapshots, stacked al
 
 ## Parallel and heterogeneous environments
 
-Sensors run across parallel environments. A returned tensor carries a leading batch axis, written `([n_envs,] ...)`: the `[n_envs,]` bracket is present when the scene is built with multiple environments and absent otherwise. The example above reads shape `(16, 4, 1)` — 16 environments, 4 history steps, 1 contact bin.
+Sensors run across parallel environments. A returned tensor carries a leading batch axis, written `([n_envs,] ...)`: the `[n_envs,]` bracket is present when the scene is built with multiple environments and absent otherwise. The example above reads shape `(16, 4, 1)`: 16 environments, 4 history steps, 1 contact bin.
 
 For high-throughput training or logging, read every sensor of a class at once with `scene.read_sensors()` (or `entity.read_sensors()` to scope it to one entity). Each returns a `dict` keyed by a sensor-type tag, `gs.sensors.types.<Name>`, mapping to one batched tensor per class. The last axis is a flat concatenation of every sensor of that class; for sensors that return a `NamedTuple`, the fields are packed in field order (an {doc}`imu` contributes `lin_acc + ang_vel + mag = 9` scalars). The history axis is present whenever any sensor in the class was created with `history_length > 0`.
 
@@ -75,8 +75,8 @@ Runnable examples for every sensor live under `examples/sensors/`.
 
 ## See also
 
-- {doc}`Recorders </user_guide/getting_started/recorders>` — save sensor data alongside the simulation.
-- {doc}`Extending Genesis World: sensors </user_guide/advanced_topics/sensors/index>` — the sensor pipeline and how to add your own sensor type.
+- {doc}`Recorders </user_guide/getting_started/recorders>`: save sensor data alongside the simulation.
+- {doc}`Extending Genesis World: sensors </user_guide/advanced_topics/sensors/index>`: the sensor pipeline and how to add your own sensor type.
 
 ```{toctree}
 :hidden:

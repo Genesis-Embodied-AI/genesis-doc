@@ -4,9 +4,9 @@ This tutorial trains a walking policy for the Unitree Go2 quadruped and rolls it
 
 The three scripts that make up the example are the source of truth for the complete code:
 
-- [`go2_env.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/locomotion/go2_env.py) — the environment: scene, control, observations, rewards, and resets.
-- [`go2_train.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/locomotion/go2_train.py) — hyperparameters and the training entry point.
-- [`go2_eval.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/locomotion/go2_eval.py) — loading a checkpoint and running the policy.
+- [`go2_env.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/locomotion/go2_env.py): the environment: scene, control, observations, rewards, and resets.
+- [`go2_train.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/locomotion/go2_train.py): hyperparameters and the training entry point.
+- [`go2_eval.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/locomotion/go2_eval.py): loading a checkpoint and running the policy.
 
 The design borrows its structure from [Legged Gym](https://github.com/leggedrobotics/legged_gym).
 

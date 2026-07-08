@@ -28,7 +28,7 @@ Notes on the return types:
 
 - **Camera sensors:** `read()` returns `CameraReturnType`, which carries a single `rgb` field. Depth, segmentation, and surface normals come from `scene.add_camera(...).render(...)`, not from the camera-sensor `read()`.
 - **`SurfaceDistanceProbe`:** `read()` returns the probe-to-surface distances; the corresponding nearest points are available as `sensor.nearest_points`, shape `([n_envs,] n_probes, 3)`.
-- **`Raycaster` patterns:** `pattern_shape` follows the ray pattern — for example `(n_horizontal, n_vertical)` for a spherical pattern and `(height, width)` for `DepthCamera`.
+- **`Raycaster` patterns:** `pattern_shape` follows the ray pattern: for example `(n_horizontal, n_vertical)` for a spherical pattern and `(height, width)` for `DepthCamera`.
 
 ## Quick start
 
@@ -90,6 +90,6 @@ other
 
 ## See also
 
-- {doc}`/user_guide/getting_started/sensors/index` — the attach-and-read model, imperfections, history, and batched reads.
-- {doc}`/api_reference/visualization/index` — the rendering and camera system.
-- {doc}`/api_reference/entity/index` — entities and links that sensors attach to.
+- {doc}`/user_guide/getting_started/sensors/index`: the attach-and-read model, imperfections, history, and batched reads.
+- {doc}`/api_reference/visualization/index`: the rendering and camera system.
+- {doc}`/api_reference/entity/index`: entities and links that sensors attach to.

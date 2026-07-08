@@ -120,7 +120,7 @@ One sentence defining what it is and when to use it.
 - ✅ "Sensors and perception", "Theory and modelling"
 - ❌ "Sensors & perception", "Theory & Modelling"
 
-**Use em dashes sparingly.** Reach for a comma, a colon, or a full stop first. One em dash in a paragraph for a genuine aside is fine; three is a nervous tic, and a sentence whose clauses are all strung together with them should be rewritten. (An en dash in a number range like "10–80×" is not an em dash and is fine.)
+**Minimize em dashes; default to a colon, comma, or full stop.** The em dash (—) is the exception, not the reflex. Before using one, try a colon (to introduce or expand), a comma (for a light pause), or a new sentence — one of those is almost always cleaner and more scannable. At most one em dash per paragraph, and only for a genuine aside; a sentence whose clauses are strung together with them should be rewritten. When a phrase introduces or defines what follows, use a colon, not a dash. (An en dash in a number range like "10–80×" is not an em dash and is fine.)
 
 **Definition-style list items lead with a bold term and a colon.** Write `- **Simulation interface:** the user-facing API for …`, with the description as a normal clause after the colon. Do not separate the term from its description with an em dash, and do not use the "bold term, full stop, sentence" form for definition lists.
 

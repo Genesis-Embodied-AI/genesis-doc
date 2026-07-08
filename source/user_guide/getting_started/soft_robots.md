@@ -78,7 +78,7 @@ The MPM solver discretizes space onto a background grid; `lower_bound` and `uppe
 
 ## Muscle groups and fiber directions
 
-By default a soft robot has a single muscle group spanning its whole body, with all fibers pointing along `+Z` (`[0, 0, 1]`). A single actuation value then contracts the entire body along that axis — useful for the sphere demo, useless for locomotion.
+By default a soft robot has a single muscle group spanning its whole body, with all fibers pointing along `+Z` (`[0, 0, 1]`). A single actuation value then contracts the entire body along that axis: useful for the sphere demo, useless for locomotion.
 
 To make a robot move deliberately, partition it into groups and assign each part a fiber direction. Declare the number of groups on the material, then call `set_muscle` after `build` (it reads the built particle positions):
 

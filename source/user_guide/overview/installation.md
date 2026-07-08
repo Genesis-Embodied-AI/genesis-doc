@@ -34,7 +34,7 @@ Supported features on various systems are as follows:
 If you are using Genesis World with CUDA, make sure appropriate nvidia-driver is installed on your machine.
 :::
 
-Once installed, initialize the library with `gs.init()` — see {doc}`Initialization and backends </user_guide/getting_started/initialization>` for backend selection, precision, and reproducibility.
+Once installed, initialize the library with `gs.init()`. See {doc}`Initialization and backends </user_guide/getting_started/initialization>` for backend selection, precision, and reproducibility.
 
 ## (Optional) Surface reconstruction
 To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, you reconstruct a mesh surface from the internal particle representation. [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) is supported out of the box. Alternatively, `ParticleMesher`, our own OpenVDB-based tool, is faster but produces lower-quality surfaces:

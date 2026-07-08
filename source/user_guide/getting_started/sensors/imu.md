@@ -101,7 +101,7 @@ The magnetometer also reads a global field, set by `magnetic_field` (default `(0
 
 ## Reading measured versus ground-truth data
 
-`read()` returns the value with all configured imperfections applied. `read_ground_truth()` returns the same quantities with no noise, bias, drift, or delay — useful as a training target or for validation:
+`read()` returns the value with all configured imperfections applied. `read_ground_truth()` returns the same quantities with no noise, bias, drift, or delay, which is useful as a training target or for validation:
 
 ```python
 print("Ground truth data:")

@@ -74,7 +74,7 @@ You do not register links with the coupler directly. Instead, each entity's {doc
 
 When `coup_type` is `None` (the default), Genesis picks one from the entity type: `external_articulation` for fixed-base robots, `two_way_soft_constraint` for floating-base robots, and `ipc_only` for non-articulated objects.
 
-To restrict a `two_way_soft_constraint` robot so that only certain links participate — for example, coupling a gripper's fingers but not its arm — pass `coup_links`:
+To restrict a `two_way_soft_constraint` robot so that only certain links participate (for example, coupling a gripper's fingers but not its arm), pass `coup_links`:
 
 ```python
 franka = scene.add_entity(

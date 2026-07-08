@@ -60,4 +60,4 @@ Key options in `SFOptions`:
 
 ## See also
 
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/sf_options` — full options.
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/sf_options`: full options.

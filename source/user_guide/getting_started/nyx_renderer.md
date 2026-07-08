@@ -4,7 +4,7 @@
 :alt: The Nyx renderer producing photorealistic frames of a Genesis World simulation
 ```
 
-**Nyx** is a GPU-accelerated path tracer built in-house for Genesis World. It produces physically based, photorealistic frames — suitable for robotics datasets, demos, and synthetic perception — and it plugs into a scene as a **camera sensor** rather than as a scene-wide renderer.
+**Nyx** is a GPU-accelerated path tracer built in-house for Genesis World. It produces physically based, photorealistic frames (suitable for robotics datasets, demos, and synthetic perception) and plugs into a scene as a **camera sensor** rather than as a scene-wide renderer.
 
 That distinction is the whole idea. The other rendering backends are selected once for the entire scene with `gs.Scene(renderer=...)`. Nyx instead attaches per camera with `scene.add_sensor(NyxCameraOptions(...))`, so a single scene can pair fast rasterized cameras for control loops with a photorealistic Nyx camera for the frames you keep. Rendering runs during `scene.step()`, and you read frames back from `cam.read().rgb`.
 
@@ -17,7 +17,7 @@ Genesis World offers several ways to turn a scene into pixels (see {doc}`Visuali
 | An interactive window while iterating | the {doc}`viewer <visualization>` |
 | Fast, non-photorealistic camera frames for control and debugging | `gs.renderers.Rasterizer()` (the default) |
 | High-throughput rendering across many environments | `gs.renderers.BatchRenderer(...)` |
-| Photorealistic frames — PBR materials, HDRI lighting, Gaussian splats | **Nyx** |
+| Photorealistic frames: PBR materials, HDRI lighting, Gaussian splats | **Nyx** |
 
 Genesis World also ships an older path tracer, `gs.renderers.RayTracer()` (Luisa), for photorealistic stills. Nyx is the recommended path forward for photorealistic rendering; the RayTracer backend is being deprecated.
 

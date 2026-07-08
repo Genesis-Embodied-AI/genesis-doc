@@ -51,7 +51,7 @@ scene.viewer.set_camera_pose(pos=(3.5, 0.0, 2.5), lookat=(0, 0, 0.5))
 
 ## Lighting
 
-The rasterizer — the viewer and any rasterizer camera sensor — lights the scene from a list of lights on `VisOptions`. With no configuration it uses a single directional light, so scenes are lit out of the box; set `lights` to control direction, color, and intensity yourself. The light classes live in `gs.options.vis`:
+The rasterizer (the viewer and any rasterizer camera sensor) lights the scene from a list of lights on `VisOptions`. With no configuration it uses a single directional light, so scenes are lit out of the box; set `lights` to control direction, color, and intensity yourself. The light classes live in `gs.options.vis`:
 
 ```python
 scene = gs.Scene(

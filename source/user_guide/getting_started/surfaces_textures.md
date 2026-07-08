@@ -68,7 +68,7 @@ gs.surfaces.Smooth(color=(1.0, 1.0, 1.0, 0.5))
 
 ## Textures
 
-When a property varies across a surface — a wood grain, a painted logo, a roughness map — supply a texture instead of a constant. Textures live under `gs.textures`:
+When a property varies across a surface (a wood grain, a painted logo, a roughness map), supply a texture instead of a constant. Textures live under `gs.textures`:
 
 - `gs.textures.ColorTexture(color=...)`: a single uniform color. Equivalent to the `color` shortcut, useful when an argument requires a texture object.
 - `gs.textures.ImageTexture(image_path=..., encoding=...)`: an image map sampled over the mesh's UV coordinates.
@@ -131,7 +131,7 @@ The accepted values are `"visual"`, `"collision"`, `"particle"`, `"sdf"`, and `"
 
 ## Foam and spray
 
-A fast-moving particle fluid entrains air: whitewater on a breaking wave, spray thrown off a splash, bubbles carried below the surface. Genesis World can add these as secondary foam particles at render time. This is purely a visual effect for particle-based fluids in the {doc}`Nyx <nyx_renderer>` ray tracer — it does not change the physics, and the rasterizer ignores it.
+A fast-moving particle fluid entrains air: whitewater on a breaking wave, spray thrown off a splash, bubbles carried below the surface. Genesis World can add these as secondary foam particles at render time. This is purely a visual effect for particle-based fluids in the {doc}`Nyx <nyx_renderer>` ray tracer. It does not change the physics, and the rasterizer ignores it.
 
 Enable it on the fluid's surface with `generate_foam=True`, and tune the look with a `foam_options` object:
 
@@ -153,7 +153,7 @@ scene.add_entity(
 )
 ```
 
-`gs.options.FoamOptions` splits the effect into three populations, each with its own dissipation rate — a larger value clears that population faster:
+`gs.options.FoamOptions` splits the effect into three populations, each with its own dissipation rate (a larger value clears that population faster):
 
 - **`radius_scale`:** foam particle radius as a fraction of the fluid particle radius. Defaults to `0.2`.
 - **`k_foam`:** number of foam particles generated per frame. Defaults to `1000.0`.

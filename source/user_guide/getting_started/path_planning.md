@@ -13,7 +13,7 @@ Two consequences follow from this, and both are common sources of confusion:
 - **You usually need inverse kinematics first.** A task is normally stated as an end-effector pose in the world, but the planner wants a joint configuration. {doc}`inverse_kinematics_motion_planning` converts one to the other; feed its `qpos` output in as `qpos_goal`.
 - **Planning does not move the robot.** `plan_path` returns waypoints; it does not step the simulation. The robot only moves when you send those waypoints to a controller and call `scene.step()`.
 
-The planners are sampling-based (RRT and RRTConnect). They are probabilistically complete — given enough time they find a path if one exists — but they are randomized, so two runs on the same problem can return different paths, and a hard problem can fail within the retry budget.
+The planners are sampling-based (RRT and RRTConnect). They are probabilistically complete (given enough time they find a path if one exists), but they are randomized, so two runs on the same problem can return different paths, and a hard problem can fail within the retry budget.
 
 ## Minimal example
 

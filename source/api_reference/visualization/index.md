@@ -62,6 +62,6 @@ lights
 
 ## See also
 
-- {doc}`/user_guide/getting_started/visualization` — visualization guide with worked examples
-- {doc}`/api_reference/options/renderer/index` — renderer configuration options
-- {doc}`/api_reference/options/options` — viewer and visualization options
+- {doc}`/user_guide/getting_started/visualization`: visualization guide with worked examples
+- {doc}`/api_reference/options/renderer/index`: renderer configuration options
+- {doc}`/api_reference/options/options`: viewer and visualization options

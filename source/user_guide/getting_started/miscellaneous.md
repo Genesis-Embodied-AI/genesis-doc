@@ -15,9 +15,9 @@ QD_OFFLINE_CACHE_FILE_PATH="$XDG_CACHE_HOME/quadrants" \
 python your_script.py
 ```
 
-- `GS_CACHE_FILE_PATH` — Genesis World's cache directory.
-- `QD_OFFLINE_CACHE_FILE_PATH` — the Quadrants compiler cache directory.
-- `XDG_CACHE_HOME` — the base cache directory, honored on Linux only.
+- `GS_CACHE_FILE_PATH`: Genesis World's cache directory.
+- `QD_OFFLINE_CACHE_FILE_PATH`: the Quadrants compiler cache directory.
+- `XDG_CACHE_HOME`: the base cache directory, honored on Linux only.
 
 On Linux, `XDG_CACHE_HOME` alone is enough to relocate the Genesis World cache. On Windows and macOS it is ignored, so set `GS_CACHE_FILE_PATH` and `QD_OFFLINE_CACHE_FILE_PATH` explicitly as shown above.
 

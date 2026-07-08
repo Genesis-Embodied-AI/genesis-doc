@@ -1,6 +1,6 @@
 # Initialization and backends
 
-Every Genesis World program begins with a single call to `gs.init()`. It selects the compute backend, fixes the numeric precision, seeds the random number generators, and configures logging — the global state that every scene you build afterward relies on. Call it once, before you construct a `gs.Scene` or any options object. If you skip it, the first API call raises `GenesisException: Genesis hasn't been initialized. Did you call gs.init()?`.
+Every Genesis World program begins with a single call to `gs.init()`. It selects the compute backend, fixes the numeric precision, seeds the random number generators, and configures logging: the global state that every scene you build afterward relies on. Call it once, before you construct a `gs.Scene` or any options object. If you skip it, the first API call raises `GenesisException: Genesis hasn't been initialized. Did you call gs.init()?`.
 
 ## Minimal example
 
@@ -57,7 +57,7 @@ Single precision is faster and uses less memory; double precision trades speed f
 - **Double precision is not available on Apple Metal.** Requesting `precision="64"` with `backend=gs.metal` raises an error.
 - `gs.init()` sets PyTorch's global default dtype and device to match, so tensors you create afterward land on the right device with the right dtype without extra arguments.
 
-The observable result — what dtype the tensors returned by the API carry — is described in {doc}`conventions`.
+What dtype the tensors returned by the API carry is described in {doc}`conventions`.
 
 ## Reproducibility
 
@@ -87,7 +87,7 @@ Set `logger_verbose_time=True` to prefix each log line with a full timestamp ins
 
 ## Environment variables
 
-A few environment variables adjust backend and runtime behavior without changing your code — useful for CI, containers, and quick experiments:
+A few environment variables adjust backend and runtime behavior without changing your code, which is useful for CI, containers, and quick experiments:
 
 | Variable | Effect |
 |---|---|

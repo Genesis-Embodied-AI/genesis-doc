@@ -170,7 +170,7 @@ def _apply_hardware_imperfections(cls, shared_metadata, measured_slot_0):
     measured_slot_0 += torch.normal(0.0, shared_metadata.signal_noise_coeff) * measured_slot_0.abs()
 ```
 
-For a sensor whose noise is intrinsic to the physics computation — a single kernel pass must produce both the ideal and the noised value because the noise shapes the kernel's branches — override `_update_current_timestep_data` instead. It writes the ground-truth slice and the noised measured slot in one pass, and the rest of the pipeline still runs on top.
+For a sensor whose noise is intrinsic to the physics computation (a single kernel pass must produce both the ideal and the noised value because the noise shapes the kernel's branches), override `_update_current_timestep_data` instead. It writes the ground-truth slice and the noised measured slot in one pass, and the rest of the pipeline still runs on top.
 
 ### Projecting to a different return type
 

@@ -116,7 +116,7 @@ The simulation timestep is a duration in seconds, defaulting to `dt = 1e-2` (10 
 gs.options.SimOptions(dt=0.01)  # seconds
 ```
 
-A few APIs carry their own natural units where SI would be awkward — for example, a drone's propellers take angular speed in **RPM**, and the temperature-grid sensor reports **degrees Celsius**. These are called out on the pages and in the docstrings where they appear. When in doubt, assume SI.
+A few APIs carry their own natural units where SI would be awkward. For example, a drone's propellers take angular speed in **RPM**, and the temperature-grid sensor reports **degrees Celsius**. These are called out on the pages and in the docstrings where they appear. When in doubt, assume SI.
 
 ## Tensor shapes and batching
 

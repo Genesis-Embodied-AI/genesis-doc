@@ -77,6 +77,6 @@ Key options in `SPHOptions`:
 
 ## See also
 
-- {doc}`/api_reference/entity/sph_entity` — SPHEntity.
-- {doc}`/api_reference/material/sph/index` — SPH materials.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/sph_options` — full options.
+- {doc}`/api_reference/entity/sph_entity`: SPHEntity.
+- {doc}`/api_reference/material/sph/index`: SPH materials.
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/sph_options`: full options.

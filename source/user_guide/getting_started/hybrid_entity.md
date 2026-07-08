@@ -11,7 +11,7 @@ A hybrid entity is not a single solver's object. Genesis World builds it from tw
 - A **rigid part** (a `RigidEntity`) parsed from the URDF, carrying the joints and **degrees of freedom** (**dofs**).
 - A **soft part** (an `MPMEntity`) whose particles are attached to the rigid links.
 
-Each simulation step, the rigid solver advances the joints, and the coupling maps every soft particle back onto the link it belongs to; the particles' reaction then feeds a force back onto the rigid link. You drive the entity through the rigid dofs — the skin follows. The soft material must be MPM-based; FEM and PBD skins are not yet supported.
+Each simulation step, the rigid solver advances the joints, and the coupling maps every soft particle back onto the link it belongs to; the particles' reaction then feeds a force back onto the rigid link. You drive the entity through the rigid dofs; the skin follows. The soft material must be MPM-based; FEM and PBD skins are not yet supported.
 
 ## Minimal setup
 

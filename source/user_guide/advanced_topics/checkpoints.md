@@ -1,6 +1,6 @@
 # Checkpoints and simulation state
 
-A checkpoint is a snapshot of the dynamic state of a scene at one instant: the numbers the physics solvers advance every step, such as joint positions, velocities, and particle fields. Capturing that snapshot and restoring it later lets you rewind a simulation, reset an environment between episodes, or resume a long run after a crash — deterministically, from the exact state you left.
+A checkpoint is a snapshot of the dynamic state of a scene at one instant: the numbers the physics solvers advance every step, such as joint positions, velocities, and particle fields. Capturing that snapshot and restoring it later lets you rewind a simulation, reset an environment between episodes, or resume a long run after a crash, deterministically, from the exact state you left.
 
 Genesis World exposes two levels of this. The state model is the same underneath; the difference is where the snapshot lives.
 

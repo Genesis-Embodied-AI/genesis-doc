@@ -1,12 +1,12 @@
 # Entity
 
-An entity is a single simulated object in a Genesis World scene — a robot, a rigid body, a piece of cloth, a volume of fluid, or a deformable solid. It is the unit you add, configure, query, and control.
+An entity is a single simulated object in a Genesis World scene: a robot, a rigid body, a piece of cloth, a volume of fluid, or a deformable solid. It is the unit you add, configure, query, and control.
 
 You create an entity by calling {py:meth}`scene.add_entity <genesis.engine.scene.Scene.add_entity>`, which combines three ingredients:
 
-- **Morph:** the geometry and pose — a primitive shape, a mesh, or a robot description loaded from URDF, MJCF, or USD. See {doc}`/api_reference/options/morph/index`.
+- **Morph:** the geometry and pose: a primitive shape, a mesh, or a robot description loaded from URDF, MJCF, or USD. See {doc}`/api_reference/options/morph/index`.
 - **Material:** the physical model that decides which solver simulates the entity and how it responds to forces. See {doc}`/api_reference/material/index`.
-- **Surface:** the visual appearance used for rendering — color, texture, and visualization mode. See {doc}`/api_reference/options/surface/index`.
+- **Surface:** the visual appearance used for rendering: color, texture, and visualization mode. See {doc}`/api_reference/options/surface/index`.
 
 ```python
 import genesis as gs
@@ -25,7 +25,7 @@ scene.build()  # required before stepping or reading state
 
 ## Object-oriented accessors
 
-Genesis World follows an object-oriented model: you interact with each entity through methods on the object `add_entity` returned, rather than through global scene calls indexed by id. After {py:meth}`scene.build() <genesis.engine.scene.Scene.build>`, you read state and issue commands directly — for example `franka.get_pos()`, `franka.get_dofs_position()`, and `franka.control_dofs_position(...)` on a rigid entity. The available methods differ by entity type; see each type's reference page.
+Genesis World follows an object-oriented model: you interact with each entity through methods on the object `add_entity` returned, rather than through global scene calls indexed by id. After {py:meth}`scene.build() <genesis.engine.scene.Scene.build>`, you read state and issue commands directly, for example `franka.get_pos()`, `franka.get_dofs_position()`, and `franka.control_dofs_position(...)` on a rigid entity. The available methods differ by entity type; see each type's reference page.
 
 State-reading methods return tensors that follow the batched-optional shape convention: the leading environment dimension is present when the scene is built with multiple environments and absent otherwise, for example `([n_envs,] 3)` for a position. See {doc}`/user_guide/getting_started/hello_genesis` for a worked example.
 
@@ -37,7 +37,7 @@ Each physics solver has its own entity type. Choosing a material selects the sol
 - **`DroneEntity`:** a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>` subclass that adds propeller and thrust control for quadrotor simulation.
 - **`MPMEntity`:** elastic and plastic solids, sand, snow, and similar continua simulated with the Material Point Method (MPM) solver.
 - **`FEMEntity`:** deformable solids simulated with the Finite Element Method (FEM) solver.
-- **PBD entities:** cloth, ropes, and particle-based fluids simulated by the Position Based Dynamics (PBD) solver. The material determines the concrete type — for example `PBD2DEntity` for cloth and `PBD3DEntity` for elastic volumes.
+- **PBD entities:** cloth, ropes, and particle-based fluids simulated by the Position Based Dynamics (PBD) solver. The material determines the concrete type: for example `PBD2DEntity` for cloth and `PBD3DEntity` for elastic volumes.
 - **`SPHEntity`:** liquids and gases simulated with the Smoothed Particle Hydrodynamics (SPH) solver.
 - **`SFParticleEntity`:** smoke and gaseous media simulated with the Stable Fluid (SF) solver.
 - **`ToolEntity`:** a kinematically-scripted collider that couples one-way with soft and particle-based entities to push or deform them.
