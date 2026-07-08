@@ -59,7 +59,7 @@ html[data-theme="dark"] {
   align-items: center;
 }
 .bd-footer p {
-  margin-bottom: 0;
+  margin: 0;
 }
 
 a:hover {
@@ -199,7 +199,7 @@ html[data-theme="dark"] #pst-back-to-top:hover {
   line-height: 0;
 }
 .footer-logo img {
-  height: 1.1rem;
+  height: 1.5rem;
   width: auto;
   display: block;
 }
