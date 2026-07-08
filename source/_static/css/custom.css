@@ -56,6 +56,7 @@ html[data-theme="dark"] {
 .bd-footer .bd-footer__inner {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+  align-items: center;
 }
 .bd-footer p {
   margin-bottom: 0;
@@ -192,6 +193,11 @@ html[data-theme="dark"] #pst-back-to-top:hover {
 }
 
 /* Footer: Genesis company logo (left corner), kept small; light/dark variants toggled by theme. */
+.footer-logo {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
 .footer-logo img {
   height: 1.1rem;
   width: auto;
