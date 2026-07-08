@@ -60,7 +60,10 @@ html_theme = "pydata_sphinx_theme"
 # html_title also fixes the browser-tab title to "Genesis World" rather than the
 # default "Genesis World <version> documentation".
 html_title = "Genesis World"
-html_favicon = "_static/option2_shadow_1.svg"
+# Baseline favicon is the multi-resolution .ico (understood everywhere); the
+# adaptive SVG and apple-touch-icon are added in setup() below so modern
+# browsers prefer the crisp, theme-aware SVG.
+html_favicon = "_static/favicon.ico"
 
 json_url = "_static/version_switcher.json"
 version_match = os.environ.get("READTHEDOCS_VERSION")
@@ -113,6 +116,23 @@ html_css_files = [
     "css/custom.css",
 ]
 html_static_path = ["_static"]
+
+def _add_favicon_links(app, pagename, templatename, context, doctree):
+    # Supplement the .ico (set via html_favicon) with the theme-adaptive SVG and
+    # an apple-touch-icon. Browsers that support SVG favicons prefer the SVG.
+    pathto = context.get("pathto")
+    if pathto is None:
+        return
+    links = (
+        f'<link rel="icon" type="image/svg+xml" href="{pathto("_static/favicon.svg", 1)}">'
+        f'<link rel="apple-touch-icon" href="{pathto("_static/apple-touch-icon.png", 1)}">'
+    )
+    context["metatags"] = context.get("metatags", "") + links
+
+
+def setup(app):
+    app.connect("html-page-context", _add_favicon_links)
+
 
 ### Autodoc configurations ###
 autodoc_typehints = "signature"
