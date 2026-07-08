@@ -58,7 +58,7 @@ We sincerely welcome *any forms of contributions* from the community to make the
 
 ## Support
 
-- Please use Github [Issues](https://github.com/Genesis-Embodied-AI/genesis-world/issues) for bug reports and feature requests.
+- Please use GitHub [Issues](https://github.com/Genesis-Embodied-AI/genesis-world/issues) for bug reports and feature requests.
 
 - Please use GitHub [Discussions](https://github.com/Genesis-Embodied-AI/genesis-world/discussions) for discussing ideas, and asking questions.
 
