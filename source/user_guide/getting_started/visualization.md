@@ -7,7 +7,7 @@ Every scene owns a `visualizer` (`scene.visualizer`) that drives both paths. The
 - **The viewer** is an interactive window that runs in its own thread and follows the simulation in real time. Use it while developing on a machine with a display.
 - **Camera sensors** render frames on demand and return them as arrays. They are not tied to the viewer or a display, so they work headless: on a render farm, in a container, or over SSH.
 
-The complete runnable script is [`examples/tutorials/visualization.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/visualization.py). This page explains the pieces; run the file to see them together.
+The complete script is [`examples/tutorials/visualization.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/visualization.py).
 
 ## The viewer
 

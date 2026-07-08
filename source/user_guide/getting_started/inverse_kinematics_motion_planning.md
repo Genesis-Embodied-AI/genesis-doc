@@ -2,7 +2,7 @@
 
 This tutorial builds a complete pick-and-place task with a Franka arm: solve **inverse kinematics** (IK) for a target end-effector pose, plan a collision-free path to that configuration, then close the gripper and lift a cube. Along the way it covers the pose conventions IK expects and why the two control modes (position and force) are used at different stages.
 
-The full runnable script is [`examples/tutorials/IK_motion_planning_grasp.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/IK_motion_planning_grasp.py). This page explains the ideas behind it; run the script to see the arm move.
+The complete script is [`examples/tutorials/IK_motion_planning_grasp.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/IK_motion_planning_grasp.py).
 
 ```{figure} ../../_static/images/IK_mp_grasp.png
 :alt: A Franka arm positioned above a small cube on the ground plane, viewed in the Genesis World viewer.

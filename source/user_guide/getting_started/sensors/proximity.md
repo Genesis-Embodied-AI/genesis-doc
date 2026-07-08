@@ -2,7 +2,7 @@
 
 `gs.sensors.SurfaceDistanceProbe` reports the nearest distance from one or more probe points to the mesh surfaces of a set of tracked rigid links. Each probe is mounted in the local frame of a link and moves with it, so the sensor answers "how close is this point on my robot to those objects?" as the scene evolves.
 
-The complete runnable script is [`examples/sensors/surface_distance_shadowhand.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/surface_distance_shadowhand.py), which mounts probes on the palm and fingertips of a Shadow Hand and measures distance to a duck mesh and a box under keyboard teleoperation.
+The complete script is [`examples/sensors/surface_distance_shadowhand.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/surface_distance_shadowhand.py), which mounts probes on the palm and fingertips of a Shadow Hand and measures distance to a duck mesh and a box under keyboard teleoperation.
 
 ## Minimal example
 

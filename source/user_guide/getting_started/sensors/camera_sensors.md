@@ -9,7 +9,7 @@ A camera sensor is distinct from two things it is easy to confuse it with:
 
 A camera sensor, by contrast, is a first-class {doc}`sensor <index>`: it renders lazily on `read()`, participates in the batched `scene.read_sensors()` path, and can be attached to a moving link like any other sensor. It returns **RGB only**.
 
-The complete runnable script is [`examples/sensors/camera_as_sensor.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/camera_as_sensor.py).
+The complete script is [`examples/sensors/camera_as_sensor.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/camera_as_sensor.py).
 
 ## Minimal example
 

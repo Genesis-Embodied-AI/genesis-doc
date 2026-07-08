@@ -2,7 +2,7 @@
 
 A hybrid entity couples a rigid skeleton to a soft skin so that the two simulate as one body. The rigid part carries the joints you control; the soft part deforms around it and pushes back through contact. Use it for compliant manipulators, soft grippers, and creatures whose motion comes from a jointed frame but whose surface is deformable.
 
-The complete runnable script is [`examples/tutorials/advanced_hybrid_robot.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/advanced_hybrid_robot.py): a two-link arm with a soft skin that sweeps a rigid ball across the ground.
+The complete script is [`examples/tutorials/advanced_hybrid_robot.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/advanced_hybrid_robot.py): a two-link arm with a soft skin that sweeps a rigid ball across the ground.
 
 ## Mental model
 

@@ -20,7 +20,7 @@ pip install pyuipc
 
 ## Minimal example
 
-The complete runnable script is [`examples/IPC_Solver/ipc_objects_falling.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/IPC_Solver/ipc_objects_falling.py): a cloth sheet falls onto a rigid box and a soft FEM ball, all resolved by IPC. Select the coupler by passing `IPCCouplerOptions` to the {doc}`Scene </api_reference/scene/scene>`:
+The complete script is [`examples/IPC_Solver/ipc_objects_falling.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/IPC_Solver/ipc_objects_falling.py): a cloth sheet falls onto a rigid box and a soft FEM ball, all resolved by IPC. Select the coupler by passing `IPCCouplerOptions` to the {doc}`Scene </api_reference/scene/scene>`:
 
 ```python
 import genesis as gs

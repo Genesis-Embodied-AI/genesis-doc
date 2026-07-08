@@ -2,7 +2,7 @@
 
 This example trains a Franka arm to reach a graspable pose over a randomly placed box, then hands off to a scripted close-and-lift. It uses a two-stage recipe common in sim-to-real manipulation: first train a **teacher** policy on privileged ground-truth state, then distill it into a **student** policy that sees only stereo camera images. The teacher learns fast because it has perfect information; the student inherits that behavior while depending on inputs a real robot can actually produce.
 
-The complete, runnable code lives in [`examples/manipulation/`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/manipulation/), split across four files:
+The complete code lives in [`examples/manipulation/`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/manipulation/), split across four files:
 
 - **[`grasp_env.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/manipulation/grasp_env.py):** the environment, shared by both stages.
 - **[`grasp_train.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/manipulation/grasp_train.py):** configs and the training entry point for both stages.

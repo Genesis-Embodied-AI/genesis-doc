@@ -6,7 +6,7 @@
 
 This tutorial builds the smallest complete Genesis World program: load a Franka arm above a ground plane and let it fall under gravity. It is under fifteen lines, and it already contains every step common to any Genesis World simulation: initialize, create a scene, add entities, build, and step.
 
-The complete runnable script is [`examples/tutorials/hello_genesis.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/hello_genesis.py):
+The complete script is [`examples/tutorials/hello_genesis.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/hello_genesis.py):
 
 ```python
 import genesis as gs

@@ -2,7 +2,7 @@
 
 The `TemperatureGrid` sensor overlays a 3D voxel grid on one rigid link and reports the temperature of every cell, in degrees Celsius. Genesis World discretizes the link's local bounding box into an `(nx, ny, nz)` grid and evolves each cell's temperature from contact conduction, radiation, convection, and optional per-cell heat generation. Use it to observe how a surface heats or cools as other bodies touch it.
 
-The complete runnable script is [`examples/sensors/temperature_grid.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/temperature_grid.py), an interactive scene in which a hot pusher and dropped objects heat a sensorized platform.
+The complete script is [`examples/sensors/temperature_grid.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/temperature_grid.py), an interactive scene in which a hot pusher and dropped objects heat a sensorized platform.
 
 ## Minimal example
 

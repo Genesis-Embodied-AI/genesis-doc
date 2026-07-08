@@ -4,7 +4,7 @@ An emitter is a nozzle that streams particles into a particle solver as the simu
 
 An emitter does not simulate anything itself. It owns a particle entity, pre-allocated with `max_particles` slots, and feeds positions and velocities into that entity's solver. The material you give the emitter decides which solver runs the particles: `gs.materials.SPH.*` for smoothed-particle hydrodynamics, `gs.materials.MPM.*` for the material point method, and `gs.materials.PBD.*` for position-based dynamics.
 
-The complete runnable script is [`examples/coupling/water_wheel.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/coupling/water_wheel.py):
+The complete script is [`examples/coupling/water_wheel.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/coupling/water_wheel.py):
 
 ```python
 import numpy as np

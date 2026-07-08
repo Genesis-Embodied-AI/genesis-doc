@@ -2,7 +2,7 @@
 
 An **inertial measurement unit (IMU)** reports the motion of a rigid link as an onboard sensor would: linear acceleration from an accelerometer, angular velocity from a gyroscope, and, optionally, the local magnetic field from a magnetometer. Use it to feed state estimators, train locomotion policies on realistic proprioception, or log ground-truth dynamics.
 
-The complete runnable script is [`examples/sensors/imu_franka.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/imu_franka.py). This page explains what the sensor measures and how to configure it; see {doc}`Sensors <index>` for the pipeline every sensor shares.
+The complete script is [`examples/sensors/imu_franka.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/imu_franka.py). This page explains what the sensor measures and how to configure it; see {doc}`Sensors <index>` for the pipeline every sensor shares.
 
 ## Minimal example
 

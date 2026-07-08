@@ -2,10 +2,8 @@
 
 This tutorial loads a Franka arm and drives it with Genesis World's built-in
 controllers: setting the joint state directly, position and velocity control
-through a PD controller, and direct force (torque) control. The complete,
-runnable script is
-[`examples/tutorials/control_your_robot.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/control_your_robot.py);
-the excerpts below are drawn from it.
+through a PD controller, and direct force (torque) control. The complete script is
+[`examples/tutorials/control_your_robot.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/control_your_robot.py).
 
 ## Scene setup
 

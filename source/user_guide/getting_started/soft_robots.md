@@ -15,7 +15,7 @@ MPM and FEM are compute-heavy. Run them on the GPU by passing `backend=gs.gpu` t
 
 ## Minimal example
 
-The complete runnable script is [`examples/tutorials/advanced_muscle.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/advanced_muscle.py). It drops two spheres (one MPM, one FEM) into a zero-gravity scene and pulses them with a sine wave so you can compare the solvers side by side.
+The complete script is [`examples/tutorials/advanced_muscle.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/advanced_muscle.py). It drops two spheres (one MPM, one FEM) into a zero-gravity scene and pulses them with a sine wave so you can compare the solvers side by side.
 
 <video preload="auto" controls="True" width="100%">
 <source src="../../_static/videos/muscle.mp4" type="video/mp4">

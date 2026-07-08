@@ -16,7 +16,7 @@ SAP does not support differentiable simulation. Calls into the gradient path rai
 
 ## Minimal example
 
-The complete runnable script is [`examples/sap_coupling/fem_sphere_and_cube.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/fem_sphere_and_cube.py), which drops an FEM cube onto an FEM sphere. The setup that turns on SAP coupling is these three choices:
+The complete script is [`examples/sap_coupling/fem_sphere_and_cube.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/fem_sphere_and_cube.py), which drops an FEM cube onto an FEM sphere. The setup that turns on SAP coupling is these three choices:
 
 ```python
 import genesis as gs
