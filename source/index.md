@@ -1,6 +1,6 @@
 # Genesis World
 
-![Genesis World teaser](https://raw.githubusercontent.com/YilingQiao/Genesis/readme-assets/videos/HeroShot_Final.png)
+![Genesis World teaser](_static/images/genesis_world_teaser.png)
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/Genesis-Embodied-AI/genesis-world?style=plastic&logo=GitHub&logoSize=auto)](https://github.com/Genesis-Embodied-AI/genesis-world)
 [![PyPI version](https://badge.fury.io/py/genesis-world.svg?icon=si%3Apython)](https://pypi.org/project/genesis-world/)
