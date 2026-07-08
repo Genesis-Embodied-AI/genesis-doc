@@ -5,7 +5,6 @@
 [![GitHub Repo stars](https://img.shields.io/github/stars/Genesis-Embodied-AI/genesis-world?style=plastic&logo=GitHub&logoSize=auto)](https://github.com/Genesis-Embodied-AI/genesis-world)
 [![PyPI version](https://badge.fury.io/py/genesis-world.svg?icon=si%3Apython)](https://pypi.org/project/genesis-world/)
 [![Website](https://img.shields.io/website?url=https%3A%2F%2Fgenesis-embodied-ai.github.io%2F)](https://genesis-embodied-ai.github.io/)
-[![Discord](https://img.shields.io/discord/1322086972302430269?logo=discord)](https://discord.gg/nukCuhB47p)
 
 **Genesis World** is a simulation platform for physical AI development. It combines a unified multi-physics engine, a photorealistic renderer ([Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx)), and a cross-platform compiler ([Quadrants](https://github.com/Genesis-Embodied-AI/quadrants)) behind a single Pythonic API. It scales from a laptop CPU to datacenter GPUs, and it is written in Python so you can read, extend, and embed it directly in research code.
 
