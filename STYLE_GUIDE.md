@@ -110,7 +110,7 @@ One sentence defining what it is and when to use it.
 - Write "10–80×" with an en dash and a real multiplication sign, not "10~80x". (Better: avoid the range and cite a benchmark.)
 
 **Capitalization:**
-- Sentence case for all headings: "Reading sensor data", not "Reading Sensor Data".
+- Sentence case for in-page content headings: "Reading sensor data", not "Reading Sensor Data". Navigation and section titles are the one exception (Title Case) — see §7.
 - Code identifiers keep their real casing: `Scene`, `add_entity`, `gs.cpu`.
 
 **Oxford comma. American spelling.** ("color", "behavior", "modeling").
@@ -206,6 +206,7 @@ We build with Sphinx + MyST Markdown (`pydata_sphinx_theme`). Use the following,
 
 **Headings**
 - One `#` H1 per page, matching the page's job. **No emoji in headings.** They break scannability, sorting, and search, and read as decoration. (Existing emoji headings should be removed as pages are touched.)
+- **Content headings use sentence case; navigation titles use Title Case.** Every heading inside a page is sentence case. The exception is navigation: the two top-level section landing titles (`User Guide`, `API Reference`) and the sidebar `:caption:` labels in a `{toctree}` (`Getting Started`, `Robot Control`, …) are Title Case, because they read as proper section names rather than page content.
 - Don't skip levels (no H2 → H4). `myst_heading_anchors` generates anchors down to H4; keep meaningful headings within that depth.
 
 **Cross-references** — prefer Sphinx roles over bare Markdown links for anything inside the docs, so links survive file moves and are checked at build time:
@@ -268,7 +269,7 @@ Before opening a docs PR, confirm:
 - [ ] Every fenced block is tagged with a lowercase language (`python`, `bash`, …).
 - [ ] No space-aligned keyword arguments; Python is `black`-clean.
 - [ ] The page leads with what it's for and a runnable example within one screen.
-- [ ] Headings are sentence case with no emoji.
+- [ ] In-page headings are sentence case with no emoji; section/navigation titles (top-level section pages, toctree captions) are Title Case.
 - [ ] Terminology matches §6; the product is "Genesis World" (not keyword-stuffed).
 - [ ] No jokes, no marketing superlatives, no "let's".
 - [ ] Internal links use `{doc}` / `{py:*}` roles; no hard-coded genesis-doc URLs.
