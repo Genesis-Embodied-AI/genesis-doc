@@ -40,6 +40,8 @@ gs.init(backend=gs.cpu)
 - **Logging.** On init, Genesis World logs system and version information. Set `logging_level="warning"` to quiet it, and `theme="light"` for light-background terminals.
 - **Performance mode.** With `performance_mode=True`, Genesis World bakes static tensor shapes into its compiled kernels for roughly 30% faster simulation, at the cost of recompiling whenever the scene changes (several minutes per change). Leave it off for research, debugging, and interactive work; turn it on for policy training and production runs.
 
+For the full set of `gs.init()` arguments — backend selection and fallback, precision, seeding and determinism, logging, and environment variables — see {doc}`Initialization and backends <initialization>`.
+
 ## Create a scene
 
 Every object, robot, camera, and light lives in a scene (see the {doc}`Scene API </api_reference/scene/scene>`). A scene owns a `simulator` (the physics solvers) and a `visualizer` (everything you see):

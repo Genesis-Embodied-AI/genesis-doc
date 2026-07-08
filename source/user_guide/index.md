@@ -20,6 +20,7 @@ getting_started/visualization
 getting_started/control_your_robot
 getting_started/parallel_simulation
 getting_started/interactive_debugging
+getting_started/more_examples
 ```
 
 
@@ -81,6 +82,7 @@ getting_started/viewer_plugin
 :caption: Configuration and Conventions
 :maxdepth: 1
 
+getting_started/initialization
 getting_started/config_system
 getting_started/conventions
 getting_started/miscellaneous
