@@ -1,0 +1,11 @@
+# Discourage filing issues in the docs repository; redirect to the main
+# genesis-world repository. With blank issues disabled and no issue templates,
+# the "New issue" page shows only these contact links.
+blank_issues_enabled: false
+contact_links:
+  - name: Report a bug or problem
+    url: https://github.com/Genesis-Embodied-AI/genesis-world/issues
+    about: Hit a genuine bug or problem (including in the docs)? Please open an issue in the genesis-world repository, not here.
+  - name: Questions, ideas, and everything else
+    url: https://github.com/Genesis-Embodied-AI/genesis-world/discussions
+    about: Questions, feature ideas, and general discussion belong in genesis-world Discussions.
