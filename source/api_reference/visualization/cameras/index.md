@@ -10,7 +10,7 @@ Genesis World provides a unified `Camera` class that works with different render
 - **Raytracer cameras**: Photorealistic rendering
 - **BatchRenderer cameras**: High-throughput parallel rendering
 
-## Adding Cameras
+## Adding cameras
 
 ```python
 import genesis as gs
@@ -31,7 +31,7 @@ cam = scene.add_camera(
 scene.build()
 ```
 
-## Rendering Images
+## Rendering images
 
 ```python
 # Step simulation
@@ -47,7 +47,7 @@ _, _, _, normal = cam.render(normal=True)              # Surface normals
 rgb, depth, _, _ = cam.render(rgb=True, depth=True)
 ```
 
-## Camera Parameters
+## Camera parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
@@ -60,9 +60,9 @@ rgb, depth, _, _ = cam.render(rgb=True, depth=True)
 | `spp` | int | Samples per pixel (raytracer only) |
 | `denoise` | bool | Enable denoising (raytracer only) |
 
-## Camera Models
+## Camera models
 
-### Pinhole Camera (Default)
+### Pinhole camera (default)
 
 Standard perspective camera with infinite depth of field:
 
@@ -75,7 +75,7 @@ cam = scene.add_camera(
 )
 ```
 
-### Thin Lens Camera
+### Thin lens camera
 
 Physically-based camera with depth of field:
 
@@ -90,7 +90,7 @@ cam = scene.add_camera(
 )
 ```
 
-## Dynamic Camera Control
+## Dynamic camera control
 
 ```python
 # Update camera position during simulation
@@ -111,7 +111,7 @@ cam.follow_entity(robot, fixed_axis=(None, None, 1.0), smoothing=0.5)
 camera
 ```
 
-## See Also
+## See also
 
 - {doc}`/api_reference/visualization/renderers/index` - Rendering backends
 - {doc}`/api_reference/sensor/index` - Other sensor types

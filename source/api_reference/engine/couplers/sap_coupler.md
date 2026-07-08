@@ -21,7 +21,7 @@ scene = gs.Scene(
 )
 ```
 
-## See Also
+## See also
 
 - {doc}`index` - Coupler overview
 - {doc}`ipc_coupler` - IPC coupling

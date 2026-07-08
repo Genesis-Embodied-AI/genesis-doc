@@ -1,8 +1,8 @@
-# Device & Platform Utilities
+# Device & platform utilities
 
 Functions for detecting and configuring the compute platform and device.
 
-## Device Information
+## Device information
 
 ```python
 import genesis as gs
@@ -18,9 +18,9 @@ backend = gs.backend
 print(backend)  # gs.cuda, gs.metal, gs.cpu, etc.
 ```
 
-## Backend Selection
+## Backend selection
 
-### Automatic Selection
+### Automatic selection
 
 ```python
 # GPU auto-selects based on platform
@@ -29,7 +29,7 @@ gs.init(backend=gs.gpu)
 # macOS -> Metal
 ```
 
-### Manual Selection
+### Manual selection
 
 ```python
 # Force specific backend
@@ -38,7 +38,7 @@ gs.init(backend=gs.metal)   # Apple Metal
 gs.init(backend=gs.cpu)     # CPU fallback
 ```
 
-## Random Seed
+## Random seed
 
 ```python
 import genesis as gs
@@ -50,7 +50,7 @@ gs.init(seed=42)
 gs.set_random_seed(42)
 ```
 
-## Global Variables
+## Global variables
 
 After `gs.init()`, these are available:
 
@@ -60,7 +60,7 @@ After `gs.init()`, these are available:
 | `gs.backend` | gs.backend | Active compute backend |
 | `gs.EPS` | float | Machine epsilon for the current precision |
 
-## Type Hints
+## Type hints
 
 ```python
 # Quadrants types
@@ -74,7 +74,7 @@ gs.tc_float  # PyTorch float dtype
 gs.tc_int    # PyTorch int dtype
 ```
 
-## See Also
+## See also
 
 - {doc}`constants` - Backend enums
 - {doc}`tensor_utils` - Tensor operations

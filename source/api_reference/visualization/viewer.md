@@ -12,7 +12,7 @@ The Viewer is an optional component that provides:
 - Entity selection and highlighting
 - Render state visualization
 
-## Quick Start
+## Quick start
 
 ```python
 import genesis as gs
@@ -40,7 +40,7 @@ for i in range(1000):
     scene.visualizer.update()
 ```
 
-## Camera Controls
+## Camera controls
 
 | Control | Action |
 |---------|--------|
@@ -49,7 +49,7 @@ for i in range(1000):
 | Scroll Wheel | Zoom in/out |
 | Middle Mouse + Drag | Zoom |
 
-## Keyboard Shortcuts
+## Keyboard shortcuts
 
 | Key | Action |
 |-----|--------|
@@ -72,7 +72,7 @@ viewer_options = gs.options.ViewerOptions(
 )
 ```
 
-## Headless Mode
+## Headless mode
 
 For environments without a display (servers, CI), disable the viewer:
 
@@ -80,7 +80,7 @@ For environments without a display (servers, CI), disable the viewer:
 scene = gs.Scene(show_viewer=False)
 ```
 
-## API Reference
+## API reference
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.viewer.Viewer
@@ -89,7 +89,7 @@ scene = gs.Scene(show_viewer=False)
    :show-inheritance:
 ```
 
-## See Also
+## See also
 
 - {doc}`visualizer` - Main visualization orchestrator
 - {doc}`/api_reference/options/options` - ViewerOptions configuration

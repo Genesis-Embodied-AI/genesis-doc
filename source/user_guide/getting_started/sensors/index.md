@@ -65,7 +65,7 @@ Each family has its own page. The `read()` return types and shapes below are the
 | {doc}`imu` | `IMU` | linear acceleration, angular velocity, magnetic field | `IMUReturnType(lin_acc, ang_vel, mag)`, each `([n_envs,] 3)` |
 | {doc}`contact_and_tactile` | `Contact`, `ContactForce`, `KinematicTaxel`, `ElastomerTaxel`, `ProximityTaxel` | contact state, net force, per-taxel force/torque and displacement | bool `([n_envs,] 1)`; force `([n_envs,] 3)`; per-taxel `force`/`torque` `([n_envs,] n_probes, 3)` |
 | {doc}`raycaster` | `Lidar` (alias of `Raycaster`), `DepthCamera` | ray-hit points and distances | `RaycasterReturnType(points, distances)`: points `([n_envs,] *pattern_shape, 3)`, distances `([n_envs,] *pattern_shape)` |
-| {doc}`camera_sensors` | `RasterizerCameraSensor`, `RaytracerCameraSensor`, `BatchRendererCameraSensor` | rendered RGB images | `CameraReturnType(rgb)`, shape `([n_envs,] height, width, 3)` |
+| {doc}`camera_sensors` | `RasterizerCameraOptions`, `RaytracerCameraOptions`, `BatchRendererCameraOptions` | rendered RGB images | `CameraReturnType(rgb)`, shape `([n_envs,] height, width, 3)` |
 | {doc}`proximity` | `SurfaceDistanceProbe` | nearest distance from probes to tracked mesh surfaces | distances `([n_envs,] n_probes)`; `sensor.nearest_points` `([n_envs,] n_probes, 3)` |
 | {doc}`temperature_grid` | `TemperatureGrid` | per-cell temperature in Celsius over a voxel grid | `([n_envs,] grid_x, grid_y, grid_z)` |
 

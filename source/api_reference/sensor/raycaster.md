@@ -1,4 +1,4 @@
-# Raycaster Sensor
+# Raycaster sensor
 
 The `RaycasterSensor` provides ray-based distance measurements, useful for LIDAR simulation, proximity sensing, and obstacle detection.
 
@@ -42,7 +42,7 @@ for i in range(100):
     print(f"Min distance: {data.distances.min():.2f} m")
 ```
 
-## Output Format
+## Output format
 
 `read()` returns a `RaycasterReturnType` NamedTuple:
 
@@ -53,7 +53,7 @@ for i in range(100):
 
 The `pattern_shape` depends on the ray pattern (e.g. `(n_horizontal, n_vertical)` for spherical, `(height, width)` for depth camera).
 
-## Ray Patterns
+## Ray patterns
 
 ### Circular (2D LIDAR)
 
@@ -79,7 +79,7 @@ lidar_3d = scene.add_sensor(
 )
 ```
 
-### Custom Pattern
+### Custom pattern
 
 There is no `ray_directions` argument on `Raycaster`. To cast an arbitrary set of rays, subclass `gs.sensors.RaycastPattern` and fill in `_ray_dirs` (unit direction vectors in the sensor frame), then pass an instance as `pattern`.
 
@@ -119,7 +119,7 @@ The Raycaster uses a GPU-accelerated Linear BVH (LBVH) for efficient ray-scene i
 - Efficient for hundreds to thousands of rays
 - Batched across parallel environments
 
-## Depth Camera
+## Depth camera
 
 The `DepthCameraSensor` is a raycaster driven by a `DepthCameraPattern`. It exposes everything the raycaster does, plus `read_image()`, which reshapes the per-ray hit distances into a depth image of shape `([n_envs,] height, width)` (misses carry `no_hit_value`). See {doc}`the raycaster guide </user_guide/getting_started/sensors/raycaster>` for usage.
 
@@ -140,7 +140,7 @@ scene.step()
 depth = depth_cam.read_image()  # shape ([n_envs,] 72, 96), meters
 ```
 
-## API Reference
+## API reference
 
 ### RaycasterSensor
 
@@ -186,7 +186,7 @@ A pattern is a local description of the rays: it fixes a start point and a unit 
    :show-inheritance:
 ```
 
-## See Also
+## See also
 
 - {doc}`index` - Sensor overview
 - {doc}`camera` - Visual sensing

@@ -35,7 +35,7 @@ scene = gs.Scene(
 )
 ```
 
-## Raytracer Lighting
+## Raytracer lighting
 
 When using the raytracer renderer, additional lighting options are available for photorealistic rendering:
 
@@ -53,7 +53,7 @@ cam = scene.add_camera(
 )
 ```
 
-## See Also
+## See also
 
 - {doc}`/api_reference/options/options` - VisOptions configuration
 - {doc}`renderers/raytracer` - Raytracer for photorealistic rendering

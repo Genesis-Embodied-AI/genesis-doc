@@ -1,8 +1,8 @@
-# Geometry Utilities
+# Geometry utilities
 
 Genesis World provides utility functions for geometric transformations and calculations.
 
-## Quaternion Operations
+## Quaternion operations
 
 Genesis World uses `(w, x, y, z)` quaternion convention (scalar-first).
 
@@ -27,7 +27,7 @@ q_inv = gu.inv_quat(quat)
 rot_matrix = gu.quat_to_R(quat)
 ```
 
-## Transform Operations
+## Transform operations
 
 ```python
 import numpy as np
@@ -46,7 +46,7 @@ transformed = gu.transform_by_trans_quat(point, pos, quat)
 original = gu.inv_transform_by_trans_quat(transformed, pos, quat)
 ```
 
-## Rotation Conversions
+## Rotation conversions
 
 ```python
 import numpy as np
@@ -64,7 +64,7 @@ R = np.eye(3).reshape(1, 3, 3)
 quat = gu.R_to_quat(R)
 ```
 
-## Vector Operations
+## Vector operations
 
 ```python
 import numpy as np
@@ -85,9 +85,9 @@ t = np.array([0.5])  # Midpoint
 q_mid = gu.slerp(q0, q1, t)
 ```
 
-## Common Patterns
+## Common patterns
 
-### Setting Entity Orientation
+### Setting entity orientation
 
 ```python
 import genesis as gs
@@ -105,7 +105,7 @@ quat = gu.axis_angle_to_quat(angle, np.array([0.0, 0.0, 1.0]))
 box.set_quat(quat)
 ```
 
-### Camera Look-at Calculation
+### Camera look-at calculation
 
 ```python
 import numpy as np
@@ -119,7 +119,7 @@ direction = target - camera_pos
 direction = direction / np.linalg.norm(direction)
 ```
 
-## See Also
+## See also
 
 - {doc}`tensor_utils` - Tensor conversions
 - {doc}`/api_reference/entity/index` - Entity transforms

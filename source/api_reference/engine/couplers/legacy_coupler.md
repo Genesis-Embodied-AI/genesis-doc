@@ -23,7 +23,7 @@ scene = gs.Scene(
 )
 ```
 
-## See Also
+## See also
 
 - {doc}`index` - Coupler overview
 - {doc}`sap_coupler` - Spatial acceleration

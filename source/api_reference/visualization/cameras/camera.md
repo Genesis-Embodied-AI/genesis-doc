@@ -11,7 +11,7 @@ A Camera can capture:
 - **Segmentation**: Per-pixel entity/link identification
 - **Normals**: Surface normal vectors
 
-## API Reference
+## API reference
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.camera.Camera
@@ -22,7 +22,7 @@ A Camera can capture:
 
 ## Examples
 
-### Basic Rendering
+### Basic rendering
 
 ```python
 import genesis as gs
@@ -45,7 +45,7 @@ rgb, _, _, _ = cam.render(rgb=True)
 print(rgb.shape)  # (480, 640, 3)
 ```
 
-### Saving Images
+### Saving images
 
 ```python
 import cv2
@@ -54,7 +54,7 @@ rgb, _, _, _ = cam.render(rgb=True)
 cv2.imwrite("output.png", rgb[..., ::-1])  # RGB to BGR for OpenCV
 ```
 
-### Depth Visualization
+### Depth visualization
 
 ```python
 import numpy as np
@@ -66,7 +66,7 @@ depth_vis = (depth - depth.min()) / (depth.max() - depth.min())
 depth_vis = (depth_vis * 255).astype(np.uint8)
 ```
 
-### With GUI Display
+### With GUI display
 
 ```python
 cam = scene.add_camera(
@@ -77,7 +77,7 @@ cam = scene.add_camera(
 )
 ```
 
-## See Also
+## See also
 
 - {doc}`index` - Camera overview and parameters
 - {doc}`/api_reference/visualization/renderers/index` - Renderer backends

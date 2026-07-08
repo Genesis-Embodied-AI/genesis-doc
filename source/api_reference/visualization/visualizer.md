@@ -29,9 +29,9 @@ visualizer = scene.visualizer
 visualizer.update()
 ```
 
-## Common Operations
+## Common operations
 
-### Adding Cameras
+### Adding cameras
 
 ```python
 # Add a camera for rendering
@@ -43,7 +43,7 @@ cam = scene.add_camera(
 )
 ```
 
-### Updating the View
+### Updating the view
 
 ```python
 # Update visualization each step
@@ -52,7 +52,7 @@ for i in range(1000):
     scene.visualizer.update()
 ```
 
-### Controlling the Viewer
+### Controlling the viewer
 
 ```python
 # Access the interactive viewer
@@ -64,7 +64,7 @@ if scene.visualizer.viewer is not None:
     pass
 ```
 
-## API Reference
+## API reference
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.Visualizer
@@ -73,7 +73,7 @@ if scene.visualizer.viewer is not None:
    :show-inheritance:
 ```
 
-## See Also
+## See also
 
 - {doc}`viewer` - Interactive viewer for real-time visualization
 - {doc}`renderers/index` - Renderer backends

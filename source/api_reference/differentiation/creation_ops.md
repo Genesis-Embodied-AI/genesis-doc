@@ -1,4 +1,4 @@
-# Creation Operations
+# Creation operations
 
 Functions for creating Genesis World tensors that are compatible with differentiable simulation.
 
@@ -6,9 +6,9 @@ Functions for creating Genesis World tensors that are compatible with differenti
 
 When working with differentiable simulation, use these functions to create tensors that properly integrate with the gradient system.
 
-## Creating Tensors
+## Creating tensors
 
-### From Python Values
+### From Python values
 
 ```python
 import genesis as gs
@@ -28,7 +28,7 @@ tensor = torch.tensor(
 )
 ```
 
-### Zeros/Ones
+### Zeros/ones
 
 ```python
 # Create zero tensor
@@ -41,7 +41,7 @@ ones = torch.ones(10, device=gs.device, dtype=gs.tc_float)
 zeros_grad = torch.zeros(10, device=gs.device, dtype=gs.tc_float, requires_grad=True)
 ```
 
-### Random Tensors
+### Random tensors
 
 ```python
 # Random uniform [0, 1)
@@ -51,7 +51,7 @@ rand = torch.rand(10, device=gs.device, dtype=gs.tc_float)
 randn = torch.randn(10, device=gs.device, dtype=gs.tc_float)
 ```
 
-## Converting to Genesis World Tensors
+## Converting to Genesis World tensors
 
 Standard PyTorch tensors become Genesis World tensors when combined with scene state:
 
@@ -64,7 +64,7 @@ pos = robot.get_pos()
 combined = pos + external  # Result is Genesis World tensor
 ```
 
-## API Reference
+## API reference
 
 ```{eval-rst}
 .. automodule:: genesis.grad.creation_ops
@@ -72,7 +72,7 @@ combined = pos + external  # Result is Genesis World tensor
    :undoc-members:
 ```
 
-## See Also
+## See also
 
 - {doc}`tensor` - Genesis World Tensor class
 - {doc}`index` - Differentiable simulation overview

@@ -1,4 +1,4 @@
-# Contact Sensors
+# Contact sensors
 
 Genesis World provides sensors for detecting and measuring contact forces. These are essential for manipulation tasks, grasping, and understanding physical interactions.
 
@@ -51,7 +51,7 @@ gs.sensors.ContactForce(
 )
 ```
 
-### Output Format
+### Output format
 
 `read()` returns a plain `torch.Tensor` (float32):
 
@@ -84,7 +84,7 @@ scene.step()
 in_contact = contact.read()  # ([n_envs,] 1) boolean tensor
 ```
 
-### Output Format
+### Output format
 
 `read()` returns a plain `torch.Tensor` (bool):
 
@@ -92,7 +92,7 @@ in_contact = contact.read()  # ([n_envs,] 1) boolean tensor
 |-------|-------------|
 | `([n_envs,] 1)` | True if link is in contact |
 
-## API Reference
+## API reference
 
 ### ContactForceSensor
 
@@ -112,7 +112,7 @@ in_contact = contact.read()  # ([n_envs,] 1) boolean tensor
    :show-inheritance:
 ```
 
-## See Also
+## See also
 
 - {doc}`index` - Sensor overview
 - {doc}`/api_reference/entity/rigid_entity/index` - RigidEntity and links

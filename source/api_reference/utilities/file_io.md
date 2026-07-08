@@ -1,8 +1,8 @@
-# File I/O Utilities
+# File I/O utilities
 
 Genesis World provides utilities for file operations, path handling, and loading robot/scene descriptions.
 
-## Cache Directories
+## Cache directories
 
 Genesis World caches compiled kernels and processed assets:
 
@@ -17,7 +17,7 @@ gsd_cache = gs.utils.get_gsd_cache_dir()
 src_dir = gs.utils.get_src_dir()
 ```
 
-## URDF Loading
+## URDF loading
 
 URDF (Unified Robot Description Format) files can be loaded directly:
 
@@ -41,7 +41,7 @@ robot = scene.add_entity(gs.morphs.URDF(
 scene.build()
 ```
 
-### URDF Customization
+### URDF customization
 
 ```python
 # Override link properties
@@ -56,7 +56,7 @@ robot = scene.add_entity(gs.morphs.URDF(
 ))
 ```
 
-## MJCF Loading
+## MJCF loading
 
 MuJoCo XML format (MJCF) is also supported:
 
@@ -71,7 +71,7 @@ robot = scene.add_entity(gs.morphs.MJCF(
 ))
 ```
 
-## Mesh Loading
+## Mesh loading
 
 Genesis World supports various mesh formats:
 
@@ -92,7 +92,7 @@ mesh = scene.add_entity(gs.morphs.Mesh(
 ))
 ```
 
-## Asset Paths
+## Asset paths
 
 Genesis World looks for assets in:
 
@@ -111,7 +111,7 @@ robot = scene.add_entity(gs.morphs.URDF(file="robots/my_robot.urdf"))
 plane = scene.add_entity(gs.morphs.Plane())
 ```
 
-## See Also
+## See also
 
 - {doc}`/api_reference/options/morph/file_morph/index` - File-based morphs
 - {doc}`/api_reference/entity/index` - Entity loading

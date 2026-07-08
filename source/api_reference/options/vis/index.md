@@ -1,4 +1,4 @@
-# Viewer & Visualization
+# Viewer & visualization
 
 ```{toctree}
 :maxdepth: 2

@@ -1,4 +1,4 @@
-# IMU Sensor
+# IMU sensor
 
 The `IMUSensor` (Inertial Measurement Unit) provides accelerometer, gyroscope, and magnetometer readings for robot state estimation.
 
@@ -81,7 +81,7 @@ gs.sensors.IMU(
 )
 ```
 
-## Output Format
+## Output format
 
 `read()` and `read_ground_truth()` both return an `IMUReturnType` NamedTuple:
 
@@ -93,25 +93,25 @@ gs.sensors.IMU(
 
 `read()` applies noise, bias, random walk, and cross-axis coupling if configured. `read_ground_truth()` returns noiseless values.
 
-## Noise Modeling
+## Noise modeling
 
 The IMU supports realistic noise modeling based on Allan variance parameters:
 
-### Accelerometer Noise
+### Accelerometer noise
 
 | Parameter | Description | Typical Value |
 |-----------|-------------|---------------|
 | `acc_noise` | White noise std | 0.001-0.01 m/s^2 |
 | `acc_random_walk` | Bias drift std | 0.0001-0.001 m/s^3 |
 
-### Gyroscope Noise
+### Gyroscope noise
 
 | Parameter | Description | Typical Value |
 |-----------|-------------|---------------|
 | `gyro_noise` | White noise std | 0.0001-0.001 rad/s |
 | `gyro_random_walk` | Bias drift std | 0.00001-0.0001 rad/s^2 |
 
-## Example: Quadruped State Estimation
+## Example: quadruped state estimation
 
 ```python
 import genesis as gs
@@ -146,7 +146,7 @@ for i in range(1000):
     velocity_estimate += data.lin_acc * dt
 ```
 
-## API Reference
+## API reference
 
 ```{eval-rst}
 .. autoclass:: genesis.engine.sensors.imu.IMUSensor
@@ -155,7 +155,7 @@ for i in range(1000):
    :show-inheritance:
 ```
 
-## See Also
+## See also
 
 - {doc}`index` - Sensor overview
 - {doc}`contact` - Contact force sensing
