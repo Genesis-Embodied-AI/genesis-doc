@@ -45,7 +45,7 @@ source ~/.bashrc
 
 ## (Optional) Ray tracing renderer
 
-For photorealistic visuals, Genesis World includes a ray-tracing (path-tracing) renderer built on [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain-specific language for rendering. See {doc}`/user_guide/getting_started/visualization` for setup.
+For photorealistic visuals, Genesis World includes a ray-tracing (path-tracing) renderer built on [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain-specific language for rendering. See {doc}`/user_guide/getting_started/rendering` for setup.
 
 ## (Optional) USD assets
 

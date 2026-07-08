@@ -5,7 +5,7 @@ A camera sensor renders the scene to an RGB image off-screen and returns it thro
 A camera sensor is distinct from two things it is easy to confuse it with:
 
 - The **viewer** (`show_viewer=True`) is the interactive window a human watches. It renders live and returns nothing to your code. See {doc}`/user_guide/getting_started/visualization`.
-- The **visualization camera** (`scene.add_camera().render(...)`) renders color, depth, segmentation, and surface-normal images on demand. Use it when you want the four image channels. It is also covered in {doc}`/user_guide/getting_started/visualization`.
+- The **visualization camera** (`scene.add_camera().render(...)`) renders color, depth, segmentation, and surface-normal images on demand. Use it when you want the four image channels. It is covered in {doc}`/user_guide/getting_started/rendering`.
 
 A camera sensor, by contrast, is a first-class {doc}`sensor <index>`: it renders lazily on `read()`, participates in the batched `scene.read_sensors()` path, and can be attached to a moving link like any other sensor. It returns **RGB only**.
 
@@ -78,7 +78,7 @@ Three backends render RGB. They share the common options below and differ in spe
 | `RaytracerCameraOptions` | LuisaRender | single environment | photo-realistic offline renders |
 | `BatchRendererCameraOptions` | Madrona (GPU) | parallel | high-throughput RL training (CUDA only) |
 
-Select a backend by choosing the matching options class; no separate scene `renderer` argument is required for the rasterizer. For photo-realistic path tracing, prefer the Nyx renderer described in {doc}`/user_guide/getting_started/visualization`.
+Select a backend by choosing the matching options class; no separate scene `renderer` argument is required for the rasterizer. For photo-realistic path tracing, prefer the Nyx renderer described in {doc}`/user_guide/getting_started/nyx_renderer`.
 
 Common parameters (all backends):
 
@@ -142,7 +142,7 @@ All `BatchRendererCameraOptions` cameras in a scene must share the same resoluti
 ## Notes and gotchas
 
 :::{note}
-**Camera sensors return RGB only.** `read()` gives you the color image and nothing else. For depth, segmentation masks, or surface normals, use the visualization camera's `render()` method (see {doc}`/user_guide/getting_started/visualization`) or, for depth specifically, the {doc}`depth-camera raycaster sensor <raycaster>`.
+**Camera sensors return RGB only.** `read()` gives you the color image and nothing else. For depth, segmentation masks, or surface normals, use the visualization camera's `render()` method (see {doc}`/user_guide/getting_started/rendering`) or, for depth specifically, the {doc}`depth-camera raycaster sensor <raycaster>`.
 :::
 
 :::{warning}
@@ -151,6 +151,6 @@ Camera sensors do not support `history_length`. They render lazily on `read()` a
 
 ## See also
 
-- {doc}`/user_guide/getting_started/visualization`: the viewer, the visualization camera's four image channels, video recording, and rendering backends.
+- {doc}`/user_guide/getting_started/rendering`: the visualization camera's four image channels, video recording, and rendering backends.
 - {doc}`Sensors <index>`: the sensor pipeline, batched reads, and other sensor families.
 - {doc}`Raycaster sensors <raycaster>`: depth camera and lidar with configurable ray patterns.

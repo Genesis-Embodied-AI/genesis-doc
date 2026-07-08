@@ -121,4 +121,4 @@ for i in range(1000):
 
 ## Next steps
 
-Continue with {doc}`Visualization <visualization>` to add cameras and work with the viewer, then {doc}`Control Your Robot <control_your_robot>` to actuate the Franka you just loaded.
+Continue with {doc}`Visualization <visualization>` to work with the viewer and {doc}`Rendering <rendering>` to capture images, then {doc}`Control Your Robot <control_your_robot>` to actuate the Franka you just loaded.

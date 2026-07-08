@@ -184,4 +184,4 @@ Debug geometry is drawn from `on_draw()`, which runs every frame. Call `self.sce
 ## See also
 
 - {doc}`Interactive GUI and debugging <interactive_debugging>`: the ImGui overlay, joint sliders, and simulation controls.
-- {doc}`Visualization <visualization>`: cameras, rendering, and recording video.
+- {doc}`Rendering <rendering>`: cameras, rendering, and recording video.

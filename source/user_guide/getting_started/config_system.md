@@ -102,5 +102,6 @@ franka = scene.add_entity(
 ## See also
 
 - {doc}`hello_genesis`: the minimal scene that uses these options.
-- {doc}`visualization`: configuring the viewer, cameras, and renderer in depth.
+- {doc}`visualization`: the interactive viewer and command-line tools.
+- {doc}`rendering`: cameras, image types, video, and rendering backends.
 - {doc}`Options API reference </api_reference/options/index>`: every option class and its fields.
