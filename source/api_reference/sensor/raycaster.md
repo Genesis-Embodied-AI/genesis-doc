@@ -121,7 +121,7 @@ The Raycaster uses a GPU-accelerated Linear BVH (LBVH) for efficient ray-scene i
 
 ## Depth camera
 
-The `DepthCameraSensor` is a raycaster driven by a `DepthCameraPattern`. It exposes everything the raycaster does, plus `read_image()`, which reshapes the per-ray hit distances into a depth image of shape `([n_envs,] height, width)` (misses carry `no_hit_value`). See {doc}`the raycaster guide </user_guide/getting_started/sensors/raycaster>` for usage.
+The `DepthCameraSensor` is a raycaster driven by a `DepthCameraPattern`. It exposes everything the raycaster does, plus `read_image()`, which reshapes the per-ray hit distances into a depth image of shape `([n_envs,] height, width)` (misses carry `no_hit_value`). See {doc}`the raycaster guide </user_guide/sensing/sensors/raycaster>` for usage.
 
 ```python
 depth_cam = scene.add_sensor(

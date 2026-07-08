@@ -2,7 +2,7 @@
 
 The `RecorderManager` is the per-scene component that drives every recorder: it holds the registered recorders, samples their data functions as the scene steps, and flushes and closes them when recording stops. You do not construct or call it directly. You register recorders through `scene.start_recording` (or `sensor.start_recording`) and stop them through `scene.stop_recording`; the manager does the rest.
 
-For a task-oriented walkthrough with runnable examples, see {doc}`/user_guide/getting_started/recorders`. This page is the API reference.
+For a task-oriented walkthrough with runnable examples, see {doc}`/user_guide/sensing/recorders`. This page is the API reference.
 
 ## Minimal example
 
@@ -80,7 +80,7 @@ cam.stop_recording(save_to_filename="video.mp4", fps=60)
 
 ## See also
 
-- {doc}`/user_guide/getting_started/recorders` - task-oriented guide to recording
+- {doc}`/user_guide/sensing/recorders` - task-oriented guide to recording
 - {doc}`recorder` - base recorder class
 - {doc}`file_writers` and {doc}`plotters` - the recorder options you pass to `start_recording`
 - {doc}`/api_reference/scene/scene` - `scene.start_recording` and `scene.stop_recording`

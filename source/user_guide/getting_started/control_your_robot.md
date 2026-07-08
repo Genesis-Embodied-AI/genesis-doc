@@ -232,7 +232,7 @@ The runnable version is
 which moves the end-effector above a cube, welds them, transports the cube, and
 releases it.
 
-Reach a pose above the cube using {doc}`inverse kinematics <inverse_kinematics_motion_planning>`,
+Reach a pose above the cube using {doc}`inverse kinematics </user_guide/robot_control/inverse_kinematics_motion_planning>`,
 then activate the "suction" by welding the cube's link to the gripper's `hand`
 link:
 
@@ -260,5 +260,5 @@ object instead.
 ## See also
 
 - {doc}`hello_genesis`: the minimal scene this tutorial builds on.
-- {doc}`inverse_kinematics_motion_planning`: solving for joint targets from a desired end-effector pose.
+- {doc}`/user_guide/robot_control/inverse_kinematics_motion_planning`: solving for joint targets from a desired end-effector pose.
 - {doc}`/api_reference/entity/index`: the full entity control API.

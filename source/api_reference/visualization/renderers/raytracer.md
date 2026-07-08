@@ -1,94 +1,23 @@
-# Raytracer
+# RayTracer
 
-The `Raytracer` provides photorealistic rendering using path tracing. It's designed for generating high-quality images and videos.
+A path-tracing renderer backed by LuisaRender, for photorealistic stills with global illumination, reflections, and refractions. Enable it with `gs.Scene(renderer=gs.renderers.RayTracer(...))`. Per-camera ray-tracing settings such as `spp` (samples per pixel), `denoise`, `model` (`"pinhole"` or `"thinlens"`), `aperture`, and `focus_dist` are passed to `scene.add_camera()`, not to the renderer.
 
-## Overview
+Photorealistic output depends on entity {doc}`surfaces </api_reference/options/surface/index>` (metal, glass, plastic, emission) and on scene {doc}`lighting </api_reference/visualization/lights>`. For setup and a worked example, see {doc}`/user_guide/rendering/rendering`.
 
-The Raytracer offers:
+:::{warning}
+This backend is deprecated in favor of {doc}`Nyx </user_guide/rendering/nyx_renderer>` and must be built from source (the LuisaRender extra). Prefer Nyx for new work.
+:::
 
-- **Photorealistic quality**: Global illumination, reflections, refractions
-- **Physical accuracy**: Correct light transport simulation
-- **Advanced materials**: PBR materials, subsurface scattering
-- **Denoising**: AI-based denoising for faster convergence
+## Options
 
-## Quick start
-
-```python
-import genesis as gs
-
-gs.init()
-scene = gs.Scene()
-
-# Add entities with materials
-plane = scene.add_entity(
-    gs.morphs.Plane(),
-    surface=gs.surfaces.Plastic(),
-)
-box = scene.add_entity(
-    gs.morphs.Box(pos=(0, 0, 0.5), size=(1.0, 1.0, 1.0)),
-    surface=gs.surfaces.Gold(),
-)
-
-# Add raytracer camera
-cam = scene.add_camera(
-    res=(1920, 1080),
-    pos=(3, 0, 2),
-    lookat=(0, 0, 0.5),
-    fov=40,
-    spp=256,        # Samples per pixel
-    denoise=True,   # Enable denoising
-)
-
-scene.build()
-
-# Render high-quality image
-scene.step()
-rgb, _, _, _ = cam.render(rgb=True)
+```{eval-rst}
+.. autoclass:: genesis.options.renderers.RayTracer
 ```
 
-## Configuration
-
-Key parameters for raytracer cameras:
-
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `spp` | Samples per pixel (higher = less noise) | 256 |
-| `denoise` | Enable AI denoising | False |
-| `model` | Camera model (`pinhole` or `thinlens`) | `pinhole` |
-| `aperture` | Aperture for depth of field | 0.0 |
-| `focus_dist` | Focus distance | Auto |
-
-## Thin lens (depth of field)
-
-```python
-cam = scene.add_camera(
-    res=(1920, 1080),
-    pos=(3, 0, 2),
-    lookat=(0, 0, 0.5),
-    model="thinlens",
-    aperture=0.1,      # Larger = more blur
-    focus_dist=3.0,    # Distance to focus plane
-    spp=512,
-)
-```
-
-## Materials for ray tracing
-
-The raytracer supports advanced surface materials:
-
-- **Plastic**: Diffuse with optional roughness
-- **Metal**: Reflective metallic surfaces (Gold, Copper, Iron, etc.)
-- **Glass**: Transparent/refractive materials
-- **Emission**: Light-emitting surfaces
-
-See {doc}`/api_reference/options/surface/index` for all surface types.
-
-## API reference
-
-The ray-tracing renderer is selected per scene with `gs.renderers.RayTracer` and configured through its options; see {doc}`/api_reference/options/renderer/raytracer`. Per-camera ray-tracing settings (`spp`, `denoise`, `model`, `aperture`, `focus_dist`) are passed to `scene.add_camera()`; see {doc}`/api_reference/visualization/cameras/index`. The underlying `genesis.vis.raytracer.Raytracer` implementation is only importable when the optional ray-tracing extra (LuisaRender) is installed, so it is not auto-documented here.
+The underlying `genesis.vis.raytracer.Raytracer` implementation is importable only when the optional ray-tracing extra is installed, so it is not auto-documented here.
 
 ## See also
 
-- {doc}`rasterizer` - Fast rasterization renderer
-- {doc}`/api_reference/options/surface/index` - Surface materials
-- {doc}`/api_reference/options/renderer/raytracer` - Raytracer options
+- {doc}`rasterizer`: the fast default renderer
+- {doc}`/user_guide/rendering/nyx_renderer`: the recommended photorealistic path
+- {doc}`/api_reference/options/surface/index`: surface materials for ray tracing

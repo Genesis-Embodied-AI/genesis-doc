@@ -1,46 +1,22 @@
 # Renderers
 
-Genesis World provides multiple rendering backends optimized for different use cases. Each renderer offers different trade-offs between speed and visual quality.
+A renderer is the backend that camera sensors use to turn a scene into images. Select one per scene by passing an instance to `gs.Scene(renderer=...)`; the choice applies to every camera sensor and does not affect the interactive viewer, which always rasterizes. For the task-oriented walkthrough, see {doc}`/user_guide/rendering/rendering`.
 
-## Available renderers
+| Renderer | Speed | Quality | Use it for |
+|---|---|---|---|
+| {doc}`Rasterizer <rasterizer>` | Fast | Good | real-time viewing, control loops, RL rollouts (the default) |
+| {doc}`RayTracer <raytracer>` | Slow | Photorealistic | high-quality stills (Luisa backend, deprecating in favor of Nyx) |
+| {doc}`BatchRenderer <batch_renderer>` | Very fast | Good | rendering many parallel environments on the GPU |
 
-| Renderer | Speed | Quality | Use Case |
-|----------|-------|---------|----------|
-| **Rasterizer** | Fast | Good | Real-time visualization, RL training |
-| **Raytracer** | Slow | Photorealistic | High-quality images, videos |
-| **BatchRenderer** | Very Fast | Good | Parallel rendering for large-scale RL |
+Every renderer options class derives from `RendererOptions`:
 
-## Choosing a renderer
-
-```python
-import genesis as gs
-
-gs.init()
-scene = gs.Scene()
-scene.add_entity(gs.morphs.Plane())
-
-# Rasterizer (default, fast)
-cam_raster = scene.add_camera(
-    res=(640, 480),
-    pos=(3, 0, 2),
-    lookat=(0, 0, 0),
-)
-
-# Raytracer (photorealistic)
-cam_raytrace = scene.add_camera(
-    res=(1920, 1080),
-    pos=(3, 0, 2),
-    lookat=(0, 0, 0),
-    spp=256,  # Samples per pixel
-)
-
-scene.build()
+```{eval-rst}
+.. autoclass:: genesis.options.renderers.RendererOptions
 ```
-
-## Renderer components
 
 ```{toctree}
 :titlesonly:
+:hidden:
 
 rasterizer
 raytracer
@@ -49,4 +25,5 @@ batch_renderer
 
 ## See also
 
-- {doc}`/api_reference/options/renderer/index` - Renderer configuration options
+- {doc}`/user_guide/rendering/rendering`: adding cameras, image types, video, and backends
+- {doc}`/api_reference/visualization/lights`: lighting a rendered scene

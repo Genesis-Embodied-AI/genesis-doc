@@ -1,86 +1,25 @@
 # Viewer
 
-The `Viewer` class provides an interactive window for real-time visualization of simulations. It allows users to navigate the scene with mouse controls, inspect objects, and control simulation playback.
+The interactive window that renders a scene in real time, with mouse and keyboard camera controls. It is optional: pass `show_viewer=True` to `gs.Scene(...)` to open it, and omit it (or pass `show_viewer=False`) to run headless. The viewer always uses the rasterizer backend, independent of the scene's `renderer`. For the walkthrough, mouse and keyboard controls, and the `gs` command-line tools, see {doc}`/user_guide/interaction/visualization`.
 
-## Overview
-
-The Viewer is an optional component that provides:
-
-- Real-time 3D rendering of the simulation
-- Mouse-based camera navigation (orbit, pan, zoom)
-- Keyboard shortcuts for controlling simulation
-- Entity selection and highlighting
-- Render state visualization
-
-## Quick start
+The viewer is configured by two options objects: `ViewerOptions` sets its initial camera pose, resolution, and refresh rate; `VisOptions` sets viewer-independent visualization such as lighting, world-frame display, and segmentation level.
 
 ```python
-import genesis as gs
-
-gs.init()
-
-# Create scene with interactive viewer
 scene = gs.Scene(
     viewer_options=gs.options.ViewerOptions(
-        camera_pos=(3, 0, 2),
-        camera_lookat=(0, 0, 0.5),
-        res=(1280, 720),
-        max_FPS=60,
+        camera_pos=(3.0, 0.0, 2.0),
+        camera_lookat=(0.0, 0.0, 0.5),
+        camera_fov=40,
+        refresh_rate=60,  # frames per second cap
     ),
     show_viewer=True,
 )
-
-scene.add_entity(gs.morphs.Plane())
-scene.add_entity(gs.morphs.Box(pos=(0, 0, 0.5), size=(1.0, 1.0, 1.0)))
-scene.build()
-
-# Run with viewer
-for i in range(1000):
+for _ in range(1000):
     scene.step()
-    scene.visualizer.update()
+    scene.visualizer.update()  # refresh the viewer
 ```
 
-## Camera controls
-
-| Control | Action |
-|---------|--------|
-| Left Mouse + Drag | Orbit camera |
-| Right Mouse + Drag | Pan camera |
-| Scroll Wheel | Zoom in/out |
-| Middle Mouse + Drag | Zoom |
-
-## Keyboard shortcuts
-
-| Key | Action |
-|-----|--------|
-| Space | Pause/Resume simulation |
-| R | Reset camera to initial position |
-| Esc | Close viewer |
-
-## Configuration
-
-The viewer is configured through `ViewerOptions`:
-
-```python
-viewer_options = gs.options.ViewerOptions(
-    res=(1920, 1080),          # Resolution
-    camera_pos=(5, 0, 3),       # Initial camera position
-    camera_lookat=(0, 0, 0),    # Camera look-at point
-    camera_fov=45,              # Field of view
-    max_FPS=60,                 # Maximum frame rate
-    run_in_thread=True,         # Run viewer in separate thread
-)
-```
-
-## Headless mode
-
-For environments without a display (servers, CI), disable the viewer:
-
-```python
-scene = gs.Scene(show_viewer=False)
-```
-
-## API reference
+## Viewer
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.viewer.Viewer
@@ -89,7 +28,22 @@ scene = gs.Scene(show_viewer=False)
    :show-inheritance:
 ```
 
+## ViewerOptions
+
+```{eval-rst}
+.. autoclass:: genesis.options.ViewerOptions
+    :show-inheritance:
+```
+
+## VisOptions
+
+```{eval-rst}
+.. autoclass:: genesis.options.VisOptions
+    :show-inheritance:
+```
+
 ## See also
 
-- {doc}`visualizer` - Main visualization orchestrator
-- {doc}`/api_reference/options/options` - ViewerOptions configuration
+- {doc}`visualizer`: the orchestrator that owns the viewer, cameras, and renderer
+- {doc}`lights`: lighting the scene through `VisOptions`
+- {doc}`/user_guide/interaction/visualization`: the interactive viewer and `gs` tools

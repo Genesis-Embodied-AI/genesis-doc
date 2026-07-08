@@ -2,7 +2,7 @@
 
 Genesis World records simulation data through a recorder framework: you register a recorder with the scene, describe *what* to sample, then step the scene as usual. The recorder samples on a schedule and either writes the data to a file or draws it in a live plot, so you never thread logging code through your step loop.
 
-This page is the API overview for the `genesis.recorders` module. For a task-oriented walkthrough, see {doc}`/user_guide/getting_started/recorders`.
+This page is the API overview for the `genesis.recorders` module. For a task-oriented walkthrough, see {doc}`/user_guide/sensing/recorders`.
 
 ## Components
 
@@ -103,6 +103,6 @@ Whether a recorder runs on a background thread is decided internally per recorde
 
 ## See also
 
-- {doc}`/user_guide/getting_started/recorders`: task-oriented guide to recording sensor and custom data.
+- {doc}`/user_guide/sensing/recorders`: task-oriented guide to recording sensor and custom data.
 - {doc}`/api_reference/visualization/index`: cameras and other visual output.
 - {doc}`/api_reference/scene/index`: `scene.start_recording` and `scene.stop_recording`.
