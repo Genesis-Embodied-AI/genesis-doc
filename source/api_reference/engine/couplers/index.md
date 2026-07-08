@@ -1,68 +1,33 @@
 # Couplers
 
-Couplers handle multi-physics interactions between different solvers in Genesis. They enable simulating scenarios where different material types interact (e.g., a robot grasping a soft object).
+A coupler transfers forces and state between the physics solvers so that different material types interact in a shared scene, for example a rigid gripper grasping a soft object. The simulator holds exactly one coupler, selected by the coupler options you pass to the scene.
 
-## Available Couplers
+## Available couplers
 
-| Coupler | Description | Use Case |
-|---------|-------------|----------|
-| **LegacyCoupler** | Impulse-based coupling | Simple interactions |
-| **SAPCoupler** | Spatial acceleration | Efficient broad-phase |
-| **IPCCoupler** | Incremental Potential Contact | Robust contact |
+| Coupler | What it is | Best for |
+|---------|------------|----------|
+| **LegacyCoupler** | The default coupler that handles all cross-solver pairs (rigid, MPM, SPH, PBD, FEM), slated for deprecation | General multi-physics scenes |
+| **SAPCoupler** | A Semi-Analytic Primal (SAP) contact solver, as used in Drake | Accurate rigid-deformable contact with implicit FEM |
+| **IPCCoupler** | Incremental Potential Contact, a barrier-based, intersection-free contact model | Cloth and large-deformation soft bodies |
+
+See {doc}`/user_guide/advanced_topics/couplers/index` for guidance on choosing between them.
 
 ## Configuration
 
-Couplers are configured through coupler options:
+The coupler is chosen by the type of `coupler_options` passed to the scene. Omitting it selects the legacy coupler.
 
 ```python
 import genesis as gs
 
 gs.init()
 scene = gs.Scene(
-    coupler_options=gs.options.LegacyCouplerOptions(
-        # Coupler-specific options
-    ),
+    coupler_options=gs.options.SAPCouplerOptions(),
 )
 ```
 
-## Multi-Physics Examples
+Once the coupler is set, coupling between entities happens automatically as the scene steps; there is no per-step coupling call.
 
-### Robot + Soft Object
-
-```python
-# Rigid robot
-robot = scene.add_entity(gs.morphs.URDF(file="gripper.urdf"))
-
-# Soft MPM object
-soft = scene.add_entity(
-    gs.morphs.Box(pos=(0.5, 0, 0.5), size=(0.1, 0.1, 0.1)),
-    material=gs.materials.MPM.Elastic(),
-)
-
-scene.build()
-
-# Coupling happens automatically
-for i in range(1000):
-    scene.step()
-```
-
-### Tool + Fluid
-
-```python
-# Kinematic tool
-tool = scene.add_entity(
-    gs.morphs.Mesh(file="paddle.obj"),
-    material=gs.materials.Tool(),
-)
-
-# SPH fluid
-fluid = scene.add_entity(
-    gs.morphs.Box(pos=(0, 0, 0.5), size=(1.0, 1.0, 1.0)),
-    material=gs.materials.SPH.Liquid(),
-)
-```
-
-## Coupler Types
+## Coupler types
 
 ```{toctree}
 :titlesonly:
@@ -72,7 +37,8 @@ sap_coupler
 ipc_coupler
 ```
 
-## See Also
+## See also
 
-- {doc}`/api_reference/engine/solvers/index` - Physics solvers
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/coupler_options` - Coupler options
+- {doc}`/user_guide/advanced_topics/couplers/index`: choosing and configuring a coupler
+- {doc}`/api_reference/engine/solvers/index`: the physics solvers being coupled
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/coupler_options`: coupler options reference

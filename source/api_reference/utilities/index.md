@@ -1,50 +1,36 @@
-# Utilities & Helpers
+# Utilities and helpers
 
-Genesis World provides various utility functions, constants, and helper classes for common operations.
+Genesis World bundles a set of helper modules under `genesis.utils` for the operations that surround a simulation: selecting a compute backend, converting between array formats, applying geometric transforms, and loading assets from disk. This page is the entry point to those modules; each linked page documents one of them in detail.
 
-## Overview
+## Modules
 
-This section covers:
+- **{doc}`constants`:** enums and named constants for compute backends, joint types, and geometry types.
+- **{doc}`device`:** detecting the platform and selecting the compute backend and PyTorch device.
+- **{doc}`tensor_utils`:** converting between Quadrants fields, PyTorch tensors, and NumPy arrays.
+- **{doc}`geometry`:** quaternion, rotation, and coordinate-transform helpers in `genesis.utils.geom`.
+- **{doc}`file_io`:** cache and source directory paths, plus loading URDF and MJCF descriptions.
 
-- **Constants**: Enums for joint types, geometry types, backends
-- **Device utilities**: Platform detection, device selection
-- **Tensor utilities**: Array/tensor conversions
-- **Geometry utilities**: Transform operations
-- **File I/O**: Path utilities, URDF/MJCF parsing
+## Initialization and globals
 
-## Quick Reference
-
-### Initialization
+Most utilities assume the library has been initialized. `gs.init()` selects the backend, sets the random seed and float precision, and populates the module-level globals below.
 
 ```python
 import genesis as gs
 
-# Initialize with default settings
-gs.init()
-
-# Initialize with specific backend
-gs.init(backend=gs.cpu)      # CPU backend
-gs.init(backend=gs.gpu)      # GPU backend (CUDA/Metal)
-
-# With custom settings
 gs.init(
-    seed=42,              # Random seed
-    precision="32",       # Float precision
-    debug=False,          # Debug mode
-    backend=gs.gpu,
+    backend=gs.gpu,  # CUDA on Linux, Metal on macOS
+    precision="32",
+    seed=42,
 )
 ```
 
-### Global Variables
+After `gs.init()` returns, these globals hold the resolved configuration:
 
-After `gs.init()`, these globals are available:
-
-| Variable | Description |
-|----------|-------------|
-| `gs.platform` | Platform string ("Linux", "macOS", etc.) |
-| `gs.device` | PyTorch device |
-| `gs.backend` | Active backend enum |
-| `gs.EPS` | Numerical epsilon |
+| Global | Type | Description |
+|---|---|---|
+| `gs.device` | `torch.device` | The active PyTorch device (for example, `cuda:0`, `mps:0`, or `cpu`). |
+| `gs.backend` | backend enum | The backend that was actually selected, after resolving `gs.gpu`. |
+| `gs.EPS` | `float` | Numerical epsilon for the active float precision. |
 
 ## Components
 
@@ -58,6 +44,6 @@ geometry
 file_io
 ```
 
-## See Also
+## See also
 
-- {doc}`/api_reference/options/index` - Configuration options
+- {doc}`/api_reference/options/index`: configuration options passed to the scene and solvers.
