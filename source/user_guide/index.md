@@ -1,5 +1,7 @@
 # User Guide
 
+This guide takes you from installation through the core concepts, tutorials, and API reference for Genesis World. If you are new, start with {doc}`overview/what_is_genesis` and the {doc}`getting_started/hello_genesis` tutorial.
+
 ```{toctree}
 :caption: Overview
 :maxdepth: 1
