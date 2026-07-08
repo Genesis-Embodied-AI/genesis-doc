@@ -12,7 +12,7 @@ scene/index
 entity/index
 ```
 
-## Visualization & rendering
+## Visualization and rendering
 
 ```{toctree}
 :titlesonly:
@@ -21,7 +21,7 @@ entity/index
 visualization/index
 ```
 
-## Sensors & perception
+## Sensors and perception
 
 ```{toctree}
 :titlesonly:
@@ -30,7 +30,7 @@ visualization/index
 sensor/index
 ```
 
-## Data recording & playback
+## Data recording and playback
 
 ```{toctree}
 :titlesonly:
@@ -48,7 +48,7 @@ recording/index
 engine/index
 ```
 
-## Configuration & options
+## Configuration and options
 
 ```{toctree}
 :titlesonly:
@@ -58,7 +58,7 @@ material/index
 options/index
 ```
 
-## Utilities & helpers
+## Utilities and helpers
 
 ```{toctree}
 :titlesonly:

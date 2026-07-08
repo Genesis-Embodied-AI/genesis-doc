@@ -1,4 +1,4 @@
-# Constants & enums
+# Constants and enums
 
 Genesis World defines several enums and constants for physics simulation configuration.
 

@@ -115,6 +115,11 @@ One sentence defining what it is and when to use it.
 
 **Oxford comma. American spelling.** ("color", "behavior", "modeling").
 
+**Spell out "and"; don't use the ampersand (`&`).** In headings, section titles, toctree captions, and running prose, write "and". The ampersand reads as shorthand, sorts and searches inconsistently, and clashes with the calm, spelled-out voice. (It is fine inside code, where `&` is an operator.)
+
+- ✅ "Sensors and perception", "Theory and modelling"
+- ❌ "Sensors & perception", "Theory & Modelling"
+
 **Use em dashes sparingly.** Reach for a comma, a colon, or a full stop first. One em dash in a paragraph for a genuine aside is fine; three is a nervous tic, and a sentence whose clauses are all strung together with them should be rewritten. (An en dash in a number range like "10–80×" is not an em dash and is fine.)
 
 **Definition-style list items lead with a bold term and a colon.** Write `- **Simulation interface:** the user-facing API for …`, with the description as a normal clause after the colon. Do not separate the term from its description with an em dash, and do not use the "bold term, full stop, sentence" form for definition lists.
@@ -207,6 +212,7 @@ We build with Sphinx + MyST Markdown (`pydata_sphinx_theme`). Use the following,
 **Headings**
 - One `#` H1 per page, matching the page's job. **No emoji in headings.** They break scannability, sorting, and search, and read as decoration. (Existing emoji headings should be removed as pages are touched.)
 - **Content headings use sentence case; navigation titles use Title Case.** Every heading inside a page is sentence case. The exception is navigation: the two top-level section landing titles (`User Guide`, `API Reference`) and the sidebar `:caption:` labels in a `{toctree}` (`Getting Started`, `Robot Control`, …) are Title Case, because they read as proper section names rather than page content.
+- **Spell out "and" in headings and toctree captions — never `&`** (see §4).
 - Don't skip levels (no H2 → H4). `myst_heading_anchors` generates anchors down to H4; keep meaningful headings within that depth.
 
 **Cross-references** — prefer Sphinx roles over bare Markdown links for anything inside the docs, so links survive file moves and are checked at build time:
@@ -272,6 +278,7 @@ Before opening a docs PR, confirm:
 - [ ] In-page headings are sentence case with no emoji; section/navigation titles (top-level section pages, toctree captions) are Title Case.
 - [ ] Terminology matches §6; the product is "Genesis World" (not keyword-stuffed).
 - [ ] No jokes, no marketing superlatives, no "let's".
+- [ ] Headings, titles, and captions spell out "and" — no ampersands (`&`).
 - [ ] Internal links use `{doc}` / `{py:*}` roles; no hard-coded genesis-doc URLs.
 - [ ] Tensor shapes, coordinate frame, quaternion order, and units are stated where relevant.
 - [ ] Alt text on every image; assets live under `_static/` and are referenced relatively.

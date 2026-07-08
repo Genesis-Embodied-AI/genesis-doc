@@ -1,4 +1,4 @@
-# Simulator, coupler & solver options
+# Simulator, coupler and solver options
 
 This configures the global simulator, all the solvers inside it, and the inter-solver coupler.
 

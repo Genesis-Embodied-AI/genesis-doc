@@ -49,7 +49,7 @@ getting_started/force_fields
 
 
 ```{toctree}
-:caption: Sensing & Perception
+:caption: Sensing and Perception
 :maxdepth: 2
 
 getting_started/sensors/index
@@ -68,7 +68,7 @@ getting_started/policy_training/examples/index
 
 
 ```{toctree}
-:caption: Assets & Rendering
+:caption: Assets and Rendering
 :maxdepth: 1
 
 getting_started/surfaces_textures
@@ -78,7 +78,7 @@ getting_started/viewer_plugin
 
 
 ```{toctree}
-:caption: Configuration & Conventions
+:caption: Configuration and Conventions
 :maxdepth: 1
 
 getting_started/config_system
@@ -100,7 +100,7 @@ advanced_topics/mesh_processing
 
 
 ```{toctree}
-:caption: Theory & Modelling
+:caption: Theory and Modelling
 :maxdepth: 2
 
 advanced_topics/rigid_collision/index

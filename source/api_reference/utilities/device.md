@@ -1,4 +1,4 @@
-# Device & platform utilities
+# Device and platform utilities
 
 Functions for detecting and configuring the compute platform and device.
 
