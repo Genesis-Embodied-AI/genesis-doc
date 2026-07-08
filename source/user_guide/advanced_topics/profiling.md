@@ -8,7 +8,24 @@ This page covers how to measure where a Genesis World simulation spends its time
 
 The first is built in and always available. The other two use the PyTorch profiler, which works even in a simulation that never touches PyTorch.
 
-Before you measure anything, read {doc}`/user_guide/getting_started/miscellaneous`: Genesis World caches compiled kernels, so the first run of a scene pays a compilation cost that later runs skip. Benchmark against a warm cache, or your numbers will be dominated by compilation.
+## Benchmark against a disposable cache
+
+Before you measure anything, get the compilation cache out of the way. Genesis World compiles GPU kernels just-in-time and caches the results to a persistent local folder, so repeated runs of the same scene start quickly. Quadrants, the compiler, keeps its own cache in the same way. This is what you want for day-to-day work, but it distorts profiling and benchmarking: the first run pays the compilation cost and later runs read from the warm cache.
+
+Do not wipe the persistent cache to get around this. Its effect outlives your experiment, and every future simulation is slow until the cache rebuilds. Instead, redirect both caches to a throwaway directory for the duration of a single run, by setting a few environment variables:
+
+```bash
+XDG_CACHE_HOME="$(mktemp -d)" \
+GS_CACHE_FILE_PATH="$XDG_CACHE_HOME/genesis" \
+QD_OFFLINE_CACHE_FILE_PATH="$XDG_CACHE_HOME/quadrants" \
+python your_script.py
+```
+
+- `GS_CACHE_FILE_PATH`: Genesis World's cache directory.
+- `QD_OFFLINE_CACHE_FILE_PATH`: the Quadrants compiler cache directory.
+- `XDG_CACHE_HOME`: the base cache directory, honored on Linux only.
+
+On Linux, `XDG_CACHE_HOME` alone is enough to relocate the Genesis World cache. On Windows and macOS it is ignored, so set `GS_CACHE_FILE_PATH` and `QD_OFFLINE_CACHE_FILE_PATH` explicitly as shown above.
 
 ## Reading the FPS counter
 
@@ -134,5 +151,4 @@ Run it with `--profiling` to attach the PyTorch profiler instead, or without to 
 
 - {doc}`/user_guide/getting_started/parallel_simulation`: scaling to many environments for throughput.
 - {doc}`/user_guide/getting_started/policy_training/best_practices/efficient_environment`: removing CPU–GPU stalls in a training loop.
-- {doc}`/user_guide/getting_started/miscellaneous`: benchmarking against a disposable cache.
 - {doc}`/user_guide/getting_started/config_system`: how `ProfilingOptions` fits with the other options objects.

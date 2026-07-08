@@ -97,7 +97,7 @@ A few environment variables adjust backend and runtime behavior without changing
 | `GS_ENABLE_NDARRAY=0` | Force static array mode in the compiler backend. |
 | `GS_ENABLE_ZEROCOPY=0/1` | Force zero-copy tensor sharing between PyTorch and the backend off or on. |
 
-For relocating the compilation caches (a separate concern, relevant to benchmarking), see {doc}`miscellaneous`.
+For relocating the compilation caches (a separate concern, relevant to benchmarking), see {doc}`/user_guide/advanced_topics/profiling`.
 
 ## Performance mode
 

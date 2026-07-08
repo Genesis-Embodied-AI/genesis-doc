@@ -49,6 +49,32 @@ pose = scene.viewer.camera_pose
 scene.viewer.set_camera_pose(pos=(3.5, 0.0, 2.5), lookat=(0, 0, 0.5))
 ```
 
+## Command-line tools
+
+Installing Genesis World adds a `gs` command with a few subcommands, so you can open the viewer without writing a script. Run `gs` with no arguments to list them.
+
+**`gs launch [asset]`** opens an asset in the interactive viewer. It accepts a Mesh, URDF, MJCF, or USD file; for a USD stage, every rigid entity in the stage is loaded. The viewer's overlay exposes per-joint sliders and play, pause, step, and reset controls, and it starts paused so you can inspect and pose the asset first. With no file, it opens an empty scene to which you can add entities live. Useful flags: `-c` visualize collision geometry, `-r` slowly rotate the asset, `-s SCALE` scale it, and `-l` show link frames.
+
+```bash
+gs launch xml/franka_emika_panda/panda.xml
+```
+
+**`gs play [asset]`** opens the same interactive viewer but runs the physics simulation, so joints and bodies respond under gravity and contact. With no file, it loads a demo scene (a Franka arm on a ground plane). It accepts `-c` and `-s SCALE`.
+
+```bash
+gs play xml/franka_emika_panda/panda.xml
+```
+
+**`gs animate 'pattern'`** combines every image matching a glob pattern into a video written to `video.mp4`. Pass `--fps` to set the frame rate (default 30).
+
+```bash
+gs animate 'frames/*.png' --fps 60
+```
+
+:::{note}
+`gs view` still works as a deprecated alias of `gs launch` and prints a deprecation warning. Use `gs launch` instead.
+:::
+
 ## Lighting
 
 The rasterizer (the viewer and any rasterizer camera sensor) lights the scene from a list of lights on `VisOptions`. With no configuration it uses a single directional light, so scenes are lit out of the box; set `lights` to control direction, color, and intensity yourself. The light classes live in `gs.options.vis`:
