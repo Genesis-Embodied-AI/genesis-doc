@@ -36,7 +36,7 @@ vel = robot.get_vel()       # Genesis World Tensor
 qpos = robot.get_qpos()     # Genesis World Tensor
 ```
 
-## Gradient Flow
+## Gradient flow
 
 ```python
 # Forward pass
@@ -51,7 +51,7 @@ loss = (pos - target).pow(2).sum()
 loss.backward()
 ```
 
-## Detaching from Scene
+## Detaching from scene
 
 To prevent gradients from flowing through the simulation:
 
@@ -63,7 +63,7 @@ pos_detached = pos.detach(sceneless=True)
 pos_sceneless = pos.sceneless()
 ```
 
-## Checking Scene Association
+## Checking scene association
 
 ```python
 # Check if tensor is associated with a scene
@@ -71,16 +71,16 @@ if pos.scene is not None:
     print(f"Tensor from scene: {pos.scene.uid}")
 ```
 
-## API Reference
+## API reference
 
 ```{eval-rst}
-.. autoclass:: genesis.grad.Tensor
+.. autoclass:: genesis.grad.tensor.Tensor
    :members:
    :undoc-members:
    :show-inheritance:
 ```
 
-## See Also
+## See also
 
 - {doc}`index` - Differentiable simulation overview
 - {doc}`creation_ops` - Creating tensors

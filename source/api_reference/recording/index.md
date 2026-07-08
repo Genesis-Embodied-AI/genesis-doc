@@ -1,21 +1,58 @@
-# Recording & Playback
+# Recording and playback
 
-Genesis World provides a flexible recording system for capturing simulation data. This enables data logging, visualization, video generation, and analysis of simulation results.
+Genesis World records simulation data through a recorder framework: you register a recorder with the scene, describe *what* to sample, then step the scene as usual. The recorder samples on a schedule and either writes the data to a file or draws it in a live plot, so you never thread logging code through your step loop.
 
-## Overview
+This page is the API overview for the `genesis.recorders` module. For a task-oriented walkthrough, see {doc}`/user_guide/getting_started/recorders`.
 
-The recording system consists of:
+## Components
 
-- **Recorder**: Base class for processing simulation data
-- **RecorderManager**: Coordinates multiple recorders
-- **FileWriters**: Export data to files (CSV, NPZ, Video)
-- **Plotters**: Real-time visualization of data
+- **Recorder:** the base class that processes each sampled value. See {doc}`recorder`.
+- **RecorderManager:** the per-scene coordinator that drives every registered recorder as the scene builds, steps, and resets. See {doc}`recorder_manager`.
+- **File writers:** `NPZFile`, `CSVFile`, and `VideoFile` persist data to disk. See {doc}`file_writers`.
+- **Plotters:** `PyQtLinePlot`, `MPLLinePlot`, `MPLImagePlot`, and `MPLVectorFieldPlot` visualize data live and can save the animation. See {doc}`plotters`.
 
-## Quick Start
+All recorder options classes are exported from `gs.recorders`.
 
-### Recording Camera Video
+## Minimal example
 
-Record a video from a scene camera. Frames are captured automatically on each `cam.render()` call while recording is active.
+Register a recorder with `scene.start_recording` before `scene.build()`, passing a zero-argument data function and a recorder options object. The manager samples the data function for you on each step.
+
+```python
+import genesis as gs
+
+gs.init()
+scene = gs.Scene()
+franka = scene.add_entity(gs.morphs.MJCF(file="xml/franka_emika_panda/panda.xml"))
+
+scene.start_recording(
+    data_func=lambda: franka.get_qpos(),
+    rec_options=gs.recorders.NPZFile(filename="qpos.npz", hz=50),  # 50 samples/second
+)
+
+scene.build()
+
+for _ in range(1000):
+    scene.step()
+
+scene.stop_recording()  # flushes files and closes plot windows
+```
+
+Recording also stops and flushes when the scene is destroyed, so short scripts need no explicit `stop_recording`.
+
+## Recording a live plot
+
+Swap the file writer for a plotter to visualize data as it is produced. A `dict` return value becomes one labeled subplot per key.
+
+```python
+scene.start_recording(
+    data_func=lambda: franka.get_qpos(),
+    rec_options=gs.recorders.MPLLinePlot(title="Joint positions"),
+)
+```
+
+## Recording camera video
+
+A camera exposes its own recording path, separate from the recorder framework. It buffers every frame produced by `cam.render()` while recording is active, then writes them to a video file on stop. Unlike `scene.start_recording`, `cam.start_recording` requires a built scene.
 
 ```python
 import genesis as gs
@@ -24,62 +61,18 @@ gs.init()
 scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
 scene.add_entity(gs.morphs.Box(pos=(0, 0, 1), size=(1.0, 1.0, 1.0)))
-
 cam = scene.add_camera(res=(640, 480), pos=(3, 0, 2), lookat=(0, 0, 0.5))
 
 scene.build()
 
 cam.start_recording()
-
-for i in range(200):
+for _ in range(200):
     scene.step()
     cam.render()
-
-cam.stop_recording(save_to_filename="simulation.mp4")
+cam.stop_recording(save_to_filename="simulation.mp4", fps=60)
 ```
 
-### Recording Custom Data
-
-```python
-# Define what data to record
-def get_robot_state():
-    return {
-        "position": robot.get_pos(),
-        "velocity": robot.get_vel(),
-        "joint_positions": robot.get_qpos(),
-    }
-
-# Start recording with recorder options
-scene.start_recording(
-    data_func=get_robot_state,
-    rec_options=gs.recorders.NPZFile(
-        filename="robot_data.npz",
-        hz=100,  # Recording frequency
-    ),
-)
-
-for i in range(1000):
-    scene.step()
-scene.stop_recording()
-```
-
-### Real-time Plotting
-
-```python
-# Plot joint positions in real-time
-scene.start_recording(
-    data_func=lambda: robot.get_qpos(),
-    rec_options=gs.recorders.MPLLinePlot(
-        title="Joint Positions",
-    ),
-)
-
-for i in range(1000):
-    scene.step()
-scene.stop_recording()
-```
-
-## Components
+## Components reference
 
 ```{toctree}
 :titlesonly:
@@ -90,25 +83,26 @@ file_writers
 plotters
 ```
 
-## Recording Workflow
+## Shared options
 
-1. **Define data function**: A callable that returns the data to record
-2. **Create recorder**: Instantiate a recorder (FileWriter, Plotter, etc.)
-3. **Add to scene**: Register the recorder with the scene
-4. **Start recording**: Begin data capture
-5. **Run simulation**: Execute simulation steps
-6. **Stop recording**: Finalize and save data
+Every recorder options class inherits these fields from `RecorderOptions`:
 
-## Configuration
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `hz` | float or `None` | `None` | Sampling frequency in samples per second. If `None`, samples on every step. Snapped to the nearest integer multiple of the timestep. |
+| `buffer_size` | int | `0` | Size of the background queue used when a recorder runs off-thread. `0` means unbounded. |
+| `buffer_full_wait_time` | float | `0.1` s | How long to wait for queue space when the buffer is full. |
 
-All recorders share common options:
+File writers (`NPZFile`, `CSVFile`, `VideoFile`) add one more shared field:
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `hz` | float | Recording frequency (samples/second) |
-| `async_mode` | bool | Process data in background thread |
+- **`save_on_reset`:** when `True`, `scene.reset()` flushes the current file and appends an incrementing counter to the filename, starting a fresh recording per episode. Defaults to `False`.
 
-## See Also
+:::{note}
+Whether a recorder runs on a background thread is decided internally per recorder through its `run_in_thread` property; it is not a user-facing option. The `buffer_size` and `buffer_full_wait_time` settings apply only to recorders that run off-thread.
+:::
 
-- {doc}`/api_reference/visualization/index` - Visual output
-- {doc}`/api_reference/scene/index` - Scene management
+## See also
+
+- {doc}`/user_guide/getting_started/recorders` — task-oriented guide to recording sensor and custom data.
+- {doc}`/api_reference/visualization/index` — cameras and other visual output.
+- {doc}`/api_reference/scene/index` — `scene.start_recording` and `scene.stop_recording`.

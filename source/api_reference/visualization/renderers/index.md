@@ -2,7 +2,7 @@
 
 Genesis World provides multiple rendering backends optimized for different use cases. Each renderer offers different trade-offs between speed and visual quality.
 
-## Available Renderers
+## Available renderers
 
 | Renderer | Speed | Quality | Use Case |
 |----------|-------|---------|----------|
@@ -10,7 +10,7 @@ Genesis World provides multiple rendering backends optimized for different use c
 | **Raytracer** | Slow | Photorealistic | High-quality images, videos |
 | **BatchRenderer** | Very Fast | Good | Parallel rendering for large-scale RL |
 
-## Choosing a Renderer
+## Choosing a renderer
 
 ```python
 import genesis as gs
@@ -37,7 +37,7 @@ cam_raytrace = scene.add_camera(
 scene.build()
 ```
 
-## Renderer Components
+## Renderer components
 
 ```{toctree}
 :titlesonly:
@@ -47,6 +47,6 @@ raytracer
 batch_renderer
 ```
 
-## See Also
+## See also
 
 - {doc}`/api_reference/options/renderer/index` - Renderer configuration options

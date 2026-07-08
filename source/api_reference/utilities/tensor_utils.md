@@ -1,4 +1,4 @@
-# Tensor Utilities
+# Tensor utilities
 
 Genesis World provides utilities for converting between different array and tensor formats.
 
@@ -9,7 +9,7 @@ Genesis World uses:
 - **PyTorch tensors**: For state access and differentiability
 - **NumPy arrays**: For data export and visualization
 
-## Tensor Conversion
+## Tensor conversion
 
 ### To NumPy
 
@@ -34,7 +34,7 @@ print(type(qpos_np))  # numpy.ndarray
 qpos_cpu = gs.utils.tensor_to_cpu(qpos)
 ```
 
-### Creating Tensors
+### Creating tensors
 
 ```python
 import torch
@@ -46,9 +46,9 @@ tensor = torch.zeros(10, device=gs.device, dtype=gs.tc_float)
 tensor = gs.utils.to_gs_tensor([1.0, 2.0, 3.0])
 ```
 
-## Common Patterns
+## Common patterns
 
-### Getting Entity State
+### Getting entity state
 
 ```python
 # Returns PyTorch tensor
@@ -60,7 +60,7 @@ import numpy as np
 pos_np = positions.cpu().numpy()
 ```
 
-### Setting Entity State
+### Setting entity state
 
 ```python
 import torch
@@ -73,7 +73,7 @@ robot.set_dofs_position(torch.from_numpy(target).to(gs.device))
 robot.set_dofs_position([0.1, 0.2, 0.3])
 ```
 
-### Batched Tensors
+### Batched tensors
 
 With `n_envs > 1`:
 
@@ -87,14 +87,14 @@ all_positions = robot.get_qpos()
 some_positions = robot.get_qpos(envs_idx=[0, 5, 10])
 ```
 
-## Data Types
+## Data types
 
 | Genesis World | PyTorch | NumPy | Description |
 |---------|---------|-------|-------------|
 | `gs.tc_float` | `torch.float32` | `np.float32` | Default float |
 | `gs.tc_int` | `torch.int32` | `np.int32` | Default int |
 
-## See Also
+## See also
 
 - {doc}`device` - Device configuration
 - {doc}`/api_reference/engine/states/index` - State management

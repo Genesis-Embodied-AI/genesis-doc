@@ -2,7 +2,7 @@
 
 This section provides comprehensive documentation for the Genesis World API. The reference is organized by functionality to help you find the classes and functions you need.
 
-## Core Components
+## Core components
 
 ```{toctree}
 :titlesonly:
@@ -12,7 +12,7 @@ scene/index
 entity/index
 ```
 
-## Visualization & Rendering
+## Visualization and rendering
 
 ```{toctree}
 :titlesonly:
@@ -21,7 +21,7 @@ entity/index
 visualization/index
 ```
 
-## Sensors & Perception
+## Sensors and perception
 
 ```{toctree}
 :titlesonly:
@@ -30,7 +30,7 @@ visualization/index
 sensor/index
 ```
 
-## Data Recording & Playback
+## Data recording and playback
 
 ```{toctree}
 :titlesonly:
@@ -39,7 +39,7 @@ sensor/index
 recording/index
 ```
 
-## Physics Engine
+## Physics engine
 
 ```{toctree}
 :titlesonly:
@@ -48,7 +48,7 @@ recording/index
 engine/index
 ```
 
-## Configuration & Options
+## Configuration and options
 
 ```{toctree}
 :titlesonly:
@@ -58,7 +58,7 @@ material/index
 options/index
 ```
 
-## Utilities & Helpers
+## Utilities and helpers
 
 ```{toctree}
 :titlesonly:
@@ -67,7 +67,7 @@ options/index
 utilities/index
 ```
 
-## Differentiable Simulation
+## Differentiable simulation
 
 ```{toctree}
 :titlesonly:

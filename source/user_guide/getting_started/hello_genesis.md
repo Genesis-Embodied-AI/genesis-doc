@@ -1,68 +1,58 @@
-# 👋🏻 Hello, Genesis World
+# Hello, Genesis World
 
 ```{figure} ../../_static/images/hello_genesis.png
+:alt: A Franka arm resting on the ground plane in the Genesis World viewer
 ```
-In this tutorial, we will go through a basic example that loads a single Franka arm and then let it fall freely onto the floor, and use this example to illustrate the core steps for creating a simulation experiment in Genesis World, and some basic concepts:
+
+This tutorial builds the smallest complete Genesis World program: load a Franka arm above a ground plane and let it fall under gravity. It is under fifteen lines, and it already contains every step common to any Genesis World simulation: initialize, create a scene, add entities, build, and step.
+
+The complete script is [`examples/tutorials/hello_genesis.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/hello_genesis.py):
 
 ```python
 import genesis as gs
+
 gs.init(backend=gs.cpu)
 
-scene = gs.Scene(show_viewer=True)
+scene = gs.Scene()
+
 plane = scene.add_entity(gs.morphs.Plane())
 franka = scene.add_entity(
-    gs.morphs.MJCF(file='xml/franka_emika_panda/panda.xml'),
+    gs.morphs.MJCF(file="xml/franka_emika_panda/panda.xml"),
 )
 
 scene.build()
-
 for i in range(1000):
     scene.step()
 ```
-This is the **complete code script**! Such an example only takes <10 lines of code, and already encapsulates all the necessary steps needed for creating a simulation experiment using Genesis World. 
 
-You can stop here and start exploring Genesis World if you want, but if you are patient enough, let's go through it step by step together:
+The rest of this page explains what each step is for.
 
-#### Initialization
-The first step is to import Genesis World and initialize it:
-```
-import genesis as gs
+## Initialize
+
+`gs.init()` must run once before you touch any other part of the API. Its most important argument is the compute **backend**:
+
+```python
 gs.init(backend=gs.cpu)
 ```
-- **Backend device**: Genesis World is designed to be cross-platform, meaning that it supports various backend devices. Here we are using `gs.cpu`. If you need GPU-accelerated [parallel simulation](parallel_simulation.md), you can switch to other backends such as `gs.cuda`, `gs.amdgpu` or `gs.metal`. You can also use `gs.gpu` as a shortcut, and Genesis World will select a backend based on your system (e.g. `gs.cuda` if CUDA is available, and `gs.metal` for Apple Silicon devices).
-- **Precision level**: By default, Genesis World uses f32 precision. You can change to f64 if you want a higher precision level by setting `precision='64'`.
-- **Logging level**: Once Genesis World is initialized, you will see logger output on your terminal detailing your system info and Genesis World-related info like its current version. You can suppress logger output by setting `logging_level` to `'warning'`.
-- **Color scheme**: The default color theme used by Genesis World logger is optimized for dark background terminal, i.e. `theme='dark'`. You can change to `'light'` if you are using a terminal with a light background, or simply use `'dumb'` if you are a black-and-white person.
-- **Performance mode**: When `performance_mode=True`, Genesis World bakes static tensor shapes into compiled kernels, yielding roughly 30% faster simulation. The trade-off is that kernels must be recompiled whenever the scene changes, which can take several minutes. With performance mode off (the default), kernels are shape-generic and only compiled once - rebuilds take just a few seconds once cached. In short, keep it off during research, fast iteration, debugging, and interactive data inspection; turn it on for policy training and production deployment.
 
-A more detailed example of an `gs.init()` call would look like this:
-```python
-gs.init(
-    backend             = gs.gpu,
-    precision           = '32',
-    seed                = None,
-    debug               = False,
-    performance_mode    = False,
-    logging_level       = None,
-    theme               = 'dark',
-    logger_verbose_time = False,
-)
-```
+- **Backend.** `gs.cpu` runs anywhere. For GPU-accelerated {doc}`parallel simulation <parallel_simulation>`, use `gs.cuda`, `gs.amdgpu`, or `gs.metal`. `gs.gpu` picks the right one for your machine (CUDA where available, Metal on Apple Silicon).
+- **Precision.** Genesis World uses 32-bit floats by default. Pass `precision="64"` when you need double precision.
+- **Logging.** On init, Genesis World logs system and version information. Set `logging_level="warning"` to quiet it, and `theme="light"` for light-background terminals.
+- **Performance mode.** With `performance_mode=True`, Genesis World bakes static tensor shapes into its compiled kernels for roughly 30% faster simulation, at the cost of recompiling whenever the scene changes (several minutes per change). Leave it off for research, debugging, and interactive work; turn it on for policy training and production runs.
 
-#### Create a scene
-All the objects, robots, cameras, etc. in Genesis World are placed in a Genesis World `Scene`:
+## Create a scene
+
+Every object, robot, camera, and light lives in a scene (see the {doc}`Scene API </api_reference/scene/scene>`). A scene owns a `simulator` (the physics solvers) and a `visualizer` (everything you see):
+
 ```python
 scene = gs.Scene()
 ```
-A scene wraps a `simulator` object, which handles all the underlying physics solvers, and a `visualizer` object, which manages visualization-related concepts. For more details and APIs, see [`Scene`](../../api_reference/scene/scene.md).
 
-When creating a scene, there's various physics solver parameters you can configure. A slightly more complex example would be:
+The default scene is headless. Pass `show_viewer=True` to open the interactive window, and use the options objects to configure physics and the camera:
+
 ```python
 scene = gs.Scene(
-    sim_options=gs.options.SimOptions(
-        dt=0.01,
-        gravity=(0, 0, -10.0),
-    ),
+    sim_options=gs.options.SimOptions(dt=0.01, gravity=(0, 0, -10.0)),
     viewer_options=gs.options.ViewerOptions(
         camera_pos=(3.5, 0.0, 2.5),
         camera_lookat=(0.0, 0.0, 0.5),
@@ -71,75 +61,62 @@ scene = gs.Scene(
     show_viewer=True,
 )
 ```
-This example sets simulation `dt` to be 0.01s for each step, configures gravity, and sets the initial camera pose for the interactive viewer.
 
+Here `dt` is the simulation timestep in seconds, `gravity` points down along `-Z`, and the viewer options set the initial camera pose.
 
-#### Load objects into the scene
-In this example, we load one plane and one franka arm into the scene:
+## Add entities
+
+Objects and robots are {doc}`entities </api_reference/entity/index>`. Genesis World is object-oriented: you interact with an entity through its own methods and attributes, not through a global handle or id.
+
+The first argument to `add_entity` is a {doc}`morph </api_reference/options/morph/index>`: a combined description of an entity's geometry *and* initial pose. You can build a morph from a shape primitive or load one from a file:
+
 ```python
 plane = scene.add_entity(gs.morphs.Plane())
 franka = scene.add_entity(
-    gs.morphs.MJCF(file='xml/franka_emika_panda/panda.xml'),
+    gs.morphs.MJCF(file="xml/franka_emika_panda/panda.xml"),
 )
 ```
-In Genesis World, all the objects and robots are represented as [`Entity`](../../api_reference/entity/index.md). Genesis World is designed to be fully object-oriented, so you will be able to interact with these entity objects through their methods directly, instead of using a handle or a global id assigned to them.
-The first parameter for `add_entity` is [`morph`](../../api_reference/options/morph/index.md). A morph in Genesis World is a hybrid concept, encapsulating both the geometry and pose information of an entity. By using different morphs, you can instantiate Genesis World entities from shape primitives, meshes, URDF, MJCF, Terrain, or soft robot description files.
 
-When creating the morph, you can additionally specify its position, orientation, size, etc. For orientation, a morph accepts either `euler` (scipy extrinsic x-y-z convention) or `quat` (w-x-y-z convention). One example would be:
+Shape primitives include `Plane`, `Box`, `Cylinder`, `Sphere`, `Terrain` (see the {doc}`terrain tutorial <terrain>`), and `Drone`. Supported file formats include:
+
+- `gs.morphs.MJCF`: MuJoCo `.xml` models
+- `gs.morphs.URDF`: robot descriptions (`.urdf`, and `.xacro`, which is preprocessed automatically)
+- `gs.morphs.USD`: Universal Scene Description (`.usd`, `.usda`, `.usdc`, `.usdz`); see the {doc}`USD import tutorial <usd_import>`
+- `gs.morphs.Mesh`: non-articulated meshes (`.obj`, `.stl`, `.glb`, `.gltf`); see {doc}`Conventions <conventions>` for Y-up vs. Z-up handling
+
+A morph also accepts pose and scale. Orientation is either `euler` (SciPy extrinsic x-y-z, in degrees) or `quat` (`(w, x, y, z)`):
+
 ```python
 franka = scene.add_entity(
     gs.morphs.MJCF(
-        file  = 'xml/franka_emika_panda/panda.xml',
-        pos   = (0, 0, 0),
-        euler = (0, 0, 90), # we follow scipy's extrinsic x-y-z rotation convention, in degrees,
-        # quat = (1.0, 0.0, 0.0, 0.0), # we use w-x-y-z convention for quaternions,
-        scale = 1.0,
+        file="xml/franka_emika_panda/panda.xml",
+        pos=(0, 0, 0),
+        euler=(0, 0, 90),
+        scale=1.0,
     ),
 )
 ```
 
-We currently support different types of shape primitives including:
-- `gs.morphs.Plane`
-- `gs.morphs.Box`
-- `gs.morphs.Cylinder`
-- `gs.morphs.Sphere`
-- `gs.morphs.Terrain`: built-in terrains and user-given height maps for locomotion tasks. See the [Terrain tutorial](terrain.md) for details.
-- `gs.morphs.Drone`: quadrotor drones with propeller physics
-
-We support loading from external files with different formats including :
-- `gs.morphs.MJCF`: mujoco `.xml` robot configuration files
-- `gs.morphs.URDF`: robot description files (`.urdf`), including `.xacro` files which are automatically preprocessed
-- `gs.morphs.USD`: Universal Scene Description files (`.usd`, `.usda`, `.usdc`, `.usdz`) for loading complex scenes with articulated robots and rigid objects. See the [USD Import tutorial](usd_import.md) for detailed information.
-- `gs.morphs.Mesh`: non-articulated mesh assets, supporting extensions: `*.obj`, `*.stl`, `*.glb`, `*.gltf`. See [Conventions](conventions.md) for mesh orientation handling (Y-up vs Z-up).
-
-
-When loading from external files, you need to specify the file location using the `file` parameter. When parsing this, we support both *absolute* and *relative* file path. Note that since Genesis World also comes with an internal asset directory (`genesis/assets`), so if a relative path is used, we search not only relative path with respect to your current working directory, but also under `genesis/assets`. Therefore, in this example, we will retrieve the franka model from: `genesis/assets/xml/franka_emika_panda/panda.xml`.
+File paths may be absolute or relative. Relative paths are resolved against your working directory *and* against the bundled asset directory (`genesis/assets`), so `xml/franka_emika_panda/panda.xml` loads the Franka model that ships with Genesis World.
 
 :::{note}
-During Genesis World's development, we have tried to support as many file extensions as we can, including support for loading their associated textures for rendering. If you would like us to support any other file types not listed above, or if you find your texture is not being loaded or rendered correctly, feel free to submit a feature request!
+An MJCF file specifies the joint connecting the robot's base to the world; a URDF does not. A URDF base is therefore free (a 6-DoF joint to the world) unless you pass `fixed=True`. The same applies to `gs.morphs.Mesh`.
 :::
 
-If you want to load a Franka arm using an external **URDF** file, you can simply change the morph to `gs.morphs.URDF(file='urdf/panda_bullet/panda.urdf', fixed=True)`. Note that unlike MJCF file which already specifies the joint type connecting the robot's base link and the `world`, URDF file doesn't come with this information. Therefore, by default, the base link of a URDF robot tree is disconnected from the `world` (or more precisely, connected to `world` via a `free` 6-dof joint). Therefore, we need to additionally specify `fixed=True` for `morphs.URDF` and `morphs.Mesh` if we want the base link to be fixed.
+## Build and step
 
-
-#### Build the scene and start simulating
-```Python
+```python
 scene.build()
 for i in range(1000):
     scene.step()
 ```
-Now that everything has been added, we can start the simulation. Note that we now need to ***build*** the scene first by calling `scene.build()`. This is because Genesis World uses just-in-time (JIT) technology to compile GPU kernels on the fly for each run, so we need an explicit step to initiate this process, which puts everything in place, allocates device memory, and creates underlying data fields for simulation.
 
-Once the scene is built, an interactive viewer will pop up to visualize the scene. The viewer comes with various keyboard shortcuts for video recording, screenshot, switching between different visualization modes, etc. We will discuss more details on visualization later in this tutorial.
-
+`scene.build()` is a required, explicit step. Genesis World compiles GPU kernels just-in-time, so building is what allocates device memory, creates the simulation data fields, and triggers that compilation. With `show_viewer=True`, the viewer window opens once the scene is built. Each `scene.step()` then advances the simulation by one `dt`.
 
 :::{note}
-**Kernel compilation and caching**
-
-Due to the nature of JIT, each time you create a scene with a new configuration (i.e. different robot types, different number of objects, etc. that involves size change of the internal data structure), Genesis World needs to re-compile the GPU kernels on the fly. Genesis World supports auto-caching of compiled kernels: after the first run (as long as it exits normally or is killed via `ctrl + c`, **not** `ctrl + \`), if the scene configuration stays the same, we will load from cached kernels from previous runs to speed up the scene creation process.
-
-We are actively working on optimizing this compilation step by adding techniques like parallel compilation and faster kernel serialization, so we expect to greatly speed up the speed of this step in future releases.
+**Kernel compilation and caching.** The first build with a new scene configuration (different robots, a different number of objects — anything that changes the internal data layout) compiles kernels on the fly, which is slow. Genesis World caches compiled kernels: as long as the first run exits normally or via `Ctrl-C` (**not** `Ctrl-\`), later runs with the same configuration load from cache and start quickly.
 :::
 
+## Next steps
 
-Now we have walked through the whole example. Next, let's dive into Genesis World's visualization system, and play with the viewer and add some cameras.
+Continue with {doc}`Visualization <visualization>` to add cameras and work with the viewer, then {doc}`Control Your Robot <control_your_robot>` to actuate the Franka you just loaded.

@@ -1,108 +1,88 @@
-# 🔒 Constraints
+# Rigid-body constraints
 
-Genesis World supports runtime constraints for manipulation tasks like suction grasping.
+A **constraint** ties two rigid links together so the solver keeps a geometric relationship between them: coincident points, a fixed relative pose, or coupled joint values. Most constraints are declared once in a model file and hold for the whole simulation. One kind, the **weld** constraint, can be added and removed while the simulation runs, which is what makes it the tool for modeling a suction gripper picking up and releasing an object.
 
-## Weld Constraints
+This page covers the runtime weld API on the rigid solver, and how the file-declared constraint types relate to it.
 
-Weld constraints rigidly attach two links together (6 DOF constraint).
+The complete runnable example is [`examples/rigid/suction_cup.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/suction_cup.py): a Franka arm reaches a cube, welds it to the hand, lifts and moves it, then releases.
 
-### Adding a Weld Constraint
+## Weld constraints at runtime
+
+A weld constraint pins two links so their relative pose is frozen at the values they have the instant you add it: all six degrees of freedom, translation and rotation. It is the constraint you toggle to model suction or a magnetic gripper: engage it when the end-effector reaches the object, delete it to let go.
+
+The API lives on the rigid solver, not on an entity, because a weld couples links that belong to two different entities. Reach it through `scene.sim.rigid_solver` after the scene is built:
 
 ```python
-import genesis as gs
-import numpy as np
-
-scene = gs.Scene()
-franka = scene.add_entity(gs.morphs.MJCF(file="franka.xml"))
-cube = scene.add_entity(gs.morphs.Box(pos=(0.65, 0, 0.02), size=(0.04, 0.04, 0.04)))
-scene.build()
-
-# Get link handles
 rigid = scene.sim.rigid_solver
-end_effector = franka.get_link("hand")
-cube_link = cube.base_link
-
-# Create constraint arrays
-link_cube = np.array([cube_link.idx], dtype=gs.np_int)
-link_franka = np.array([end_effector.idx], dtype=gs.np_int)
-
-# Add weld constraint (suction engages)
+link_cube = cube.get_link("box_baselink").idx
+link_franka = franka.get_link("hand").idx
 rigid.add_weld_constraint(link_cube, link_franka)
 ```
 
-### Removing a Weld Constraint
+The arguments are global **link indices** (integers), not link or entity handles. Get an index from a link with `entity.get_link(name).idx`. The order of the two links does not matter.
+
+Deleting the constraint releases the object:
 
 ```python
-# Release object
 rigid.delete_weld_constraint(link_cube, link_franka)
 ```
 
-## Suction Cup Example
+Pass the same two link indices you welded. Once released, the object is governed by contact and gravity again, so it will fall unless something supports it.
 
-```python
-# Move to object
-qpos = franka.inverse_kinematics(link=end_effector, pos=np.array([0.65, 0.0, 0.13]))
-franka.control_dofs_position(qpos[:-2], motors_dof)
-for _ in range(50):
-    scene.step()
+:::{note}
+A weld records the relative pose at the moment it is added; it does not snap the links together. Move the end-effector into contact with the object *before* welding, or the object will hang in the air at whatever offset it had when the constraint engaged.
+:::
 
-# Attach (suction on)
-rigid.add_weld_constraint(link_cube, link_franka)
+## Applying to a subset of environments
 
-# Lift
-qpos = franka.inverse_kinematics(link=end_effector, pos=np.array([0.65, 0.0, 0.28]))
-franka.control_dofs_position(qpos[:-2], motors_dof)
-for _ in range(100):
-    scene.step()
-
-# Place
-qpos = franka.inverse_kinematics(link=end_effector, pos=np.array([0.4, 0.2, 0.13]))
-franka.control_dofs_position(qpos[:-2], motors_dof)
-for _ in range(100):
-    scene.step()
-
-# Release (suction off)
-rigid.delete_weld_constraint(link_cube, link_franka)
-```
-
-## Multi-Environment Constraints
+In a {doc}`parallel simulation <parallel_simulation>`, both calls take an `envs_idx` argument to select which environments the weld applies to. Omit it to apply to all environments:
 
 ```python
 scene.build(n_envs=4)
 
-# Add constraint to specific environments
 rigid.add_weld_constraint(link_cube, link_franka, envs_idx=(0, 1, 2))
-
-# Delete from subset
 rigid.delete_weld_constraint(link_cube, link_franka, envs_idx=(0, 1))
 ```
 
-## Connect Constraints
+The two link indices are the same across environments; only the environment selection differs.
 
-Connect constraints enforce position-only coincidence (3 DOF), allowing relative rotation.
+## Budgeting for dynamic constraints
 
-```xml
-<!-- In MJCF/URDF -->
-<equality>
-    <connect name="ball_joint" body1="link_1" body2="link_2" anchor="0 0 1" />
-</equality>
-```
-
-## Query Active Constraints
+Runtime welds draw from a fixed pool sized before the scene is built. The pool holds `max_dynamic_constraints` welds (default 8), set on `gs.options.RigidOptions`:
 
 ```python
-constraints = rigid.get_weld_constraints()
-print(constraints)  # Active constraint pairs
+scene = gs.Scene(
+    rigid_options=gs.options.RigidOptions(max_dynamic_constraints=16),
+)
 ```
 
-## Constraint Properties
+:::{warning}
+Adding a weld once the pool is full has no effect: the solver logs a warning and ignores the request rather than raising. If a gripper silently fails to hold its object, check that you have released stale welds and that `max_dynamic_constraints` is large enough for the number held at once.
+:::
 
-- **Weld**: Full 6-DOF constraint (translation + rotation)
-- **Connect**: 3-DOF constraint (translation only)
-- **Instant**: No force limits or compliance
-- **Runtime**: Can be added/removed dynamically
+## Querying active welds
 
-## What's Next
+`get_weld_constraints` returns the welds currently active, as a dictionary of tensors keyed by field. `link_a` and `link_b` hold the welded link indices; `force` holds the constraint force. Each is batched over environments, with shape `(n_envs, n_welds_max, ...)`:
 
-- [Control Your Robot](./control_your_robot) - joint-level position, velocity, and force control
-- [Inverse Kinematics & Motion Planning](./inverse_kinematics_motion_planning) - IK solving and pick-and-place workflows
+```python
+welds = rigid.get_weld_constraints()  # dict with keys "link_a", "link_b", "force"
+```
+
+Pass `to_torch=False` for NumPy arrays, or `as_tensor=False` to get a per-environment tuple instead of a padded batch.
+
+## Constraint types
+
+Genesis World supports three equality-constraint types. Weld is the only one you add at runtime; the other two are read from a model's `<equality>` block when it is loaded from MJCF or URDF.
+
+| Type | Constrains | Declared in | Runtime API |
+|---|---|---|---|
+| Connect | A point on each link to coincide (3 DoF) — a ball joint. | MJCF | — |
+| Weld | Relative pose fully fixed (6 DoF). | MJCF, or `add_weld_constraint` | `add_weld_constraint` / `delete_weld_constraint` |
+| Joint | One joint's value tied to another's by a polynomial. | MJCF, URDF | — |
+
+A connect or joint constraint enters the simulation with its host model. There is no runtime API to add or remove it; edit the model file's equality section instead.
+
+## See also
+
+- {doc}`Control your robot <control_your_robot>`: joint-level position, velocity, and force control.
+- {doc}`Inverse kinematics and motion planning <inverse_kinematics_motion_planning>`: the IK solving and path planning the suction example uses to reach the object.

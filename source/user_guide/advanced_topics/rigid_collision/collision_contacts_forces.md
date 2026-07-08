@@ -1,160 +1,91 @@
-# 💥 Rigid Collision Detection
+# Rigid collision: contacts and forces
 
-Genesis World provides a highly-efficient, feature-rich collision detection and contact generation pipeline for rigid bodies.  The Python implementation lives in `genesis/engine/solvers/rigid/collider_decomp.py`.  This page gives a *conceptual* overview of the algorithmic building blocks so that you can understand, extend or debug the code.
+Every simulation step, Genesis World finds which rigid bodies touch, generates a contact manifold for each touching pair, and hands those contacts to the constraint solver. This page explains how detection works conceptually and how to read the resulting contacts and contact forces back into Python. Force resolution (how contacts turn into accelerations) is covered in {doc}`rigid_constraint_model`.
 
-> **Scope.**  The focus is on rigid–rigid interactions.  Soft-body / particle collisions rely on different solvers are in other files like `genesis/engine/coupler.py`.
+The detection code lives under `genesis/engine/solvers/rigid/collider/`, driven by the collider's `detection()` method.
 
----
+## How contacts are detected
 
-## Pipeline Overview
+Detection runs in two phases each step, from a cheap approximate cull to an exact contact manifold.
 
-The whole procedure can be seen as three successive stages:
+**Broad phase.** Each geometry gets a world-space axis-aligned bounding box (AABB), recomputed every step because rigid bodies move. A Sweep-and-Prune pass then reports only the geometry pairs whose boxes overlap, turning an all-pairs comparison into a near-linear one. The same pass drops pairs that cannot physically collide:
 
-1. **AABB Update** – update world–space Axis-Aligned Bounding Boxes for every geometry.
-2. **Broad Phase (Sweep-and-Prune)** – quickly reject obviously non-intersecting geom pairs based on AABB and output *possible* collision pairs.
-3. **Narrow Phase** – robustly compute the actual contact manifold (normal, penetration depth, position, etc.) for every surviving pair using primitive-spcific algoirithm, SDF, MPR, or GJK.
+- **Adjacency:** two geometries on the same link, or on directly connected links.
+- **Collision masks:** pairs excluded by their `contype` / `conaffinity` bitmasks.
+- **Static pairs:** two geometries both fixed relative to the world.
+- **Hibernation:** contacts between sleeping bodies, unless one side is awake.
 
-`Collider` orchestrates all three stages through the public `detection()` method:
+**Narrow phase.** Each surviving pair is resolved to an exact contact manifold: a contact normal, a penetration depth, and one or more contact points. The algorithm depends on the geometry pair:
+
+| Geometry pair | Path |
+|---|---|
+| General convex–convex, including plane–convex | Minkowski Portal Refinement (MPR) by default, or GJK with EPA when `use_gjk_collision=True`; a signed-distance-field query takes over on deep penetration. |
+| Plane–box and box–box | Analytic special case, ported from MuJoCo for stability when a box lies flush on a plane. |
+| Any geometry against height-field terrain | Terrain routine that can emit several contact points per supporting cell. |
+| Non-convex meshes | Signed-distance-field sampling: vertices first (vertex–face), then edges (edge–edge), keeping the deepest penetration. |
+
+MPR and GJK both operate through a *support function* — "which vertex lies farthest along a given direction?" — so they run branch-free on the GPU without face-adjacency caches. GJK additionally reports a separation distance when the geometries are apart and is the differentiable path (it is selected automatically when the scene requires gradients). Both accelerate support queries with a precomputed support field; see {doc}`/user_guide/advanced_topics/support_field` for how that structure is built and used. To capture flush faces rather than a single point, Genesis perturbs the pose slightly around the first contact normal and gathers the extra contacts that result.
+
+The number of candidate pairs the broad phase may emit is bounded by the `max_collision_pairs` option on {doc}`RigidOptions </api_reference/options/simulator_coupler_and_solver_options/rigid_options>`. Exceeding it at runtime halts the simulation, so raise it for scenes with dense contact.
+
+## Reading contacts
+
+Read the contacts from the most recent `scene.step()` with `get_contacts()` on any {doc}`rigid entity </api_reference/entity/rigid_entity/rigid_entity>`. It returns a dict of parallel arrays, one entry per contact that involves the entity.
 
 ```python
-collider.detection()  # updates AABBs → SAP broad phase → narrow phase(s)
+import genesis as gs
+
+gs.init(backend=gs.gpu)
+
+scene = gs.Scene()
+plane = scene.add_entity(gs.morphs.Plane())
+ball = scene.add_entity(gs.morphs.Sphere(radius=0.2, pos=(0.0, 0.0, 0.5)))
+
+scene.build()
+for _ in range(200):
+    scene.step()
+
+contacts = ball.get_contacts()  # all contacts involving the ball
+positions = contacts["position"]  # world-frame contact points, shape ([n_envs,] n_contacts, 3)
+forces = contacts["force_a"]  # force on geom A, shape ([n_envs,] n_contacts, 3), N
 ```
 
-Each stage is described in the following sections.
+Each entry shares a leading contact axis. Index and scalar fields have shape `([n_envs,] n_contacts)`; vector fields have shape `([n_envs,] n_contacts, 3)`. The fields are:
 
----
+- **`geom_a`, `geom_b`:** global geometry indices of the two geometries in the pair. Recover a geometry with `scene.rigid_solver.geoms[idx]`.
+- **`link_a`, `link_b`:** global link indices of the links owning those geometries, recoverable via `scene.rigid_solver.links[idx]`.
+- **`position`:** contact point in the world frame, in meters.
+- **`normal`:** contact normal, a world-space unit vector.
+- **`penetration`:** penetration depth, positive when the geometries overlap.
+- **`force_a`, `force_b`:** contact force on geometry A and on geometry B. They are equal and opposite, in newtons.
+- **`valid_mask`:** present only when the scene is parallelized. See the note below.
 
-## 1&nbsp;· AABB Update
+To restrict the result to contacts against one other entity, pass `with_entity`. Passing the entity itself returns self-collisions only, and `exclude_self_contact=True` drops them:
 
-The helper kernel `_func_update_aabbs()` delegates the work to `RigidSolver._func_update_geom_aabbs()`.  It computes a *tight* world-space AABB per geometry and stores the result in `geoms_state[..].aabb_min / aabb_max`.
+```python
+contacts = ball.get_contacts(with_entity=plane)  # only ball–plane contacts
+```
 
-Why do we do this every frame?
+:::{note}
+With multiple environments, every field carries a leading `n_envs` axis and is padded to the largest contact count across environments, so the same array is rectangular. `valid_mask` (shape `(n_envs, n_contacts)`) marks which rows are real; filter with it before using the data. A single-environment scene returns the fields already trimmed, with no `valid_mask`.
+:::
 
-* Rigid bodies move ⇒ their bounding boxes change.
-* AABB overlap checks are the cornerstone of the broad phase.
+## Net contact force per link
 
----
+When you only need the total external contact force on each link rather than the individual contact points, use `get_links_net_contact_force()`. It sums the contact forces the solver applied to every link of the entity:
 
-## 2&nbsp;· Broad Phase – Sweep & Prune
+```python
+net = ball.get_links_net_contact_force()  # world frame, shape ([n_envs,] n_links, 3), N
+```
 
-The broad phase is implemented in `_func_broad_phase()`.  It is an *N·log N* insertion-sort variant of the classical Sweep-and-Prune (a.k.a. Sort-and-Sweep):
+This is the aggregate the constraint solver accumulated, so it reflects the resolved contact forces rather than the raw manifold. For a link resting on the ground, it balances gravity.
 
-1.  Project every AABB onto a single axis (currently X) and insert its *min* and *max* endpoints into a sortable buffer.
-2.  **Warm-start** – the endpoints are already almost sorted from the previous frame ⇒ insertion sort is almost linear.
-3.  Sweep through the sorted buffer maintaining an *active set* of intervals that overlap the current endpoint.
-4.  Whenever `min_a` crosses inside `max_b` we have a *potential* pair `(geom_a, geom_b)`.
+## When to use a contact sensor instead
 
-Extra filtering steps remove pairs that are physically impossible or explicitly disabled:
+`get_contacts()` and `get_links_net_contact_force()` pull the whole contact set on demand, which is convenient for scripting and debugging. For a per-link signal you sample every step in a control or training loop (with history, noise, and delay handled for you), attach a contact sensor instead. `ContactForce` reports the net force on a link in its own frame, and the tactile probes estimate dense per-taxel forces. See {doc}`/user_guide/getting_started/sensors/contact_and_tactile`.
 
-* Same link / adjacent link filtering.
-* `contype`/`conaffinity` bitmasks.
-* Pairs of links that are both fixed w.r.t. the world.
-* *Hibernation* support – sleeping bodies are ignored unless colliding with awake ones.
+## See also
 
-The surviving pairs are stored in `broad_collision_pairs` and `n_broad_pairs`.
-
----
-
-## 3&nbsp;· Narrow Phase – Contact Manifold Generation
-
-The narrow phase is split into four specialised kernels:
-
-| Kernel | When it runs | Purpose |
-|--------|--------------|---------|
-| `_func_narrow_phase_convex_vs_convex` | general convex–convex & plane-convex | Default path using **MPR** (Minkowski Portal Refinement) with fall-back to signed-distance-field queries. Use **GJK** algorithm when `use_gjk_collision` option in `RigidOptions` is set to be `True`.
-| `_func_narrow_phase_convex_specializations` | plane-box & box-box | Specialized handlers for a pair of convex geometries that have analytic solutions.
-| `_func_narrow_phase_any_vs_terrain` | at least one geometry is a *height-field terrain* | Generate multiple contact points per supporting cell.
-| `_func_narrow_phase_nonconvex_vs_nonterrain` | at least one geometry is **non-convex** | Handles mesh ↔ convex or mesh ↔ mesh collisions via SDF vertex/edge sampling.
-
-### 3.1&nbsp; Convex–Convex
-
-#### 3.1.1. GJK
-
-GJK, along with EPA, is a widely used contact detection algorithm in many physics engines, as it has following advantages:
-
-* Runs entirely on the GPU thanks to branch-free support-mapping primitives.
-* Requires only a *support function* per shape – no face adjacency or feature cache.
-* Gives separation distance when the geometries are not in contact.
-* Verified numerical robustness in many implementations.
-
-In Genesis World, it is enabled when `use_gjk_collision` option in `RigidOptions` is set to be `True`. Also, Genesis World enhances
-the robustness of GJK with following measures.
-
-* Thorough degeneracy check on simplex and polytope during runtime.
-* Robust face normal estimation.
-* Robust lower and upper bound estimation on the penetration depth.
-
-Genesis World accelerates support queries with a **pre-computed Support Field** (see {doc}`Support Field <support_field>`).
-
-Multi-contact generation is enabled by *small pose perturbations* around the first contact normal.  At most five
-contacts (`_n_contacts_per_pair = 5`) are stored per pair.
-
-#### 3.1.2. MPR
-
-MPR is another contact detection algorithm widely adopted in physics engines. Even though it shares most of the advantages
-of GJK, it does not give separation distance when the geometries are not colliding, and could be susceptible to numerical
-errors and degeneracies as it is not verified as much as GJK in many implementations.
-
-In Genesis World, MPR is improved with a signed-distance-field fall-back when there is a deep penetration.
-
-As GJK, Genesis World accelerates support queries of MPR with a pre-computed Support Field, and detect multiple contacts with
-small pose perturbations around the first contact normal. Thus, at most five contacts (`_n_contacts_per_pair = 5`) are stored per pair.
-
-### 3.2&nbsp; Non-convex Objects
-
-For triangle meshes or decomposed convex clusters the pipeline uses **signed-distance fields** (SDF) pre-baked offline.  The algorithm samples
-
-* vertices (vertex–face contact), then
-* edges (edge–edge contact)
-
-and keeps the deepest penetration.  The costly edge pass is skipped if a vertex contact is already found.
-
-### 3.3&nbsp; Plane ↔ Box Special-Case
-
-Mujoco's analytical plane–box and box–box routine is ported for extra stability and to avoid degeneracies when a box lies flush on a plane.
-
----
-
-## Contact Data Layout
-
-Successful contacts are pushed into the *struct-of-arrays* field `contact_data`:
-
-| Field | Meaning |
-|-------|---------|
-| `geom_a`, `geom_b` | geometry indices |
-| `penetration` | positive depth (≤ 0 means separated) |
-| `normal` | world-space unit vector pointing **from B to A** |
-| `pos` | mid-point of inter-penetration |
-| `friction` | effective Coulomb coefficient (max of the two) |
-| `sol_params` | solver tuning constants |
-
-`n_contacts` is incremented atomically so that GPU kernels may append in parallel.
-
----
-
-## Warm-Start & Caching
-
-To improve temporal coherence we cache, for every geometry pair, the ID of the previously deepest vertex and the last known separating normal.  The cache is consulted to *seed* the MPR search direction and is cleared when the pair separates in the broad phase.
-
----
-
-## Hibernation
-
-When this feature is enabled, contacts belonging exclusively to hibernated bodies are preserved but not re-evaluated every frame (`n_contacts_hibernated`).  This drastically reduces GPU work for scenes with large static backgrounds.
-
----
-
-## Tuning Parameters
-
-| Option | Default | Effect |
-|--------|---------|--------|
-| `RigidSolver._max_collision_pairs` | 4096 | upper bound on broad-phase pairs (per environment) |
-| `Collider._mc_perturbation` | `1e-2` rad | perturbation angle for multi-contact search |
-| `Collider._mc_tolerance`    | `1e-2` of AABB size  | duplicate-contact rejection radius |
-| `Collider._mpr_to_gjk_overlap_ratio` | `0.5` | threshold to switch from MPR to SDF when one shape encloses the other |
-
----
-
-## Further Reading
-
-* {doc}`Support Field <support_field>` – offline acceleration structure for support-mapping shapes.
+- {doc}`rigid_constraint_model`: how contacts, joint limits, and equality constraints are solved for the resulting motion.
+- {doc}`/user_guide/advanced_topics/support_field`: the acceleration structure behind MPR and GJK support queries.
+- {doc}`/user_guide/getting_started/sensors/contact_and_tactile`: contact and tactile sensors for per-step readings.

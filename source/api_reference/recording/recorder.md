@@ -11,7 +11,7 @@ Recorders:
 - Support building/cleanup lifecycle
 - Can be reset between episodes
 
-## Creating Custom Recorders
+## Creating custom recorders
 
 ```python
 import genesis as gs
@@ -49,7 +49,7 @@ class MyRecorder(Recorder):
 4. **`cleanup()`**: Finalize and release resources (called when recording stops)
 5. **`reset()`**: Reset state for new episode
 
-## API Reference
+## API reference
 
 ```{eval-rst}
 .. autoclass:: genesis.recorders.base_recorder.Recorder
@@ -58,7 +58,7 @@ class MyRecorder(Recorder):
    :show-inheritance:
 ```
 
-## See Also
+## See also
 
 - {doc}`recorder_manager` - Managing multiple recorders
 - {doc}`file_writers` - Built-in file writers

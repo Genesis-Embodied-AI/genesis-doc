@@ -1,8 +1,8 @@
-# Constants & Enums
+# Constants and enums
 
 Genesis World defines several enums and constants for physics simulation configuration.
 
-## Backend Selection
+## Backend selection
 
 ```python
 import genesis as gs
@@ -18,7 +18,7 @@ gs.backend.amdgpu   # AMD ROCm (HIP)
 gs.init(backend=gs.gpu)
 ```
 
-## Joint Types
+## Joint types
 
 ```python
 # Joint types for articulated bodies
@@ -29,7 +29,7 @@ gs.JOINT_TYPE.SPHERICAL  # Ball joint (3 DOF)
 gs.JOINT_TYPE.FREE       # Free joint (6 DOF)
 ```
 
-## Geometry Types
+## Geometry types
 
 ```python
 # Geometry types for collision shapes
@@ -43,7 +43,7 @@ gs.GEOM_TYPE.MESH       # Mesh
 gs.GEOM_TYPE.TERRAIN    # Heightfield terrain
 ```
 
-## Control Modes
+## Control modes
 
 ```python
 # Control modes for joints
@@ -66,7 +66,7 @@ rigid_options = gs.options.RigidOptions(
 )
 ```
 
-## Constraint Solvers
+## Constraint solvers
 
 ```python
 # Constraint solving methods
@@ -79,7 +79,7 @@ rigid_options = gs.options.RigidOptions(
 )
 ```
 
-## Broadphase Traversal
+## Broadphase traversal
 
 ```python
 # Broadphase collision detection methods
@@ -87,7 +87,7 @@ gs.broadphase_traversal.SAP          # Sweep and Prune
 gs.broadphase_traversal.ALL_VS_ALL   # Brute-force all pairs
 ```
 
-## Parallelization Level
+## Parallelization level
 
 ```python
 # Multi-environment parallelization levels
@@ -96,7 +96,7 @@ gs.PARA_LEVEL.PARTIAL  # Partial parallelization
 gs.PARA_LEVEL.ALL      # Full parallelization
 ```
 
-## Equality Constraints
+## Equality constraints
 
 ```python
 # Equality constraint types (for MJCF)
@@ -105,14 +105,14 @@ gs.EQUALITY_TYPE.WELD     # Weld constraint
 gs.EQUALITY_TYPE.JOINT    # Joint equality
 ```
 
-## Entity State
+## Entity state
 
 ```python
 gs.ACTIVE    # Entity is active (1)
 gs.INACTIVE  # Entity is inactive (0)
 ```
 
-## See Also
+## See also
 
 - {doc}`device` - Device and platform utilities
 - {doc}`/api_reference/options/index` - Configuration options

@@ -1,8 +1,8 @@
-# File Writers
+# File writers
 
 Genesis World provides file writers for exporting simulation data to various formats.
 
-## Available Writers
+## Available writers
 
 | Writer | Format | Description |
 |--------|--------|-------------|
@@ -89,9 +89,9 @@ for i in range(300):
 scene.stop_recording()
 ```
 
-## Configuration Options
+## Configuration options
 
-### Common Options
+### Common options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -99,14 +99,14 @@ scene.stop_recording()
 | `hz` | float | None | Recording frequency |
 | `async_mode` | bool | False | Background processing |
 
-### VideoFileWriter Options
+### VideoFileWriter options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `fps` | int | 30 | Video frame rate |
 | `codec` | str | "libx264" | Video codec |
 
-## API Reference
+## API reference
 
 ```{eval-rst}
 .. automodule:: genesis.recorders.file_writers
@@ -115,7 +115,7 @@ scene.stop_recording()
    :show-inheritance:
 ```
 
-## See Also
+## See also
 
 - {doc}`index` - Recording overview
 - {doc}`plotters` - Real-time visualization

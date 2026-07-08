@@ -1,128 +1,113 @@
-# 🫧 Non-rigid Dynamics
+# Non-rigid material models
 
-This page gives a compact overview of the physical models implemented by Genesis World's continuum and discrete solvers.  The emphasis is on *which equations are being solved and how*, rather than on the Python API. For coupling theory see the dedicated *Solvers & Coupling* chapter.
+A **constitutive model** is the equation that relates how much a material deforms to the stress it develops in response. In Genesis World you do not call these equations directly. You assign a `material` to an entity, and that choice selects both the solver that advances it and the constitutive model it obeys. This page explains the models behind the material classes in `gs.materials`: what each one computes, the parameters that shape it, and when to reach for it.
 
----
+For the complementary question of which *solver* to use and how to configure a scene around it, see {doc}`/user_guide/getting_started/beyond_rigid_bodies`. For actuated muscles specifically, see {doc}`/user_guide/getting_started/soft_robots`. For how forces cross material boundaries, see {doc}`/user_guide/advanced_topics/solvers_and_coupling`.
 
-## 1. Eulerian Stable-Fluid Solver (`SFSolver`)
+## The shared foundation
 
-**Purpose.** Fast smoke / gas simulation on a fixed grid.
+Every continuum material tracks the **deformation gradient** $\mathbf F$, the local map from an undeformed neighborhood to its deformed shape. Its determinant $J = \det \mathbf F$ is the local volume ratio: $J = 1$ is volume-preserving, $J < 1$ is compression, and $J > 1$ is expansion. A constitutive model is a rule that turns $\mathbf F$ into a stress, usually by way of an elastic strain-energy density $\psi(\mathbf F)$ whose derivative is the force.
 
-**Governing equations** – incompressible Navier–Stokes.
+Most solids share three physical parameters, from which Genesis derives the Lamé coefficients $\mu$ (resistance to shear) and $\lambda$ (resistance to volume change):
 
-**Algorithm** – Jos Stam's *Stable Fluids*:
+- **`E`:** Young's modulus in Pa, the overall stiffness. Larger `E` means a stiffer body and a numerically stiffer system that needs smaller substeps.
+- **`nu`:** Poisson ratio, the tendency to preserve volume under stretch. Values near `0.5` are nearly incompressible.
+- **`rho`:** density in kg/m³ (kg/m² for the 2D PBD cloth model).
 
-1. **Advection** – velocities are back-traced with third-order RK and interpolated (`backtrace` + `trilerp`).  Numerically unconditionally stable.
-2. **External impulses** – jet sources inject momentum after advection.
-3. **Viscosity / decay** – optional exponential damping term.
-4. **Pressure projection** – solve Poisson by Jacobi iteration (`pressure_jacobi`).
+$$\mu = \frac{E}{2(1+\nu)}, \qquad \lambda = \frac{E\,\nu}{(1+\nu)(1-2\nu)}.$$
 
-5. **Boundary conditions** – zero-normal velocity enforced by mirroring components at solid faces.
+Several models factor $\mathbf F$ before building a stress. The polar decomposition $\mathbf F = \mathbf R \mathbf S$ splits it into a rotation $\mathbf R$ and a symmetric stretch $\mathbf S$; the singular value decomposition $\mathbf F = \mathbf U \boldsymbol\Sigma \mathbf V^\top$ exposes the principal stretches on the diagonal of $\boldsymbol\Sigma$. Plasticity models operate directly on those stretches.
 
-Because all steps are explicit or diagonally implicit the method is extremely robust at large time-steps and suitable for real-time effects.
+## Elastic models
 
----
+An elastic material returns to its rest shape when unloaded: all deformation is stored as recoverable energy. Genesis provides elastic models across three solvers, and the elastic classes are the base that plasticity and muscle models extend.
 
-## 2. Material Point Method Solver (`MPMSolver`)
+**`gs.materials.MPM.Elastic`** offers two stress models through its `model` argument:
 
-**Purpose.** Unified simulation of solids, liquids and granular media using particles + background grid.
+- **`"corotation"`** (the default): the fixed-corotated model, whose energy penalizes deviation from the nearest rotation, $\psi(\mathbf F) = \mu\,\lVert \mathbf F - \mathbf R\rVert_F^2 + \tfrac{\lambda}{2}(J-1)^2$. It handles large rotations cleanly and is a good default for stiff, chalk-like solids.
+- **`"neohooken"`**: a Neo-Hookean model, $\psi(\mathbf F) = \tfrac{\mu}{2}(\operatorname{tr}(\mathbf F^\top\mathbf F) - 3) - \mu\ln J + \tfrac{\lambda}{2}(\ln J)^2$. It reads $\mathbf F$ and $J$ directly and skips the SVD, so it is cheaper per particle. The accepted literal is spelled `"neohooken"`.
 
-**Core idea.**  The continuum momentum equation is evaluated on an Eulerian grid while material history (deformation gradient, plastic strain, etc.) is stored on Lagrangian particles.
+**`gs.materials.FEM.Elastic`** solves elasticity on a tetrahedral mesh and exposes three models, defaulting to `"linear"`:
 
-### 2.1 Update sequence (APIC / CPIC variant)
+```python
+soft = scene.add_entity(
+    material=gs.materials.FEM.Elastic(E=3e5, nu=0.45, model="stable_neohookean"),
+    morph=gs.morphs.Sphere(radius=0.1),
+)
+```
 
-| Phase | Description |
-|-------|-------------|
-| P2G | Transfer mass and momentum to neighbour grid nodes with B-spline weights; add stress contribution. |
-| Grid solve | Divide by mass to obtain velocities, apply gravity & boundary collisions. |
-| G2P | Interpolate grid velocity back, update affine matrix and position. |
-| Polar-SVD | Decompose deformation graident; material law returns new deformation gradient. |
+- **`"linear"`:** linear elasticity. Fastest and the only model with a constant (precomputed) Hessian, but valid only for small strains; large rotations produce visible artifacts.
+- **`"stable_neohookean"`:** the rest-stable Neo-Hookean formulation. Its energy stays well-defined for inverted or degenerate elements, which makes it the robust choice for large deformation and contact-rich scenes.
+- **`"linear_corotated"`:** linear elasticity evaluated in a per-element rotated frame, recovering correct behavior under large rotation while keeping a linear stress response to stretch.
 
-### 2.2 Constitutive models
+**`gs.materials.PBD.Elastic`** takes a different route. Position-Based Dynamics does not integrate a stress; it enforces geometric constraints on particle positions. Stiffness is expressed as **compliance** (inverse stiffness) rather than a modulus, with `stretch_compliance`, `bending_compliance`, and `volume_compliance` controlling edge, bending, and volume constraints. In the XPBD formulation a constraint's effective compliance is $\alpha = \text{compliance}/\Delta t^2$, so a compliance of `0.0` is perfectly rigid. Reach for it when speed and stability matter more than physical accuracy.
 
-Genesis World ships several analytic stress functions:
+## Elastoplasticity: permanent deformation
 
-* **Neo-Hookean elastic** (chalk/snow)
-* **Von Mises capped plasticity** (snow-plastic)
-* **Weakly compressible liquid** (WC fluid)
-* **Anisotropic muscle** adding active fibre stress
+A plastic material keeps part of its deformation after unloading. Genesis models this by splitting $\mathbf F$ into an elastic part that stores energy and a plastic part that does not. Each step first computes a trial elastic state, then a **return mapping** projects it back onto a yield surface, moving any excess into the permanent plastic part.
 
----
+**`gs.materials.MPM.ElastoPlastic`** supports two yield criteria through `use_von_mises`:
 
-## 3. Finite Element Method Solver (`FEMSolver`)
+- **von Mises (`use_von_mises=True`, the default):** yielding is governed by the deviatoric (shape-changing) part of the Hencky strain $\boldsymbol\varepsilon = \ln\boldsymbol\Sigma$. The material flows once $\lVert \operatorname{dev}\boldsymbol\varepsilon\rVert$ exceeds $\tau_Y / (2\mu)$, where the threshold `von_mises_yield_stress` is $\tau_Y$. This models a metal- or clay-like solid that dents and holds the dent.
+- **Singular-value clamping (`use_von_mises=False`):** the principal stretches are clamped into $[\,1-\texttt{yield\_lower},\ 1+\texttt{yield\_higher}\,]$, capping how far the material may stretch or compress elastically before the rest is made permanent.
 
-**Purpose.** High-quality deformable solids with tetrahedral meshes; optional implicit integration for stiff materials.
+**`gs.materials.MPM.Sand`** implements a Drucker-Prager model for cohesionless granular media. Its yield surface is a cone in stress space set by `friction_angle` (degrees): particles resist shear only under confining pressure, so sand piles up to an angle of repose and otherwise flows.
 
-### 3.1 Energy formulation
+```python
+sand = scene.add_entity(
+    material=gs.materials.MPM.Sand(friction_angle=45.0),  # degrees
+    morph=gs.morphs.Box(size=(0.2, 0.2, 0.2)),
+)
+```
 
-Total potential energy
+**`gs.materials.MPM.Snow`** is a specialization of `ElastoPlastic` that uses singular-value clamping (it does not support von Mises) and additionally *hardens* as it compacts: the more it is compressed, the stiffer it becomes. This reproduces the way snow packs into a firm, shape-holding solid.
 
-$$ \Pi(\mathbf x) = \sum_{e} V_{e}\,\psi(\mathbf F_e) - \sum_{i} m_{i}\,\mathbf g\!\cdot\!\mathbf x_i. $$
+## Liquids
 
-The first variation yields the internal force; the second variation gives the element stiffness.
+Liquids sustain no shear stress at rest; they resist only changes in volume. Three material classes model them, differing in how strictly incompressibility is enforced.
 
-### 3.2 Implicit backward Euler
+**`gs.materials.MPM.Liquid`** is weakly compressible. Each step it discards the shape of $\mathbf F$, keeping only its volumetric part $J^{1/3}\mathbf I$, so no shear stress accumulates and the material flows freely; pressure comes from the volume change alone. Set `viscous=True` to retain a deviatoric viscous term for a thicker fluid.
 
-Given current state $(\mathbf x^n, \mathbf v^n)$ solve for $\mathbf x^{n+1}$ by Newton–Raphson:
+**`gs.materials.SPH.Liquid`** is a purely particle-based fluid whose pressure follows a Tait equation of state,
 
-$$ \mathbf r(\mathbf x) = \frac{m}{\Delta t^{2}}(\mathbf x - \hat{\mathbf x}) + \frac{\partial \Pi}{\partial \mathbf x} = 0,$$
-where $\hat{\mathbf x} = \mathbf x^{n} + \Delta t\,\mathbf v^{n}$ is the inertial prediction.
+$$p_i = k\left[\left(\frac{\rho_i}{\rho_0}\right)^{n} - 1\right],$$
 
-Each Newton step solves $\mathbf H\,\delta \mathbf x = -\mathbf r$ with PCG; $\mathbf H$ is the consistent stiffness + mass matrix.  A block-Jacobi inverse of per-vertex 3×3 blocks is used as preconditioner.  Line-search (Armijo back-tracking) guarantees energy decrease.
+where $k$ is `stiffness`, $n$ is `exponent`, and $\rho_0$ is the rest density `rho`. It exposes fluid parameters directly: `mu` sets viscosity and `gamma` sets surface tension. Choose SPH when you want a free-surface liquid tuned by physical fluid properties.
 
----
+**`gs.materials.PBD.Liquid`** enforces a per-particle density constraint positionally rather than through pressure, tuned by `density_relaxation` and `viscosity_relaxation`. It is the fastest liquid model and the least physically precise.
 
-## 4. Position-Based Dynamics Solver (`PBDSolver`)
+## Muscles: active materials
 
-**Purpose.** Real-time cloth, elastic rods, XPBD fluids and particle crowds.
+A muscle is an elastic material with an extra, controllable stress. On top of the passive elastic response, it adds an **active stress** along an embedded fiber direction $\mathbf m$, proportional to a per-step actuation signal. Contracting the fiber pulls the body into a new shape; releasing it lets the elastic part restore the rest configuration.
 
-### 4.1 XPBD integration cycle
+- **`gs.materials.MPM.Muscle`:** actuated per particle; extends `MPM.Elastic` and defaults to the `"neohooken"` passive model.
+- **`gs.materials.FEM.Muscle`:** actuated per tetrahedral element; extends `FEM.Elastic` and defaults to the `"linear"` passive model.
 
-1. **Predict** – explicit Euler: $\mathbf v^{*}\!=\!\mathbf v + \Delta t\,\mathbf f/m$ and $\mathbf x^{*}\!=\!\mathbf x + \Delta t\,\mathbf v^{*}$.
-2. **Project constraints** – iterate over edges, tetrahedra, SPH density etc.
-   For each constraint $C(\mathbf x)\!=\!0$ solve for Lagrange multiplier λ
-   
-   $$ \Delta\mathbf x = -\frac{C + \alpha\,\lambda^{old}}{\sum w_i\,|\nabla\!C_i|^{2}+\alpha}\,\nabla\!C, \quad \alpha = \frac{\text{compliance}}{\Delta t^{2}}. $$
+Both accept `n_groups` to define independently actuated fiber groups. The end-to-end control loop is covered in {doc}`/user_guide/getting_started/soft_robots`.
 
-3. **Update velocities** – $\mathbf v = (\mathbf x^{new}-\mathbf x^{old})/\Delta t$.
+## Cloth and thin shells
 
-### 4.2 Supported constraints
+Cloth is a two-dimensional material: it stretches and bends but has negligible thickness. Two classes model it.
 
-* Stretch / bending (cloth)
-* Volume preservation (XPBD tetrahedra)
-* Incompressible SPH density & viscosity constraints (fluid-PBD)
-* Collision & friction via positional correction + Coulomb model.
+- **`gs.materials.PBD.Cloth`:** a constraint-based sheet with separate `stretch_compliance` and `bending_compliance`. Its `rho` is a surface density in kg/m², and entity mass is `rho` times surface area. This is the fast, interactive option for garments and flags.
+- **`gs.materials.FEM.Cloth`:** a thin-shell FEM material for the IPC contact backend, parameterized by `thickness` (m) and optional `bending_stiffness`. Use it when cloth must resolve accurate, penetration-free contact against other bodies.
 
----
+## Choosing a model
 
-## 5. Smoothed Particle Hydrodynamics Solver (`SPHSolver`)
+| Behavior you want | Material | Key parameter or option |
+|---|---|---|
+| Recoverable elastic solid | `MPM.Elastic`, `FEM.Elastic`, `PBD.Elastic` | `model`, or compliance for PBD |
+| Dents and holds its shape | `MPM.ElastoPlastic` | `use_von_mises`, `von_mises_yield_stress` |
+| Granular media / sand | `MPM.Sand` | `friction_angle` |
+| Compacting snow | `MPM.Snow` | `yield_lower`, `yield_higher` |
+| Flowing liquid | `MPM.Liquid`, `SPH.Liquid`, `PBD.Liquid` | `viscous`; `stiffness`/`mu`/`gamma` for SPH |
+| Actuated soft body | `MPM.Muscle`, `FEM.Muscle` | `n_groups`, actuation signal |
+| Cloth and shells | `PBD.Cloth`, `FEM.Cloth` | compliances; `thickness` for FEM |
 
-**Purpose.** Particle-based fluids with either WCSPH or DFSPH pressure solvers.
+## References
 
-### 5.1 Kernels
-
-Cubic spline kernel $W(r,h)$ and gradient $\nabla W$ with support radius $h=$ `_support_radius`.
-
-### 5.2 Weakly Compressible SPH (WCSPH)
-
-* Equation of state: $p_i = k\bigl[(\rho_i/\rho_0)^{\gamma}-1\bigr]$.
-* Momentum equation:
-  
-  $$ \frac{d\mathbf v_i}{dt} = -\sum_j m_j \left( \frac{p_i}{\rho_i^2} + \frac{p_j}{\rho_j^2} \right) \nabla W_{ij} + \mathbf g + \mathbf f_{visc} + \mathbf f_{surf}. $$
-
-### 5.3 Divergence-free SPH (DFSPH)
-
-* Splits solve into **divergence pass** (enforce $\nabla\!\cdot\mathbf v = 0$) and **density pass** (enforce $\rho\!=\!\rho_0$).
-* Both passes iteratively compute per-particle pressure coefficient κ with Jacobi iterations using the *DFSPh factor* field.
-* Ensures incompressibility with bigger time-steps than WCSPH.
-
----
-
-### References
-
-* Stam, J. "Stable Fluids", SIGGRAPH 1999.
-* Zhu, Y.⁠ & Bridson, R. "Animating Sand as a Fluid", SIGGRAPH 2005.
-* Gao, T. et al. "Robust Simulation of Deformable Solids with Implicit FEM", SIGGRAPH 2015.
-* Macklin, M. et al. "Position Based Fluids", SIGGRAPH 2013.
-* Bender, J. et al. "Position Based Dynamics", 2014.
-* Bavo et al. "Divergence-Free SPH", Eurographics 2015.
+- Stomakhin, A. et al. "A Material Point Method for Snow Simulation." SIGGRAPH 2013.
+- Klár, G. et al. "Drucker-Prager Elastoplasticity for Sand Animation." SIGGRAPH 2016.
+- Smith, B., Goldade, T., Kim, T. "Stable Neo-Hookean Flesh Simulation." ACM TOG 2018.
+- Macklin, M., Müller, M., Chentanez, N. "XPBD: Position-Based Simulation of Compliant Constrained Dynamics." MIG 2016.
+- Bender, J., Koschier, D. "Divergence-Free Smoothed Particle Hydrodynamics." SCA 2015.

@@ -1,13 +1,13 @@
 # User Guide
 
+This guide takes you from installation through the core concepts, tutorials, and API reference for Genesis World. If you are new, start with {doc}`overview/what_is_genesis` and the {doc}`getting_started/hello_genesis` tutorial.
+
 ```{toctree}
 :caption: Overview
 :maxdepth: 1
 
 overview/what_is_genesis
-overview/why_a_new_simulator
 overview/installation
-overview/mission
 ```
 
 
@@ -44,11 +44,12 @@ getting_started/hybrid_entity
 getting_started/drone_entity
 getting_started/terrain
 getting_started/emitters
+getting_started/force_fields
 ```
 
 
 ```{toctree}
-:caption: Sensing & Perception
+:caption: Sensing and Perception
 :maxdepth: 2
 
 getting_started/sensors/index
@@ -67,7 +68,7 @@ getting_started/policy_training/examples/index
 
 
 ```{toctree}
-:caption: Assets & Rendering
+:caption: Assets and Rendering
 :maxdepth: 1
 
 getting_started/surfaces_textures
@@ -77,7 +78,7 @@ getting_started/viewer_plugin
 
 
 ```{toctree}
-:caption: Configuration & Conventions
+:caption: Configuration and Conventions
 :maxdepth: 1
 
 getting_started/config_system
@@ -99,7 +100,7 @@ advanced_topics/mesh_processing
 
 
 ```{toctree}
-:caption: Theory & Modelling
+:caption: Theory and Modelling
 :maxdepth: 2
 
 advanced_topics/rigid_collision/index

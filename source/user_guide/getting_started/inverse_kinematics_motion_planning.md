@@ -1,52 +1,42 @@
-# 🦾 Inverse Kinematics & Motion Planning
+# Inverse kinematics and motion planning
 
-In this tutorial, we will go through several examples illustrating how to use solve inverse kinematics (IK) and motion planning in Genesis World, and perform a simple grasping task.
+This tutorial builds a complete pick-and-place task with a Franka arm: solve **inverse kinematics** (IK) for a target end-effector pose, plan a collision-free path to that configuration, then close the gripper and lift a cube. Along the way it covers the pose conventions IK expects and why the two control modes (position and force) are used at different stages.
 
-Let's first create a scene, load your favorite robotic arm and a small cube, build the scene, and then set control gains:
+The complete script is [`examples/tutorials/IK_motion_planning_grasp.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/IK_motion_planning_grasp.py).
+
+```{figure} ../../_static/images/IK_mp_grasp.png
+:alt: A Franka arm positioned above a small cube on the ground plane, viewed in the Genesis World viewer.
+```
+
+Motion planning uses the [OMPL](https://ompl.kavrakilab.org/) library. Install it with the instructions on the {doc}`installation </user_guide/overview/installation>` page before running the example.
+
+## Scene and robot setup
+
+Load a ground plane, a small cube to grasp, and the Franka arm, then build the scene:
+
 ```python
-import numpy as np
-import genesis as gs
-
-########################## init ##########################
-gs.init(backend=gs.gpu)
-
-########################## create a scene ##########################
-scene = gs.Scene(
-    sim_options = gs.options.SimOptions(
-        dt = 0.01,
-    ),
-    viewer_options = gs.options.ViewerOptions(
-        camera_pos    = (3, -1, 1.5),
-        camera_lookat = (0.0, 0.0, 0.5),
-        camera_fov    = 30,
-        max_FPS       = 60,
-    ),
-    show_viewer = True,
-)
-
-########################## entities ##########################
-plane = scene.add_entity(
-    gs.morphs.Plane(),
-)
 cube = scene.add_entity(
     gs.morphs.Box(
-        size = (0.04, 0.04, 0.04),
-        pos  = (0.65, 0.0, 0.02),
+        size=(0.04, 0.04, 0.04),
+        pos=(0.65, 0.0, 0.02),  # meters, Z-up
     )
 )
 franka = scene.add_entity(
-    gs.morphs.MJCF(file='xml/franka_emika_panda/panda.xml'),
+    gs.morphs.MJCF(file="xml/franka_emika_panda/panda.xml"),
 )
-########################## build ##########################
 scene.build()
+```
 
+The Franka has nine degrees of freedom (**dof**): seven arm joints and two gripper fingers. Splitting them into two index arrays lets you command the arm and the fingers independently:
+
+```python
 motors_dof = np.arange(7)
 fingers_dof = np.arange(7, 9)
+```
 
-# set control gains
-# Note: the following values are tuned for achieving best behavior with Franka
-# Typically, each new robot would have a different set of parameters.
-# Sometimes high-quality URDF or XML file would also provide this and will be parsed.
+Position control is a PD controller, so it needs per-dof stiffness (`kp`) and damping (`kv`) gains, plus a force range. The values below are tuned for the Franka; a different robot needs its own, and a well-authored URDF or MJCF may already provide them.
+
+```python
 franka.set_dofs_kp(
     np.array([4500, 4500, 3500, 3500, 2000, 2000, 2000, 100, 100]),
 )
@@ -55,68 +45,84 @@ franka.set_dofs_kv(
 )
 franka.set_dofs_force_range(
     np.array([-87, -87, -87, -87, -12, -12, -12, -100, -100]),
-    np.array([ 87,  87,  87,  87,  12,  12,  12,  100,  100]),
+    np.array([87, 87, 87, 87, 12, 12, 12, 100, 100]),
 )
 ```
 
-```{figure} ../../_static/images/IK_mp_grasp.png
-```
-Next, let's move the robot's end-effector to a pre-grasping pose. This is done by two steps:
-- using IK to solve the joint position given a target end-effector pose
-- using a motion planner to reach the target position
-  
-Motion planning in Genesis World uses OMPL library. You can install it following the instructions in the [installation](../overview/installation.md) page.
+## Solving inverse kinematics
 
-IK and motion planning in Genesis World are as simple as it can get: each can be done via a single function call.
+IK answers the question "what joint angles put the end-effector at this pose?" In Genesis World it is a method on the robot entity: name the link that acts as the end-effector, give it a target pose, and it returns a full-body configuration (`qpos`).
+
 ```python
+end_effector = franka.get_link("hand")
 
-# get the end-effector link
-end_effector = franka.get_link('hand')
-
-# move to pre-grasp pose
 qpos = franka.inverse_kinematics(
-    link = end_effector,
-    pos  = np.array([0.65, 0.0, 0.25]),
-    quat = np.array([0, 1, 0, 0]),
+    link=end_effector,
+    pos=np.array([0.65, 0.0, 0.25]),  # world-frame position, meters
+    quat=np.array([0, 1, 0, 0]),  # w-x-y-z; 180 deg about X, gripper points down
 )
-# gripper open pos
-qpos[-2:] = 0.04
+```
+
+The target `pos` and `quat` are in the **world frame**, using the right-handed, Z-up coordinate system and the scalar-first `(w, x, y, z)` quaternion convention. Here `(0, 1, 0, 0)` is a 180-degree rotation about the world X-axis, which orients the gripper to point straight down at the table.
+
+The returned `qpos` covers every dof, including the fingers. Setting the finger entries opens the gripper before the approach:
+
+```python
+qpos[-2:] = 0.04  # open gripper, meters per finger
+```
+
+## Planning a path to the configuration
+
+IK gives a goal configuration but not how to get there. `plan_path` finds a collision-free trajectory from the current configuration to `qpos_goal` and returns a list of waypoints, one per simulation step:
+
+```python
 path = franka.plan_path(
-    qpos_goal     = qpos,
-    num_waypoints = 200, # 2s duration
+    qpos_goal=qpos,
+    num_waypoints=200,  # 200 steps at dt=0.01 s -> 2 s of motion
 )
-# execute the planned path
+
 for waypoint in path:
     franka.control_dofs_position(waypoint)
     scene.step()
 
-# allow robot to reach the last waypoint
+# let the PD controller settle onto the final waypoint
 for i in range(100):
     scene.step()
-
 ```
-As you can see, both IK solving and motion planning are two integrated methods of the robot entity. For IK solving, you simply tell the robot's IK solver which link is the end-effector, and specify the target pose. Then, you tell the motion planner the target joint position (qpos) and it will return a planned and smoothed list of waypoints. Note that after we execute the path, we let the controller run for another 100 steps. This is because we are using a PD controller, and there will be a gap between the desired target position and the current position. Therefore, we let the controller run a bit longer so that the robot can reach the last waypoint in the planned trajectory.
 
-Next, we move the robot gripper down, grasp the cube, and lift it:
+Executing the path steps the simulation once per waypoint. The extra 100 steps at the end matter: position control is a PD controller, so the arm trails its commanded target by a small error. Stepping a little longer lets it converge onto the last waypoint before the next phase begins.
+
+:::{tip}
+`scene.draw_debug_path(path, franka)` visualizes the planned trajectory in the viewer, and `scene.clear_debug_object(...)` removes it afterward. The example uses both to render the path while the arm follows it.
+:::
+
+## Grasping and lifting
+
+The rest of the task is a sequence of IK solves and control commands. To reach down to the cube, solve IK for a lower target and drive only the arm dofs with position control:
+
 ```python
-# reach
 qpos = franka.inverse_kinematics(
-    link = end_effector,
-    pos  = np.array([0.65, 0.0, 0.130]),
-    quat = np.array([0, 1, 0, 0]),
+    link=end_effector,
+    pos=np.array([0.65, 0.0, 0.130]),
+    quat=np.array([0, 1, 0, 0]),
 )
-franka.control_dofs_position(qpos[:-2], motors_dof)
+franka.control_dofs_position(qpos[:-2], motors_dof)  # arm only; leave fingers as-is
 for i in range(100):
     scene.step()
+```
 
-# grasp
+To grasp, switch the fingers from position control to **force control**. Position control would command a target opening; force control instead applies a steady squeezing force, which holds the cube robustly regardless of its exact width:
+
+```python
 franka.control_dofs_position(qpos[:-2], motors_dof)
-franka.control_dofs_force(np.array([-0.5, -0.5]), fingers_dof)
-
+franka.control_dofs_force(np.array([-0.5, -0.5]), fingers_dof)  # 0.5 N inward per finger
 for i in range(100):
     scene.step()
+```
 
-# lift
+Finally, solve IK for a raised target and hold the grasp while the arm lifts:
+
+```python
 qpos = franka.inverse_kinematics(
     link=end_effector,
     pos=np.array([0.65, 0.0, 0.28]),
@@ -126,10 +132,12 @@ franka.control_dofs_position(qpos[:-2], motors_dof)
 for i in range(200):
     scene.step()
 ```
-When grasping the object, we used force control for the 2 gripper dofs, and applied a 0.5N grasping force. If everything goes right, you will see the object being grasped and lifted.
 
-## What's Next
+The fingers stay under force control from the grasp step, so the cube rises with the gripper.
 
-- [Advanced IK](./advanced_ik) - multi-target IK, null-space control, and solver tuning
-- [Constraints](./constraints) - weld and connect constraints for locking links together at runtime
-- [Path Planning](./path_planning) - collision-free motion planning with RRT
+## See also
+
+- {doc}`advanced_ik`: multi-target IK, null-space control, and solver tuning
+- {doc}`constraints`: weld and connect constraints for locking links together at runtime
+- {doc}`path_planning`: collision-free motion planning with RRT
+- {doc}`control_your_robot`: position, velocity, and force control in depth

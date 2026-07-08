@@ -8,4 +8,5 @@ renderer
 rasterizer
 raytracer
 batchrenderer
+spherelight
 ```

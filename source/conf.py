@@ -55,7 +55,11 @@ templates_path = ["_templates"]
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "pydata_sphinx_theme"
-html_logo = "_static/logo.svg"
+# The navbar brand is the text "Genesis World" (html_theme_options["logo"]["text"]),
+# not an image; the logo mark now lives in the footer (see footer-logo component).
+# html_title also fixes the browser-tab title to "Genesis World" rather than the
+# default "Genesis World <version> documentation".
+html_title = "Genesis World"
 html_favicon = "_static/option2_shadow_1.svg"
 
 json_url = "_static/version_switcher.json"
@@ -65,14 +69,16 @@ if version_match is None:
 html_theme_options = {
     "show_nav_level": 1,
     "use_edit_page_button": True,
-    # Footer: only the copyright, matching genesis.ai ("© 2026 Genesis AI SAS").
-    # The default theme/Sphinx attribution links are dropped (BSD-2/BSD-3 require
-    # retaining the LICENSE notice in the packages, not a rendered footer link).
-    "footer_start": ["copyright"],
+    # Footer: the Genesis company logo on the left, copyright on the right
+    # (matching genesis.ai, "© 2026 Genesis AI SAS"). The default theme/Sphinx
+    # attribution links are dropped (BSD-2/BSD-3 require retaining the LICENSE
+    # notice in the packages, not a rendered footer link).
+    "footer_start": ["footer-logo"],
     "footer_center": [],
-    "footer_end": [],
+    "footer_end": ["copyright"],
+    # Navbar brand is the text "Genesis World" (no image).
     "logo": {
-        "image_dark": "_static/logo_dark.svg",
+        "text": "Genesis World",
     },
     "icon_links": [
         {

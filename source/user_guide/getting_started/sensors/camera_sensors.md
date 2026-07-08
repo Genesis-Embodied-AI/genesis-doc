@@ -1,231 +1,156 @@
-# 🎥 Camera Sensors
+# Camera sensors
 
-Genesis World ships three camera sensor backends for rendering RGB images:
+A camera sensor renders the scene to an RGB image off-screen and returns it through the sensor pipeline. Add one with `scene.add_sensor(...)`, step the simulation, and call `read()` to get pixels back as a tensor. No viewer window required.
 
-| Sensor | Backend | Multi-Env | Best for |
-|---|---|---|---|
-| `RasterizerCameraSensor` | OpenGL | Sequential | Fast real-time rendering on any platform |
-| `RaytracerCameraSensor` | LuisaRender | Single only | Photo-realistic offline renders |
-| `BatchRendererCameraSensor` | Madrona GPU | Parallel | High-throughput RL training (CUDA only) |
+A camera sensor is distinct from two things it is easy to confuse it with:
 
-## Basic usage
+- The **viewer** (`show_viewer=True`) is the interactive window a human watches. It renders live and returns nothing to your code. See {doc}`/user_guide/getting_started/visualization`.
+- The **visualization camera** (`scene.add_camera().render(...)`) renders color, depth, segmentation, and surface-normal images on demand. Use it when you want the four image channels. It is also covered in {doc}`/user_guide/getting_started/visualization`.
+
+A camera sensor, by contrast, is a first-class {doc}`sensor <index>`: it renders lazily on `read()`, participates in the batched `scene.read_sensors()` path, and can be attached to a moving link like any other sensor. It returns **RGB only**.
+
+The complete script is [`examples/sensors/camera_as_sensor.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/camera_as_sensor.py).
+
+## Minimal example
 
 ```python
 import genesis as gs
 
 gs.init(backend=gs.gpu)
-scene = gs.Scene()
-scene.add_entity(morph=gs.morphs.Plane())
+
+scene = gs.Scene(show_viewer=False)
+scene.add_entity(gs.morphs.Plane())
+scene.add_entity(gs.morphs.Sphere(radius=0.5, pos=(0.0, 0.0, 2.0)))
 
 camera = scene.add_sensor(
     gs.sensors.RasterizerCameraOptions(
-        res=(512, 512),
-        pos=(3.0, 0.0, 2.0),
-        lookat=(0.0, 0.0, 0.5),
-        fov=60.0,
-    )
+        res=(500, 600),        # (width, height), pixels
+        pos=(3.0, 0.0, 2.0),   # world frame when unattached, meters
+        lookat=(0.0, 0.0, 1.0),
+        fov=60.0,              # vertical field of view, degrees
+    ),
 )
 
-scene.build(n_envs=1)
+scene.build()
 scene.step()
 
 data = camera.read()
-print(data.rgb.shape)  # (512, 512, 3) for single env
+print(data.rgb.shape)  # (600, 500, 3) — (H, W, 3), H and W from res=(W, H)
 ```
 
-## Camera options
+`add_sensor` returns the sensor object; interact with the camera through it rather than a global handle. The default renderer is the rasterizer, so this runs on any platform without extra setup.
 
-### Common parameters (all backends)
+## What `read()` returns
 
-```python
-gs.sensors.RasterizerCameraOptions(
-    res=(512, 512),            # (width, height)
-    pos=(3.0, 0.0, 2.0),       # position (world, or local if attached)
-    lookat=(0.0, 0.0, 0.0),    # look-at point
-    up=(0.0, 0.0, 1.0),        # up vector
-    fov=60.0,                  # vertical FOV in degrees
-    entity_idx=-1,             # entity to attach to (-1 = static)
-    link_idx_local=0,          # link index for attachment
-)
-```
-
-### Raytracer-specific
+`read()` renders the current scene state if it is stale, then returns a `CameraReturnType`, a `NamedTuple` whose single field is the color image:
 
 ```python
-gs.sensors.RaytracerCameraOptions(
-    model="pinhole",   # "pinhole" or "thinlens"
-    spp=256,           # samples per pixel
-    denoise=False,     # apply denoising
-    aperture=2.8,      # depth-of-field (thinlens)
-    focus_dist=3.0,    # focus distance (thinlens)
-)
-```
-
-### Batch renderer-specific
-
-```python
-gs.sensors.BatchRendererCameraOptions(
-    near=0.01,
-    far=100.0,
-    use_rasterizer=True,
-)
-```
-
-All `BatchRendererCameraSensor` cameras must have identical resolution.
-
-## Attaching cameras to entities
-
-Mount a camera on a robot's end-effector:
-
-```python
-robot = scene.add_entity(morph=gs.morphs.URDF(file="robot.urdf"))
-
-camera = scene.add_sensor(
-    gs.sensors.BatchRendererCameraOptions(
-        res=(640, 480),
-        pos=(0.1, 0.0, 0.05),    # offset from link frame
-        lookat=(0.2, 0.0, 0.0),  # look direction
-        entity_idx=robot.idx,
-        link_idx_local=8,        # end-effector link
-    )
-)
-```
-
-The camera automatically follows the entity's motion.
-
-## Multi-environment rendering
-
-```python
-scene.build(n_envs=4)
-
-# Set different states per environment
-sphere.set_pos([[0, 0, 1], [0.2, 0, 1], [0.4, 0, 1], [0.6, 0, 1]])
-scene.step()
-
 data = camera.read()
-print(data.rgb.shape)  # (4, H, W, 3)
+rgb = data.rgb  # shape ([n_envs,] H, W, 3), dtype uint8, values 0–255
+```
 
-# Read specific environments
+The image is `(H, W, 3)` with `H = res[1]` and `W = res[0]`. Note that `res` is `(width, height)` but the array is row-major `(height, width)`, matching NumPy image conventions. The leading `n_envs` axis is present only when the scene is built with environments (`scene.build(n_envs=...)`); an unbatched `scene.build()` drops it.
+
+Pass `envs_idx` to read a subset of environments:
+
+```python
 data = camera.read(envs_idx=[0, 2])
 print(data.rgb.shape)  # (2, H, W, 3)
 ```
 
-## Choosing a backend
-
-- **Rasterizer** - default; fast; works on every platform.
-- **Raytracer** - use when photo-realism is needed (requires `renderer=gs.renderers.RayTracer()`).
-- **BatchRenderer** - use for RL training with many environments (CUDA only).
+The example saves each frame with matplotlib; `read()` returns a GPU tensor, so convert it first:
 
 ```python
-# For raytracer, configure scene renderer
-scene = gs.Scene(renderer=gs.renderers.RayTracer())
+from genesis.utils.misc import tensor_to_array
 
-# For batch renderer
-scene = gs.Scene(renderer=gs.renderers.BatchRenderer())
+data = camera.read()
+rgb = data.rgb[0] if data.rgb.ndim > 3 else data.rgb  # drop the env axis if present
+plt.imsave("frame.png", tensor_to_array(rgb))
 ```
 
-## Batch rendering with Madrona
+## Rendering backends
 
-The Madrona-based batch renderer is the high-throughput option for RL training. It renders many environments and cameras in parallel on GPU.
+Three backends render RGB. They share the common options below and differ in speed, fidelity, and platform support:
 
-```bash
-pip install gs-madrona
-```
+| Options class | Backend | Environments | Best for |
+|---|---|---|---|
+| `RasterizerCameraOptions` | OpenGL | sequential | fast real-time rendering on any platform |
+| `RaytracerCameraOptions` | LuisaRender | single environment | photo-realistic offline renders |
+| `BatchRendererCameraOptions` | Madrona (GPU) | parallel | high-throughput RL training (CUDA only) |
 
-**Requirements:** Linux x86-64, NVIDIA CUDA, Python ≥ 3.10.
+Select a backend by choosing the matching options class; no separate scene `renderer` argument is required for the rasterizer. For photo-realistic path tracing, prefer the Nyx renderer described in {doc}`/user_guide/getting_started/visualization`.
+
+Common parameters (all backends):
 
 ```python
-import genesis as gs
-
-gs.init(backend=gs.cuda)  # CUDA required
-
-scene = gs.Scene(
-    renderer=gs.renderers.BatchRenderer(use_rasterizer=True),
+gs.sensors.RasterizerCameraOptions(
+    res=(512, 512),        # (width, height), pixels
+    pos=(3.5, 0.0, 1.5),   # camera position; link-relative when attached
+    lookat=(0.0, 0.0, 0.0),
+    up=(0.0, 0.0, 1.0),
+    fov=60.0,              # vertical field of view, degrees
+    lights=[],             # per-camera lights, backend-specific dicts
 )
-
-plane = scene.add_entity(gs.morphs.Plane())
-robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
-
-cam1 = scene.add_camera(res=(256, 256), pos=(2, 0, 1), lookat=(0, 0, 0.5))
-cam2 = scene.add_camera(res=(256, 256), pos=(0, 2, 1), lookat=(0, 0, 0.5))
-
-scene.build(n_envs=128)
 ```
 
-### Rendering
+Backend-specific options include `near` / `far` clipping planes (rasterizer and batch renderer, meters), `model` / `spp` / `denoise` and thin-lens depth-of-field controls (ray tracer), and `use_rasterizer` (batch renderer). See the options classes in [`genesis/options/sensors/camera.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/options/sensors/camera.py) for the full list and defaults.
 
-```python
-for step in range(1000):
-    scene.step()
+## Attaching a camera to a link
 
-    # Render a single camera with channel selection
-    rgb, depth, seg, normal = cam1.render(
-        rgb=True, depth=True, segmentation=True, normal=True,
-    )
-    # Shape: (n_envs, H, W, C)
-
-    # Or render all cameras at once
-    all_rgb = scene.render_all_cameras(rgb=True)
-    # Shape: (n_cameras, n_envs, H, W, 3)
-```
-
-### Camera sensor API
+Set `entity_idx` (and optionally `link_idx_local`) to mount the camera on an entity. The camera then follows that link's motion each step, so `read()` always renders from the current pose:
 
 ```python
 camera = scene.add_sensor(
-    gs.sensors.BatchRendererCameraOptions(
-        res=(512, 512),
-        pos=(3.0, 0.0, 2.0),
-        lookat=(0.0, 0.0, 0.5),
-        fov=60.0,
-        near=0.1,
-        far=100.0,
-        lights=[{
-            "pos": (2.0, 2.0, 5.0),
-            "color": (1.0, 1.0, 1.0),
-            "intensity": 1.0,
-            "directional": True,
-            "castshadow": True,
-        }],
-    )
-)
-
-scene.build(n_envs=64)
-
-data = camera.read()  # CameraReturnType(rgb=...)
-```
-
-### Lighting
-
-```python
-scene.add_light(
-    pos=(0.0, 0.0, 3.0),
-    dir=(0.0, 0.0, -1.0),
-    color=(1.0, 1.0, 1.0),
-    intensity=1.0,
-    directional=True,
-    castshadow=True,
-)
-```
-
-### Segmentation
-
-```python
-scene = gs.Scene(
-    renderer=gs.renderers.BatchRenderer(),
-    vis_options=gs.options.VisOptions(
-        segmentation_level="link",  # "entity", "link", or "geom"
+    gs.sensors.RasterizerCameraOptions(
+        res=(500, 600),
+        pos=(0.0, 0.0, 1.0),        # relative to the link frame once attached
+        lookat=(0.0, 0.0, 0.0),
+        fov=70.0,
+        entity_idx=robot.idx,       # -1 or None for a static, world-fixed camera
+        link_idx_local=0,           # which link of the entity to mount on
     ),
 )
-
-# After rendering
-_, _, seg, _ = camera.render(segmentation=True)
-colored = scene.visualizer.colorize_seg_idxc_arr(seg)
 ```
 
-### Performance tips
+For a fixed mounting transform relative to the link, pass `offset_T`, a 4×4 homogeneous matrix. When given, it takes priority over `pos_offset` / `euler_offset`:
 
-- Use identical resolution for all cameras.
-- Prefer `use_rasterizer=True` for speed.
-- Batch render all cameras with `scene.render_all_cameras()`.
-- Typical setup: 256×256 resolution with 128–256 environments.
+```python
+import numpy as np
+
+gs.sensors.RasterizerCameraOptions(
+    # ... res, fov, entity_idx, link_idx_local as above ...
+    offset_T=np.eye(4),  # camera pose relative to the attached link
+)
+```
+
+## Multiple environments
+
+Build with `n_envs` to render every environment in one pass. The batch renderer runs them in parallel on the GPU; the rasterizer renders them sequentially:
+
+```python
+scene.build(n_envs=4)
+scene.step()
+
+data = camera.read()
+print(data.rgb.shape)  # (4, H, W, 3)
+```
+
+:::{note}
+All `BatchRendererCameraOptions` cameras in a scene must share the same resolution.
+:::
+
+## Notes and gotchas
+
+:::{note}
+**Camera sensors return RGB only.** `read()` gives you the color image and nothing else. For depth, segmentation masks, or surface normals, use the visualization camera's `render()` method (see {doc}`/user_guide/getting_started/visualization`) or, for depth specifically, the {doc}`depth-camera raycaster sensor <raycaster>`.
+:::
+
+:::{warning}
+Camera sensors do not support `history_length`. They render lazily on `read()` and bypass the shared sensor cache that backs the history buffer, so setting it raises an error at construction. Read once per step instead.
+:::
+
+## See also
+
+- {doc}`/user_guide/getting_started/visualization`: the viewer, the visualization camera's four image channels, video recording, and rendering backends.
+- {doc}`Sensors <index>`: the sensor pipeline, batched reads, and other sensor families.
+- {doc}`Raycaster sensors <raycaster>`: depth camera and lidar with configurable ray patterns.

@@ -56,9 +56,10 @@ html[data-theme="dark"] {
 .bd-footer .bd-footer__inner {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+  align-items: center;
 }
 .bd-footer p {
-  margin-bottom: 0;
+  margin: 0;
 }
 
 a:hover {
@@ -189,4 +190,42 @@ html[data-theme="dark"] #pst-back-to-top:hover {
   background-color: #ff5656;
   color: #ffffff;
   text-decoration: none;
+}
+
+/* Footer: Genesis company logo (left corner), kept small; light/dark variants toggled by theme. */
+.footer-logo {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+.footer-logo img {
+  height: 1.5rem;
+  width: auto;
+  display: block;
+}
+.footer-logo-dark {
+  display: none;
+}
+html[data-theme="dark"] .footer-logo-light {
+  display: none;
+}
+html[data-theme="dark"] .footer-logo-dark {
+  display: block;
+}
+
+/* The code background is dark (#1a1d34) in both themes, so token colors must be
+   light-on-dark. The overrides above cover most tokens, but a few Pygments
+   classes fell through to the light-mode brown (#7F4707) and rendered poorly on
+   the dark background (notably the bibtex cite key, Name.Label, in the citation
+   block). Give those stragglers colors consistent with the scheme above. */
+html[data-theme] .highlight .nl {  /* Name.Label, e.g. a bibtex cite key */
+  color: #86ccf0;
+}
+html[data-theme] .highlight .l,
+html[data-theme] .highlight .ld,
+html[data-theme] .highlight .mb {  /* generic/date literals, binary numbers */
+  color: #f2b880;
+}
+html[data-theme] .highlight .vm {  /* Variable.Magic */
+  color: inherit;
 }

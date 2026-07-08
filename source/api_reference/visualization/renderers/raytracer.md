@@ -11,7 +11,7 @@ The Raytracer offers:
 - **Advanced materials**: PBR materials, subsurface scattering
 - **Denoising**: AI-based denoising for faster convergence
 
-## Quick Start
+## Quick start
 
 ```python
 import genesis as gs
@@ -58,7 +58,7 @@ Key parameters for raytracer cameras:
 | `aperture` | Aperture for depth of field | 0.0 |
 | `focus_dist` | Focus distance | Auto |
 
-## Thin Lens (Depth of Field)
+## Thin lens (depth of field)
 
 ```python
 cam = scene.add_camera(
@@ -72,7 +72,7 @@ cam = scene.add_camera(
 )
 ```
 
-## Materials for Raytracing
+## Materials for ray tracing
 
 The raytracer supports advanced surface materials:
 
@@ -83,16 +83,11 @@ The raytracer supports advanced surface materials:
 
 See {doc}`/api_reference/options/surface/index` for all surface types.
 
-## API Reference
+## API reference
 
-```{eval-rst}
-.. autoclass:: genesis.vis.raytracer.Raytracer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-```
+The ray-tracing renderer is selected per scene with `gs.renderers.RayTracer` and configured through its options; see {doc}`/api_reference/options/renderer/raytracer`. Per-camera ray-tracing settings (`spp`, `denoise`, `model`, `aperture`, `focus_dist`) are passed to `scene.add_camera()`; see {doc}`/api_reference/visualization/cameras/index`. The underlying `genesis.vis.raytracer.Raytracer` implementation is only importable when the optional ray-tracing extra (LuisaRender) is installed, so it is not auto-documented here.
 
-## See Also
+## See also
 
 - {doc}`rasterizer` - Fast rasterization renderer
 - {doc}`/api_reference/options/surface/index` - Surface materials

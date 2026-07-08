@@ -4,15 +4,15 @@ States in Genesis World hold the runtime data for physics simulation, including 
 
 ## Overview
 
-Each solver maintains its own state:
+`scene.get_state()` returns a `SimState`, the aggregate snapshot for the whole scene. It holds one per-solver state for each solver present:
 
-- **RigidState**: Link poses, joint positions/velocities
-- **MPMState**: Particle positions, velocities, deformation gradients
-- **FEMState**: Node positions, velocities
-- **PBDState**: Particle positions, velocities
-- **SPHState**: Particle positions, velocities, densities
+- **RigidSolverState**: link poses, joint positions and velocities
+- **MPMSolverState**: particle positions, velocities, deformation gradients
+- **FEMSolverState**: node positions, velocities
+- **PBDSolverState**: particle positions, velocities
+- **SPHSolverState**: particle positions, velocities, densities
 
-## Accessing State
+## Accessing state
 
 States are accessed through entities or the simulator:
 
@@ -34,7 +34,7 @@ rigid_solver = scene.sim.rigid_solver
 # ... direct solver state access
 ```
 
-## State for Parallel Environments
+## State for parallel environments
 
 With `n_envs > 1`, states are batched:
 
@@ -48,28 +48,32 @@ positions = robot.get_qpos()  # Shape: (n_envs, n_dofs)
 positions = robot.get_qpos(envs_idx=[0, 5, 10])
 ```
 
-## State Management
+## State management
 
-### Saving State
-
-```python
-state = scene.get_state()
-```
-
-### Restoring State
+### Saving state
 
 ```python
-scene.set_state(state)
+state = scene.get_state()  # a SimState snapshot of the whole scene
 ```
+
+### Restoring state
+
+The scene has no `set_state`. Restore a saved `SimState` by passing it to `scene.reset`, which resets the scene to that state and registers it as the new initial state:
+
+```python
+scene.reset(state=state)
+```
+
+Individual solvers and entities expose their own `set_state` for finer-grained restoration (for example, `scene.sim.rigid_solver.set_state(...)`).
 
 ### Resetting
 
 ```python
-scene.reset()  # Reset all environments
-scene.reset(envs_idx=[0, 1, 2])  # Reset specific environments
+scene.reset()  # reset all environments to the initial state
+scene.reset(envs_idx=[0, 1, 2])  # reset specific environments
 ```
 
-## Gradient Tracking
+## Gradient tracking
 
 For differentiable simulation:
 
@@ -86,7 +90,7 @@ loss = compute_loss(robot.get_qpos())
 loss.backward()
 ```
 
-## See Also
+## See also
 
-- {doc}`/api_reference/differentiation/index` - Differentiable simulation
-- {doc}`/api_reference/scene/scene` - Scene state methods
+- {doc}`/api_reference/differentiation/index` - differentiable simulation
+- {doc}`/api_reference/scene/scene` - scene state methods (`get_state`, `reset`)

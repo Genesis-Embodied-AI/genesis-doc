@@ -1,162 +1,168 @@
-# 📸 Visualization & Rendering
+# Visualization and rendering
 
-Genesis World's visualization system is managed by the `visualizer` of the scene you just created (i.e. `scene.visualizer`). There are two ways for visualizing the scene: 1). using the interactive viewer that runs in a separate thread, and 2). by manually adding cameras to the scene and render images using the camera.
+This tutorial covers how to see a Genesis World scene: the interactive viewer for watching a simulation live, and camera sensors for rendering images off-screen. You will add a camera, render color, depth, segmentation, and surface-normal images, and record a video.
 
+Every scene owns a `visualizer` (`scene.visualizer`) that drives both paths. There are two ways to look at a scene:
 
-## Viewer
-If you are connected to a display, you can visualize the scene using the interactive viewer. Genesis World uses different `options` groups to configure different components in the scene. To configure the viewer, you can change the parameters in `viewer_options` when creating the scene. In addition, we use `vis_options` to specify visualization-related properties, which will be shared by the viewer and cameras (that we will add very soon).
+- **The viewer** is an interactive window that runs in its own thread and follows the simulation in real time. Use it while developing on a machine with a display.
+- **Camera sensors** render frames on demand and return them as arrays. They are not tied to the viewer or a display, so they work headless: on a render farm, in a container, or over SSH.
 
-Create a scene with a more detailed viewer and vis setting (this looks a bit complex, but it's just for illustration purposes):
+The complete script is [`examples/tutorials/visualization.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/visualization.py).
+
+## The viewer
+
+Configure the scene's visuals through two options objects. `viewer_options` controls the interactive window; `vis_options` controls visual properties shared by the viewer *and* every camera (frame gizmos, lighting, reflections). Pass `show_viewer=True` to open the window:
+
 ```python
 scene = gs.Scene(
-    vis_options = gs.options.VisOptions(
-        show_world_frame = True, # visualize the coordinate frame of `world` at its origin
-        world_frame_size = 1.0, # length of the world frame in meter
-        show_link_frame  = False, # do not visualize coordinate frames of entity links
-        show_cameras     = False, # do not visualize mesh and frustum of the cameras added
-        plane_reflection = True, # turn on plane reflection
-        ambient_light    = (0.1, 0.1, 0.1), # ambient light setting
+    viewer_options=gs.options.ViewerOptions(
+        res=(1280, 960),
+        camera_pos=(3.5, 0.0, 2.5),
+        camera_lookat=(0.0, 0.0, 0.5),
+        camera_fov=40,
     ),
-    viewer_options = gs.options.ViewerOptions(
-        res           = (1280, 960),
-        camera_pos    = (3.5, 0.0, 2.5),
-        camera_lookat = (0.0, 0.0, 0.5),
-        camera_fov    = 40,
-        max_FPS       = 60,
+    vis_options=gs.options.VisOptions(
+        show_world_frame=True,  # draw the world coordinate frame at the origin
+        world_frame_size=1.0,  # length of each axis, in meters
+        show_link_frame=False,  # do not draw per-link frames
+        show_cameras=False,  # do not draw camera meshes and frustums
+        plane_reflection=True,
+        ambient_light=(0.1, 0.1, 0.1),
     ),
-    renderer       = gs.renderers.Rasterizer(), # using rasterizer for camera rendering
-    show_viewer    = True,
+    renderer=gs.renderers.Rasterizer(),
+    show_viewer=True,
 )
 ```
-Here we can specify the pose and fov of the viewer camera. The viewer will run as fast as possible if `max_FPS` is set to `None`. If `res` is set to None, Genesis World will automatically create a 4:3 window with the height set to half of your display height. Also note that in the above setting, we set to use rasterization backend for camera rendering. Genesis World provides two rendering backends: `gs.renderers.Rasterizer()` and `gs.renderers.RayTracer()`. The viewer always uses the rasterizer. By default, camera also uses rasterizer.
 
+`camera_pos` and `camera_lookat` are in meters, in the right-handed, Z-up world frame. `camera_fov` is the vertical field of view in degrees. If `res` is `None`, Genesis World opens a 4:3 window sized to half your display height.
 
-Once the scene is created, you can access the viewer object via `scene.visualizer.viewer`, or simply `scene.viewer` as a shortcut. You can query or set the viewer camera pose:
+The viewer always renders with the rasterizer; `renderer` selects the backend used by camera sensors (see [Rendering backends](#rendering-backends)).
+
+:::{note}
+To cap the viewer frame rate, set `refresh_rate` on `ViewerOptions`. The older `max_FPS` argument is deprecated and now maps to `refresh_rate`.
+:::
+
+Once the scene exists, reach the viewer through the `scene.viewer` shortcut to read or set the camera pose at runtime:
+
 ```python
-cam_pose = scene.viewer.camera_pose
-
-scene.viewer.set_camera_pose(cam_pose)
+pose = scene.viewer.camera_pose
+scene.viewer.set_camera_pose(pos=(3.5, 0.0, 2.5), lookat=(0, 0, 0.5))
 ```
 
-## Camera & Headless Rendering
-Now let's manually add a camera object to the scene. Cameras are not connected to the viewer or the display, and returns rendered images only when you need it. Therefore, camera works in headless mode.
+## Lighting
+
+The rasterizer — the viewer and any rasterizer camera sensor — lights the scene from a list of lights on `VisOptions`. With no configuration it uses a single directional light, so scenes are lit out of the box; set `lights` to control direction, color, and intensity yourself. The light classes live in `gs.options.vis`:
+
+```python
+scene = gs.Scene(
+    vis_options=gs.options.VisOptions(
+        lights=[
+            gs.options.vis.DirectionalLight(
+                dir=(-1, -1, -1),  # direction the light travels, world frame
+                color=(1.0, 1.0, 1.0),  # RGB in [0, 1]
+                intensity=5.0,
+            ),
+            gs.options.vis.PointLight(
+                pos=(2.0, 0.0, 3.0),  # meters, world frame
+                color=(1.0, 0.9, 0.8),
+                intensity=8.0,
+            ),
+        ],
+        ambient_light=(0.1, 0.1, 0.1),  # uniform fill so shadows are not pure black
+    ),
+)
+```
+
+Two light types are available:
+
+- **`DirectionalLight`:** parallel rays from a fixed direction, like sunlight. Set `dir` (the direction the light travels), `color`, and `intensity`. Position does not matter.
+- **`PointLight`:** light radiating outward from a point. Set `pos`, `color`, and `intensity`.
+
+Ambient light is a separate, uniform fill set through the `ambient_light` field rather than an entry in `lights`.
+
+:::{note}
+This controls the rasterizer only. The ray tracer has no light objects: lights there are entities with an `Emission` surface, covered in {doc}`Surfaces and textures <surfaces_textures>`. The `BatchRenderer` backend instead takes lights at runtime through `scene.add_light(...)`.
+:::
+
+## Adding a camera
+
+A camera is a sensor you add to the scene. It renders independently of the viewer, so it is the tool for headless rendering and for capturing views from angles other than the viewer's:
 
 ```python
 cam = scene.add_camera(
-    res    = (1280, 960),
-    pos    = (3.5, 0.0, 2.5),
-    lookat = (0, 0, 0.5),
-    fov    = 30,
-    GUI    = False
+    res=(640, 480),  # (width, height) in pixels
+    pos=(3.5, 0.0, 2.5),
+    lookat=(0, 0, 0.5),
+    fov=30,
+    GUI=False,
 )
 ```
-If `GUI=True`, each camera will create an opencv window to dynamically display the rendered image. Note that this is different from the viewer GUI.
 
-Then, once we build the scene, we can render images using the camera. Our camera supports rendering rgb image, depth, segmentation mask and surface normals. By default, only rgb is rendered, and you can turn other modes on by setting the parameters when calling `camera.render()`:
+With `GUI=True`, the camera opens an OpenCV window that displays each rendered frame. This is separate from the viewer window. Leave it `False` when running headless.
+
+## Rendering images
+
+Build the scene, then call `cam.render()`. The camera can produce four image types: color, depth, segmentation mask, and surface normals. Only RGB is rendered by default; enable the others with keyword flags. `render()` always returns the four in the same order, with disabled types returned as `None`:
 
 ```python
 scene.build()
 
-# render rgb, depth, segmentation mask and normal map
-rgb, depth, segmentation, normal = cam.render(depth=True, segmentation=True, normal=True)
+# render rgb, depth, segmentation, normal
+rgb, depth, segmentation, normal = cam.render(rgb=True, depth=True, segmentation=True, normal=True)
 ```
 
-If you used `GUI=True` and have a display connected, you should be able to see 4 windows now. (Sometimes opencv windows comes with extra delay, so you can call extra `cv2.waitKey(1)` if the windows are black, or simply call `render()` again to refresh the window.)
+Each returned array is shaped `(height, width, ...)` following the `res=(width, height)` you set. By default the segmentation mask stores an integer object index per pixel; set `colorize_seg=True` for a viewable color mask. The index maps back to scene objects at the level set by `VisOptions.segmentation_level` (for example, `link_idx` into `scene.rigid_solver.links`).
+
 ```{figure} ../../_static/images/multimodal.png
+:alt: The Franka scene rendered four ways: color, depth, segmentation mask, and surface normals
 ```
 
-**Record videos using camera**
+:::{tip}
+OpenCV windows opened with `GUI=True` sometimes render black on the first frame. Call `cam.render()` again to refresh them, or `cv2.waitKey(1)`.
+:::
 
-Now, let's only render rgb images, and move the camera around and record a video. Genesis World provides a handy util for recording videos:
+## Recording a video
+
+To capture a video, call `start_recording()`, render a frame each step, then `stop_recording()` to encode the accumulated frames. Every `cam.render()` call between the two is added to the recording. Here the camera orbits the scene while the simulation steps:
+
 ```python
-# start camera recording. Once this is started, all the rgb images rendered will be recorded internally
+import math
+
 cam.start_recording()
 
-import numpy as np
 for i in range(120):
     scene.step()
-
-    # change camera position
     cam.set_pose(
-        pos    = (3.0 * np.sin(i / 60), 3.0 * np.cos(i / 60), 2.5),
-        lookat = (0, 0, 0.5),
+        pos=(3.0 * math.sin(i / 60), 3.0 * math.cos(i / 60), 2.5),
+        lookat=(0, 0, 0.5),
     )
-    
     cam.render()
 
-# stop recording and save video. If `filename` is not specified, a name will be auto-generated using the caller file name.
-cam.stop_recording(save_to_filename='video.mp4', fps=60)
+cam.stop_recording(save_to_filename="video.mp4", fps=60)
 ```
-You will have the video saved to `video.mp4`:
+
+If you omit `save_to_filename`, Genesis World generates a name from the calling script. The result:
 
 <video preload="auto" controls="True" width="100%">
-<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/cam_record.mp4" type="video/mp4">
+<source src="../../_static/videos/cam_record.mp4" type="video/mp4">
 </video>
 
+## Rendering backends
 
-Here is the full code script covering everything discussed above:
-```python
-import genesis as gs
+`gs.Scene(renderer=...)` selects how camera sensors turn the scene into pixels. Genesis World provides:
 
-gs.init(backend=gs.cpu)
+- `gs.renderers.Rasterizer()`: the default. Fast, and what the viewer always uses.
+- `gs.renderers.RayTracer()`: a path tracer for photorealistic stills (see [below](#photorealistic-rendering-with-luisa-deprecating)).
+- `gs.renderers.BatchRenderer(...)`: high-throughput rendering across many environments (see [Batch rendering with gs-madrona](#batch-rendering-with-gs-madrona)).
 
-scene = gs.Scene(
-    vis_options = gs.options.VisOptions(
-        show_world_frame = True,
-        world_frame_size = 1.0,
-        show_link_frame  = False,
-        show_cameras     = False,
-        plane_reflection = True,
-        ambient_light    = (0.1, 0.1, 0.1),
-    ),
-    viewer_options = gs.options.ViewerOptions(
-        res           = (1280, 960),
-        camera_pos    = (3.5, 0.0, 2.5),
-        camera_lookat = (0.0, 0.0, 0.5),
-        camera_fov    = 40,
-        max_FPS       = 60,
-    ),
-    renderer     = gs.renderers.Rasterizer(),
-    show_viewer  = True,
-)
+**Nyx** is the recommended path toward photorealistic rendering. Unlike the backends above, it attaches as a camera *sensor* rather than a scene-wide renderer.
 
-plane = scene.add_entity(
-    gs.morphs.Plane(),
-)
-franka = scene.add_entity(
-    gs.morphs.MJCF(file='xml/franka_emika_panda/panda.xml'),
-)
+(photo-realistic-rendering-with-nyx)=
+### Photorealistic rendering with Nyx
 
-cam = scene.add_camera(
-    res    = (640, 480),
-    pos    = (3.5, 0.0, 2.5),
-    lookat = (0, 0, 0.5),
-    fov    = 30,
-    GUI    = False,
-)
+[Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx) is a GPU-accelerated path tracer purpose-built for Genesis World. It is wired in as a **camera sensor**: you attach a `NyxCameraOptions` sensor to the scene and read frames back from `cam.read().rgb`. It supports PBR materials, HDRI lighting, 3D Gaussian splat assets, attached and multi-camera setups, multi-environment rendering, and per-pixel object picking.
 
-scene.build()
-
-# render rgb, depth, segmentation, and normal
-# rgb, depth, segmentation, normal = cam.render(rgb=True, depth=True, segmentation=True, normal=True)
-
-cam.start_recording()
-import numpy as np
-
-for i in range(120):
-    scene.step()
-    cam.set_pose(
-        pos    = (3.0 * np.sin(i / 60), 3.0 * np.cos(i / 60), 2.5),
-        lookat = (0, 0, 0.5),
-    )
-    cam.render()
-cam.stop_recording(save_to_filename='video.mp4', fps=60)
-```
-## Photo-realistic Rendering with Nyx
-
-[Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx) is a GPU-accelerated path tracer purpose-built for Genesis World. Unlike the LuisaRender backend covered below, Nyx is wired in as a **camera sensor** rather than as a scene-wide renderer: you attach a `NyxCameraOptions` sensor to the scene and read frames back from `cam.read().rgb`. It supports PBR materials, HDRI lighting, 3D Gaussian splat assets, attached / multi-camera setups, multi-environment rendering, and per-pixel object picking.
-
-### Installation
+#### Installation
 
 Nyx ships as the `gs-nyx` package:
 
@@ -164,9 +170,9 @@ Nyx ships as the `gs-nyx` package:
 pip install gs-nyx
 ```
 
-```{note}
+:::{note}
 `gs-nyx` is currently distributed through an internal package index while the project is being prepared for public release. Public installation instructions will be published at the [Nyx repository](https://github.com/Genesis-Embodied-AI/genesis-nyx) once the wheel is on PyPI.
-```
+:::
 
 Verify the install by importing the plugin alongside Genesis World:
 
@@ -177,9 +183,9 @@ import gs_nyx.nyx_py_sdk as nps
 from gs_nyx_plugin.nyx_camera_options import NyxCameraOptions
 ```
 
-### A minimal example
+#### A minimal example
 
-The snippet below renders a PBR ball on a plane lit purely by an HDRI environment map — the canonical "hello world" for Nyx, mirroring [`examples/01_hello_nyx.py`](https://github.com/Genesis-Embodied-AI/genesis-nyx/blob/main/examples/01_hello_nyx.py) in the Nyx repo.
+The snippet below renders a PBR ball on a plane lit purely by an HDRI environment map, the canonical "hello world" for Nyx, mirroring [`examples/01_hello_nyx.py`](https://github.com/Genesis-Embodied-AI/genesis-nyx/blob/main/examples/01_hello_nyx.py) in the Nyx repo.
 
 ```{image} ../../_static/images/nyx_hello.png
 :alt: PBR ball rendered with Nyx under an HDRI environment map
@@ -197,9 +203,9 @@ import gs_nyx.nyx_py_sdk as nps
 from gs_nyx_plugin.nyx_camera_options import NyxCameraOptions
 
 
-HERE        = os.path.dirname(__file__)
-PBR_BALL    = os.path.join(HERE, "assets", "PBR_Ball.glb")
-ENV_MAP     = os.path.join(HERE, "assets", "kloppenheim_07_puresky_4k.hdr")
+HERE = os.path.dirname(__file__)
+PBR_BALL = os.path.join(HERE, "assets", "PBR_Ball.glb")
+ENV_MAP = os.path.join(HERE, "assets", "kloppenheim_07_puresky_4k.hdr")
 OUTPUT_PATH = os.path.join(HERE, "out", "01_hello_nyx.png")
 
 
@@ -217,22 +223,24 @@ def main():
         surface=gs.surfaces.Gold(),
     )
 
-    # Describe how the env map is encoded
-    env_map            = nps.EnvironmentMapAsset()
-    env_map.texture    = ENV_MAP
-    env_map.layout     = nps.EEnvMapLayout.LongLat
+    # describe how the env map is encoded
+    env_map = nps.EnvironmentMapAsset()
+    env_map.texture = ENV_MAP
+    env_map.layout = nps.EEnvMapLayout.LongLat
     env_map.multiplier = 8
 
-    # Attach a Nyx camera sensor
-    cam = scene.add_sensor(NyxCameraOptions(
-        res         = (1920, 1080),
-        pos         = (-1.0, 1.0, 1.2),
-        lookat      = (0.0, 0.0, 0.1),
-        fov         = 20.0,
-        spp         = 64,
-        render_mode = npr.ERenderMode.FastPathTracer,
-        env_maps    = (env_map,),
-    ))
+    # attach a Nyx camera sensor
+    cam = scene.add_sensor(
+        NyxCameraOptions(
+            res=(1920, 1080),
+            pos=(-1.0, 1.0, 1.2),
+            lookat=(0.0, 0.0, 0.1),
+            fov=20.0,
+            spp=64,
+            render_mode=npr.ERenderMode.FastPathTracer,
+            env_maps=(env_map,),
+        )
+    )
 
     scene.build(n_envs=1)
     scene.step()  # rendering happens during the sim step
@@ -247,220 +255,79 @@ if __name__ == "__main__":
     main()
 ```
 
-Key things to notice:
+Three things distinguish Nyx from the other backends:
 
-- **Nyx is a sensor.** It is registered with `scene.add_sensor(NyxCameraOptions(...))`, not as a global renderer backend.
-- **Rendering happens during `scene.step()`.** Read frames back via `cam.read().rgb` (a torch tensor, one image per environment).
-- **`spp`** (samples-per-pixel) and **`render_mode`** trade quality for speed; `FastPathTracer` is a good default for iteration.
+- **Nyx is a sensor.** Register it with `scene.add_sensor(NyxCameraOptions(...))`, not as the scene `renderer`.
+- **Rendering happens during `scene.step()`.** Read frames back via `cam.read().rgb`, a torch tensor with one image per environment.
+- **`spp`** (samples per pixel) and **`render_mode`** trade quality for speed; `FastPathTracer` is a good default for iteration.
 
-For advanced features (Gaussian splats, multi-camera setups, object picking, etc.) see the dedicated [Nyx Renderer](nyx_renderer.md) page and the [Nyx documentation site](https://genesis-embodied-ai.github.io/genesis-nyx/).
+For advanced features such as Gaussian splats, multi-camera setups, and object picking, see the {doc}`Nyx renderer <nyx_renderer>` page and the [Nyx documentation site](https://genesis-embodied-ai.github.io/genesis-nyx/).
 
-```{note}
-**Roadmap.** We are working to unify rasterization and path tracing under Nyx as a single, sensor-based rendering interface. Nyx will gradually replace both the LuisaRender backend documented below and the default Pyrender-based rasterizer — over time, all camera-based rendering in Genesis World will go through Nyx.
-```
+:::{note}
+**Roadmap.** We are unifying rasterization and path tracing under Nyx as a single, sensor-based rendering interface. Nyx will gradually replace both the Luisa backend below and the default rasterizer. Over time, all camera-based rendering in Genesis World will go through Nyx.
+:::
 
-## Photo-realistic Rendering with Luisa (deprecating)
+### Photorealistic rendering with Luisa (deprecating)
 
-Genesis World provides a ray tracing rendering backend for photorealistic rendering. You can easily switch to using this backend by setting `renderer=gs.renderers.RayTracer()` when creating the scene. This camera allows more parameter adjustment, such as `spp`, `aperture`, `model`, etc.
+Genesis World also ships a Luisa-based ray-tracing backend. Enable it by passing `renderer=gs.renderers.RayTracer()` when creating the scene; it exposes extra parameters such as `spp`, `aperture`, and camera `model`.
 
-### Setup
+:::{warning}
+This backend is deprecated in favor of Nyx and requires building `LuisaRender` from source. Prefer Nyx for new work.
+:::
 
-Tested on
-- Ubuntu 22.04, CUDA 12.4, python 3.9
+Setup, tested on Ubuntu 22.04 with CUDA 12.4 and Python 3.9:
 
-Get submodules, specifically `genesis/ext/LuisaRender`.
-```bash
-# inside Genesis/
-git submodule update --init --recursive
-pip install -e ".[render]"
-```
-Install/upgrad g++ and gcc (to) version >= 11.
-```bash
-sudo apt install build-essential manpages-dev software-properties-common
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-sudo apt update && sudo apt install gcc-11 g++-11
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 110
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110
+1. Fetch the submodule and install the render extras:
 
-# verify version
-g++ --version
-gcc --version
-```
-Install CMake if your local version does not meet the required version. We use `snap` instead of `apt` because we need CMake version >= 3.26. However, remember to use the correct cmake. You may have `/usr/local/bin/cmake` but the `snap` installed package is at `/snap/bin/cmake` (or `/usr/bin/snap`). Please double check the order of binary path via `echo $PATH`.
-```bash
-sudo snap install cmake --classic
-cmake --version
-```
-Install dependencies,
-```bash
-sudo apt install libvulkan-dev xorg-dev # Vulkan, X11 & RandR
-sudo apt-get install uuid-dev # UUID 
-sudo apt-get install zlib1g-dev # zlib
-```
+   ```bash
+   # inside the genesis-world repo
+   git submodule update --init --recursive
+   pip install -e ".[render]"
+   ```
 
-If you do not have sudo, the following commands also install the required dependencies in your conda environments:
-```bash
-conda install -c conda-forge gcc=11.4 gxx=11.4 
-conda install -c conda-forge cmake=3.26.1
-conda install -c conda-forge vulkan-tools vulkan-headers xorg-xproto # Vulkan, X11 & RandR
-conda install -c conda-forge libuuid # UUID
-conda install -c conda-forge zlib # zlib
-```
+2. Ensure `gcc`/`g++` >= 11 and CMake >= 3.26 are on your `PATH`, and install the Vulkan, X11, UUID, and zlib development headers (via `apt` with sudo, or `conda install -c conda-forge` without).
 
-Build `LuisaRender`. Remember to use the correct cmake. By default, we use OptiX denoiser (For CUDA backend only). If you need OIDN denoiser, append `-D LUISA_COMPUTE_DOWNLOAD_OIDN=ON`.
-```bash
-cd genesis/ext/LuisaRender
-cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON -D LUISA_COMPUTE_ENABLE_GUI=OFF -D LUISA_RENDER_BUILD_TESTS=OFF # remember to check python version
-cmake --build build -j $(nproc)
-```
+3. Build `LuisaRender`:
 
-If you really struggle getting the build, we have some build [here](https://drive.google.com/drive/folders/1Ah580EIylJJ0v2vGOeSBU_b8zPDWESxS?usp=sharing) and you can check if your machine happens to have the same setup. The naming follows `build_<commit-tag>_cuda<version>_python<version>`. Download the one that matches your system, rename to `build/` and put it in `genesis/ext/LuisaRender`.
+   ```bash
+   cd genesis/ext/LuisaRender
+   cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 \
+       -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON -D LUISA_COMPUTE_ENABLE_GUI=OFF \
+       -D LUISA_RENDER_BUILD_TESTS=OFF
+   cmake --build build -j $(nproc)
+   ```
 
-Finally, you can run the example,
-```bash
-cd examples/rendering
-python demo.py
-```
-You should be able to get
+4. Run the demo:
+
+   ```bash
+   cd examples/rendering
+   python demo.py
+   ```
+
 ```{figure} ../../_static/images/raytracing_demo.png
+:alt: A scene rendered photorealistically with the Luisa ray-tracing backend
 ```
 
-## Batch rendering with gs-madrona
+:::{note}
+Prebuilt LuisaRender binaries for common CUDA and Python combinations are available [on Google Drive](https://drive.google.com/drive/folders/1Ah580EIylJJ0v2vGOeSBU_b8zPDWESxS?usp=sharing), named `build_<commit-tag>_cuda<version>_python<version>`. Download the one matching your system, rename it to `build/`, and place it in `genesis/ext/LuisaRender`. For build and CUDA-toolkit troubleshooting, see the [genesis-world README](https://github.com/Genesis-Embodied-AI/genesis-world#quick-installation).
+:::
 
-Genesis World provides a high-throughput batch rendering backend via gs-madrona. You can easily switch to gs-madrona backend by setting `renderer=gs.renderers.BatchRenderer(use_rasterizer=True/False)`
+### Batch rendering with gs-madrona
 
-### Pre-requisite
-Please first install the latest version of Genesis World to date following the [official README instructions](https://github.com/Genesis-Embodied-AI/genesis-world#quick-installation).
+For high-throughput rendering across many parallel environments, use the gs-madrona backend by passing `renderer=gs.renderers.BatchRenderer(use_rasterizer=True)` (set `use_rasterizer=False` to path-trace instead).
 
-### Easy install (x86 only)
-Pre-compiled binary wheels for Python>=3.10 are available on PyPI. They can be installed using any Python package manager (e.g. `uv` or `pip`):
-```sh
+Install the package first. Prebuilt wheels are available on PyPI for x86 and Python >= 3.10:
+
+```bash
 pip install gs-madrona
 ```
 
-### Build from source
-```sh
-pip install .
+Then run the bundled example, which writes frames to `./image_output`:
+
+```bash
+python examples/rigid/single_franka_batch_render.py
 ```
 
-### Testing (Optional)
-1. Clone Genesis World repository if not already done
-```sh
-git clone https://github.com/Genesis-Embodied-AI/genesis-world.git
-```
+## Next steps
 
-2. Run the following example script provided with Genesis World
-```sh
-python Genesis/examples/rigid/single_franka_batch_render.py
-```
-
-All the generated images will be stored in the current directory under `./image_output`.
-
-2. To use ray tracer, change the `use_rasterizer=False` in `single_franka_batch_render.py`
-```
-renderer = gs.options.renderers.BatchRenderer(
-    use_rasterizer=False,
-)
-```
-
-### FAQ
-- Installed libraries still undetected when running `cmake -S . -B build`,
-    You can manually instruct CMake to detect the dependencies by explicitly setting options such as `XXX_INCLUDE_DIR`, e.g., `ZLIB_INCLUDE_DIR=/path/to/include`. For conda environments, `XXX_INCLUDE_DIR` typically follows the format `/home/user/anaconda3/envs/genesis/include`.
-- Pybind error when doing `cmake -S . -B build`,
-    ```bash
-    CMake Error at src/apps/CMakeLists.txt:12 (find_package):
-    By not providing "Findpybind11.cmake" in CMAKE_MODULE_PATH this project has
-    asked CMake to find a package configuration file provided by "pybind11",
-    but CMake did not find one.
-
-    Could not find a package configuration file provided by "pybind11" with any
-    of the following names:
-
-        pybind11Config.cmake
-        pybind11-config.cmake
-    ```
-    You probably forget to do `pip install -e ".[render]"`. Alternatively, you can simply do `pip install "pybind11[global]"`.
-- CUDA runtime compilation error when running `cmake -S . -B build`,
-    ```bash
-    /usr/bin/ld: CMakeFiles/luisa-cuda-nvrtc-standalone-compiler.dir/cuda_nvrtc_compiler.cpp.o: in function `main':
-    cuda_nvrtc_compiler.cpp:(.text.startup+0x173): undefined reference to `nvrtcGetOptiXIRSize'
-    /usr/bin/ld: cuda_nvrtc_compiler.cpp:(.text.startup+0x197): undefined reference to `nvrtcGetOptiXIR'
-    ```
-    You need to install "system-wise" cuda-toolkit ([official installation guide](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)). You first check the cuda-toolkit,
-    ```bash
-    nvcc --version # this should be the consistent with you cuda version from nvidia-smi
-    which nvcc # just to check you are using the cuda-toolkit you expected
-    ```
-    If you don't get proper output from `nvcc`, please follow the official cuda-toolkit installation guide. Yet, just as an example of installing cuda-toolkit for cuda-12.4. Download installer as in [here](https://developer.nvidia.com/cuda-12-4-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local).
-    ```bash
-    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
-    sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
-    wget https://developer.download.nvidia.com/compute/cuda/12.4.0/local_installers/cuda-repo-ubuntu2204-12-4-local_12.4.0-550.54.14-1_amd64.deb
-    sudo dpkg -i cuda-repo-ubuntu2204-12-4-local_12.4.0-550.54.14-1_amd64.deb
-    sudo cp /var/cuda-repo-ubuntu2204-12-4-local/cuda-*-keyring.gpg /usr/share/keyrings/
-    sudo apt-get update
-    sudo apt-get -y install cuda-toolkit-12-4
-    ```
-    Remember to set binary and runtime library path. In `~/.bashrc`, add the following (note that we append the CUDA path at the end since there are also another `gcc` and `g++` in `/usr/local/cuda-12.4/bin` and may not be version 11, which is required for the build),
-    ```bash
-    PATH=${PATH:+${PATH}:}/usr/local/cuda-12.4/bin
-    LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}/usr/local/cuda-12.4/lib64
-    ```
-    Remember to either restart the terminal or do `source ~/.bashrc`. Another type of error is,
-    ```bash
-    <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_fatal_printf@GLIBC_PRIVATE'
-    <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_audit_symbind_alt@GLIBC_PRIVATE'
-    <your-env-path>/genesis-test1/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_exception_create@GLIBC_PRIVATE'
-    <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `__nptl_change_stack_perm@GLIBC_PRIVATE'
-    <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `__tunable_get_val@GLIBC_PRIVATE'
-    <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_audit_preinit@GLIBC_PRIVATE'
-    <your-env-path>/bin/ld: /lib/x86_64-linux-gnu/libc.so.6: undefined reference to `_dl_find_dso_for_object@GLIBC_PRIVATE'
-    ```
-    This may be due to the cuda-toolkit in your conda environment. Please do the following and install the system-wise CUDA,
-    ```bash
-    which nvcc
-    conda uninstall cuda-toolkit
-    ```
-    Alternatively, you can add your conda library path to the runtime library path,
-    ```bash
-    ls $CONDA_PREFIX/lib/libcudart.so # you should have this
-
-    # inside you ~/.bashrc, add
-    LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}/usr/local/cuda-12.4/lib64
-    ```
-    Lastly, remember to clear the build after doing the above fixed,
-    ```bash
-    rm -r build
-    ```
-- C/CXX Compiler error at `cmake -S . -B build`,
-    ```bash
-    CMake Error at /snap/cmake/1435/share/cmake-3.31/Modules/CMakeDetermineCCompiler.cmake:49 (message):
-    Could not find compiler set in environment variable CC:
-
-    /home/tsunw/miniconda3/envs/genesis-test1/bin/x86_64-conda-linux-gnu-cc.
-    Call Stack (most recent call first):
-    CMakeLists.txt:21 (project)
-
-
-    CMake Error: CMAKE_C_COMPILER not set, after EnableLanguage
-    CMake Error: CMAKE_CXX_COMPILER not set, after EnableLanguage
-    ```
-    You are probably not using `gcc` and `g++` version 11. Please double check (i) the version (ii) if the binary points to the path as expected (iii) the order of your binary path,
-    ```bash
-    gcc --version
-    g++ --version
-    which gcc
-    which g++
-    echo $PATH # e.g., /usr/local/cuda-12.4/bin/gcc (version = 10.5) shouldn't be in front of /usr/bin/gcc (version = 11 if you install properly with apt)
-    ```
-- Import error when running `examples/rendering/demo.py`,
-    ```bash
-    [Genesis] [11:29:47] [ERROR] Failed to import LuisaRenderer. ImportError: /home/tsunw/miniconda3/envs/genesis-test1/bin/../lib/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by /home/tsunw/workspace/Genesis/genesis/ext/LuisaRender/build/bin/liblc-core.so)
-    ```
-    Conda’s `libstdc++.so.6` doesn’t support 3.4.30. You need to move system’s into conda ([reference](https://stackoverflow.com/a/73708979)).
-    ```bash
-    cd $CONDA_PREFIX/lib
-    mv libstdc++.so.6 libstdc++.so.6.old
-    ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 libstdc++.so.6
-    ```
-- Assertion 'lerror’ failed: Failed to write to the process: Broken pipe: You may need to use CUDA of the same version as compiled.
+Continue with {doc}`Control your robot <control_your_robot>` to actuate the Franka, or see {doc}`Sensors <sensors/index>` for reading data back from the scene. For the full photorealistic rendering reference, see the {doc}`Nyx renderer <nyx_renderer>` page.

@@ -11,7 +11,7 @@ The Rasterizer offers:
 - **Multiple outputs**: RGB, depth, segmentation, normals
 - **Multi-environment support**: Efficient batched rendering
 
-## Quick Start
+## Quick start
 
 ```python
 import genesis as gs
@@ -44,15 +44,15 @@ for i in range(100):
 
 ## Configuration
 
-The Rasterizer is configured through `RasterizerOptions`:
+`gs.options.renderers.Rasterizer` takes no parameters:
 
 ```python
-rasterizer_options = gs.options.renderers.Rasterizer(
-    env_separate_rigid=True,   # Separate rendering per environment
-)
+rasterizer = gs.options.renderers.Rasterizer()
 ```
 
-## Output Types
+Rendering behavior such as shadows, lights, and per-environment isolation (`env_separate_rigid`) is configured on `gs.options.VisOptions`, not on the renderer.
+
+## Output types
 
 | Output | Type | Description |
 |--------|------|-------------|
@@ -61,7 +61,7 @@ rasterizer_options = gs.options.renderers.Rasterizer(
 | `segmentation` | `np.ndarray` (H, W) | Entity/link segmentation IDs |
 | `normal` | `np.ndarray` (H, W, 3) | Surface normals |
 
-## API Reference
+## API reference
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.rasterizer.Rasterizer
@@ -70,7 +70,7 @@ rasterizer_options = gs.options.renderers.Rasterizer(
    :show-inheritance:
 ```
 
-## See Also
+## See also
 
 - {doc}`raytracer` - Photorealistic ray tracing renderer
 - {doc}`batch_renderer` - High-throughput parallel renderer

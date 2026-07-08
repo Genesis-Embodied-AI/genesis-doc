@@ -1,92 +1,35 @@
-# 🌐 Loading USD Scenes
+# Importing USD assets
 
-Genesis World supports loading complex scenes from Universal Scene Description (USD) files, enabling you to import articulated robots, rigid objects, and complete environments with proper physics properties and joint configurations. USD is an open-source framework developed by Pixar for describing, composing, simulating, and collaborating within 3D worlds.
+[Universal Scene Description (USD)](https://openusd.org/) is Pixar's open framework for describing and composing 3D scenes. Genesis World imports USD files (`.usd`, `.usda`, `.usdc`, `.usdz`) through `gs.morphs.USD`, reading geometry, materials, and `UsdPhysics` joint definitions. A single file may hold one articulated robot, one rigid object, or a whole environment of many entities — the assets NVIDIA Isaac Sim and similar tools export.
 
-This tutorial will guide you through loading USD files in Genesis World, configuring parsing options, and working with USD-based scenes. The parser is designed to work seamlessly with assets exported from popular tools like NVIDIA Isaac Sim, while also supporting standard USD physics schemas.
+Two runnable examples are the source of truth for this page:
+
+- [`examples/usd/import_stage.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/usd/import_stage.py): load a single articulated asset and animate its joints.
+- [`examples/usd/kitchen.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/usd/kitchen.py): load a multi-entity kitchen scene with per-asset processing options.
 
 ## Installation
 
-To load USD assets into Genesis World scenes, install the required dependencies:
+USD parsing needs the `usd` optional dependency:
 
 ```bash
-pip install -e .[usd]
+pip install -e ".[usd]"
 ```
 
-### Optional: USD Material Baking
+That installs `usd-core`, which is enough to read USD files and their `UsdPreviewSurface` materials. For assets whose materials use other shaders, see [material baking](#material-baking) below.
 
-For advanced material parsing beyond `UsdPreviewSurface`, you can optionally install Omniverse Kit for USD material baking. This feature is only available for Python 3.10 and 3.11 and GPU backend. (For Python 3.12, there is possibility that most of materials in the scene are baked successfully, but some will leave unbaked.)
+## Minimal working example
 
-```bash
-pip install --extra-index-url https://pypi.nvidia.com/ omniverse-kit
-export OMNI_KIT_ACCEPT_EULA=yes
-```
-
-**Note:** The `OMNI_KIT_ACCEPT_EULA` environment variable must be set to accept the EULA. This is a one-time operation. Once set, it will not prompt again. If USD baking is disabled, Genesis World will only parse materials of type `UsdPreviewSurface`.
-
-If you encounter the Genesis World warning "Baking process failed: ...", here are some troubleshooting tips:
-
-- **EULA Acceptance**: The first launch may require accepting the Omniverse EULA. Accept it in runtime or set `OMNI_KIT_ACCEPT_EULA=yes` to accept it automatically.
-
-- **IOMMU Warning**: A window showing "IOMMU Enabled" warning may pop up on the first launch. Click "OK" promptly to avoid timeout.
-
-- **Initial Installation**: The first launch may install additional dependencies, which can cause a timeout. Run your program again after installation completes; subsequent runs will not require installation.
-
-- **Multiple Python Environments**: If you have multiple Python environments (especially with different Python versions), Omniverse Kit extensions may conflict across environments. Remove the shared Omniverse extension folder (e.g., `~/.local/share/ov/data/ext` on Linux) and try again.
-
-## Overview
-
-Genesis World's USD parser supports the following features:
-
-### Joint Types
-
-- **Revolute Joints** (`UsdPhysics.RevoluteJoint`): Rotational joints with angular limits
-- **Prismatic Joints** (`UsdPhysics.PrismaticJoint`): Linear/sliding joints with distance limits
-- **Spherical Joints** (`UsdPhysics.SphericalJoint`): Ball joints with 3 rotational degrees of freedom
-- **Fixed Joints** (`UsdPhysics.FixedJoint`): Rigid connections between links
-- **Free Joints** (`UsdPhysics.Joint` with type "PhysicsJoint"): 6-DOF joints with full translational and rotational freedom
-
-### Physics Properties
-
-- **Joint limits** (lower/upper bounds): Supported for revolute and prismatic joints
-- **Joint friction** (`dofs_frictionloss`): Supported for revolute, prismatic, and spherical joints
-- **Joint armature** (`dofs_armature`): Supported for revolute, prismatic, and spherical joints
-- **Joint stiffness** (`dofs_stiffness`): Passive property supported for revolute and prismatic joints
-- **Joint damping** (`dofs_damping`): Passive property supported for revolute and prismatic joints
-- **Drive API** (`dofs_kp`, `dofs_kv`, `dofs_force_range`): PD control parameters supported for revolute, prismatic, and spherical joints
-
-### Geometry
-
-- **Visual geometries**: Parsed from USD geometry prims matching visual patterns
-- **Collision geometries**: Parsed from USD geometry prims matching collision patterns
-
-### Materials and Rendering
-
-- **UsdPreviewSurface**: Fully supported with diffuse color, opacity, metallic, roughness, emissive, normal maps, and IOR
-- **Material baking**: Optional support via Omniverse Kit for complex materials beyond **UsdPreviewSurface**
-- **Display colors**: Fallback to `displayColor` when materials are not available
-
-## Basic Example
-
-Let's start with a simple example that loads a USD file containing an articulated object:
+The following loads a refrigerator asset and steps the simulation. It downloads the asset from the Genesis World asset repository on Hugging Face on first run:
 
 ```python
 import genesis as gs
 from huggingface_hub import snapshot_download
 
-# Initialize Genesis World
 gs.init(backend=gs.cpu)
 
-# Create a scene
-scene = gs.Scene(
-    viewer_options=gs.options.ViewerOptions(
-        camera_pos=(3.5, 0.0, 2.5),
-        camera_lookat=(0.0, 0.0, 0.5),
-        camera_fov=40,
-    ),
-    show_viewer=True,
-)
+scene = gs.Scene(show_viewer=True)
+scene.add_entity(gs.morphs.Plane())
 
-# Download a USD asset (example from Genesis World assets)
 asset_path = snapshot_download(
     repo_type="dataset",
     repo_id="Genesis-Intelligence/assets",
@@ -95,41 +38,86 @@ asset_path = snapshot_download(
     max_workers=1,
 )
 
-# Load the USD stage
 entities = scene.add_stage(
     morph=gs.morphs.USD(
         file=f"{asset_path}/usd/Refrigerator055/Refrigerator055.usd",
+        pos=(0, 0, 0.9),
+        euler=(0, 0, 180),  # extrinsic x-y-z, degrees
     ),
 )
 
-# Build and simulate
 scene.build()
+for _ in range(1000):
+    scene.step()
 ```
 
-USD files can contain multiple rigid entities (articulations and rigid bodies) in a single file. Genesis World provides two methods for loading USD:
+`add_stage` returns a `list` of the {doc}`entities </api_reference/entity/index>` it created, one per rigid body or articulation found in the file. The refrigerator is a single articulation, so the list has one element; a room scene returns many. See {doc}`hello_genesis` for the initialize / scene / build / step lifecycle that every Genesis World program shares.
 
-- **`scene.add_stage()`**: Automatically discovers and loads **all** rigid entities in the USD file. This is the recommended method for loading complete USD scenes with multiple entities.
+## `add_stage` vs. `add_entity`
 
-- **`scene.add_entity()`**: Loads a **single** entity from the USD file. If `prim_path` is not specified, it uses the USD stage's default prim. Set `prim_path` to target a specific prim in the stage.
+A USD file is a *stage* that can contain any number of physics entities. Genesis World offers two entry points:
 
-## USD Morph Configuration
+- **`scene.add_stage(morph=gs.morphs.USD(...))`** discovers and loads **every** rigid entity in the file and returns them as a list. Use it for complete scenes and for any file whose contents you don't want to enumerate by hand.
+- **`scene.add_entity(gs.morphs.USD(...))`** loads a **single** entity and returns it directly. It targets the prim named by `prim_path`; when `prim_path` is left as `None`, it falls back to the stage's default prim, and raises if the file declares none.
 
-The `gs.morphs.USD` class provides extensive configuration options for controlling how USD files are parsed:
+Both accept the same `gs.morphs.USD` morph, so every option below applies to either path.
 
-### Joint Dynamics Configuration
+## Articulations and rigid bodies
 
-Genesis World can parse joint properties from USD attributes. 
+Genesis World parses `UsdPhysics` joints into a `dof` graph. Rigid bodies with no joints between them become free bodies; bodies connected by joints become one articulation. The supported joint types are:
 
-Because some joint physics properties are not part of the USD standard, Genesis World provides default attribute name candidates that accommodate well-established exporters, notably Isaac Sim, which uses custom attributes like `physxJoint:jointFriction` and `physxLimit:angular:stiffness`.
+| USD schema | Genesis World joint | Degrees of freedom |
+|---|---|---|
+| `UsdPhysics.RevoluteJoint` | revolute | 1 rotational, with limits |
+| `UsdPhysics.PrismaticJoint` | prismatic | 1 translational, with limits |
+| `UsdPhysics.SphericalJoint` | spherical | 3 rotational |
+| `UsdPhysics.FixedJoint` | fixed | 0 (rigid link-to-link weld) |
+| `UsdPhysics.Joint` (generic) | free | 6 (full translation + rotation) |
 
-For example, the following code configures the attribute name candidates for joint friction. The parser will try these candidates in order and use the first one that is found.
+A joint's root link is *fixed* or *floating* according to the asset. Override this with `fixed` on the morph, which applies only to root (base) links:
+
+```python
+gs.morphs.USD(file="robot.usd", fixed=True)  # weld the base to the world
+```
+
+`examples/usd/kitchen.py` uses `fixed=False` so authored-fixed appliances such as the dishwasher become free bodies that drop onto the ground and can be dragged, and `fixed=None` to keep the scene's authored fixed/free states.
+
+## Axis and units
+
+USD stages carry their own `upAxis` and `metersPerUnit` metadata, and Genesis World honors it when transforming the asset into its right-handed, Z-up, meters world. When a referenced mesh omits that information, the `file_meshes_are_zup` morph option controls interpretation the same way it does for other mesh formats. See {doc}`conventions` for the full axis- and unit-handling rules, including the Blender-aligned Y-up ↔ Z-up mapping Genesis World follows.
+
+## Mesh processing
+
+Collision meshes are derived from the asset's geometry. Three options control that derivation; `examples/usd/kitchen.py` sets all three to honor the asset as authored:
+
+```python
+scene.add_stage(
+    morph=gs.morphs.USD(
+        file=usd_file,
+        fixed=fixed,
+        convexify=False,  # Don't force convex hulls; honor the asset's per-geom MeshCollisionAPI approximation.
+        decimate=True,  # Simplify collision meshes (fewer faces) for speed and stability.
+        align=False,  # Keep the USD root-link frames (don't re-center to the center of mass).
+    ),
+    vis_mode="visual",  # Render the asset's own USD materials, not the per-collision debug colors.
+)
+```
+
+- **`convexify`** wraps each mesh in one or more convex hulls (decomposing with `coacd` when a single hull is too coarse). It defaults to `True` for rigid entities. Set it to `False` to keep concave collision geometry the asset already provides.
+- **`decimate`** simplifies collision meshes toward `decimate_face_num` (default 500) faces. It defaults to `True` when `convexify` is on.
+- **`align`** re-frames floating-base root links so the origin sits at the center of mass. It defaults to `False`.
+
+`vis_mode="collision"` renders the collision geometry instead of the visual meshes, which is the fastest way to check that collision shapes match what you expect.
+
+## Joint dynamics attributes
+
+Some joint properties (friction, armature, passive stiffness and damping) are not part of the core USD physics schema, so exporters store them under custom attribute names. Isaac Sim, for example, writes `physxJoint:jointFriction` and `physxLimit:angular:stiffness`. Genesis World reads each property from a list of candidate attribute names, trying them in order and using the first that exists:
 
 ```python
 gs.morphs.USD(
     file="robot.usd",
-    # Joint friction attributes (tried in order)
     joint_friction_attr_candidates=[
-        "physxJoint:jointFriction",  # Isaac Sim compatibility
+        "physxJoint:jointFriction",  # Isaac Sim
         "physics:jointFriction",
         "jointFriction",
         "friction",
@@ -137,120 +125,58 @@ gs.morphs.USD(
 )
 ```
 
-Supported attributes are listed in the following table:
+The defaults already cover Isaac Sim and common community conventions; override a candidate list only when your exporter uses a name none of them match. The parsed values populate the corresponding `dof` fields:
 
-| Genesis World Attribute Name | Source / Default Attribute Name Candidates | Description |
-|----------------|-------------|-------------|
-| `dofs_frictionloss` | `["physxJoint:jointFriction", "physics:jointFriction", "jointFriction", "friction"]` | Joint friction (passive property) |
-| `dofs_armature` | `["physxJoint:armature", "physics:armature", "armature"]` | Joint armature (passive property) |
-| `dofs_kp` | `"physics:stiffness"` | PD control proportional gain (kp) - from DriveAPI |
-| `dofs_kv` | `"physics:angular:damping"` | PD control derivative gain (kv) - from DriveAPI |
-| `dofs_stiffness` | **Revolute joints:** `["physxLimit:angular:stiffness", "physics:stiffness", "stiffness"]`<br>**Prismatic joints:** `["physxLimit:linear:stiffness", "physxLimit:X:stiffness", "physxLimit:Y:stiffness", "physxLimit:Z:stiffness", "physics:linear:stiffness", "linear:stiffness"]` | Passive joint stiffness (depends on joint type) |
-| `dofs_damping` | **Revolute joints:** `["physxLimit:angular:damping", "physics:angular:damping", "angular:damping"]`<br>**Prismatic joints:** `["physxLimit:linear:damping", "physxLimit:X:damping", "physxLimit:Y:damping", "physxLimit:Z:damping", "physics:linear:damping", "linear:damping"]` | Passive joint damping (depends on joint type) |
+| Morph option | `dof` field it fills | Meaning |
+|---|---|---|
+| `joint_friction_attr_candidates` | `dofs_frictionloss` | passive joint friction |
+| `joint_armature_attr_candidates` | `dofs_armature` | reflected rotor inertia |
+| `revolute_joint_stiffness_attr_candidates` | `dofs_stiffness` | passive stiffness (revolute) |
+| `revolute_joint_damping_attr_candidates` | `dofs_damping` | passive damping (revolute) |
+| `prismatic_joint_stiffness_attr_candidates` | `dofs_stiffness` | passive stiffness (prismatic) |
+| `prismatic_joint_damping_attr_candidates` | `dofs_damping` | passive damping (prismatic) |
 
-Note that, attribute name within bracket (`[...]`) is unofficial USD attribute, user can setup their own attribute name candidates to customize the parsing behavior, while the attribute name without bracket (`...`) is official USD attribute, which is parsed from the USD file directly.
+PD control gains authored through the USD `PhysicsDriveAPI` (`physics:stiffness`, `physics:angular:damping`) are read into `dofs_kp` and `dofs_kv` directly, since those are standard USD attributes.
 
-### Geometry Parsing Options
+## Separating visual and collision geometry
 
-Genesis World can parse collision and visual geometries from USD files. You can configure regex patterns to identify which prims should be treated as collision-only or visual-only geometry. The parser uses `re.match()` to check if a prim's name matches each pattern from the start of the string.
-
-**Recognition Rules:**
-
-1. **Pattern Matching**: The parser recursively traverses the prim hierarchy. For each prim, it checks the prim's name against the patterns in order. Once a prim matches a pattern, it is marked as visual-matched or collision-matched, and this classification is inherited by all its child prims recursively.
-
-2. **Geometry Classification**: 
-   - A prim matching a visual pattern is treated as visual-only geometry (not used for collision detection).
-   - A prim matching a collision pattern is treated as collision-only geometry (not used for visualization).
-   - A prim matching both patterns is treated as both visual and collision geometry.
-   - A prim matching neither pattern is also treated as both visual and collision geometry (this is the default behavior for mesh-only USD assets).
-
-3. **Visibility and Purpose**: Only visible prims (not marked as "invisible") are parsed. Prims with purpose "guide" are excluded from visual geometry but can still be collision geometry.
-
-**Example Configuration:**
+When an asset does not declare collision geometry through `MeshCollisionAPI`, Genesis World infers it from prim names. It matches each prim against regex patterns and inherits the match down the subtree:
 
 ```python
 gs.morphs.USD(
     file="robot.usd",
-    # Regex patterns to identify collision meshes (tried in order)
-    collision_mesh_prim_patterns=[
-        r"^([cC]ollision).*",  # Matches prims starting with "Collision" or "collision"
-    ],
-    # Regex patterns to identify visual meshes
-    visual_mesh_prim_patterns=[
-        r"^([vV]isual).*",     # Matches prims starting with "Visual" or "visual"
-    ],
+    collision_mesh_prim_patterns=[r"^([cC]ollision).*"],  # collision-only geometry
+    visual_mesh_prim_patterns=[r"^([vV]isual).*"],  # visual-only geometry
 )
 ```
 
-**Example Stage Structures:**
+The rules, in order of application:
 
-- **Direct geometry on rigid body**: The geometry prim itself doesn't match any pattern, so it's treated as both visual and collision.
+1. **Inheritance.** The parser traverses the prim hierarchy top-down. Once a prim matches a pattern, every descendant inherits that classification.
+2. **Classification.** A prim matching only the visual pattern is visual-only; one matching only the collision pattern is collision-only; one matching both, or neither, is used for both. The neither case is the default for mesh-only assets that carry no naming convention.
+3. **Visibility and purpose.** Only visible prims are parsed. Prims with `purpose = "guide"` are excluded from visuals but may still serve as collision geometry.
 
-    ```usd
-    def Cube "Cube" (
-        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
-    )
-    {
-    }
-    ```
-- **Separate visual and collision children**: Direct children matching patterns are treated accordingly, and the match propagates to their subtrees.
+The patterns above are the defaults, so most Isaac Sim assets need no configuration here.
 
-    ```usd
-    def Xform "ObjectA" (
-            prepend apiSchemas = ["PhysicsRigidBodyAPI"]
-        )
-        {
-            def Cube "Visual"      # Matches visual pattern → visual-only
-            {
-            }
+(material-baking)=
+## Material baking
 
-            def Cube "Collision"   # Matches collision pattern → collision-only
-            {
-            }
-        }
-    ```
-- **Nested hierarchies**: Once a parent matches a pattern, all descendants inherit that classification.
+`usd-core` parses `UsdPreviewSurface` materials, which covers most assets. Materials built on other shader networks require NVIDIA Omniverse Kit to bake them into a supported form. Baking is available on Python 3.10 and 3.11 with a GPU backend:
 
-    ```usd
-    def Xform "ObjectB" (
-            prepend apiSchemas = ["PhysicsRigidBodyAPI"]
-        )
-        {
-            def Xform "Visual"     # Matches visual pattern
-            {
-                def Mesh "Cube"    # Inherits visual-only (entire subtree)
-                {
-                }
-                def Mesh "Sphere"  # Inherits visual-only
-                {
-                }
-            }
+```bash
+pip install --extra-index-url https://pypi.nvidia.com/ omniverse-kit
+export OMNI_KIT_ACCEPT_EULA=yes
+```
 
-            def Xform "Collision" # Matches collision pattern
-            {
-                def Cube "Cube"   # Inherits collision-only (entire subtree)
-                {
-                }
-            }
-        }
-    ```
-- **No pattern match**: Prims that don't match any pattern are treated as both visual and collision.
-    ```usd
-    def Xform "ObjectC" (
-        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
-    )
-    {
-        def Mesh "Whatever"  # No pattern match → both visual and collision
-        {
-        }
-    }
-    ```
+`OMNI_KIT_ACCEPT_EULA=yes` accepts the Omniverse EULA non-interactively; set it once. Without Omniverse Kit, Genesis World parses only `UsdPreviewSurface` and falls back to each prim's `displayColor` where no material is present.
 
+:::{note}
+If you see a `Baking process failed: ...` warning, the usual causes are an unaccepted EULA (set `OMNI_KIT_ACCEPT_EULA=yes`), a first-launch dependency install that timed out (rerun the program once it finishes), or stale extensions across multiple Python environments (remove the shared extension folder, e.g. `~/.local/share/ov/data/ext` on Linux, and retry).
+:::
 
-## Next Steps
+## See also
 
-- Learn about [controlling robots](control_your_robot.md) in Genesis World
-- Explore [inverse kinematics](inverse_kinematics_motion_planning.md) for USD-loaded robots
-- Check out [parallel simulation](parallel_simulation.md) for training with USD assets
-- See the [API reference](../../api_reference/options/morph/file_morph/file_morph.md) for detailed USD morph options
-- See the [conventions](conventions.md) for more details on the coordinate system and mathematical conventions used throughout Genesis World.
+- {doc}`conventions`: coordinate frame, units, and Y-up ↔ Z-up handling.
+- {doc}`control_your_robot` and {doc}`inverse_kinematics_motion_planning`: actuating and planning for a USD-loaded articulation.
+- {doc}`parallel_simulation`: running USD assets across many environments on the GPU.
+- {doc}`/api_reference/options/morph/index`: the full `gs.morphs` reference, including every `USD` option.

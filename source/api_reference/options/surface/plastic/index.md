@@ -8,5 +8,6 @@ rough
 smooth
 reflective
 collision
+bsdf
 default
 ```

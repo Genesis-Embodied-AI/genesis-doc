@@ -1,4 +1,4 @@
-# 🛠️ Installation
+# Installation
 ## Prerequisites
 * **Python**: >=3.10,<3.14
 * **OS**: Linux (*recommended*) / MacOS / Windows
@@ -34,24 +34,24 @@ Supported features on various systems are as follows:
 If you are using Genesis World with CUDA, make sure appropriate nvidia-driver is installed on your machine.
 :::
 
-## (Optional) Surface Reconstruction
-If you need fancy visuals for visualizing particle-based entities (fluids, deformables, etc.), you typically need to reconstruct the mesh surface using the internal particle-based representation. For this purpose, [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf), a state-of-the-art surface reconstruction, is supported out-of-the-box. Alternatively, we also provide `ParticleMesher`, our own openVDB-based surface reconstruction tool, which is faster but lower quantity:
+## (Optional) Surface reconstruction
+To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, you reconstruct a mesh surface from the internal particle representation. [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) is supported out of the box. Alternatively, `ParticleMesher`, our own OpenVDB-based tool, is faster but produces lower-quality surfaces:
 ```bash
 echo "export LD_LIBRARY_PATH=${PWD}/ext/ParticleMesher/ParticleMesherPy:$LD_LIBRARY_PATH" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-## (Optional) Ray Tracing Renderer
+## (Optional) Ray tracing renderer
 
-If you need photo-realistic visuals, Genesis World has a built-in ray-tracing (path-tracing) based renderer developed using [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain specific language designed for rendering. See [Visualization & Rendering](../getting_started/visualization.md) for setup.
+For photorealistic visuals, Genesis World includes a ray-tracing (path-tracing) renderer built on [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain-specific language for rendering. See {doc}`/user_guide/getting_started/visualization` for setup.
 
-## (Optional) USD Assets
+## (Optional) USD assets
 
 If you need to load USD assets into Genesis World scenes, see [USD Import Setup](../getting_started/usd_import.md#installation) for installation instructions.
 
 ## Troubleshooting
 
-### Import Error
+### Import error
 
 #### 'Genesis hasn't been initialized'
 
@@ -78,11 +78,11 @@ if TYPE_CHECKING:
     from genesis.engine.entities.drone_entity import DroneEntity
 ```
 
-#### Circular Import Error
+#### Circular import error
 
 Python would fail to (circular) import the `genesis` package if the current directory is Genesis World's source directory. This is likely due to Genesis World being installed WITHOUT enabling editable mode, either from PyPI Package Index or from source. The obvious workaround is moving out of the source directory before running Python. The long-term solution is simply switching to editable install mode: first uninstall the Python package `genesis-world`, then run `pip install -e '.[render]'` inside the source directory.
 
-### [Native Ubuntu] Slow Rendering (CPU aka. Software Fallback)
+### [Native Ubuntu] Slow rendering (CPU / software fallback)
 
 Sometimes, when using `cam.render()` or viewer-related functions in Genesis World, rendering becomes extremely slow. This is **not a Genesis World issue**. Genesis World relies on PyRender and EGL for GPU-based offscreen rendering. If your system isn’t correctly set up to use `libnvidia-egl`, it may **silently fall back to MESA (CPU) rendering**, severely affecting performance.
 
@@ -90,7 +90,7 @@ Even if the GPU appears accessible, your system might still default to CPU rende
 
 ---
 
-#### ✅ Ensure GPU Rendering is Active
+#### Ensure GPU rendering is active
 
 1. **Install NVIDIA GL libraries**
    ```bash
@@ -179,7 +179,7 @@ Genesis World tries EGL rendering by default, so in most environments you don’
    print("[DEBUG] NVIDIA capabilities:", os.environ.get("NVIDIA_DRIVER_CAPABILITIES"))
    ```
 
-### [Docker Container (Genesis image) on Windows 11 via WSL2] Black Rendering Window
+### [Docker container (Genesis image) on Windows 11 via WSL2] Black rendering window
 
     For machines with Nvidia GPU, make sure that NVIDIA Container Toolkit is installed. The official guide is available [here](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
 
@@ -223,7 +223,7 @@ Genesis World tries EGL rendering by default, so in most environments you don’
     export LIBGL_ALWAYS_SOFTWARE=1
     ```
 
-### [Ubuntu VM on Windows 11 via WSL2] Quadrants and Genesis World do not find cudalib.so and falls back to CPU
+### [Ubuntu VM on Windows 11 via WSL2] Quadrants and Genesis World do not find cudalib.so and fall back to CPU
 
 After installing Pytorch and Genesis World, Quadrants falls back to CPU, while torch initializes okay on CUDA.
 

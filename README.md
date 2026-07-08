@@ -1,14 +1,25 @@
-# Genesis Documentation (English Version)
+# Genesis World Documentation
 
-1. Create a clean env using python >= 3.9, install Sphinx and other dependencies
+Source for the Genesis World documentation site, built with [Sphinx](https://www.sphinx-doc.org/) and [MyST Markdown](https://myst-parser.readthedocs.io/).
 
-```bash
-pip install genesis-world  # Requires Python >= 3.9;
-```
+## Building locally
 
-2. Build the documentation and watch the change lively
+1. Create a clean Python environment (Python ≥ 3.10) and install Genesis World together with the docs dependencies:
 
-```bash
-# In genesis-doc/
-rm -rf build/; make html; sphinx-autobuild ./source ./build/html
-```
+   ```bash
+   pip install genesis-world
+   pip install -r requirements.txt
+   ```
+
+2. Build the site and rebuild it on every change:
+
+   ```bash
+   make html
+   sphinx-autobuild ./source ./build/html
+   ```
+
+   The rendered docs are then served at http://127.0.0.1:8000.
+
+## Writing docs
+
+Follow the [documentation style guide](STYLE_GUIDE.md) for voice, structure, and formatting conventions.

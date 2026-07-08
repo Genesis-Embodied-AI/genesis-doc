@@ -1,112 +1,96 @@
-# 🧮 Non-rigid Coupling
+# Solvers and coupling
 
-Genesis World allows you to combine multiple continuum and rigid-body solvers in the **same scene** – e.g. MPM snow interacting with SPH water, deformable FEM tissue colliding with surgical tools, or rigid props splashing into a granular bed.  All cross-solver interactions are orchestrated by the `gs.engine.Coupler` class.
+A single Genesis World `Scene` can hold a rigid robot, a pool of water, a pile of sand, and a sheet of cloth at once. It does this by running several physics **solvers** side by side and letting a **coupler** exchange forces wherever materials from different solvers meet. This page explains what each solver models, how they share one scene and one set of state fields, and how coupling moves momentum across material boundaries.
 
-This page explains:
+It is a conceptual overview. For the equations each solver integrates, see {doc}`Non-rigid dynamics <nonrigid_models>`; to pick a solver and run it, see {doc}`Beyond rigid bodies </user_guide/getting_started/beyond_rigid_bodies>`; for the contact backends, see {doc}`Couplers <couplers/index>`.
 
-* the **architecture** of the Coupler and how it decides which solver pairs are active;
-* the **impulse-based collision response** that governs momentum exchange;
-* the meaning of **friction, restitution, softness** and other coupling parameters;
-* a quick **reference table** of currently supported solver pairs; and
-* **usage examples** showing how to enable/disable specific interactions.
+## The solvers
 
----
+A **solver** is the set of algorithms that advances one family of materials. You never instantiate a solver directly. You assign a `material` to an entity, and the scene routes that entity to the solver its material belongs to. `gs.materials.MPM.Liquid` goes to the Material Point Method solver; `gs.materials.Rigid` goes to the rigid solver, and so on.
 
-## 1. Architecture overview
+Genesis World ships six physics solvers, each suited to a different representation of matter:
 
-Internally the simulator owns **one Coupler instance** which keeps pointers to every solver.  During each sub-step the simulator executes:
+| Solver | Models | Representation |
+|---|---|---|
+| **Rigid** | Articulated robots and rigid bodies, joints, contacts | Reduced-coordinate multibody dynamics |
+| **MPM** (Material Point Method) | Elastic solids, plastics, sand, snow, liquids | Hybrid: particles carry state, a background grid resolves forces |
+| **FEM** (Finite Element Method) | Stiff elastic solids and volumetric muscles | Tetrahedral mesh |
+| **PBD** (Position-Based Dynamics) | Cloth, ropes, and topology-preserving deformables | Particles linked by constraints |
+| **SPH** (Smoothed-Particle Hydrodynamics) | Free-surface liquids with real fluid parameters | Particles (purely Lagrangian) |
+| **SF** (Stable Fluids) | Smoke and gas | Fixed Eulerian grid |
 
-1. `coupler.preprocess(f)`  &nbsp;&nbsp; – e.g. surfacing operations for CPIC.
-2. `solver.substep_pre_coupling(f)`       – advance each individual solver.
-3. `coupler.couple(f)`       – exchange momentum between solvers.
-4. `solver.substep_post_coupling(f)`       – solver postprocessing after collision.
+The rigid solver is the default. In {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` the Franka arm had no explicit material, so it defaulted to `gs.materials.Rigid` and ran on the rigid solver. Assign a material from another family and its solver runs alongside.
 
-Because all solver fields live on Quadrants data-structures the Coupler can call Quadrants `@kernel`s that touch the memory of several solvers **without data copies**.
+:::{note}
+Two internal solvers round out the set: a **kinematic** solver for scripted, non-dynamic motion and a **tool** solver for driven manipulators. They participate in coupling but are not chosen through the material families above.
+:::
 
-### 1.1 Activating a coupling pair
+## One scene, many solvers
 
-Whether a pair is active is determined **statically once** when `Coupler.build()` is called:
+The scene owns a single `simulator`, and the simulator owns one instance of every solver plus one coupler. This shared-state design is what makes cross-material simulation practical:
+
+- **Every entity lives in exactly one solver.** When you call `scene.add_entity`, the simulator inspects the material and hands the entity to the matching solver. That solver stores the entity's state.
+- **State lives in flat, global fields.** Each solver keeps its data in Quadrants fields that span all of its entities at once, indexed by offset rather than per-entity objects. An MPM solver holds one particle array for the whole scene; a rigid solver holds one degree-of-freedom (**dof**) array. See {doc}`Concepts <concepts>` for how local and global indexing map onto these fields.
+- **Coupling touches solver memory without copies.** Because the fields are laid out for the GPU, the coupler runs compiled kernels that read and write the memory of several solvers in place. No data is marshalled between solvers each step, which is what keeps multi-solver scenes fast enough to be useful.
+
+At build time the simulator marks each solver active only if it holds at least one entity. Inactive solvers cost nothing, so declaring a scene that *could* hold fluids does not slow down a rigid-only run.
+
+## How coupling works
+
+Solvers advance independently within a timestep, and the coupler reconciles them in between. Each substep runs four phases in order:
+
+- **Preprocess:** the coupler prepares cross-solver data, for example surfacing operations needed by the CPIC variant of MPM.
+- **Advance (pre-coupling):** every active solver integrates its own material forward by one substep, ignoring the others.
+- **Couple:** the coupler detects contact between entities in different solvers and exchanges momentum so they no longer interpenetrate.
+- **Postprocess (post-coupling):** each solver finalizes the substep with the coupled state.
+
+The default coupler resolves contact with an **impulse-based** response. For each candidate contact it queries the signed distance to the rigid or solid geometry and blends the response with a smooth influence weight, so contact turns on gradually rather than snapping. It then splits the relative velocity into a normal and a tangential part, applies a restitution rule along the normal and a Coulomb-friction rule along the tangent, and applies the equal-and-opposite momentum change back on the rigid body as an external force. Three per-geometry material parameters govern the response:
+
+- **`coup_softness`:** the thickness of the contact zone. Larger values spread the influence farther from the surface and soften the impulse.
+- **`coup_restitution`:** bounce along the normal, from `0` (perfectly inelastic) to `1` (perfectly elastic).
+- **`coup_friction`:** the Coulomb friction coefficient limiting tangential slip.
+
+## Choosing a coupler
+
+The coupler is selected by the type of `coupler_options` you pass to the scene. Genesis World ships three, and the scene defaults to the legacy coupler when you pass nothing:
+
+| Coupler | Options class | Best for | Contact model |
+|---|---|---|---|
+| **Legacy** (default) | `LegacyCouplerOptions` | Particle and grid solvers (MPM, SPH, PBD) and differentiable simulation | Impulse-based |
+| **SAP** | `SAPCouplerOptions` | Accurate rigid-FEM contact, such as grasping deformables | Semi-analytic primal |
+| **IPC** | `IPCCouplerOptions` | Cloth and highly deformable bodies in contact with rigid tools | Barrier-based (Incremental Potential Contact) |
+
+All three inherit from `BaseCouplerOptions`. Passing an options object both selects the coupler and configures it:
 
 ```python
-self._rigid_mpm = rigid.is_active() and mpm.is_active() and options.rigid_mpm
+import genesis as gs
+
+# The scene defaults to LegacyCouplerOptions() if you pass nothing.
+scene = gs.Scene(
+    coupler_options=gs.options.SAPCouplerOptions(),  # switch to the SAP coupler
+)
 ```
 
+The SAP and IPC couplers carry requirements the legacy coupler does not (SAP needs 64-bit precision and the implicit FEM solver; IPC needs the `libuipc` library). Their trade-offs and full parameter sets live in {doc}`Couplers <couplers/index>`.
 
-## 2. Impulse-based collision response
+## Enabling and disabling interactions
 
-### 2.1 Signed distance & influence weight
+The legacy coupler activates a pair of solvers only when both are present in the scene *and* the corresponding flag is set. Every pair is enabled by default:
 
-For every candidate contact the Coupler queries the signed distance function `sdf(p)` of the rigid geometry.  The *softness* parameter produces a smooth blending weight
+```python
+scene = gs.Scene(
+    coupler_options=gs.options.LegacyCouplerOptions(
+        rigid_mpm=False,  # skip rigid-MPM contact even when both solvers are active
+    ),
+)
+```
 
-$$
-\text{influence} = \min\bigl( \exp\!\left(-\dfrac{\;d\;}{\epsilon}\right) ,\;1 \bigr)
-$$
+The available pair flags on `LegacyCouplerOptions` are `rigid_mpm`, `rigid_sph`, `rigid_pbd`, `rigid_fem`, `mpm_sph`, `mpm_pbd`, `fem_mpm`, and `fem_sph`. A pair with no flag is not coupled by the legacy coupler. Disable a pair you do not need to save the cost of its contact kernels.
 
-where `d` is the signed distance and `ε = coup_softness`.  Large softness values make the contact zone thicker and produce gentler impulses.
+## See also
 
-### 2.2 Relative velocity decomposition
-
-For a particle/grid node with world velocity **v** and a rigid body velocity **vᵣ**, the **relative velocity** is
-
-$$ \mathbf r = \mathbf v - \mathbf v_{\text{rigid}}. $$
-
-Split **r** into its normal and tangential components
-
-$$
- r_n = (\mathbf r \cdot \mathbf n)\,\mathbf n, \quad
- r_t = \mathbf r - r_n
-$$
-
-with **n** the outward surface normal.
-
-### 2.3 Normal impulse (restitution)
-
-If the normal component is *inward* ($r_n<0$) an impulse is applied so that after the collision
-
-$$ r_n' = -e\,r_n, \quad 0 \le e \le 1, $$
-
-where `e = coup_restitution` is the **restitution coefficient**.  `e=0` is perfectly inelastic, `e=1` perfectly elastic.
-
-### 2.4 Tangential impulse (Coulomb friction)
-
-Friction is implemented by **scaling** the tangential component:
-
-$$ r_t' = \max\!\bigl( 0,\;|r_t| + \mu \, r_n\bigr) \; \dfrac{r_t}{|r_t|}\,, $$
-
-with `μ = coup_friction`.  This is an impulse-based variant of Coulomb friction that ensures the post-collision tangential speed never exceeds the sticking limit.
-
-### 2.5 Velocity update and momentum transfer
-
-The new particle/node velocity is then
-
-$$ \mathbf v' = \mathbf v_{\text{rigid}} + (r_t' + r_n') \times \text{influence} + \mathbf r\,(1-\text{influence}). $$
-
-The *change of momentum*
-
-$$ \Delta\mathbf p = m\,(\mathbf v' - \mathbf v) $$
-
-is applied as an **external force** on the rigid body
-
-$$ \mathbf F_{\text{rigid}} = -\dfrac{\Delta\mathbf p}{\Delta t}. $$
-
-Thus Newton's third law is satisfied and the rigid body responds to fluid impacts.
-
----
-
-## 3. Supported solver pairs
-
-| Pair | Direction | Notes |
-|------|-----------|-------|
-| **MPM ↔ Rigid** | impulse based on grid nodes (supports CPIC) |
-| **MPM ↔ SPH**   | averages SPH particle velocities within an MPM cell |
-| **MPM ↔ PBD**   | similar to SPH but skips pinned PBD particles |
-| **FEM ↔ Rigid** | collision on surface vertices only |
-| **FEM ↔ MPM**   | uses MPM P2G/G2P weights to exchange momentum |
-| **FEM ↔ SPH**   | experimental – normal projection only |
-| **SPH ↔ Rigid** | robust side-flip handling of normals |
-| **PBD ↔ Rigid** | positional correction then velocity projection |
-| **Tool ↔ MPM**  | delegated to each Tool entity's `collide()` |
-
-If a combination is not in the table it is currently unsupported.
-
----
+- {doc}`Beyond rigid bodies </user_guide/getting_started/beyond_rigid_bodies>`: choose a solver and run a minimal example for each.
+- {doc}`Non-rigid dynamics <nonrigid_models>`: the governing equations and integration scheme behind each solver.
+- {doc}`Couplers <couplers/index>`: the SAP and IPC contact backends, their requirements, and parameters.
+- {doc}`Concepts <concepts>`: how entity state maps onto each solver's global data fields.
+- Runnable cross-solver pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling).

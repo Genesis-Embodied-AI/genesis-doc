@@ -2,7 +2,7 @@
 
 Genesis World provides real-time plotting recorders for visualizing simulation data during execution.
 
-## Available Plotters
+## Available plotters
 
 | Plotter | Description |
 |---------|-------------|
@@ -62,17 +62,17 @@ for i in range(500):
 scene.stop_recording()
 ```
 
-## Multiple Recorders
+## Multiple recorders
 
 You can start multiple recorders for different data streams by calling `start_recording` multiple times or using the RecorderManager directly.
 
-## Performance Tips
+## Performance tips
 
 1. **Reduce update rate**: Use lower `hz` for complex plots
 2. **Limit data points**: Use smaller `window_size`
 3. **Use async mode**: Enable `async_mode=True` for background updates
 
-## API Reference
+## API reference
 
 ```{eval-rst}
 .. automodule:: genesis.recorders.plotters
@@ -81,7 +81,7 @@ You can start multiple recorders for different data streams by calling `start_re
    :show-inheritance:
 ```
 
-## See Also
+## See also
 
 - {doc}`index` - Recording overview
 - {doc}`file_writers` - File export

@@ -12,7 +12,13 @@ Lighting in Genesis World is configured through visualization options and can in
 
 ## Configuration
 
-Lighting is configured through `VisOptions`:
+Lighting is configured through `VisOptions`. Each entry in `lights` is a dict matching one of the light option classes, selected by its `type` field:
+
+- `"directional"`: requires `dir`, `color`, and `intensity`.
+- `"point"`: requires `pos`, `color`, and `intensity`.
+- `"ambient"`: requires `color` and `intensity`.
+
+`color` is an RGB triple with each channel in `[0, 1]`, and it is required for every light. `dir` is the direction the light travels along (not a position).
 
 ```python
 import genesis as gs
@@ -21,15 +27,15 @@ gs.init()
 
 scene = gs.Scene(
     vis_options=gs.options.VisOptions(
-        ambient_light=(0.3, 0.3, 0.3),  # RGB ambient light
+        ambient_light=(0.3, 0.3, 0.3),  # RGB ambient light, each channel in [0, 1]
         lights=[
-            {"type": "directional", "direction": (1, 1, -1), "intensity": 1.0},
+            {"type": "directional", "dir": (1, 1, -1), "color": (1.0, 1.0, 1.0), "intensity": 5.0},
         ],
     ),
 )
 ```
 
-## Raytracer Lighting
+## Raytracer lighting
 
 When using the raytracer renderer, additional lighting options are available for photorealistic rendering:
 
@@ -47,7 +53,7 @@ cam = scene.add_camera(
 )
 ```
 
-## See Also
+## See also
 
 - {doc}`/api_reference/options/options` - VisOptions configuration
 - {doc}`renderers/raytracer` - Raytracer for photorealistic rendering

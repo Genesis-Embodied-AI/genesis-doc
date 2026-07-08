@@ -6,4 +6,5 @@
 texture
 color_texture
 image_texture
+batch_texture
 ```

@@ -24,13 +24,13 @@ scene = gs.Scene(
 )
 ```
 
-## When to Use IPC
+## When to use IPC
 
 - Complex deformable-deformable contact
 - Scenarios requiring intersection-free guarantees
 - When stability is more important than speed
 
-## See Also
+## See also
 
 - {doc}`index` - Coupler overview
 - {doc}`/api_reference/options/simulator_coupler_and_solver_options/coupler_options` - Coupler options

@@ -1,4 +1,4 @@
-# `gs.renderers.Renderer`
+# `gs.renderers.RendererOptions`
 ```{eval-rst}  
-.. autoclass:: genesis.options.renderers.Renderer
+.. autoclass:: genesis.options.renderers.RendererOptions
 ```
