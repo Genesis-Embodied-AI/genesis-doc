@@ -1,4 +1,5 @@
 # `gs.surfaces.Emission`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.surfaces.Emission
 ```

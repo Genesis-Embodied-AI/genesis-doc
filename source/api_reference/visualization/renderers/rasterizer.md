@@ -1,4 +1,4 @@
-# Rasterizer
+# `gs.renderers.Rasterizer`
 
 The default renderer: fast, GPU-accelerated rasterization for real-time viewing, control loops, and reinforcement-learning rollouts. It is also the backend the interactive viewer always uses. Enable it explicitly with `gs.Scene(renderer=gs.renderers.Rasterizer())`, though it is already the default when `renderer` is omitted.
 
@@ -14,9 +14,9 @@ The options class takes no parameters. Rasterizer behavior such as shadows, ligh
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.rasterizer.Rasterizer
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also

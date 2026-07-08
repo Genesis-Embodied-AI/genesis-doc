@@ -1,4 +1,4 @@
-# BatchRenderer
+# `gs.renderers.BatchRenderer`
 
 A high-throughput renderer that renders many parallel environments together on the GPU, for large-scale data collection and reinforcement-learning observation generation. Enable it with `gs.Scene(renderer=gs.renderers.BatchRenderer(use_rasterizer=True))`; set `use_rasterizer=False` to path-trace instead. It requires the `gs-madrona` package.
 
@@ -29,9 +29,9 @@ scene.add_light(
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.batch_renderer.BatchRenderer
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also

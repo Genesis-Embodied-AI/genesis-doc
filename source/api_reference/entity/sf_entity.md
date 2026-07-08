@@ -5,6 +5,6 @@ The particle entity backing Stable Fluid smoke, created from a {py:class}`gs.mat
 ```{eval-rst}
 .. autoclass:: genesis.engine.entities.sf_entity.SFParticleEntity
     :members:
-    :show-inheritance:
     :undoc-members:
+    :show-inheritance:
 ```

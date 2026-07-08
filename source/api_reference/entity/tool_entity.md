@@ -5,6 +5,6 @@ A kinematically-scripted collider created from a {py:class}`gs.materials.Tool <g
 ```{eval-rst}
 .. autoclass:: genesis.engine.entities.tool_entity.tool_entity.ToolEntity
     :members:
-    :show-inheritance:
     :undoc-members:
+    :show-inheritance:
 ```

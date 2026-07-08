@@ -34,7 +34,6 @@ A spherical area light for the `RayTracer` renderer. Add one or more to a scene 
 
 ```{eval-rst}
 .. autoclass:: genesis.options.renderers.SphereLight
-    :show-inheritance:
 ```
 
 ## See also

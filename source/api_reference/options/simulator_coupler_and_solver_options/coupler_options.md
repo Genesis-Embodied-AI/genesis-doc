@@ -1,4 +1,5 @@
 # `gs.options.BaseCouplerOptions`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.solvers.BaseCouplerOptions
 ```

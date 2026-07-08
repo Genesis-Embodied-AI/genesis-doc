@@ -1,4 +1,5 @@
 # `gs.morphs.Box`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.morphs.Box
 ```

@@ -1,4 +1,4 @@
-# Camera
+# `Camera`
 
 The visualization camera renders a scene off-screen to images: color, depth, segmentation, and surface normals. Add one with `scene.add_camera(...)` and read frames with `cam.render(...)`. It renders through the scene's {doc}`renderer <renderers/index>`, needs no display, and works headless. It can move, follow an entity, and record video.
 
@@ -29,9 +29,9 @@ Do not confuse this with the {doc}`camera sensor </api_reference/sensor/camera>`
 
 ```{eval-rst}
 .. autoclass:: genesis.vis.camera.Camera
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also

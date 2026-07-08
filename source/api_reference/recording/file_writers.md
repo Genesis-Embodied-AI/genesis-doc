@@ -110,9 +110,9 @@ scene.stop_recording()
 
 ```{eval-rst}
 .. automodule:: genesis.recorders.file_writers
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also

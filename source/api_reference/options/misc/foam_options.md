@@ -1,4 +1,4 @@
-# Foam options
+# `gs.options.FoamOptions`
 
 Configures foam particle generation, used to render spray and bubble effects on top of a fluid simulation.
 

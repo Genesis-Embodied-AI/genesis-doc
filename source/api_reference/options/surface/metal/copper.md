@@ -1,4 +1,5 @@
 # `gs.surfaces.Copper`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.surfaces.Copper
 ```

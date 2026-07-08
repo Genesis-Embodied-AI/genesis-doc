@@ -48,39 +48,33 @@ Use the rasterizer for fast RGB with no special setup. Use the raytracer for pho
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.camera.RasterizerCameraOptions
-   :members:
-   :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.camera.RasterizerCameraSensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## Raytracer camera
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.camera.RaytracerCameraOptions
-   :members:
-   :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.camera.RaytracerCameraSensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## Batch renderer camera
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.camera.BatchRendererCameraOptions
-   :members:
-   :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.camera.BatchRendererCameraSensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also

@@ -1,4 +1,5 @@
 # `gs.options.RigidOptions`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.solvers.RigidOptions
 ```

@@ -1,8 +1,8 @@
 # `PBD3DEntity`
 
-```{eval-rst}  
+```{eval-rst}
 .. autoclass:: genesis.engine.entities.pbd_entity.PBD3DEntity
     :members:
-    :show-inheritance:
     :undoc-members:
+    :show-inheritance:
 ```

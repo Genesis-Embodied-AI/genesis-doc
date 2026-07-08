@@ -1,4 +1,5 @@
 # `gs.surfaces.Aluminium`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.surfaces.Aluminium
 ```

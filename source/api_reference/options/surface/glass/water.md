@@ -1,4 +1,5 @@
 # `gs.surfaces.Water`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.surfaces.Water
 ```

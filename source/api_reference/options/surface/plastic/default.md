@@ -1,5 +1,5 @@
 # `gs.surfaces.Default`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.surfaces.Default
-    :show-inheritance:
 ```

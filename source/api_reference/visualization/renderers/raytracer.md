@@ -1,4 +1,4 @@
-# RayTracer
+# `gs.renderers.RayTracer`
 
 A path-tracing renderer backed by LuisaRender, for photorealistic stills with global illumination, reflections, and refractions. Enable it with `gs.Scene(renderer=gs.renderers.RayTracer(...))`. Per-camera ray-tracing settings such as `spp` (samples per pixel), `denoise`, `model` (`"pinhole"` or `"thinlens"`), `aperture`, and `focus_dist` are passed to `scene.add_camera()`, not to the renderer.
 

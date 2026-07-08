@@ -76,9 +76,9 @@ You can start multiple recorders for different data streams by calling `start_re
 
 ```{eval-rst}
 .. automodule:: genesis.recorders.plotters
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also

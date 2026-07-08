@@ -1,4 +1,5 @@
 # `gs.surfaces.Surface`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.surfaces.Surface
 ```

@@ -68,8 +68,9 @@ combined = pos + external  # Result is Genesis World tensor
 
 ```{eval-rst}
 .. automodule:: genesis.grad.creation_ops
-   :members:
-   :undoc-members:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also

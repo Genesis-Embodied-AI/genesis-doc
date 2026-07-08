@@ -10,14 +10,11 @@ Reports the nearest distance from each probe point to the mesh surfaces of a set
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.options.SurfaceDistanceProbe
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.surface_distance_probe.SurfaceDistanceProbeSensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## TemperatureGrid
@@ -28,18 +25,13 @@ Material properties are supplied through a `properties_dict` mapping a global ri
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.options.TemperatureProperties
-   :members:
-   :undoc-members:
 
 .. autoclass:: genesis.options.sensors.options.TemperatureGrid
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.temperature.TemperatureGridSensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## JointTorque
@@ -48,14 +40,11 @@ Measures the generalized effort delivered at each selected actuator's output sha
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.options.JointTorque
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.joint_torque.JointTorqueSensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also
