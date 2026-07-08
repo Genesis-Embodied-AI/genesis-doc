@@ -17,7 +17,7 @@ Highlights:
 - Per-pixel object picking
 - Exposed through the standard Genesis World sensor interface (`scene.add_sensor(...)`)
 
-For installation and the minimal "hello Nyx" walkthrough, see [Photo-realistic Rendering with Nyx](visualization.md#photo-realistic-rendering-with-nyx) in the Visualization guide. For the full feature reference, options, and advanced recipes, see the **Nyx documentation**: <https://genesis-embodied-ai.github.io/genesis-nyx/>.
+For installation and the minimal "hello Nyx" walkthrough, see [Photorealistic rendering with Nyx](visualization.md#photorealistic-rendering-with-nyx) in the Visualization guide. For the full feature reference, options, and advanced recipes, see the **Nyx documentation**: <https://genesis-embodied-ai.github.io/genesis-nyx/>.
 
 ## Example: rendering a Gaussian splat
 
