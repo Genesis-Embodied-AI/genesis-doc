@@ -12,6 +12,7 @@ The classes group into families:
 - **Texture options:** the color, image, and batched textures a surface draws from. See {doc}`/api_reference/options/texture/index`.
 - **Renderer options:** the rendering backend shared by every camera in a scene — `RendererOptions` and its `Rasterizer`, `RayTracer`, and `BatchRenderer` variants. See {doc}`/api_reference/options/renderer/index`.
 - **Viewer and visualization options:** `ViewerOptions` for the interactive viewer and `VisOptions` for viewer-independent visualization. See {doc}`/api_reference/options/vis/index`.
+- **Miscellaneous options:** profiling and FPS reporting (`ProfilingOptions`), particle-fluid foam generation (`FoamOptions`), and convex decomposition (`CoacdOptions`). See {doc}`/api_reference/options/misc/index`.
 
 The base class itself is documented in {doc}`/api_reference/options/options`.
 
@@ -23,4 +24,5 @@ renderer/index
 surface/index
 texture/index
 vis/index
+misc/index
 ```

@@ -44,6 +44,7 @@ getting_started/hybrid_entity
 getting_started/drone_entity
 getting_started/terrain
 getting_started/emitters
+getting_started/force_fields
 ```
 
 

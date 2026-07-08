@@ -49,6 +49,41 @@ pose = scene.viewer.camera_pose
 scene.viewer.set_camera_pose(pos=(3.5, 0.0, 2.5), lookat=(0, 0, 0.5))
 ```
 
+## Lighting
+
+The rasterizer — the viewer and any rasterizer camera sensor — lights the scene from a list of lights on `VisOptions`. With no configuration it uses a single directional light, so scenes are lit out of the box; set `lights` to control direction, color, and intensity yourself. The light classes live in `gs.options.vis`:
+
+```python
+scene = gs.Scene(
+    vis_options=gs.options.VisOptions(
+        lights=[
+            gs.options.vis.DirectionalLight(
+                dir=(-1, -1, -1),  # direction the light travels, world frame
+                color=(1.0, 1.0, 1.0),  # RGB in [0, 1]
+                intensity=5.0,
+            ),
+            gs.options.vis.PointLight(
+                pos=(2.0, 0.0, 3.0),  # meters, world frame
+                color=(1.0, 0.9, 0.8),
+                intensity=8.0,
+            ),
+        ],
+        ambient_light=(0.1, 0.1, 0.1),  # uniform fill so shadows are not pure black
+    ),
+)
+```
+
+Two light types are available:
+
+- **`DirectionalLight`:** parallel rays from a fixed direction, like sunlight. Set `dir` (the direction the light travels), `color`, and `intensity`. Position does not matter.
+- **`PointLight`:** light radiating outward from a point. Set `pos`, `color`, and `intensity`.
+
+Ambient light is a separate, uniform fill set through the `ambient_light` field rather than an entry in `lights`.
+
+:::{note}
+This controls the rasterizer only. The ray tracer has no light objects: lights there are entities with an `Emission` surface, covered in {doc}`Surfaces and textures <surfaces_textures>`. The `BatchRenderer` backend instead takes lights at runtime through `scene.add_light(...)`.
+:::
+
 ## Adding a camera
 
 A camera is a sensor you add to the scene. It renders independently of the viewer, so it is the tool for headless rendering and for capturing views from angles other than the viewer's:

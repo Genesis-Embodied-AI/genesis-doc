@@ -89,3 +89,28 @@ The returned `q` has shape `([n_envs,] n_dofs)`: batched when the scene has mult
 :::{tip}
 Parallel IK is most effective on a GPU backend, where all environments are solved together. See {doc}`parallel_simulation` for how batched environments run, and {doc}`control_your_robot` for driving the solved configuration through the controllers instead of setting it directly.
 :::
+
+## Forward kinematics and the Jacobian
+
+Inverse kinematics is built on two lower-level operations the same solver exposes directly, and both are useful on their own for analytic control. Forward kinematics is IK's inverse: it maps a joint configuration to the resulting link poses. The Jacobian relates joint velocities to the end-effector's spatial velocity, which is the quantity IK differentiates to take each step; it also underpins Jacobian-transpose control and manipulability analysis.
+
+Both require an entity created with `requires_jac_and_IK=True`, which is the default for the `MJCF` and `URDF` robot morphs.
+
+```python
+ee_link = robot.get_link("hand")
+
+# Jacobian at the link origin: rows 0-2 are linear, rows 3-5 angular, one column per dof.
+jacobian = robot.get_jacobian(link=ee_link)  # shape ([n_envs,] 6, n_dofs)
+
+# Forward kinematics: joint configuration -> world-frame link poses.
+qpos = robot.get_qpos()
+links_pos, links_quat = robot.forward_kinematics(qpos)
+# links_pos:  shape ([n_envs,] n_links, 3)   link-frame origins, world coordinates
+# links_quat: shape ([n_envs,] n_links, 4)   orientations, (w, x, y, z)
+```
+
+`get_jacobian` takes an optional `local_point` (a length-3 point in the link's local frame) to evaluate the Jacobian somewhere other than the link origin. `forward_kinematics` accepts `qs_idx_local`, `links_idx_local`, and `envs_idx` to compute a subset of the configuration, links, or environments; the returned poses are in the world frame, consistent with the world-frame `qpos` input.
+
+:::{note}
+`forward_kinematics` reuses the IK solver's internal buffers, which are allocated the first time you call `inverse_kinematics` on the entity. Solve IK at least once before calling it standalone.
+:::

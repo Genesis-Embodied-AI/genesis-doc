@@ -129,6 +129,39 @@ gs.surfaces.Glass(color=(0.7, 0.85, 1.0, 0.7), vis_mode="recon")
 
 The accepted values are `"visual"`, `"collision"`, `"particle"`, `"sdf"`, and `"recon"`. Use `"collision"` to inspect the collision geometry that physics actually sees.
 
+## Foam and spray
+
+A fast-moving particle fluid entrains air: whitewater on a breaking wave, spray thrown off a splash, bubbles carried below the surface. Genesis World can add these as secondary foam particles at render time. This is purely a visual effect for particle-based fluids in the {doc}`Nyx <nyx_renderer>` ray tracer — it does not change the physics, and the rasterizer ignores it.
+
+Enable it on the fluid's surface with `generate_foam=True`, and tune the look with a `foam_options` object:
+
+```python
+scene.add_entity(
+    material=gs.materials.SPH.Liquid(),
+    morph=gs.morphs.Box(pos=(0.0, 0.0, 0.5), size=(0.4, 0.4, 0.4)),
+    surface=gs.surfaces.Water(
+        vis_mode="recon",  # foam sits on the reconstructed fluid surface
+        generate_foam=True,
+        foam_options=gs.options.FoamOptions(
+            radius_scale=0.2,  # foam particle radius relative to a fluid particle
+            k_foam=1000.0,  # foam particles generated per frame
+            spray_decay=2.0,
+            foam_decay=1.0,
+            bubble_decay=5.0,
+        ),
+    ),
+)
+```
+
+`gs.options.FoamOptions` splits the effect into three populations, each with its own dissipation rate — a larger value clears that population faster:
+
+- **`radius_scale`:** foam particle radius as a fraction of the fluid particle radius. Defaults to `0.2`.
+- **`k_foam`:** number of foam particles generated per frame. Defaults to `1000.0`.
+- **`spray_decay`:** dissipation rate of airborne spray. Defaults to `2.0`.
+- **`foam_decay`:** dissipation rate of foam riding the surface. Defaults to `1.0`.
+- **`bubble_decay`:** dissipation rate of submerged bubbles. Defaults to `5.0`.
+- **`color`:** RGBA tint of the foam particles. Defaults to `(0.7, 0.7, 0.7, 0.7)`.
+
 ## Next steps
 
 - {doc}`Visualization <visualization>`: cameras, the viewer, and choosing a renderer.

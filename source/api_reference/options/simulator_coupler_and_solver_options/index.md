@@ -11,8 +11,12 @@ This configures the global simulator, all the solvers inside it, and the inter-s
 
 sim_options
 coupler_options
+legacy_coupler_options
+sap_coupler_options
+ipc_coupler_options
 tool_options
 rigid_options
+kinematic_options
 mpm_options
 sph_options
 pbd_options

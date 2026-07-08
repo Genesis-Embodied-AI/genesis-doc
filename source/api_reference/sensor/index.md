@@ -16,6 +16,8 @@ Shapes use the batched-optional notation `([n_envs,] ...)`: the leading `n_envs`
 | `IMU` | `IMUReturnType(lin_acc, ang_vel, mag)` (float32) | each `([n_envs,] 3)` |
 | `Raycaster` (alias `Lidar`), `DepthCamera` | `RaycasterReturnType(points, distances)` (float32) | `points` `([n_envs,] *pattern_shape, 3)`, `distances` `([n_envs,] *pattern_shape)` |
 | `SurfaceDistanceProbe` | `torch.Tensor` (float32) distances | `([n_envs,] n_probes)` |
+| `ContactProbe` | `torch.Tensor` (bool) | `([n_envs,] n_probes)` |
+| `ContactDepthProbe` | `torch.Tensor` (float32) penetration depth | `([n_envs,] n_probes)` |
 | `KinematicTaxel` | `KinematicTaxelReturnType(force, torque)` (float32) | each `([n_envs,] n_probes, 3)` |
 | `ElastomerTaxel` | `torch.Tensor` (float32) marker displacement | `([n_envs,] n_probes, 3)` |
 | `ProximityTaxel` | `ProximityTaxelReturnType(force, torque)` (float32) | each `([n_envs,] n_probes, 3)` |
@@ -82,6 +84,8 @@ camera
 contact
 imu
 raycaster
+tactile
+other
 ```
 
 ## See also

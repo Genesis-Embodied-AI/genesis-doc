@@ -8,6 +8,7 @@ file_morph
 mesh
 urdf
 mjcf
+usd
 terrain
 drone
 ```

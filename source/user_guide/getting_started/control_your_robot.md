@@ -188,6 +188,41 @@ Running the full example produces this sequence:
 Video: the Franka arm cycling through position, velocity, and force control.
 </video>
 
+## Applying external forces
+
+The `control_*` methods act in joint space, through the dofs. Sometimes you instead
+want to push or twist a link directly in Cartesian space: a disturbance to test a
+controller's robustness, a thruster, wind, or a scripted tug on a payload. The rigid
+solver applies such wrenches with `apply_links_external_force` and
+`apply_links_external_torque`.
+
+An external force lasts for a single step and is then cleared, so reapply it on every
+step you want it active:
+
+```python
+rigid = scene.sim.rigid_solver
+hand = franka.get_link("hand").idx
+
+for i in range(150):
+    # push the hand straight up with 50 N in the world frame
+    rigid.apply_links_external_force(
+        force=np.array([[0.0, 0.0, 50.0]]),  # N, shape ([n_envs,] n_links, 3)
+        links_idx=[hand],
+    )
+    scene.step()
+```
+
+The force and torque tensors follow the batch convention used throughout the API: shape
+`([n_envs,] n_links, 3)`, matching `links_idx`. With a single environment the leading
+`n_envs` dimension is dropped. Forces are in newtons and torques in newton-meters.
+
+Both methods take the same optional arguments:
+
+- **`links_idx`:** which links to act on. `None` targets every link.
+- **`envs_idx`:** which environments to act on in a batched scene. `None` targets all of them.
+- **`ref`:** the reference frame the wrench is applied at — `"link_origin"` (default), `"link_com"` (the link's center of mass), or `"root_com"` (the center of mass of the whole kinematic tree).
+- **`local`:** by default the wrench is expressed in world coordinates. Set `local=True` to express it in the reference frame's own coordinates instead, so the force rotates with the link.
+
 ## Pick and place with a suction cup
 
 An industrial suction gripper behaves like an instant rigid grasp. You can

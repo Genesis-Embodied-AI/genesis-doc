@@ -1,0 +1,5 @@
+# SF
+
+```{toctree}
+smoke
+```
