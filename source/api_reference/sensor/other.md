@@ -6,7 +6,7 @@ Create each one from its `gs.sensors.*` options object with `scene.add_sensor()`
 
 ## SurfaceDistanceProbe
 
-Reports the nearest distance from each probe point to the mesh surfaces of a set of tracked rigid links, clamped to `probe_radius` when nothing is in range. The matching nearest points are available on the `nearest_points` attribute. See {doc}`the proximity guide </user_guide/getting_started/sensors/proximity>`.
+Reports the nearest distance from each probe point to the mesh surfaces of a set of tracked rigid links, clamped to `probe_radius` when nothing is in range. The matching nearest points are available on the `nearest_points` attribute. See {doc}`the proximity guide </user_guide/sensing/sensors/proximity>`.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.options.SurfaceDistanceProbe
@@ -22,7 +22,7 @@ Reports the nearest distance from each probe point to the mesh surfaces of a set
 
 ## TemperatureGrid
 
-Overlays a 3D voxel grid on one rigid link and reports the temperature of every cell, in degrees Celsius, evolving each cell from contact conduction, radiation, convection, and optional per-cell heat generation. See {doc}`the temperature grid guide </user_guide/getting_started/sensors/temperature_grid>`.
+Overlays a 3D voxel grid on one rigid link and reports the temperature of every cell, in degrees Celsius, evolving each cell from contact conduction, radiation, convection, and optional per-cell heat generation. See {doc}`the temperature grid guide </user_guide/sensing/sensors/temperature_grid>`.
 
 Material properties are supplied through a `properties_dict` mapping a global rigid-link index to a `TemperatureProperties` entry.
 

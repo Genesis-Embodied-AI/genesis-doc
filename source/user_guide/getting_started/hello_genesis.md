@@ -40,7 +40,7 @@ gs.init(backend=gs.cpu)
 - **Logging.** On init, Genesis World logs system and version information. Set `logging_level="warning"` to quiet it, and `theme="light"` for light-background terminals.
 - **Performance mode.** With `performance_mode=True`, Genesis World bakes static tensor shapes into its compiled kernels for roughly 30% faster simulation, at the cost of recompiling whenever the scene changes (several minutes per change). Leave it off for research, debugging, and interactive work; turn it on for policy training and production runs.
 
-For the full set of `gs.init()` arguments (backend selection and fallback, precision, seeding and determinism, logging, and environment variables), see {doc}`Initialization and backends <initialization>`.
+For the full set of `gs.init()` arguments (backend selection and fallback, precision, seeding and determinism, logging, and environment variables), see {doc}`Initialization and backends </user_guide/configuration/initialization>`.
 
 ## Create a scene
 
@@ -79,12 +79,12 @@ franka = scene.add_entity(
 )
 ```
 
-Shape primitives include `Plane`, `Box`, `Cylinder`, `Sphere`, `Terrain` (see the {doc}`terrain tutorial <terrain>`), and `Drone`. Supported file formats include:
+Shape primitives include `Plane`, `Box`, `Cylinder`, `Sphere`, `Terrain` (see the {doc}`terrain tutorial </user_guide/physics/terrain>`), and `Drone`. Supported file formats include:
 
 - `gs.morphs.MJCF`: MuJoCo `.xml` models
 - `gs.morphs.URDF`: robot descriptions (`.urdf`, and `.xacro`, which is preprocessed automatically)
-- `gs.morphs.USD`: Universal Scene Description (`.usd`, `.usda`, `.usdc`, `.usdz`); see the {doc}`USD import tutorial <usd_import>`
-- `gs.morphs.Mesh`: non-articulated meshes (`.obj`, `.stl`, `.glb`, `.gltf`); see {doc}`Conventions <conventions>` for Y-up vs. Z-up handling
+- `gs.morphs.USD`: Universal Scene Description (`.usd`, `.usda`, `.usdc`, `.usdz`); see the {doc}`USD import tutorial </user_guide/assets/usd_import>`
+- `gs.morphs.Mesh`: non-articulated meshes (`.obj`, `.stl`, `.glb`, `.gltf`); see {doc}`Conventions </user_guide/configuration/conventions>` for Y-up vs. Z-up handling
 
 A morph also accepts pose and scale. Orientation is either `euler` (SciPy extrinsic x-y-z, in degrees) or `quat` (`(w, x, y, z)`):
 
@@ -121,4 +121,4 @@ for i in range(1000):
 
 ## Next steps
 
-Continue with {doc}`Visualization <visualization>` to work with the viewer and {doc}`Rendering <rendering>` to capture images, then {doc}`Control Your Robot <control_your_robot>` to actuate the Franka you just loaded.
+Continue with {doc}`Control your robot <control_your_robot>` to actuate the Franka you just loaded, then {doc}`Visualization </user_guide/interaction/visualization>` to work with the viewer and {doc}`Rendering </user_guide/rendering/rendering>` to capture images.

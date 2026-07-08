@@ -18,7 +18,7 @@ The renderer is selected once for the whole scene and applies to its camera sens
 - **`gs.renderers.RayTracer`:** a path tracer backed by LuisaRender (Luisa), for photorealistic stills. It is being deprecated in favor of Nyx.
 - **`gs.renderers.BatchRenderer`:** high-throughput rendering across many environments in parallel on the GPU, for large-scale data collection.
 
-**Nyx** is a separate photorealistic path tracer, distributed as the `gs-nyx` package. Unlike the backends above, it is not a scene-wide renderer: it attaches per camera as a sensor through `scene.add_sensor(...)`, so one scene can pair fast rasterized cameras with a photorealistic Nyx camera. See {doc}`/user_guide/getting_started/nyx_renderer` for details.
+**Nyx** is a separate photorealistic path tracer, distributed as the `gs-nyx` package. Unlike the backends above, it is not a scene-wide renderer: it attaches per camera as a sensor through `scene.add_sensor(...)`, so one scene can pair fast rasterized cameras with a photorealistic Nyx camera. See {doc}`/user_guide/rendering/nyx_renderer` for details.
 
 ## Minimal example
 
@@ -55,14 +55,13 @@ for _ in range(1000):
 
 visualizer
 viewer
+camera
 renderers/index
-cameras/index
 lights
 ```
 
 ## See also
 
-- {doc}`/user_guide/getting_started/visualization`: the interactive viewer and command-line tools
-- {doc}`/user_guide/getting_started/rendering`: cameras, image types, video, and rendering backends
-- {doc}`/api_reference/options/renderer/index`: renderer configuration options
-- {doc}`/api_reference/options/options`: viewer and visualization options
+- {doc}`/user_guide/interaction/visualization`: the interactive viewer and command-line tools
+- {doc}`/user_guide/rendering/rendering`: cameras, image types, video, and rendering backends
+- {doc}`/api_reference/sensor/camera`: the camera sensor, read through the sensor interface

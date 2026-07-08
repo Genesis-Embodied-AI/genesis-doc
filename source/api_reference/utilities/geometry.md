@@ -1,125 +1,89 @@
 # Geometry utilities
 
-Genesis World provides utility functions for geometric transformations and calculations.
+Genesis World ships a library of geometry helpers for rotations, quaternions, and rigid transforms. They are exposed both at the top level as `gs.<name>` and under `genesis.utils.geom`, and they accept NumPy arrays or PyTorch tensors, operating on single values or batches. Use them to build poses, convert between rotation representations, and transform points between frames.
 
-## Quaternion operations
-
-Genesis World uses `(w, x, y, z)` quaternion convention (scalar-first).
+All of them follow the project conventions: quaternions are `(w, x, y, z)` scalar-first (Hamilton), `euler_to_quat` and `euler_to_R` take degrees in extrinsic x-y-z order, and the world frame is right-handed and Z-up. See {doc}`/user_guide/configuration/conventions` for the full set.
 
 ```python
-import numpy as np
-import genesis.utils.geom as gu
+import genesis as gs
 
-# Create rotation quaternion (axis-angle)
-axis = np.array([0.0, 0.0, 1.0])  # Z-axis
-angle = np.array([np.pi / 2])  # 90 degrees
-quat = gu.axis_angle_to_quat(angle, axis)
+gs.init()
 
-# Compose two rotations (quaternion multiplication)
-q1 = np.array([1.0, 0.0, 0.0, 0.0])  # Identity
-q2 = np.array([0.707, 0.0, 0.0, 0.707])  # 90 deg around Z
-q_combined = gu.transform_quat_by_quat(q2, q1)
+# Euler (degrees, extrinsic x-y-z) to quaternion (w, x, y, z)
+quat = gs.euler_to_quat((0, 0, 90))
 
-# Inverse quaternion
-q_inv = gu.inv_quat(quat)
+# Rotate a point by a quaternion
+p_world = gs.transform_by_quat((1.0, 0.0, 0.0), quat)
 
-# Quaternion to rotation matrix
-rot_matrix = gu.quat_to_R(quat)
-```
-
-## Transform operations
-
-```python
-import numpy as np
-import genesis.utils.geom as gu
-
-# Transform point by quaternion
-point = np.array([[1.0, 0.0, 0.0]])
-quat = np.array([0.707, 0.0, 0.0, 0.707])
-rotated = gu.transform_by_quat(point, quat)
-
-# Transform point by translation and quaternion
-pos = np.array([1.0, 2.0, 3.0])
-transformed = gu.transform_by_trans_quat(point, pos, quat)
-
-# Inverse transform
-original = gu.inv_transform_by_trans_quat(transformed, pos, quat)
+# Apply a full rigid transform: rotate then translate
+p_world = gs.transform_by_trans_quat((1.0, 0.0, 0.0), trans=(0, 0, 1), quat=quat)
 ```
 
 ## Rotation conversions
 
-```python
-import numpy as np
-import genesis.utils.geom as gu
+Rotations can be expressed as Euler angles, quaternions, 3×3 matrices, rotation vectors, or 4×4 homogeneous transforms. These convert between them.
 
-# Euler to quaternion (Roll, Pitch, Yaw in degrees)
-euler = np.array([0, 0, 90])
-quat = gu.euler_to_quat(euler)
+| Function | Converts |
+|---|---|
+| `euler_to_quat(euler_xyz)` | Euler degrees (extrinsic x-y-z) to quaternion |
+| `euler_to_R(euler_xyz)` | Euler degrees to 3×3 rotation matrix |
+| `xyz_to_quat(xyz, rpy=False, degrees=False)` | Euler angles to quaternion, with unit and order options |
+| `quat_to_xyz(quat, rpy=False, degrees=False)` | Quaternion to Euler angles |
+| `quat_to_R(quat)` / `R_to_quat(R)` | Quaternion ↔ rotation matrix |
+| `R_to_xyz(R, rpy=False, degrees=False)` | Rotation matrix to Euler angles |
+| `axis_angle_to_quat(angle, axis)` / `axis_angle_to_R(axis, theta)` | Axis-angle to quaternion or matrix |
+| `quat_to_rotvec(quat)` / `rotvec_to_quat(rotvec)` | Quaternion ↔ rotation vector (axis × angle) |
 
-# Quaternion to Euler (Roll, Pitch, Yaw in degrees)
-euler_back = gu.quat_to_xyz(quat, rpy=True, degrees=True)
+:::{note}
+Argument order differs between `axis_angle_to_quat(angle, axis)` (angle first) and `axis_angle_to_R(axis, theta)` (axis first).
+:::
 
-# Rotation matrix to quaternion
-R = np.eye(3).reshape(1, 3, 3)
-quat = gu.R_to_quat(R)
-```
+## Quaternion operations
 
-## Vector operations
+| Function | Result |
+|---|---|
+| `inv_quat(quat)` | Inverse (conjugate for unit quaternions) |
+| `transform_quat_by_quat(v, u)` | Quaternion product, composing rotation `v` by `u` |
+| `transform_by_quat(v, quat)` | Rotate vector `v` by `quat` |
+| `inv_transform_by_quat(pos, quat)` | Rotate `pos` by the inverse of `quat` |
+| `slerp(q0, q1, t)` | Spherical linear interpolation at fraction `t` |
+| `identity_quat()` | The identity quaternion `(1, 0, 0, 0)` |
 
-```python
-import numpy as np
-import genesis.utils.geom as gu
+## Rigid transforms
 
-# Normalize vector
-v = np.array([1, 2, 3])
-v_normalized = gu.normalize(v)
+A rigid transform is a rotation plus a translation, stored either as a `(trans, quat)` pair or as a 4×4 homogeneous matrix `T`.
 
-# Get orthogonal basis from a normal vector
-normal = gu.normalize(np.array([[0.0, 1.0, 1.0]]))
-b, c = gu.orthogonals(normal)
+| Function | Result |
+|---|---|
+| `transform_by_trans_quat(pos, trans, quat)` | Rotate `pos` by `quat`, then add `trans` |
+| `inv_transform_by_trans_quat(pos, trans, quat)` | Inverse of the above |
+| `trans_quat_to_T(trans, quat)` / `T_to_trans_quat(T)` | `(trans, quat)` ↔ 4×4 matrix |
+| `trans_R_to_T(trans, R)` | Build a 4×4 matrix from translation and rotation matrix |
+| `transform_by_T(pos, T)` / `inv_transform_by_T(pos, T)` | Apply `T` (or its inverse) to `pos` |
+| `pos_lookat_up_to_T(pos, lookat, up)` | Camera extrinsics: eye, target, up to a 4×4 matrix |
 
-# Spherical linear interpolation between quaternions
-q0 = np.array([1.0, 0.0, 0.0, 0.0])  # Identity
-q1 = np.array([0.707, 0.0, 0.0, 0.707])  # 90 deg around Z
-t = np.array([0.5])  # Midpoint
-q_mid = gu.slerp(q0, q1, t)
-```
+## Vectors
 
-## Common patterns
+| Function | Result |
+|---|---|
+| `normalize(x, eps=1e-12)` | Scale a vector or batch to unit length |
+| `spherical_to_cartesian(theta, phi)` | Spherical angles to a unit `(x, y, z)` direction |
 
-### Setting entity orientation
+## Example: orienting an entity
 
 ```python
 import genesis as gs
-import numpy as np
-import genesis.utils.geom as gu
 
 gs.init()
 scene = gs.Scene()
 box = scene.add_entity(gs.morphs.Box(pos=(0, 0, 0.5), size=(1.0, 1.0, 1.0)))
 scene.build()
 
-# Rotate 45 degrees around Z
-angle = np.array([np.pi / 4])
-quat = gu.axis_angle_to_quat(angle, np.array([0.0, 0.0, 1.0]))
-box.set_quat(quat)
-```
-
-### Camera look-at calculation
-
-```python
-import numpy as np
-import genesis.utils.geom as gu
-
-camera_pos = np.array([3.0, 0.0, 2.0])
-target = np.array([0.0, 0.0, 0.5])
-
-# Calculate look-at direction
-direction = target - camera_pos
-direction = direction / np.linalg.norm(direction)
+# Rotate 45 degrees about the world Z axis.
+box.set_quat(gs.euler_to_quat((0, 0, 45)))
 ```
 
 ## See also
 
-- {doc}`tensor_utils` - Tensor conversions
-- {doc}`/api_reference/entity/index` - Entity transforms
+- {doc}`/user_guide/configuration/conventions`: coordinate frame, rotation, and quaternion conventions
+- {doc}`tensor_utils`: converting between NumPy, PyTorch, and Genesis tensors

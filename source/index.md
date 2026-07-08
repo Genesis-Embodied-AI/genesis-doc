@@ -10,18 +10,6 @@
 
 Genesis World began as an academic project in December 2024, under the name **Genesis**, and is now developed with support from [Genesis AI](https://www.genesis.ai/). For a tour of how the system fits together, see {doc}`/user_guide/overview/what_is_genesis`; for the design rationale, see the [blog post](https://www.genesis.ai/blog/the-role-of-simulation-in-scalable-robotics-genesis-world-10-and-the-path-forward).
 
-## Key features
-
-- **Pythonic and open source:** the engine is written and exposed in Python, so reading the code and contributing to it are straightforward.
-- **Simple to install and use:** a single `pip install`, and an API designed to stay small and predictable as scenes grow.
-- **Fast parallel simulation:** thousands of environments run in parallel on a single GPU, up to 10–80× faster than prior GPU-accelerated simulators such as Isaac Gym/Sim/Lab and MuJoCo MJX, without compromising accuracy. See the [blog post](https://www.genesis.ai/blog/the-role-of-simulation-in-scalable-robotics-genesis-world-10-and-the-path-forward) for methodology.
-- **Unified multi-physics:** rigid, FEM, MPM, and particle (PBD/SPH) solvers share one scene and one state, with explicit coupling between them.
-- **Photorealistic rendering:** [Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx), an in-house renderer built for robotics, plugs in as a camera sensor alongside Luisa and Pyrender.
-- **Differentiable:** autodiff and backpropagation are provided through the [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants) compiler.
-- **Comprehensive sensors:** tactile, IMU, lidar, depth-camera, contact-force, surface-distance, and temperature-grid sensors work out of the box in parallel and heterogeneous environments.
-
-For a closer look at the stack and the design philosophy behind it, see {doc}`/user_guide/overview/what_is_genesis`.
-
 ## Getting started
 
 Install PyTorch by following the [official instructions](https://pytorch.org/get-started/locally/), then install Genesis World from PyPI:

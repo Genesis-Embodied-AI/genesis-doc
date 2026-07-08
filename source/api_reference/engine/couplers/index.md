@@ -10,7 +10,7 @@ A coupler transfers forces and state between the physics solvers so that differe
 | **SAPCoupler** | A Semi-Analytic Primal (SAP) contact solver, as used in Drake | Accurate rigid-deformable contact with implicit FEM |
 | **IPCCoupler** | Incremental Potential Contact, a barrier-based, intersection-free contact model | Cloth and large-deformation soft bodies |
 
-See {doc}`/user_guide/advanced_topics/couplers/index` for guidance on choosing between them.
+See {doc}`/user_guide/theory/couplers/index` for guidance on choosing between them.
 
 ## Configuration
 
@@ -39,6 +39,6 @@ ipc_coupler
 
 ## See also
 
-- {doc}`/user_guide/advanced_topics/couplers/index`: choosing and configuring a coupler
+- {doc}`/user_guide/theory/couplers/index`: choosing and configuring a coupler
 - {doc}`/api_reference/engine/solvers/index`: the physics solvers being coupled
 - {doc}`/api_reference/options/simulator_coupler_and_solver_options/coupler_options`: coupler options reference

@@ -1,67 +1,15 @@
 # Visualizer
 
-The `Visualizer` class is the main orchestrator for all visualization and rendering in Genesis. It manages the viewer, cameras, and renderer backends.
-
-## Overview
-
-The Visualizer is automatically created when you create a `Scene` and is responsible for:
-
-- Managing the interactive `Viewer` window
-- Coordinating multiple `Camera` instances
-- Handling renderer backends (Rasterizer, Raytracer, BatchRenderer)
-- Synchronizing render state with simulation
-
-## Access
-
-The Visualizer is accessed through the scene:
+The orchestrator behind `scene.visualizer`, created automatically with every scene. It owns the interactive viewer, the camera sensors, and the renderer backend, and it refreshes them when you call `scene.visualizer.update()`. You rarely construct or call it directly: add cameras with `scene.add_camera(...)`, open the viewer with `show_viewer=True`, and drive both by stepping the scene and calling `update()` each step.
 
 ```python
-import genesis as gs
-
-gs.init()
 scene = gs.Scene(show_viewer=True)
+scene.add_entity(gs.morphs.Plane())
 scene.build()
 
-# Access the visualizer
-visualizer = scene.visualizer
-
-# Update the visualization
-visualizer.update()
-```
-
-## Common operations
-
-### Adding cameras
-
-```python
-# Add a camera for rendering
-cam = scene.add_camera(
-    res=(1280, 720),
-    pos=(3, 0, 2),
-    lookat=(0, 0, 0.5),
-    fov=40,
-)
-```
-
-### Updating the view
-
-```python
-# Update visualization each step
-for i in range(1000):
+for _ in range(1000):
     scene.step()
-    scene.visualizer.update()
-```
-
-### Controlling the viewer
-
-```python
-# Access the interactive viewer
-viewer = scene.visualizer.viewer
-
-# Check if viewer is active
-if scene.visualizer.viewer is not None:
-    # Viewer operations available
-    pass
+    scene.visualizer.update()  # refresh viewer and camera sensors
 ```
 
 ## API reference
@@ -75,6 +23,6 @@ if scene.visualizer.viewer is not None:
 
 ## See also
 
-- {doc}`viewer` - Interactive viewer for real-time visualization
-- {doc}`renderers/index` - Renderer backends
-- {doc}`cameras/index` - Camera sensors
+- {doc}`viewer`: the interactive window
+- {doc}`camera`: camera sensors for off-screen rendering
+- {doc}`renderers/index`: renderer backends

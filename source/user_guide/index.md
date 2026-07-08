@@ -1,6 +1,6 @@
 # User Guide
 
-This guide takes you from installation through the core concepts, tutorials, and API reference for Genesis World. If you are new, start with {doc}`overview/what_is_genesis` and the {doc}`getting_started/hello_genesis` tutorial.
+This guide takes you from installation through the core concepts and tutorials for Genesis World. If you are new, start with {doc}`overview/what_is_genesis` and the {doc}`getting_started/hello_genesis` tutorial, then branch into the topic that matches what you are building.
 
 ```{toctree}
 :caption: Overview
@@ -16,12 +16,31 @@ overview/installation
 :maxdepth: 1
 
 getting_started/hello_genesis
-getting_started/visualization
 getting_started/control_your_robot
 getting_started/parallel_simulation
-getting_started/interactive_debugging
-getting_started/viewer_plugin
 getting_started/more_examples
+```
+
+
+```{toctree}
+:caption: Concepts and Configuration
+:maxdepth: 1
+
+configuration/concepts
+configuration/initialization
+configuration/config_system
+configuration/conventions
+configuration/checkpoints
+```
+
+
+```{toctree}
+:caption: Debugging and Interaction
+:maxdepth: 1
+
+interaction/visualization
+interaction/interactive_debugging
+interaction/viewer_plugin
 ```
 
 
@@ -29,24 +48,25 @@ getting_started/more_examples
 :caption: Robot Control
 :maxdepth: 1
 
-getting_started/inverse_kinematics_motion_planning
-getting_started/advanced_ik
-getting_started/constraints
-getting_started/path_planning
+robot_control/inverse_kinematics_motion_planning
+robot_control/advanced_ik
+robot_control/constraints
+robot_control/path_planning
 ```
 
 
 ```{toctree}
-:caption: Physics Simulation
+:caption: Physical Entities
 :maxdepth: 1
 
-getting_started/beyond_rigid_bodies
-getting_started/soft_robots
-getting_started/hybrid_entity
-getting_started/drone_entity
-getting_started/terrain
-getting_started/emitters
-getting_started/force_fields
+physics/rigid_bodies
+physics/beyond_rigid_bodies
+physics/soft_robots
+physics/hybrid_entity
+physics/drone_entity
+physics/terrain
+physics/emitters
+physics/force_fields
 ```
 
 
@@ -54,8 +74,8 @@ getting_started/force_fields
 :caption: Sensing and Perception
 :maxdepth: 2
 
-getting_started/sensors/index
-getting_started/recorders
+sensing/sensors/index
+sensing/recorders
 ```
 
 
@@ -63,18 +83,9 @@ getting_started/recorders
 :caption: Rendering
 :maxdepth: 1
 
-getting_started/rendering
-getting_started/surfaces_textures
-getting_started/nyx_renderer
-```
-
-
-```{toctree}
-:caption: Policy Training
-:maxdepth: 2
-
-getting_started/policy_training/best_practices/index
-getting_started/policy_training/examples/index
+rendering/rendering
+rendering/surfaces_textures
+rendering/nyx_renderer
 ```
 
 
@@ -82,29 +93,19 @@ getting_started/policy_training/examples/index
 :caption: Loading Assets
 :maxdepth: 1
 
-getting_started/usd_import
-advanced_topics/mesh_processing
+assets/loading_assets
+assets/usd_import
+assets/mesh_processing
 ```
 
 
 ```{toctree}
-:caption: Configuration and Conventions
-:maxdepth: 1
-
-getting_started/initialization
-getting_started/config_system
-getting_started/conventions
-```
-
-
-```{toctree}
-:caption: Advanced Topics
+:caption: Policy Training
 :maxdepth: 2
 
-advanced_topics/concepts
-advanced_topics/couplers/index
-advanced_topics/checkpoints
-advanced_topics/multi_gpu
+policy_training/best_practices/index
+policy_training/examples/index
+policy_training/multi_gpu
 ```
 
 
@@ -112,18 +113,21 @@ advanced_topics/multi_gpu
 :caption: Theory and Modelling
 :maxdepth: 2
 
-advanced_topics/rigid_collision/index
-advanced_topics/solvers_and_coupling
-advanced_topics/nonrigid_models
-advanced_topics/support_field
+theory/rigid_collision/index
+theory/solvers_and_coupling
+theory/couplers/index
+theory/nonrigid_models
+theory/support_field
+theory/hibernation
 ```
 
 
 ```{toctree}
-:caption: Extending Genesis
+:caption: Developers
 :maxdepth: 2
 
-advanced_topics/naming_and_variables
-advanced_topics/sensors/index
-advanced_topics/profiling
+developers/extending_genesis
+developers/sensors/index
+developers/naming_and_variables
+developers/profiling
 ```

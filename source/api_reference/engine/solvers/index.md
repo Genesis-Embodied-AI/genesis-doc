@@ -1,6 +1,6 @@
 # Solvers
 
-A solver is the physics engine for one class of material. Each solver owns the entities built from its materials, advances their state every substep, and exposes the state back to the scene. A scene can run several solvers at once, so a single simulation can mix rigid robots, deformable solids, cloth, fluids, and smoke. For how solvers exchange forces at their interfaces, see {doc}`/user_guide/advanced_topics/solvers_and_coupling`.
+A solver is the physics engine for one class of material. Each solver owns the entities built from its materials, advances their state every substep, and exposes the state back to the scene. A scene can run several solvers at once, so a single simulation can mix rigid robots, deformable solids, cloth, fluids, and smoke. For how solvers exchange forces at their interfaces, see {doc}`/user_guide/theory/solvers_and_coupling`.
 
 You rarely construct a solver directly. You add an entity with a material, and the scene routes it to the matching solver; you configure each solver through its options object.
 
@@ -91,6 +91,6 @@ Solvers run on the GPU through Quadrants, the just-in-time compiler that generat
 
 ## See also
 
-- {doc}`/user_guide/advanced_topics/solvers_and_coupling`: how solvers are combined and coupled.
+- {doc}`/user_guide/theory/solvers_and_coupling`: how solvers are combined and coupled.
 - {doc}`/api_reference/engine/couplers/index`: the couplers that exchange forces between solvers.
 - {doc}`/api_reference/options/simulator_coupler_and_solver_options/index`: per-solver options.
