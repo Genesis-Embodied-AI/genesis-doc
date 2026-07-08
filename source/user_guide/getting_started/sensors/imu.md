@@ -1,36 +1,68 @@
-# 🧭 IMU
+# IMU
 
-The `IMU` sensor models an Inertial Measurement Unit attached to a rigid link. It returns linear acceleration, angular velocity, and magnetic field as a `NamedTuple` (`lin_acc`, `ang_vel`, `mag`), with optional misalignment, noise, drift, delay, and jitter to mimic real hardware.
+An **inertial measurement unit (IMU)** reports the motion of a rigid link as an onboard sensor would: linear acceleration from an accelerometer, angular velocity from a gyroscope, and, optionally, the local magnetic field from a magnetometer. Use it to feed state estimators, train locomotion policies on realistic proprioception, or log ground-truth dynamics.
 
-The full example script is at `examples/sensors/imu_franka.py`.
+The complete runnable script is [`examples/sensors/imu_franka.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/imu_franka.py). This page explains what the sensor measures and how to configure it; see {doc}`Sensors <index>` for the pipeline every sensor shares.
 
-## Scene setup
+## Minimal example
+
+An IMU is attached to one link of a rigid entity. Identify the link by its owning entity and the link's local index, then read the sensor after the scene is built:
 
 ```python
-import genesis as gs
-import numpy as np
+end_effector = franka.get_link("hand")
 
-gs.init(backend=gs.gpu)
-
-scene = gs.Scene(
-    viewer_options=gs.options.ViewerOptions(
-        camera_pos=(3.5, 0.0, 2.5),
-        camera_lookat=(0.0, 0.0, 0.5),
-        camera_fov=40,
-    ),
-    sim_options=gs.options.SimOptions(dt=0.01),
-    show_viewer=True,
+imu = scene.add_sensor(
+    gs.sensors.IMU(
+        entity_idx=franka.idx,
+        link_idx_local=end_effector.idx_local,
+    )
 )
 
-scene.add_entity(gs.morphs.Plane())
-franka = scene.add_entity(gs.morphs.MJCF(file="xml/franka_emika_panda/panda.xml"))
-end_effector = franka.get_link("hand")
-motors_dof = (0, 1, 2, 3, 4, 5, 6)
+scene.build()
+
+for _ in range(1000):
+    scene.step()
+    data = imu.read()  # IMUReturnType(lin_acc, ang_vel, mag)
+    acc = data.lin_acc  # m/s^2, shape ([n_envs,] 3)
 ```
 
-## Adding the IMU sensor
+`read()` returns an `IMUReturnType` — a `NamedTuple` with three fields, each a tensor of shape `([n_envs,] 3)`:
 
-Attach the IMU onto the entity at the end effector by specifying `entity_idx` and `link_idx_local`:
+| Field | Meaning | Units |
+|---|---|---|
+| `lin_acc` | linear acceleration (accelerometer) | m/s² |
+| `ang_vel` | angular velocity (gyroscope) | rad/s |
+| `mag` | magnetic field (magnetometer) | Tesla |
+
+## Frame and conventions
+
+All three fields are expressed in the **sensor's body frame** — the frame of the attached link, rotated by any `euler_offset` you supply. They are not in the world frame, so they rotate with the link.
+
+The accelerometer reports **specific force**: coordinate acceleration minus gravity. A sensor at rest therefore reads roughly `(0, 0, 9.81)` m/s² — the reaction to gravity along its local up axis — not zero. This matches real hardware, which cannot distinguish free fall from weightlessness.
+
+When `pos_offset` moves the sensor off the link's origin, Genesis World adds the tangential and centripetal terms (`α × r` and `ω × (ω × r)`), so a spinning link produces the acceleration an IMU would actually feel at that offset.
+
+## Attaching and offsetting the sensor
+
+`entity_idx` and `link_idx_local` place the sensor on a link; `pos_offset` and `euler_offset` move and rotate it relative to that link's frame:
+
+```python
+imu = scene.add_sensor(
+    gs.sensors.IMU(
+        entity_idx=franka.idx,
+        link_idx_local=end_effector.idx_local,
+        pos_offset=(0.0, 0.0, 0.15),  # meters, in the link frame
+        # euler_offset=(0, 0, 0),     # extrinsic x-y-z, degrees
+        draw_debug=True,              # draw acc/gyro/mag arrows in the viewer
+    )
+)
+```
+
+With `draw_debug=True`, the viewer shows three arrows at the sensor: red for acceleration, green for angular velocity, blue for the magnetic field.
+
+## Modeling sensor imperfections
+
+By default the IMU is ideal. Each channel — `acc_*`, `gyro_*`, and `mag_*` — takes the same family of parameters to reproduce real-hardware error, applied per axis:
 
 ```python
 imu = scene.add_sensor(
@@ -38,7 +70,7 @@ imu = scene.add_sensor(
         entity_idx=franka.idx,
         link_idx_local=end_effector.idx_local,
         pos_offset=(0.0, 0.0, 0.15),
-        # sensor characteristics
+        # noise parameters
         acc_cross_axis_coupling=(0.0, 0.01, 0.02),
         gyro_cross_axis_coupling=(0.03, 0.04, 0.05),
         acc_noise=(0.01, 0.01, 0.01),
@@ -52,45 +84,24 @@ imu = scene.add_sensor(
 )
 ```
 
-The IMU constructor exposes:
+| Parameter | Effect |
+|---|---|
+| `*_noise` | standard deviation of per-axis Gaussian white noise |
+| `*_bias` | constant additive offset per axis |
+| `*_random_walk` | standard deviation of the drift that accumulates over time |
+| `*_cross_axis_coupling` | axis misalignment; a scalar, a 3-vector, or a full 3×3 rotation matrix |
+| `*_resolution` | quantization step; `0.0` (default) means no quantization |
 
-- `pos_offset` - sensor position relative to the link frame.
-- `acc_cross_axis_coupling` / `gyro_cross_axis_coupling` - sensor misalignment.
-- `acc_noise` / `gyro_noise` - Gaussian noise per axis.
-- `acc_random_walk` / `gyro_random_walk` - gradual drift over time.
-- `delay` / `jitter` - timing realism.
-- `draw_debug` - visualize the sensor frame in the viewer.
+Two timing parameters, shared across channels, are given in seconds:
 
-## Motion control and simulation
+- `delay` — how far behind real time a read lags. Must be a multiple of the simulation timestep `dt`.
+- `jitter` — a random extra delay sampled uniformly in `[0, jitter)` each step. Cannot exceed `delay`.
 
-```python
-scene.build()
+The magnetometer also reads a global field, set by `magnetic_field` (default `(0.0, 0.0, 0.5)` T in the world frame) and returned in the body frame.
 
-franka.set_dofs_kp(np.array([4500, 4500, 3500, 3500, 2000, 2000, 2000, 100, 100]))
-franka.set_dofs_kv(np.array([450, 450, 350, 350, 200, 200, 200, 10, 10]))
+## Reading measured versus ground-truth data
 
-circle_center = np.array([0.4, 0.0, 0.5])
-circle_radius = 0.15
-rate = np.deg2rad(2.0)
-
-def control_franka_circle_path(i):
-    pos = circle_center + np.array([np.cos(i * rate), np.sin(i * rate), 0]) * circle_radius
-    qpos = franka.inverse_kinematics(
-        link=end_effector,
-        pos=pos,
-        quat=np.array([0, 1, 0, 0]),
-    )
-    franka.control_dofs_position(qpos[:-2], motors_dof)
-    scene.draw_debug_sphere(pos, radius=0.01, color=(1.0, 0.0, 0.0, 0.5))
-
-for i in range(1000):
-    scene.step()
-    control_franka_circle_path(i)
-```
-
-The robot traces a horizontal circle while maintaining a fixed orientation. The circular motion creates centripetal acceleration that the IMU detects, along with gravitational effects based on the sensor's orientation.
-
-After the build, both measured and ground truth IMU data are available:
+`read()` returns the value with all configured imperfections applied. `read_ground_truth()` returns the same quantities with no noise, bias, drift, or delay — useful as a training target or for validation:
 
 ```python
 print("Ground truth data:")
@@ -99,12 +110,14 @@ print("Measured data:")
 print(imu.read())
 ```
 
-The IMU returns data as a `NamedTuple` with fields:
-
-- `lin_acc` - linear acceleration in m/s² (3D vector)
-- `ang_vel` - angular velocity in rad/s (3D vector)
-- `mag` - magnetic field in Tesla (3D vector)
+Both accept an optional `envs_idx` to select a subset of environments, and both are idempotent within a step: repeated calls in one control-loop timestep return the same value.
 
 <video preload="auto" controls="True" width="100%">
-<source src="https://github.com/Genesis-Embodied-AI/genesis-doc/raw/main/source/_static/videos/imu.mp4" type="video/mp4">
+<source src="../../../_static/videos/imu.mp4" type="video/mp4">
+Your browser does not support the video tag; the clip shows the IMU arrows tracking a Franka end effector as it traces a circle.
 </video>
+
+## See also
+
+- {doc}`Sensors <index>` — the shared read/record pipeline, `history_length`, and batched `read_sensors()`.
+- {doc}`/user_guide/getting_started/recorders` — save IMU streams alongside the simulation.
