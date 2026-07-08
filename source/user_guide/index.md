@@ -20,6 +20,8 @@ getting_started/visualization
 getting_started/control_your_robot
 getting_started/parallel_simulation
 getting_started/interactive_debugging
+getting_started/viewer_plugin
+getting_started/more_examples
 ```
 
 
@@ -53,8 +55,17 @@ getting_started/force_fields
 :maxdepth: 2
 
 getting_started/sensors/index
-getting_started/nyx_renderer
 getting_started/recorders
+```
+
+
+```{toctree}
+:caption: Rendering
+:maxdepth: 1
+
+getting_started/rendering
+getting_started/surfaces_textures
+getting_started/nyx_renderer
 ```
 
 
@@ -68,12 +79,11 @@ getting_started/policy_training/examples/index
 
 
 ```{toctree}
-:caption: Assets and Rendering
+:caption: Loading Assets
 :maxdepth: 1
 
-getting_started/surfaces_textures
 getting_started/usd_import
-getting_started/viewer_plugin
+advanced_topics/mesh_processing
 ```
 
 
@@ -81,9 +91,9 @@ getting_started/viewer_plugin
 :caption: Configuration and Conventions
 :maxdepth: 1
 
+getting_started/initialization
 getting_started/config_system
 getting_started/conventions
-getting_started/miscellaneous
 ```
 
 
@@ -95,7 +105,6 @@ advanced_topics/concepts
 advanced_topics/couplers/index
 advanced_topics/checkpoints
 advanced_topics/multi_gpu
-advanced_topics/mesh_processing
 ```
 
 

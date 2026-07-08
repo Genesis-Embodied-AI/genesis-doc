@@ -1,6 +1,6 @@
 # Conventions
 
-This page defines the coordinate system, rotation, and asset-import conventions that Genesis World uses throughout its API. State them the same way everywhere in your own code, and Genesis World will behave predictably.
+This page defines the conventions Genesis World uses throughout its API: the coordinate system, rotations, physical units, tensor shapes, and data types, plus the rules for importing assets. State them the same way everywhere in your own code, and Genesis World will behave predictably.
 
 ## Coordinate system
 
@@ -101,3 +101,41 @@ After import, each mesh records whether a conversion was applied in its `importe
 ```python
 obj.vgeoms[0].mesh.metadata["imported_as_zup"]  # False if a Y-up -> Z-up conversion ran
 ```
+
+## Units
+
+Genesis World is unitless in the sense that it does no conversion for you, but every built-in default is expressed in **SI units**, and the API assumes you follow suit:
+
+- **Length** in meters, **mass** in kilograms, **time** in seconds.
+- **Angles** in radians, with one deliberate exception: Euler angles passed to morphs are in **degrees** (see the rotation section above).
+- **Derived quantities** follow from these: density in kg/m³, force in newtons, gravitational acceleration in m/s².
+
+The simulation timestep is a duration in seconds, defaulting to `dt = 1e-2` (10 ms):
+
+```python
+gs.options.SimOptions(dt=0.01)  # seconds
+```
+
+A few APIs carry their own natural units where SI would be awkward. For example, a drone's propellers take angular speed in **RPM**, and the temperature-grid sensor reports **degrees Celsius**. These are called out on the pages and in the docstrings where they appear. When in doubt, assume SI.
+
+## Tensor shapes and batching
+
+Genesis World simulates many environments in parallel (see {doc}`parallel_simulation`), so most quantities carry an optional leading **batch dimension**. The docs and docstrings describe shapes with a bracket notation:
+
+```
+distances  # shape ([n_envs,] n_probes)
+points     # shape ([n_envs,] n_probes, 3)
+```
+
+The `[n_envs,]` bracket means: **present when the scene is built with multiple environments, absent otherwise.** A scene built with `scene.build(n_envs=4096)` returns tensors with a leading `4096` dimension; a scene built without `n_envs` drops that dimension entirely rather than using a size-1 axis.
+
+Methods that read or write per-environment state take an `envs_idx` argument to address a subset of environments. Passing `envs_idx=None` (the default) applies to all of them; passing a tensor of indices selects just those rows along the batch dimension.
+
+## Data types and precision
+
+Tensors returned by the API are **PyTorch tensors** placed on the active device (`gs.device`). Their dtype follows the precision chosen at initialization:
+
+- **Floating-point values** are `float32` by default, or `float64` when the library is initialized with `precision="64"`.
+- **Integer indices** (entity, link, and DOF indices, `envs_idx`, and the like) are always `int32`, independent of the float precision.
+
+`gs.init()` sets PyTorch's global default dtype and device to match, so tensors you allocate yourself line up with what the API returns. See {doc}`initialization` for how to choose the backend and precision.

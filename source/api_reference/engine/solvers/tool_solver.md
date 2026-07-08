@@ -70,5 +70,5 @@ The coupling is handled automatically by the coupler.
 
 ## See also
 
-- {doc}`/api_reference/engine/couplers/index` — coupling with other solvers.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/tool_options` — full options.
+- {doc}`/api_reference/engine/couplers/index`: coupling with other solvers.
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/tool_options`: full options.

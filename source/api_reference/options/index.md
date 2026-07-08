@@ -10,7 +10,7 @@ The classes group into families:
 - **Morph options:** the geometry and initial pose of an entity, loaded from primitives, meshes, URDF, MJCF, terrain, or USD. See {doc}`/api_reference/options/morph/index`.
 - **Surface options:** how an entity looks when rendered, including its textures. See {doc}`/api_reference/options/surface/index`.
 - **Texture options:** the color, image, and batched textures a surface draws from. See {doc}`/api_reference/options/texture/index`.
-- **Renderer options:** the rendering backend shared by every camera in a scene — `RendererOptions` and its `Rasterizer`, `RayTracer`, and `BatchRenderer` variants. See {doc}`/api_reference/options/renderer/index`.
+- **Renderer options:** the rendering backend shared by every camera in a scene: `RendererOptions` and its `Rasterizer`, `RayTracer`, and `BatchRenderer` variants. See {doc}`/api_reference/options/renderer/index`.
 - **Viewer and visualization options:** `ViewerOptions` for the interactive viewer and `VisOptions` for viewer-independent visualization. See {doc}`/api_reference/options/vis/index`.
 - **Miscellaneous options:** profiling and FPS reporting (`ProfilingOptions`), particle-fluid foam generation (`FoamOptions`), and convex decomposition (`CoacdOptions`). See {doc}`/api_reference/options/misc/index`.
 

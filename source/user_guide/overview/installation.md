@@ -34,6 +34,8 @@ Supported features on various systems are as follows:
 If you are using Genesis World with CUDA, make sure appropriate nvidia-driver is installed on your machine.
 :::
 
+Once installed, initialize the library with `gs.init()`. See {doc}`Initialization and backends </user_guide/getting_started/initialization>` for backend selection, precision, and reproducibility.
+
 ## (Optional) Surface reconstruction
 To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, you reconstruct a mesh surface from the internal particle representation. [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) is supported out of the box. Alternatively, `ParticleMesher`, our own OpenVDB-based tool, is faster but produces lower-quality surfaces:
 ```bash
@@ -43,7 +45,7 @@ source ~/.bashrc
 
 ## (Optional) Ray tracing renderer
 
-For photorealistic visuals, Genesis World includes a ray-tracing (path-tracing) renderer built on [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain-specific language for rendering. See {doc}`/user_guide/getting_started/visualization` for setup.
+For photorealistic visuals, Genesis World includes a ray-tracing (path-tracing) renderer built on [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute), a high-performance domain-specific language for rendering. See {doc}`/user_guide/getting_started/rendering` for setup.
 
 ## (Optional) USD assets
 

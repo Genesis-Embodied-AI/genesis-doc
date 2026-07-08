@@ -103,6 +103,6 @@ Whether a recorder runs on a background thread is decided internally per recorde
 
 ## See also
 
-- {doc}`/user_guide/getting_started/recorders` — task-oriented guide to recording sensor and custom data.
-- {doc}`/api_reference/visualization/index` — cameras and other visual output.
-- {doc}`/api_reference/scene/index` — `scene.start_recording` and `scene.stop_recording`.
+- {doc}`/user_guide/getting_started/recorders`: task-oriented guide to recording sensor and custom data.
+- {doc}`/api_reference/visualization/index`: cameras and other visual output.
+- {doc}`/api_reference/scene/index`: `scene.start_recording` and `scene.stop_recording`.

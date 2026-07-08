@@ -91,6 +91,6 @@ Solvers run on the GPU through Quadrants, the just-in-time compiler that generat
 
 ## See also
 
-- {doc}`/user_guide/advanced_topics/solvers_and_coupling` — how solvers are combined and coupled.
-- {doc}`/api_reference/engine/couplers/index` — the couplers that exchange forces between solvers.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/index` — per-solver options.
+- {doc}`/user_guide/advanced_topics/solvers_and_coupling`: how solvers are combined and coupled.
+- {doc}`/api_reference/engine/couplers/index`: the couplers that exchange forces between solvers.
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/index`: per-solver options.

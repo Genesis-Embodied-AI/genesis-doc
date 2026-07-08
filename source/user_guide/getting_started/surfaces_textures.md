@@ -68,7 +68,7 @@ gs.surfaces.Smooth(color=(1.0, 1.0, 1.0, 0.5))
 
 ## Textures
 
-When a property varies across a surface — a wood grain, a painted logo, a roughness map — supply a texture instead of a constant. Textures live under `gs.textures`:
+When a property varies across a surface (a wood grain, a painted logo, a roughness map), supply a texture instead of a constant. Textures live under `gs.textures`:
 
 - `gs.textures.ColorTexture(color=...)`: a single uniform color. Equivalent to the `color` shortcut, useful when an argument requires a texture object.
 - `gs.textures.ImageTexture(image_path=..., encoding=...)`: an image map sampled over the mesh's UV coordinates.
@@ -112,7 +112,7 @@ scene = gs.Scene(
 ```
 
 :::{note}
-Surfaces render on both the interactive viewer's rasterizer and the ray tracer, but reflections, refraction, transmission, and emission-based lighting are only fully resolved by the ray tracer. See {doc}`Visualization <visualization>` for how to choose and configure a renderer.
+Surfaces render on both the interactive viewer's rasterizer and the ray tracer, but reflections, refraction, transmission, and emission-based lighting are only fully resolved by the ray tracer. See {doc}`Rendering <rendering>` for how to choose and configure a renderer.
 :::
 
 ## Visualizing something other than the visual mesh
@@ -131,7 +131,7 @@ The accepted values are `"visual"`, `"collision"`, `"particle"`, `"sdf"`, and `"
 
 ## Foam and spray
 
-A fast-moving particle fluid entrains air: whitewater on a breaking wave, spray thrown off a splash, bubbles carried below the surface. Genesis World can add these as secondary foam particles at render time. This is purely a visual effect for particle-based fluids in the {doc}`Nyx <nyx_renderer>` ray tracer — it does not change the physics, and the rasterizer ignores it.
+A fast-moving particle fluid entrains air: whitewater on a breaking wave, spray thrown off a splash, bubbles carried below the surface. Genesis World can add these as secondary foam particles at render time. This is purely a visual effect for particle-based fluids in the {doc}`Nyx <nyx_renderer>` ray tracer. It does not change the physics, and the rasterizer ignores it.
 
 Enable it on the fluid's surface with `generate_foam=True`, and tune the look with a `foam_options` object:
 
@@ -153,7 +153,7 @@ scene.add_entity(
 )
 ```
 
-`gs.options.FoamOptions` splits the effect into three populations, each with its own dissipation rate — a larger value clears that population faster:
+`gs.options.FoamOptions` splits the effect into three populations, each with its own dissipation rate (a larger value clears that population faster):
 
 - **`radius_scale`:** foam particle radius as a fraction of the fluid particle radius. Defaults to `0.2`.
 - **`k_foam`:** number of foam particles generated per frame. Defaults to `1000.0`.
@@ -164,6 +164,6 @@ scene.add_entity(
 
 ## Next steps
 
-- {doc}`Visualization <visualization>`: cameras, the viewer, and choosing a renderer.
+- {doc}`Rendering <rendering>`: cameras and choosing a renderer.
 - {doc}`Nyx renderer <nyx_renderer>`: the ray tracer and its options in depth.
 - {doc}`USD import <usd_import>`: loading assets that carry their own surfaces.

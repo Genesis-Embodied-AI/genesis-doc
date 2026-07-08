@@ -134,6 +134,6 @@ drone.set_propellers_rpm(rpms)
 
 ## See also
 
-- {doc}`Training a drone to hover <policy_training/examples/hover_env>` — a complete reinforcement-learning environment built on this entity.
-- {doc}`Training locomotion policies <policy_training/examples/locomotion>` — the same training workflow applied to legged robots.
-- {doc}`DroneEntity reference </api_reference/entity/drone_entity>` — the full class API.
+- {doc}`Training a drone to hover <policy_training/examples/hover_env>`: a complete reinforcement-learning environment built on this entity.
+- {doc}`Training locomotion policies <policy_training/examples/locomotion>`: the same training workflow applied to legged robots.
+- {doc}`DroneEntity reference </api_reference/entity/drone_entity>`: the full class API.

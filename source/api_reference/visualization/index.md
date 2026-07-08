@@ -62,6 +62,7 @@ lights
 
 ## See also
 
-- {doc}`/user_guide/getting_started/visualization` — visualization guide with worked examples
-- {doc}`/api_reference/options/renderer/index` — renderer configuration options
-- {doc}`/api_reference/options/options` — viewer and visualization options
+- {doc}`/user_guide/getting_started/visualization`: the interactive viewer and command-line tools
+- {doc}`/user_guide/getting_started/rendering`: cameras, image types, video, and rendering backends
+- {doc}`/api_reference/options/renderer/index`: renderer configuration options
+- {doc}`/api_reference/options/options`: viewer and visualization options

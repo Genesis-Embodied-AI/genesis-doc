@@ -91,7 +91,7 @@ The conventions above surface names you also see when reading solver code. If yo
 
 | Variable | Indexes |
 |---|---|
-| `i_b` | batch — the environment |
+| `i_b` | batch: the environment |
 | `i_e` | entity |
 | `i_l` | link |
 | `i_j` | joint |

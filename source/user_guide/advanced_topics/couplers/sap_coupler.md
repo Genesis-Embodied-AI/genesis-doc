@@ -104,7 +104,7 @@ scene = gs.Scene(
 )
 ```
 
-To hold a target vertex of an FEM body in place — a fixed constraint rather than a grasp — see [`fem_fixed_constraint.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/fem_fixed_constraint.py), which sets `FEMOptions(enable_vertex_constraints=True)` and drives a vertex with `set_vertex_constraints`.
+To hold a target vertex of an FEM body in place (a fixed constraint rather than a grasp), see [`fem_fixed_constraint.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/fem_fixed_constraint.py), which sets `FEMOptions(enable_vertex_constraints=True)` and drives a vertex with `set_vertex_constraints`.
 
 ## When to use SAP
 

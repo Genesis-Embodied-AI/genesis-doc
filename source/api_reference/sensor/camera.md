@@ -85,5 +85,5 @@ Use the rasterizer for fast RGB with no special setup. Use the raytracer for pho
 
 ## See also
 
-- {doc}`index` — sensor overview and return-shape table.
-- {doc}`/api_reference/visualization/cameras/index` — the visualization camera (`scene.add_camera().render()`) for depth, segmentation, and normals.
+- {doc}`index`: sensor overview and return-shape table.
+- {doc}`/api_reference/visualization/cameras/index`: the visualization camera (`scene.add_camera().render()`) for depth, segmentation, and normals.

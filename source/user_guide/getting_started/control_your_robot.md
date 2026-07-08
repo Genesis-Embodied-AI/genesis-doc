@@ -218,7 +218,7 @@ Both methods take the same optional arguments:
 
 - **`links_idx`:** which links to act on. `None` targets every link.
 - **`envs_idx`:** which environments to act on in a batched scene. `None` targets all of them.
-- **`ref`:** the reference frame the wrench is applied at — `"link_origin"` (default), `"link_com"` (the link's center of mass), or `"root_com"` (the center of mass of the whole kinematic tree).
+- **`ref`:** the reference frame the wrench is applied at: `"link_origin"` (default), `"link_com"` (the link's center of mass), or `"root_com"` (the center of mass of the whole kinematic tree).
 - **`local`:** by default the wrench is expressed in world coordinates. Set `local=True` to express it in the reference frame's own coordinates instead, so the force rotates with the link.
 
 ## Pick and place with a suction cup

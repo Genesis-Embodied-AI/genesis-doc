@@ -1,6 +1,6 @@
 # Recorders
 
-A **recorder** samples data from your simulation on a schedule and processes it for you — writing it to a file or drawing it in a live plot — without you threading logging code through your step loop. You describe *what* to record and *how*, then step the scene as usual.
+A **recorder** samples data from your simulation on a schedule and processes it for you (writing it to a file or drawing it in a live plot) without you threading logging code through your step loop. You describe *what* to record and *how*, then step the scene as usual.
 
 Recording runs on a background thread by default, so it adds little overhead to the simulation itself.
 

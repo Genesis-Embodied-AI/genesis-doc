@@ -1,6 +1,6 @@
 # Couplers
 
-A single Genesis World scene can run several physics solvers at once — rigid bodies, FEM, MPM, SPH, PBD. A **coupler** is the component that lets those solvers affect each other: it detects contact between entities owned by different solvers and exchanges the forces and state that keep them physically consistent. Without a coupler, each solver would advance in its own world and objects would pass through one another.
+A single Genesis World scene can run several physics solvers at once: rigid bodies, FEM, MPM, SPH, PBD. A **coupler** is the component that lets those solvers affect each other: it detects contact between entities owned by different solvers and exchanges the forces and state that keep them physically consistent. Without a coupler, each solver would advance in its own world and objects would pass through one another.
 
 You select a coupler by passing a coupler-options object to the {doc}`Scene </api_reference/scene/scene>`. Every variant derives from `BaseCouplerOptions`:
 
@@ -16,7 +16,7 @@ Genesis World ships three couplers with different contact models and different t
 
 ## The three couplers
 
-- **Legacy coupler (`LegacyCouplerOptions`):** the default, used when you pass no `coupler_options`. It applies impulse-based collision response across every solver pair (rigid, MPM, SPH, PBD, FEM), and each pair can be toggled individually — for example `rigid_mpm=False`. It is the most broadly compatible option and the right starting point for mixed continuum scenes. See {doc}`/user_guide/advanced_topics/solvers_and_coupling` for its architecture and parameters.
+- **Legacy coupler (`LegacyCouplerOptions`):** the default, used when you pass no `coupler_options`. It applies impulse-based collision response across every solver pair (rigid, MPM, SPH, PBD, FEM), and each pair can be toggled individually: for example `rigid_mpm=False`. It is the most broadly compatible option and the right starting point for mixed continuum scenes. See {doc}`/user_guide/advanced_topics/solvers_and_coupling` for its architecture and parameters.
 - **SAP coupler (`SAPCouplerOptions`):** the Semi-Analytic Primal contact solver from [Drake](https://drake.mit.edu/), built for accurate rigid-FEM contact with moderate deformation. It sits between rigid-body dynamics and IPC in cost and fidelity, and suits FEM-style continuum contact where the legacy impulse model is too coarse.
 - **IPC coupler (`IPCCouplerOptions`):** Incremental Potential Contact, a smooth barrier-based model for cloth and highly deformable bodies, both elastic and plastic. It handles rich soft-body interaction directly from vertex positions, with rigid bodies represented as affine bodies (ABD), and is the choice when contact must stay intersection-free and stable under large deformation.
 

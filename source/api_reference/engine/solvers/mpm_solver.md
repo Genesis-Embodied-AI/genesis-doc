@@ -102,6 +102,6 @@ material = gs.materials.MPM.Sand(
 
 ## See also
 
-- {doc}`/api_reference/entity/mpm_entity` — MPMEntity.
-- {doc}`/api_reference/material/mpm/index` — MPM materials.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/mpm_options` — full options.
+- {doc}`/api_reference/entity/mpm_entity`: MPMEntity.
+- {doc}`/api_reference/material/mpm/index`: MPM materials.
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/mpm_options`: full options.

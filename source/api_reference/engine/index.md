@@ -89,5 +89,5 @@ states/index
 
 ## See also
 
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/index` — simulator, solver, and coupler options.
-- {doc}`/api_reference/entity/index` — the entity types that select each solver.
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/index`: simulator, solver, and coupler options.
+- {doc}`/api_reference/entity/index`: the entity types that select each solver.

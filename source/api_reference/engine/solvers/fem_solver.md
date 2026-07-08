@@ -78,6 +78,6 @@ soft_body.set_vertex_constraints(
 
 ## See also
 
-- {doc}`/api_reference/entity/fem_entity` — FEMEntity.
-- {doc}`/api_reference/material/fem/index` — FEM materials.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/fem_options` — full options.
+- {doc}`/api_reference/entity/fem_entity`: FEMEntity.
+- {doc}`/api_reference/material/fem/index`: FEM materials.
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/fem_options`: full options.

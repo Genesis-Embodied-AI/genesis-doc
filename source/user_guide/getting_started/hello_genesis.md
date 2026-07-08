@@ -40,6 +40,8 @@ gs.init(backend=gs.cpu)
 - **Logging.** On init, Genesis World logs system and version information. Set `logging_level="warning"` to quiet it, and `theme="light"` for light-background terminals.
 - **Performance mode.** With `performance_mode=True`, Genesis World bakes static tensor shapes into its compiled kernels for roughly 30% faster simulation, at the cost of recompiling whenever the scene changes (several minutes per change). Leave it off for research, debugging, and interactive work; turn it on for policy training and production runs.
 
+For the full set of `gs.init()` arguments (backend selection and fallback, precision, seeding and determinism, logging, and environment variables), see {doc}`Initialization and backends <initialization>`.
+
 ## Create a scene
 
 Every object, robot, camera, and light lives in a scene (see the {doc}`Scene API </api_reference/scene/scene>`). A scene owns a `simulator` (the physics solvers) and a `visualizer` (everything you see):
@@ -114,9 +116,9 @@ for i in range(1000):
 `scene.build()` is a required, explicit step. Genesis World compiles GPU kernels just-in-time, so building is what allocates device memory, creates the simulation data fields, and triggers that compilation. With `show_viewer=True`, the viewer window opens once the scene is built. Each `scene.step()` then advances the simulation by one `dt`.
 
 :::{note}
-**Kernel compilation and caching.** The first build with a new scene configuration (different robots, a different number of objects — anything that changes the internal data layout) compiles kernels on the fly, which is slow. Genesis World caches compiled kernels: as long as the first run exits normally or via `Ctrl-C` (**not** `Ctrl-\`), later runs with the same configuration load from cache and start quickly.
+**Kernel compilation and caching.** The first build with a new scene configuration (different robots, a different number of objects, anything that changes the internal data layout) compiles kernels on the fly, which is slow. Genesis World caches compiled kernels: as long as the first run exits normally or via `Ctrl-C` (**not** `Ctrl-\`), later runs with the same configuration load from cache and start quickly.
 :::
 
 ## Next steps
 
-Continue with {doc}`Visualization <visualization>` to add cameras and work with the viewer, then {doc}`Control Your Robot <control_your_robot>` to actuate the Franka you just loaded.
+Continue with {doc}`Visualization <visualization>` to work with the viewer and {doc}`Rendering <rendering>` to capture images, then {doc}`Control Your Robot <control_your_robot>` to actuate the Franka you just loaded.

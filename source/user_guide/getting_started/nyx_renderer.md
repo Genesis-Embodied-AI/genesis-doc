@@ -4,26 +4,45 @@
 :alt: The Nyx renderer producing photorealistic frames of a Genesis World simulation
 ```
 
-**Nyx** is a GPU-accelerated path tracer built in-house for Genesis World. It produces physically based, photorealistic frames — suitable for robotics datasets, demos, and synthetic perception — and it plugs into a scene as a **camera sensor** rather than as a scene-wide renderer.
+**Nyx** is a GPU-accelerated path tracer built in-house for Genesis World. It produces physically based, photorealistic frames (suitable for robotics datasets, demos, and synthetic perception) and plugs into a scene as a **camera sensor** rather than as a scene-wide renderer.
 
 That distinction is the whole idea. The other rendering backends are selected once for the entire scene with `gs.Scene(renderer=...)`. Nyx instead attaches per camera with `scene.add_sensor(NyxCameraOptions(...))`, so a single scene can pair fast rasterized cameras for control loops with a photorealistic Nyx camera for the frames you keep. Rendering runs during `scene.step()`, and you read frames back from `cam.read().rgb`.
 
 ## When to use Nyx
 
-Genesis World offers several ways to turn a scene into pixels (see {doc}`Visualization <visualization>` for the full list). Choose by what you need:
+Genesis World offers several ways to turn a scene into pixels (see {doc}`Rendering <rendering>` for the full list). Choose by what you need:
 
 | You want… | Use |
 |---|---|
 | An interactive window while iterating | the {doc}`viewer <visualization>` |
 | Fast, non-photorealistic camera frames for control and debugging | `gs.renderers.Rasterizer()` (the default) |
 | High-throughput rendering across many environments | `gs.renderers.BatchRenderer(...)` |
-| Photorealistic frames — PBR materials, HDRI lighting, Gaussian splats | **Nyx** |
+| Photorealistic frames: PBR materials, HDRI lighting, Gaussian splats | **Nyx** |
 
 Genesis World also ships an older path tracer, `gs.renderers.RayTracer()` (Luisa), for photorealistic stills. Nyx is the recommended path forward for photorealistic rendering; the RayTracer backend is being deprecated.
 
-## Installation and a minimal example
+## Installation
 
-Nyx is distributed as the separate `gs-nyx` package. For installation and a minimal "hello world" render (a PBR ball lit by an HDRI environment map), see [Photorealistic rendering with Nyx](visualization.md#photorealistic-rendering-with-nyx) in the Visualization guide. The full option reference lives in the [Nyx documentation](https://genesis-embodied-ai.github.io/genesis-nyx/).
+Nyx ships as the separate `gs-nyx` package:
+
+```bash
+pip install gs-nyx
+```
+
+:::{note}
+`gs-nyx` is currently distributed through an internal package index while the project is being prepared for public release. Public installation instructions will be published at the [Nyx repository](https://github.com/Genesis-Embodied-AI/genesis-nyx) once the wheel is on PyPI.
+:::
+
+Verify the install by importing the plugin alongside Genesis World:
+
+```python
+import genesis as gs
+import gs_nyx.nyx_py_renderer as npr
+import gs_nyx.nyx_py_sdk as nps
+from gs_nyx_plugin.nyx_camera_options import NyxCameraOptions
+```
+
+The full option reference lives in the [Nyx documentation](https://genesis-embodied-ai.github.io/genesis-nyx/).
 
 Feature highlights:
 
@@ -36,6 +55,84 @@ Feature highlights:
 :::{note}
 The `gs_nyx` / `gs_nyx_plugin` symbols below (`NyxCameraOptions`, `LightFieldAsset`, `EnvironmentMapAsset`, `nps.*`, `npr.*`) ship with the `gs-nyx` package, not the core `genesis` tree. `scene.add_sensor(...)` is the core sensor interface Nyx hooks into.
 :::
+
+## A minimal example
+
+The snippet below renders a PBR ball on a plane lit purely by an HDRI environment map, the canonical "hello world" for Nyx, mirroring [`examples/01_hello_nyx.py`](https://github.com/Genesis-Embodied-AI/genesis-nyx/blob/main/examples/01_hello_nyx.py) in the Nyx repo.
+
+```{image} ../../_static/images/nyx_hello.png
+:alt: PBR ball rendered with Nyx under an HDRI environment map
+:align: center
+:width: 80%
+```
+
+```python
+import os
+from PIL import Image
+
+import genesis as gs
+import gs_nyx.nyx_py_renderer as npr
+import gs_nyx.nyx_py_sdk as nps
+from gs_nyx_plugin.nyx_camera_options import NyxCameraOptions
+
+
+HERE = os.path.dirname(__file__)
+PBR_BALL = os.path.join(HERE, "assets", "PBR_Ball.glb")
+ENV_MAP = os.path.join(HERE, "assets", "kloppenheim_07_puresky_4k.hdr")
+OUTPUT_PATH = os.path.join(HERE, "out", "01_hello_nyx.png")
+
+
+def main():
+    gs.init()
+
+    scene = gs.Scene(
+        sim_options=gs.options.SimOptions(dt=0.01),
+        show_viewer=False,
+    )
+
+    scene.add_entity(morph=gs.morphs.Plane(plane_size=(10.0, 10.0)))
+    scene.add_entity(
+        morph=gs.morphs.Mesh(file=PBR_BALL, pos=(0.0, 0.0, 0.0)),
+        surface=gs.surfaces.Gold(),
+    )
+
+    # describe how the env map is encoded
+    env_map = nps.EnvironmentMapAsset()
+    env_map.texture = ENV_MAP
+    env_map.layout = nps.EEnvMapLayout.LongLat
+    env_map.multiplier = 8
+
+    # attach a Nyx camera sensor
+    cam = scene.add_sensor(
+        NyxCameraOptions(
+            res=(1920, 1080),
+            pos=(-1.0, 1.0, 1.2),
+            lookat=(0.0, 0.0, 0.1),
+            fov=20.0,
+            spp=64,
+            render_mode=npr.ERenderMode.FastPathTracer,
+            env_maps=(env_map,),
+        )
+    )
+
+    scene.build(n_envs=1)
+    scene.step()  # rendering happens during the sim step
+
+    rgb = cam.read().rgb[0].cpu().numpy()
+    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+    Image.fromarray(rgb).save(OUTPUT_PATH)
+    print(f"Saved {OUTPUT_PATH}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Three things distinguish Nyx from the other backends:
+
+- **Nyx is a sensor.** Register it with `scene.add_sensor(NyxCameraOptions(...))`, not as the scene `renderer`.
+- **Rendering happens during `scene.step()`.** Read frames back via `cam.read().rgb`, a torch tensor with one image per environment.
+- **`spp`** (samples per pixel) and **`render_mode`** trade quality for speed; `FastPathTracer` is a good default for iteration.
 
 ## Rendering a Gaussian splat
 

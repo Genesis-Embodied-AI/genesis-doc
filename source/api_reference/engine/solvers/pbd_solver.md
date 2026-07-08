@@ -98,6 +98,6 @@ cloth = scene.add_entity(
 
 ## See also
 
-- {doc}`/api_reference/entity/pbd_entity/index` — PBD entities.
-- {doc}`/api_reference/material/pbd/index` — PBD materials.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/pbd_options` — full options.
+- {doc}`/api_reference/entity/pbd_entity/index`: PBD entities.
+- {doc}`/api_reference/material/pbd/index`: PBD materials.
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/pbd_options`: full options.

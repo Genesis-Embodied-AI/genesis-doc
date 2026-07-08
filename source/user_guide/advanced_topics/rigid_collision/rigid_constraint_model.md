@@ -118,6 +118,6 @@ These `RigidOptions` fields control the model and the solve. Pass them through `
 
 ## See also
 
-- {doc}`collision_contacts_forces` — how contacts are detected and what each carries into the solve.
-- {doc}`/user_guide/getting_started/constraints` — declaring equality constraints and toggling welds at runtime.
-- [MuJoCo constraint model](https://mujoco.readthedocs.io/en/latest/computation/index.html#constraint-model) — the formulation Genesis World follows, in more mathematical depth.
+- {doc}`collision_contacts_forces`: how contacts are detected and what each carries into the solve.
+- {doc}`/user_guide/getting_started/constraints`: declaring equality constraints and toggling welds at runtime.
+- [MuJoCo constraint model](https://mujoco.readthedocs.io/en/latest/computation/index.html#constraint-model): the formulation Genesis World follows, in more mathematical depth.

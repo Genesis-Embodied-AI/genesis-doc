@@ -1,6 +1,6 @@
 # Particle emitters
 
-An emitter is a nozzle that streams particles into a particle solver as the simulation runs. Where {doc}`Beyond rigid bodies <beyond_rigid_bodies>` fills a fixed volume of particles once at build time, an emitter injects new particles every step — a faucet, a hose, or a jet of sand that keeps flowing for as long as you call it.
+An emitter is a nozzle that streams particles into a particle solver as the simulation runs. Where {doc}`Beyond rigid bodies <beyond_rigid_bodies>` fills a fixed volume of particles once at build time, an emitter injects new particles every step: a faucet, a hose, or a jet of sand that keeps flowing for as long as you call it.
 
 An emitter does not simulate anything itself. It owns a particle entity, pre-allocated with `max_particles` slots, and feeds positions and velocities into that entity's solver. The material you give the emitter decides which solver runs the particles: `gs.materials.SPH.*` for smoothed-particle hydrodynamics, `gs.materials.MPM.*` for the material point method, and `gs.materials.PBD.*` for position-based dynamics.
 

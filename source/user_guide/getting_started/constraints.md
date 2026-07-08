@@ -76,7 +76,7 @@ Genesis World supports three equality-constraint types. Weld is the only one you
 
 | Type | Constrains | Declared in | Runtime API |
 |---|---|---|---|
-| Connect | A point on each link to coincide (3 DoF) — a ball joint. | MJCF | — |
+| Connect | A point on each link to coincide (3 DoF), a ball joint. | MJCF | — |
 | Weld | Relative pose fully fixed (6 DoF). | MJCF, or `add_weld_constraint` | `add_weld_constraint` / `delete_weld_constraint` |
 | Joint | One joint's value tied to another's by a polynomial. | MJCF, URDF | — |
 

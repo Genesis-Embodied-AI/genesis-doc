@@ -1,6 +1,6 @@
 # Importing USD assets
 
-[Universal Scene Description (USD)](https://openusd.org/) is Pixar's open framework for describing and composing 3D scenes. Genesis World imports USD files (`.usd`, `.usda`, `.usdc`, `.usdz`) through `gs.morphs.USD`, reading geometry, materials, and `UsdPhysics` joint definitions. A single file may hold one articulated robot, one rigid object, or a whole environment of many entities — the assets NVIDIA Isaac Sim and similar tools export.
+[Universal Scene Description (USD)](https://openusd.org/) is Pixar's open framework for describing and composing 3D scenes. Genesis World imports USD files (`.usd`, `.usda`, `.usdc`, `.usdz`) through `gs.morphs.USD`, reading geometry, materials, and `UsdPhysics` joint definitions. A single file may hold one articulated robot, one rigid object, or a whole environment of many entities, like the assets that NVIDIA Isaac Sim and similar tools export.
 
 Two runnable examples are the source of truth for this page:
 

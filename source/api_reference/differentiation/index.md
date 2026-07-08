@@ -51,7 +51,7 @@ print(force.grad)
 - **`backward()` flows through the physics:** calling `backward()` on any tensor derived from scene state runs the standard PyTorch backward pass, then continues the gradient backward through time across the recorded steps, down to the inputs you marked with `requires_grad=True`.
 - **Inputs are ordinary leaf tensors:** control forces, initial positions, and target values are plain PyTorch tensors created with `requires_grad=True`. Any operation that mixes them with scene-derived tensors yields a scene-tracked tensor, which keeps the graph connected.
 
-A single forward run supports one backward pass. Reset the scene with `scene.reset()` before the next forward pass — for example, once per optimization step.
+A single forward run supports one backward pass. Reset the scene with `scene.reset()` before the next forward pass, for example once per optimization step.
 
 ## Shapes and conventions
 
@@ -127,6 +127,6 @@ Mixing two tensors that belong to different scenes raises an error, since gradie
 
 ## See also
 
-- {doc}`tensor` — the differentiable tensor class
-- {doc}`creation_ops` — creating tensors for differentiable simulation
-- {doc}`/api_reference/engine/states/index` — reading and writing simulation state
+- {doc}`tensor`: the differentiable tensor class
+- {doc}`creation_ops`: creating tensors for differentiable simulation
+- {doc}`/api_reference/engine/states/index`: reading and writing simulation state

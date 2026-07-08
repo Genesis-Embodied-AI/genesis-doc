@@ -9,7 +9,7 @@ and
 
 ## IK with multiple end-effector links
 
-A single call to `robot.inverse_kinematics()` positions one link. When a task constrains several links at once — a gripper's two fingertips, both hands of a dual-arm robot, or a closed kinematic loop — solve them jointly with `robot.inverse_kinematics_multilink()`. Solving each link separately would let later solutions undo earlier ones; the multi-link solver finds one joint configuration that satisfies every target together.
+A single call to `robot.inverse_kinematics()` positions one link. When a task constrains several links at once (a gripper's two fingertips, both hands of a dual-arm robot, or a closed kinematic loop), solve them jointly with `robot.inverse_kinematics_multilink()`. Solving each link separately would let later solutions undo earlier ones; the multi-link solver finds one joint configuration that satisfies every target together.
 
 The call takes parallel lists: one target link, one position, and one orientation per entry.
 
