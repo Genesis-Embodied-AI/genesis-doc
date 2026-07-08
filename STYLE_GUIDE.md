@@ -115,6 +115,10 @@ One sentence defining what it is and when to use it.
 
 **Oxford comma. American spelling.** ("color", "behavior", "modeling").
 
+**Use em dashes sparingly.** Reach for a comma, a colon, or a full stop first. One em dash in a paragraph for a genuine aside is fine; three is a nervous tic, and a sentence whose clauses are all strung together with them should be rewritten. (An en dash in a number range like "10–80×" is not an em dash and is fine.)
+
+**Definition-style list items lead with a bold term and a colon.** Write `- **Simulation interface:** the user-facing API for …`, with the description as a normal clause after the colon. Do not separate the term from its description with an em dash, and do not use the "bold term, full stop, sentence" form for definition lists.
+
 ---
 
 ## 5. Code examples

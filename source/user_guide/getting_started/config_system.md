@@ -1,148 +1,106 @@
-# 🗂 Config System
+# The configuration system
 
-## Overview
+Genesis World is configured through **options objects** — small, typed parameter groups under `gs.options.*` that you pass to `gs.Scene(...)` and to `scene.add_entity(...)`. Rather than a scene taking dozens of loose keyword arguments, each concern (the global simulator, one physics solver, the viewer, a renderer) gets its own object with its own defaults. This page explains what those objects are, how they compose into a scene, and how a setting given in two places is resolved.
 
-The Genesis World simulation framework is built around a modular and extensible configuration system. This system allows users to flexibly compose and control different aspects of a simulation-ranging from low-level physics solvers to high-level rendering options-through structured configuration objects.
+If you have not built a scene yet, read {doc}`hello_genesis` first — it uses `SimOptions` and `ViewerOptions` in passing. This page is the conceptual reference behind that usage.
 
-To help you understand how these components work together, we start with a high-level template of how a Genesis World scene is typically initialized. This template shows how simulation settings, solver options, and entity-level configurations are orchestrated.
+## A scene is assembled from options
+
+Every configurable component of a scene is described by one options object. You construct the objects you care about and hand them to the scene; anything you omit uses its defaults.
 
 ```python
-# Initialize Genesis World
-gs.init(...)
+import genesis as gs
 
-# Initialize scene
+gs.init(backend=gs.gpu)
+
 scene = gs.Scene(
-    # simulation & coupling
-    sim_options=SimOptions(...),
-    coupler_options=CouplerOptions(...),
-
-    # solvers
-    tool_options=ToolOptions(...),
-    rigid_options=RigidOptions(...),
-    mpm_options=MPMOptions(...),
-    sph_options=SPHOptions(...),
-    fem_options=FEMOptions(...),
-    sf_options=SFOptions(...),
-    pbd_options=PBDOptions(...),
-
-    # visualization & rendering
-    vis_options=VisOptions(...),
-    viewer_options=ViewerOptions(...),
-    renderer=Rasterizer(...),
+    sim_options=gs.options.SimOptions(dt=0.01, gravity=(0, 0, -9.81)),
+    rigid_options=gs.options.RigidOptions(enable_collision=True),
+    viewer_options=gs.options.ViewerOptions(
+        camera_pos=(3.5, 0.0, 2.5),
+        camera_lookat=(0.0, 0.0, 0.5),
+        camera_fov=40,
+    ),
     show_viewer=True,
-)
-
-# Add entities
-scene.add_entity(
-    morph=gs.morphs...,
-    material=gs.materials...,
-    surface=gs.surfaces....,
 )
 ```
 
-As shown above, a scene in Genesis World is defined by a combination of:
+The options split into three roles, plus a set of per-entity options passed to `add_entity` rather than to the scene:
 
-- [Simulation & Coupling](#simulation--coupling): Defines global simulation parameters and how different solvers interact.
-- [Solvers](#solvers): Configure physical behaviors for different simulation methods (e.g., rigid bodies, fluids, cloth).
-- [Visualization & Rendering](#visualization--rendering): Customize runtime visualization and final rendering options.
-- For each entity added to the scene:
-    - [Morph](#morph): Defines the geometry or structure of the entity.
-    - [Material](#material): Specifies material properties relevant with the corresponding physics solver.
-    - [Surface](#surface): Controls visual appearance and surface rendering.
+- **Global.** `SimOptions` sets the properties of the simulation as a whole; coupler options set how solvers interact.
+- **Per solver.** One options object per physics solver (rigid, MPM, SPH, FEM, SF, PBD), each configuring that solver alone.
+- **Visualization.** The viewer, solver-independent visualization, and the renderer.
 
-## Simulation & Coupling
+## Every options object shares one base
 
-This configuration defines how the simulation is globally structured and how different physics solvers are coupled. These options control the "skeleton" of the simulation loop, e.g., time-stepping, stability, and solver interoperability.
+All `gs.options.*` classes derive from `gs.options.Options`, a [Pydantic](https://docs.pydantic.dev/) model. Two properties of that base matter in practice:
 
-- `SimOptions`: Sets global simulation parameters-time step size, gravity, damping, and numerical integrator.
-- `CouplerOptions`: Configures multi-physics interactions - for instance, how a rigid tool interacts with a soft deformable body or how a fluid flows through a porous material.
+- **Fields are typed and validated on construction.** A value of the wrong type, or out of range, raises immediately with a readable message — not deep inside the first `scene.step()`.
+- **Unknown fields are rejected.** The base sets `extra="forbid"`, so a misspelled argument such as `gravty=(0, 0, -9.81)` raises `Unrecognized attribute 'gravty'` instead of being silently ignored.
 
-Defined in [genesis/options/solvers.py](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/options/solvers.py).
+You never instantiate `Options` directly; you always use a concrete subclass. See the {doc}`Options API </api_reference/options/index>` for the full class list.
 
-## Solvers
+## Simulator options override solver options
 
-Solvers are the cores behind specific physical models. Each solver encapsulates a simulation algorithm for a particular material or system-rigid bodies, fluids, deformables, etc. Users can enable or disable solvers depending on the scenario.
-- `RigidOptions`: Rigid body dynamics with contact, collision, and constraints.
-- `MPMOptions`: Material Point Method solver for elastic, plastic, granular, fluidic materials.
-- `SPHOptions`: Smoothed Particle Hydrodynamics solver for fluids and granular flows.
-- `FEMOptions`: Finite Element Method solver for elastic material.
-- `SFOptions`: Stable Fluid solver for eulerian-based gaseous simulation.
-- `PBDOptions`: Position-Based Dynamics solver for cloth, volumetric deformable objects, liquid, and particles.
-- `ToolOptions`: A temporary setup. To be deprecated.
+`SimOptions` holds settings that are global by default — most importantly the timestep `dt` (seconds) and `gravity` (N/kg, pointing down `-Z`). Each solver also exposes those same settings on its own options object, where they default to `None`.
 
-Defined in [genesis/options/solvers.py](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/options/solvers.py).
+The rule is: **a value set on a solver's options overrides the global `SimOptions` value, for that solver only.** A solver whose field is left at `None` inherits the global value. This lets most scenes set `dt` once while allowing a single solver to run at a different rate.
 
-## Visualization & Rendering
+```python
+scene = gs.Scene(
+    sim_options=gs.options.SimOptions(dt=0.01),        # global timestep
+    rigid_options=gs.options.RigidOptions(dt=0.005),   # rigid solver only, overrides the global dt
+    # mpm_options left unset -> the MPM solver, if used, inherits dt=0.01
+)
+```
 
-This configuration controls both the live visualization (useful during debugging and development) and the final rendered output (useful for demos, analysis, or media). It governs how users interact with and perceive the simulation visually.
-- `ViewerOptions`: Configure properties of the interactive viewer.
-- `VisOptions`: Configure visualization-related properties that are independent of the viewer or camera.
-- `Renderer` (Rasterizer or Raytracer): Defines the rendering backend, including lighting, shading, and post-processing effects. Support Rasterization or Raytracing.
+The same inheritance applies to `gravity`. Settings that are meaningful only to one solver (for example `RigidOptions.constraint_solver` or `RigidOptions.max_collision_pairs`) live solely on that solver's options and have no global counterpart.
 
-Defined in [genesis/options/vis.py](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/options/vis.py) and [genesis/options/renderers.py](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/options/renderers.py).
+## Scene-level option groups
 
-## Morph
+Each of these is an optional argument to `gs.Scene(...)`. Pass an instance to configure that component; omit it to accept the defaults.
 
-Morphs define the shape and topology of an entity. This includes primitive geometries (e.g., spheres, boxes), structured assets (e.g., articulated arms). Morphs form the geometric foundation on which materials and physics operate.
-- `Primitive`: For all shape-primitive morphs.
-    - `Box`: Morph defined by a box shape.
-    - `Cylinder`: Morph defined by a cylinder shape.
-    - `Sphere`: Morph defined by a sphere shape.
-    - `Plane`: Morph defined by a plane shape.
-- `FileMorph`:
-    - `Mesh`: Morph loaded from a mesh file.
-        - `MeshSet`: A collection of meshes.
-    - `MJCF`: Morph loaded from a MJCF file. This morph only supports rigid entity.
-    - `URDF`: Morph loaded from a URDF file. This morph only supports rigid entity.
-    - `Drone`: Morph loaded from a URDF file for creating a drone entity.
-- `Terrain`: Morph for creating a rigid terrain.
-- `NoWhere`: Reserved for emitter. Internal use only.
+| Options class | `Scene` argument | Configures |
+|---|---|---|
+| `gs.options.SimOptions` | `sim_options` | Global timestep, gravity, substeps, differentiable mode. |
+| `gs.options.BaseCouplerOptions` | `coupler_options` | Coupling between solvers. Concrete variants: `LegacyCouplerOptions`, `SAPCouplerOptions`, `IPCCouplerOptions`. |
+| `gs.options.RigidOptions` | `rigid_options` | Rigid-body dynamics: contact, collision, constraints, integrator. |
+| `gs.options.MPMOptions` | `mpm_options` | Material Point Method solver (elastic, plastic, granular, fluid). |
+| `gs.options.SPHOptions` | `sph_options` | Smoothed Particle Hydrodynamics solver (fluids, granular flow). |
+| `gs.options.FEMOptions` | `fem_options` | Finite Element Method solver (elastic material). |
+| `gs.options.SFOptions` | `sf_options` | Stable Fluid solver (Eulerian gaseous simulation). |
+| `gs.options.PBDOptions` | `pbd_options` | Position-Based Dynamics solver (cloth, deformables, liquids, particles). |
+| `gs.options.KinematicOptions` | `kinematic_options` | Kinematic (non-dynamic) entities. |
+| `gs.options.ToolOptions` | `tool_options` | Legacy tool solver. Slated for deprecation. |
+| `gs.options.VisOptions` | `vis_options` | Visualization independent of any viewer or camera. |
+| `gs.options.ViewerOptions` | `viewer_options` | The interactive viewer: camera pose, resolution, refresh rate. |
+| `gs.options.ProfilingOptions` | `profiling_options` | Timing and FPS reporting. |
+| `gs.renderers.RendererOptions` | `renderer` | Rendering backend: `Rasterizer`, `RayTracer`, or `BatchRenderer`. |
 
-Defined in [genesis/options/morphs.py](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/options/morphs.py).
+The scene- and solver-level options are documented in the {doc}`simulator, coupler, and solver options reference </api_reference/options/simulator_coupler_and_solver_options/index>`; the viewer and renderer in the {doc}`vis </api_reference/options/vis/index>` and {doc}`renderer </api_reference/options/renderer/index>` references.
 
-## Material
+:::{note}
+Not every solver runs in every scene. A solver is only active once you add an entity whose material targets it — adding a rigid entity activates the rigid solver, and so on. Options for an inactive solver are simply unused.
+:::
 
-Materials define how an object responds to physical forces. This includes stiffness, friction, elasticity, damping, and solver-specific material parameters. The material also determines how an entity interacts with other objects and solvers.
-- `Rigid`: Rigid-bodied and articulated.
-- `MPM`: Material Point Method.
-    - `Elastic`
-    - `ElastoPlastic`
-    - `Liquid`
-    - `Muscle`
-    - `Sand`
-    - `Snow`
-- `FEM`: Finite Element Method.
-    - `Elastic`
-    - `Muscle`
-- `PBD`: Position Based Dynamics.
-    - `Cloth`
-    - `Elastic`
-    - `Liquid`
-    - `Particle`
-- `SF`: Stable Fluid.
-    - `Smoke`
-- `Hybrid`: Rigid skeleton actuating soft skin.
-- `Tool`: Temporary and to be deprecated.
+## Per-entity options
 
-These can be found in [genesis/engine/materials](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/genesis/engine/materials).
+`add_entity` takes its own options describing a single entity rather than the scene:
 
-## Surface
+```python
+franka = scene.add_entity(
+    morph=gs.morphs.MJCF(file="xml/franka_emika_panda/panda.xml"),
+    material=gs.materials.Rigid(),
+    surface=gs.surfaces.Default(),
+)
+```
 
-Surfaces define how an entity appears visually. They include rendering properties like color, texture, reflectance, transparency, and more. Surfaces are the interface between an entity's internal structure and the renderer.
+- **Morph** — the entity's geometry and initial pose. See {doc}`hello_genesis` for loading morphs and the {doc}`morph API </api_reference/options/morph/index>`.
+- **Material** — how the entity responds to physical forces, and which solver simulates it. See {doc}`beyond_rigid_bodies`.
+- **Surface** — how the entity looks when rendered. See {doc}`surfaces_textures`.
 
-- `Default`: Basically `Plastic`.
-- `Plastic`: Plastic surface is the most basic type of surface.
-    - `Rough`: Shortcut for a rough surface with proper parameters.
-    - `Smooth`: Shortcut for a smooth surface with proper parameters.
-    - `Reflective`: For collision geometry with a grey color by default.
-    - `Collision`: Shortcut for a rough plastic surface with proper parameters.
-- `Metal`: Metallic surface with configurable `metal_type`.
-- `Iron`: Shortcut for a metallic surface with `metal_type = 'iron'`.
-- `Aluminium`: Shortcut for a metallic surface with `metal_type = 'aluminium'`.
-- `Copper`: Shortcut for a metallic surface with `metal_type = 'copper'`.
-- `Gold`: Shortcut for a metallic surface with `metal_type = 'gold'`.
-- `Glass`: Transparent surface with configurable refraction.
-- `Water`: Shortcut for a water surface (using Glass with proper values).
-- `Emission`: Emission surface. This surface emits light.
+## See also
 
-Defined in [genesis/options/surfaces.py](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/options/surfaces.py).
+- {doc}`hello_genesis` — the minimal scene that uses these options.
+- {doc}`visualization` — configuring the viewer, cameras, and renderer in depth.
+- {doc}`Options API reference </api_reference/options/index>` — every option class and its fields.

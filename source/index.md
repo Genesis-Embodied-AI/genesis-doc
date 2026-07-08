@@ -13,13 +13,13 @@ Genesis World began as an academic project in December 2024, under the name **Ge
 
 ## Key features
 
-- **Pythonic and open source.** The engine is written and exposed in Python, so reading the code and contributing to it are straightforward.
-- **Simple to install and use.** A single `pip install`, and an API designed to stay small and predictable as scenes grow.
-- **Fast parallel simulation.** Thousands of environments run in parallel on a single GPU — up to 10–80× faster than prior GPU-accelerated simulators such as Isaac Gym/Sim/Lab and MuJoCo MJX, without compromising accuracy. See the [blog post](https://www.genesis.ai/blog/the-role-of-simulation-in-scalable-robotics-genesis-world-10-and-the-path-forward) for methodology.
-- **Unified multi-physics.** Rigid, FEM, MPM, and particle (PBD/SPH) solvers share one scene and one state, with explicit coupling between them.
-- **Photorealistic rendering.** [Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx), an in-house renderer built for robotics, plugs in as a camera sensor alongside Luisa and Pyrender.
-- **Differentiable.** Autodiff and backpropagation are provided through the [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants) compiler.
-- **Comprehensive sensors.** Tactile, IMU, lidar, depth-camera, contact-force, surface-distance, and temperature-grid sensors work out of the box in parallel and heterogeneous environments.
+- **Pythonic and open source:** the engine is written and exposed in Python, so reading the code and contributing to it are straightforward.
+- **Simple to install and use:** a single `pip install`, and an API designed to stay small and predictable as scenes grow.
+- **Fast parallel simulation:** thousands of environments run in parallel on a single GPU, up to 10–80× faster than prior GPU-accelerated simulators such as Isaac Gym/Sim/Lab and MuJoCo MJX, without compromising accuracy. See the [blog post](https://www.genesis.ai/blog/the-role-of-simulation-in-scalable-robotics-genesis-world-10-and-the-path-forward) for methodology.
+- **Unified multi-physics:** rigid, FEM, MPM, and particle (PBD/SPH) solvers share one scene and one state, with explicit coupling between them.
+- **Photorealistic rendering:** [Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx), an in-house renderer built for robotics, plugs in as a camera sensor alongside Luisa and Pyrender.
+- **Differentiable:** autodiff and backpropagation are provided through the [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants) compiler.
+- **Comprehensive sensors:** tactile, IMU, lidar, depth-camera, contact-force, surface-distance, and temperature-grid sensors work out of the box in parallel and heterogeneous environments.
 
 For a closer look at the stack and the design philosophy behind it, see {doc}`/user_guide/overview/what_is_genesis`.
 
@@ -35,7 +35,7 @@ From there, the {doc}`user guide </user_guide/index>` covers installation in det
 
 ## Contributing
 
-Genesis World aims to be a transparent, community-driven ecosystem where roboticists and graphics researchers build a fast, physically and visually realistic virtual world together. Contributions of every size are welcome — pull requests for new features, bug reports, and suggestions that make the API more intuitive. See the {doc}`introduction </user_guide/overview/what_is_genesis>` for the longer story.
+Genesis World aims to be a transparent, community-driven ecosystem where roboticists and graphics researchers build a fast, physically and visually realistic virtual world together. Contributions of every size are welcome: pull requests for new features, bug reports, and suggestions that make the API more intuitive. See the {doc}`introduction </user_guide/overview/what_is_genesis>` for the longer story.
 
 ## Support
 
