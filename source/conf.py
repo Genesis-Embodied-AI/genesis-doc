@@ -77,7 +77,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/Genesis-Embodied-AI/Genesis",
+            "url": "https://github.com/Genesis-Embodied-AI/genesis-world",
             "icon": "fa-brands fa-github",
         },
         {

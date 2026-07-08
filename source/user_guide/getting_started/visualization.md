@@ -330,7 +330,7 @@ You should be able to get
 Genesis World provides a high-throughput batch rendering backend via gs-madrona. You can easily switch to gs-madrona backend by setting `renderer=gs.renderers.BatchRenderer(use_rasterizer=True/False)`
 
 ### Pre-requisite
-Please first install the latest version of Genesis World to date following the [official README instructions](https://github.com/Genesis-Embodied-AI/Genesis#quick-installation).
+Please first install the latest version of Genesis World to date following the [official README instructions](https://github.com/Genesis-Embodied-AI/genesis-world#quick-installation).
 
 ### Easy install (x86 only)
 Pre-compiled binary wheels for Python>=3.10 are available on PyPI. They can be installed using any Python package manager (e.g. `uv` or `pip`):
@@ -346,7 +346,7 @@ pip install .
 ### Testing (Optional)
 1. Clone Genesis World repository if not already done
 ```sh
-git clone https://github.com/Genesis-Embodied-AI/Genesis.git
+git clone https://github.com/Genesis-Embodied-AI/genesis-world.git
 ```
 
 2. Run the following example script provided with Genesis World

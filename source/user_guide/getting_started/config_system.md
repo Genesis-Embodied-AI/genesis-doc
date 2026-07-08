@@ -57,7 +57,7 @@ This configuration defines how the simulation is globally structured and how dif
 - `SimOptions`: Sets global simulation parameters-time step size, gravity, damping, and numerical integrator.
 - `CouplerOptions`: Configures multi-physics interactions - for instance, how a rigid tool interacts with a soft deformable body or how a fluid flows through a porous material.
 
-Defined in [genesis/options/solvers.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/solvers.py).
+Defined in [genesis/options/solvers.py](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/options/solvers.py).
 
 ## Solvers
 
@@ -70,7 +70,7 @@ Solvers are the cores behind specific physical models. Each solver encapsulates 
 - `PBDOptions`: Position-Based Dynamics solver for cloth, volumetric deformable objects, liquid, and particles.
 - `ToolOptions`: A temporary setup. To be deprecated.
 
-Defined in [genesis/options/solvers.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/solvers.py).
+Defined in [genesis/options/solvers.py](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/options/solvers.py).
 
 ## Visualization & Rendering
 
@@ -79,7 +79,7 @@ This configuration controls both the live visualization (useful during debugging
 - `VisOptions`: Configure visualization-related properties that are independent of the viewer or camera.
 - `Renderer` (Rasterizer or Raytracer): Defines the rendering backend, including lighting, shading, and post-processing effects. Support Rasterization or Raytracing.
 
-Defined in [genesis/options/vis.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/vis.py) and [genesis/options/renderers.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/renderers.py).
+Defined in [genesis/options/vis.py](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/options/vis.py) and [genesis/options/renderers.py](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/options/renderers.py).
 
 ## Morph
 
@@ -98,7 +98,7 @@ Morphs define the shape and topology of an entity. This includes primitive geome
 - `Terrain`: Morph for creating a rigid terrain.
 - `NoWhere`: Reserved for emitter. Internal use only.
 
-Defined in [genesis/options/morphs.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/morphs.py).
+Defined in [genesis/options/morphs.py](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/options/morphs.py).
 
 ## Material
 
@@ -124,7 +124,7 @@ Materials define how an object responds to physical forces. This includes stiffn
 - `Hybrid`: Rigid skeleton actuating soft skin.
 - `Tool`: Temporary and to be deprecated.
 
-These can be found in [genesis/engine/materials](https://github.com/Genesis-Embodied-AI/Genesis/tree/main/genesis/engine/materials).
+These can be found in [genesis/engine/materials](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/genesis/engine/materials).
 
 ## Surface
 
@@ -145,4 +145,4 @@ Surfaces define how an entity appears visually. They include rendering propertie
 - `Water`: Shortcut for a water surface (using Glass with proper values).
 - `Emission`: Emission surface. This surface emits light.
 
-Defined in [genesis/options/surfaces.py](https://github.com/Genesis-Embodied-AI/Genesis/blob/main/genesis/options/surfaces.py).
+Defined in [genesis/options/surfaces.py](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/genesis/options/surfaces.py).
