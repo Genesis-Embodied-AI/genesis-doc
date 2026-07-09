@@ -1,6 +1,6 @@
-# The sensor pipeline
+# Sensor pipeline
 
-This page explains what happens between `scene.step()` and the value a sensor's `read()` hands back: how the sensor manager updates every sensor once per step, how sensors of different types share expensive computation, and how buffering makes `read()` a constant-time memory lookup rather than a fresh acquisition. It is the runtime companion to {doc}`custom_sensors`, which covers the hooks you override to add a sensor. For the user-facing side (attach a sensor, step, read a tensor) start with the {doc}`sensor overview </user_guide/sensing/sensors/index>`.
+This page explains what happens between `scene.step()` and the value a sensor's `read()` hands back: how the sensor manager updates every sensor once per step, how sensors of different types share expensive computation, and how buffering makes `read()` a constant-time memory lookup rather than a fresh acquisition. It is the runtime companion to {doc}`custom_sensors`, which covers the hooks you override to add a sensor. For the user-facing side (attach a sensor, step, read a tensor) start with the {doc}`sensor overview </user_guide/sensing/index>`.
 
 ## The mental model: read is a lookup, not an acquisition
 
@@ -200,4 +200,4 @@ The standard sensors (contact, contact force, IMU, joint torque, ranging, proxim
 ## See also
 
 - {doc}`custom_sensors`: which hooks to override to add your own sensor type, and their shape and dtype contracts.
-- {doc}`sensor overview </user_guide/sensing/sensors/index>`: the user-facing attach-and-read workflow and the catalog of built-in sensors.
+- {doc}`sensor overview </user_guide/sensing/index>`: the user-facing attach-and-read workflow and the catalog of built-in sensors.

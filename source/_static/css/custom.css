@@ -48,6 +48,18 @@ html[data-theme="dark"] {
   padding: 0.35rem 0;
 }
 
+/* Left sidebar: the top-level entries are now real section landing pages, so
+   drop the "Section Navigation" header and give those entries the regular
+   high-contrast body-text color instead of the muted link color the theme
+   uses for all sidebar links. The active section still gets the primary
+   highlight (theme's `.current > a`), so exclude it here. */
+nav.bd-links p.bd-links__title {
+  display: none;
+}
+nav.bd-links li.toctree-l1:not(.current) > a.reference {
+  color: var(--pst-color-text-base);
+}
+
 .bd-footer .footer-items__start,
 .bd-footer .footer-items__end {
   font-size: 0.75rem;

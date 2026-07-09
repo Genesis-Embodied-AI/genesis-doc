@@ -63,7 +63,7 @@ Both leading dimensions follow the batched-optional convention: the `[n_envs,]` 
 - **Debug drawing.** With `draw_debug=True` and an active visualizer, the sensor draws a sphere at each probe and a line to its nearest surface point, sized by `debug_sphere_radius` (default 0.008 m).
 
 <video preload="auto" controls="True" width="100%" aria-label="Shadow Hand with proximity probes on its palm and fingertips; lines connect each probe to the nearest point on a tracked duck mesh and box as the hand moves">
-<source src="../../../_static/videos/proximity.mp4" type="video/mp4">
+<source src="../../_static/videos/proximity.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
 

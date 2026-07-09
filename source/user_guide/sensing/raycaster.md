@@ -146,7 +146,7 @@ depth = depth_cam.read_image()  # shape ([n_envs,] 72, 96), meters
 Running `python examples/sensors/lidar_teleop.py --pattern depth` teleoperates a depth camera on the Go2 (`--pattern` also accepts `spherical` and `grid`):
 
 <video preload="auto" controls="True" width="100%" alt="Depth image from a camera sensor mounted on a Go2 robot walking among obstacles">
-<source src="../../../_static/videos/depth_camera.mp4" type="video/mp4">
+<source src="../../_static/videos/depth_camera.mp4" type="video/mp4">
 </video>
 
 ## Common options
@@ -184,5 +184,5 @@ result.distances.shape  # (4, 128, 64)
 
 - {doc}`Sensors overview <index>`: the sensor pipeline, noise, delay, and batched reads.
 - {doc}`Camera sensors <camera_sensors>`: rendered RGB, depth, and segmentation through a camera.
-- {doc}`Recorders </user_guide/sensing/recorders>`: save depth images and point clouds alongside the simulation.
+- {doc}`Recording data </user_guide/sensing/recorders>`: save depth images and point clouds alongside the simulation.
 - {doc}`Conventions </user_guide/configuration/conventions>`: the Z-up frame and unit conventions the returned points follow.

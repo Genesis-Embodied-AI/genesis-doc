@@ -73,10 +73,9 @@ Genesis World also ships `gs.sensors.JointTorque`, which reports actuator output
 
 Runnable examples for every sensor live under `examples/sensors/`.
 
-## See also
+## Beyond reading a single sensor
 
-- {doc}`Recorders </user_guide/sensing/recorders>`: save sensor data alongside the simulation.
-- {doc}`Extending Genesis World: sensors </user_guide/developers/sensors/index>`: the sensor pipeline and how to add your own sensor type.
+{doc}`Recording data <recorders>` covers streaming sensor output to disk as the simulation runs, and {doc}`Custom sensors <custom_sensors/index>` covers the per-step pipeline every sensor runs through and how to add a sensor type that is not built in.
 
 ```{toctree}
 :hidden:
@@ -88,4 +87,6 @@ raycaster
 camera_sensors
 proximity
 temperature_grid
+recorders
+custom_sensors/index
 ```

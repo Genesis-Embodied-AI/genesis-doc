@@ -69,7 +69,7 @@ else:
     cam_kwargs = {}
 ```
 
-The cameras are added with `scene.add_sensor(...)`; see {doc}`Camera sensors </user_guide/sensing/sensors/camera_sensors>` for the sensor API and {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>` for how batched environments run.
+The cameras are added with `scene.add_sensor(...)`; see {doc}`Camera sensors </user_guide/sensing/camera_sensors>` for the sensor API and {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>` for how batched environments run.
 
 ### Actions and control
 
@@ -198,5 +198,5 @@ The evaluation script reuses the configuration pickled during training (`logs/<e
 ## See also
 
 - {doc}`Training locomotion policies with RL <locomotion>` and {doc}`training drone hovering policies with RL <hover_env>` for single-stage PPO examples with the same environment shape.
-- {doc}`Camera sensors </user_guide/sensing/sensors/camera_sensors>` for the rendering API behind the stereo observations.
+- {doc}`Camera sensors </user_guide/sensing/camera_sensors>` for the rendering API behind the stereo observations.
 - {doc}`Control your robot </user_guide/getting_started/control_your_robot>` for the inverse-kinematics and position-control primitives the environment uses.

@@ -63,5 +63,5 @@ lights
 ## See also
 
 - {doc}`/user_guide/interaction/visualization`: the interactive viewer and command-line tools
-- {doc}`/user_guide/rendering/rendering`: cameras, image types, video, and rendering backends
+- {doc}`/user_guide/rendering/index`: cameras, image types, video, and rendering backends
 - {doc}`/api_reference/sensor/camera`: the camera sensor, read through the sensor interface

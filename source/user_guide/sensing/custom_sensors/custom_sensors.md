@@ -1,6 +1,6 @@
 # Writing a custom sensor
 
-This page is for advanced users adding a new sensor type. It is the author's counterpart to the {doc}`sensor pipeline <sensor_pipeline>`, which describes how sensors execute at runtime; here the focus is the interface you implement, the shape and dtype contracts each override must honor, and how the framework pairs your sensor with its options automatically. If you only want to *use* the built-in sensors, start with {doc}`/user_guide/sensing/sensors/index` instead.
+This page is for advanced users adding a new sensor type. It is the author's counterpart to the {doc}`sensor pipeline <sensor_pipeline>`, which describes how sensors execute at runtime; here the focus is the interface you implement, the shape and dtype contracts each override must honor, and how the framework pairs your sensor with its options automatically. If you only want to *use* the built-in sensors, start with {doc}`/user_guide/sensing/index` instead.
 
 The base classes live in `genesis/engine/sensors/base_sensor.py`. In almost every case you derive from `SimpleSensor` and override only the hooks you need. Deriving directly from `Sensor` is reserved for sensors that bypass the standard pipeline entirely, and the built-in cameras do exactly that through `BaseCameraSensor`.
 
@@ -315,4 +315,4 @@ To pick the right hooks, mirror the closest built-in sensor. Every one implement
 ## See also
 
 - {doc}`sensor_pipeline`: how the pipeline executes at runtime, and the intermediate-versus-return separation in full.
-- {doc}`/user_guide/sensing/sensors/index`: using the built-in sensors.
+- {doc}`/user_guide/sensing/index`: using the built-in sensors.

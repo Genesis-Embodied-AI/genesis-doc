@@ -48,7 +48,7 @@ source ~/.bashrc
 
 ### Ray-tracing renderer
 
-For photorealistic stills, Genesis World includes a ray-tracing renderer built on [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute). It is built from source; see {doc}`/user_guide/rendering/rendering` for setup. For new work, prefer the {doc}`Nyx renderer </user_guide/rendering/nyx_renderer>`.
+For photorealistic stills, Genesis World includes a ray-tracing renderer built on [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute). It is built from source; see {doc}`/user_guide/rendering/index` for setup. For new work, prefer the {doc}`Nyx renderer </user_guide/rendering/nyx_renderer>`.
 
 ### USD assets
 

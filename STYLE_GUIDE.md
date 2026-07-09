@@ -212,6 +212,7 @@ We build with Sphinx + MyST Markdown (`pydata_sphinx_theme`). Use the following,
 **Headings**
 - One `#` H1 per page, matching the page's job. **No emoji in headings.** They break scannability, sorting, and search, and read as decoration. (Existing emoji headings should be removed as pages are touched.)
 - **Content headings use sentence case; navigation titles use Title Case.** Every heading inside a page is sentence case. The exception is navigation: the two top-level section landing titles (`User Guide`, `API Reference`) and the sidebar `:caption:` labels in a `{toctree}` (`Getting Started`, `Robot Control`, …) are Title Case, because they read as proper section names rather than page content.
+- **Don't start a page or section title with an article.** Name the subject directly: `Sensor pipeline`, not "The sensor pipeline"; `Support field`, not "The support field". A leading "The"/"A"/"An" adds nothing to a title, sorts and scans worse, and pushes the real word right. (An article mid-title, or in a content heading where it reads naturally, is fine.)
 - **Spell out "and" in headings and toctree captions — never `&`** (see §4).
 - Don't skip levels (no H2 → H4). `myst_heading_anchors` generates anchors down to H4; keep meaningful headings within that depth.
 
@@ -276,6 +277,7 @@ Before opening a docs PR, confirm:
 - [ ] No space-aligned keyword arguments; Python is `black`-clean.
 - [ ] The page leads with what it's for and a runnable example within one screen.
 - [ ] In-page headings are sentence case with no emoji; section/navigation titles (top-level section pages, toctree captions) are Title Case.
+- [ ] No page or section title begins with an article ("The", "A", "An").
 - [ ] Terminology matches §6; the product is "Genesis World" (not keyword-stuffed).
 - [ ] No jokes, no marketing superlatives, no "let's".
 - [ ] Headings, titles, and captions spell out "and" — no ampersands (`&`).

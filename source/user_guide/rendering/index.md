@@ -67,7 +67,7 @@ If you omit `save_to_filename`, Genesis World generates a name from the calling 
 <source src="../../_static/videos/cam_record.mp4" type="video/mp4">
 </video>
 
-For recording sensor and simulation data (not just video) on a schedule, see {doc}`Recorders </user_guide/sensing/recorders>`.
+For recording sensor and simulation data (not just video) on a schedule, see {doc}`Recording data </user_guide/sensing/recorders>`.
 
 ## Lighting
 
@@ -186,3 +186,11 @@ python examples/rigid/single_franka_batch_render.py
 - {doc}`Visualization </user_guide/interaction/visualization>`: the interactive viewer and the `gs` command-line tools.
 - {doc}`Surfaces and textures <surfaces_textures>`: how entities look when rendered.
 - {doc}`Nyx renderer <nyx_renderer>`: photorealistic path tracing in depth.
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+surfaces_textures
+nyx_renderer
+```

@@ -121,4 +121,4 @@ for i in range(1000):
 
 ## Next steps
 
-Continue with {doc}`Control your robot <control_your_robot>` to actuate the Franka you just loaded, then {doc}`Visualization </user_guide/interaction/visualization>` to work with the viewer and {doc}`Rendering </user_guide/rendering/rendering>` to capture images.
+Continue with {doc}`Control your robot <control_your_robot>` to actuate the Franka you just loaded, then {doc}`Visualization </user_guide/interaction/visualization>` to work with the viewer and {doc}`Rendering </user_guide/rendering/index>` to capture images.

@@ -89,11 +89,11 @@ Each field has a fixed unit:
 :::
 
 <video preload="auto" controls="True" width="100%">
-<source src="../../../_static/videos/temperaturegrid.mp4" type="video/mp4">
+<source src="../../_static/videos/temperaturegrid.mp4" type="video/mp4">
 A hot pusher and dropped objects heat a sensorized platform, whose temperature grid shifts from blue to red at the contact regions.
 </video>
 
 ## See also
 
 - {doc}`Sensors <index>`: the sensor pipeline, batched reads, and history.
-- {doc}`Recorders <../recorders>`: saving sensor data alongside the simulation.
+- {doc}`Recording data <recorders>`: saving sensor data alongside the simulation.

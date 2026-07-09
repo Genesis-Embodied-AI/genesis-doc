@@ -61,7 +61,7 @@ Configuration:
 - `Contact` accepts `threshold` (a positive force magnitude registers as contact above this value; default `0.0`) and `filter_link_idx`, a list of **global** link indices whose contacts with the sensor link are ignored.
 - `ContactForce` clamps each axis to `[min_force, max_force]`; readings below `min_force` are zeroed and readings above `max_force` are saturated. Both default to no clamping.
 
-```{figure} ../../../_static/images/contact_force_sensor.png
+```{figure} ../../_static/images/contact_force_sensor.png
 :alt: A Go2 quadruped standing on a ground plane, with a magenta arrow drawn at each foot showing the contact force reported by that foot's ContactForce sensor
 ```
 
@@ -156,7 +156,7 @@ data.torque  # shape ([n_envs,] n_probes, 3), N·m, link frame
 `read()` returns a `KinematicTaxelReturnType` named tuple, so `data.force` and `data.torque` unpack by name.
 
 <video preload="auto" controls="True" width="100%" aria-label="A live vector-field plot of KinematicTaxel forces across a probe grid as an object presses into the sensor, with arrows growing where penetration is deepest">
-<source src="../../../_static/videos/kin_probe_data.mp4" type="video/mp4">
+<source src="../../_static/videos/kin_probe_data.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
 
@@ -184,7 +184,7 @@ displacement = tactile.read()  # shape ([n_envs,] n_probes, 3), m
 `dilate_scale` and `shear_scale` scale the indentation and shear response; `lambda_d` and `lambda_s` control how far each effect spreads across neighboring markers. When `probe_local_pos` is a regular planar grid with a single shared normal, the dilation term is computed with an FFT to keep large arrays fast.
 
 <video preload="auto" controls="True" width="100%" aria-label="A Franka gripper with taxel grids on both fingertips grasping objects; marker displacement vectors on each fingertip deflect as the fingers make contact">
-<source src="../../../_static/videos/tactile_fingertips.mp4" type="video/mp4">
+<source src="../../_static/videos/tactile_fingertips.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
 
@@ -217,7 +217,7 @@ Like `KinematicTaxel`, it returns a named tuple (`ProximityTaxelReturnType`) wit
 The sandbox demo presses different objects into a taxel pad across four parallel environments:
 
 <video preload="auto" controls="True" width="100%" aria-label="The tactile sandbox demo pressing objects into an elastomer taxel pad across four parallel environments, with marker displacement fields responding to each object's shape">
-<source src="../../../_static/videos/elastomer_sandbox.mp4" type="video/mp4">
+<source src="../../_static/videos/elastomer_sandbox.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
 
@@ -225,4 +225,4 @@ Your browser does not support the video tag.
 
 - {doc}`Sensors overview <index>`: sampling rate, `read_ground_truth()`, batched `scene.read_sensors()`, noise, delay, and `history_length`.
 - {doc}`Proximity <proximity>`: nearest-distance probes to tracked mesh surfaces, without a force estimate.
-- {doc}`Extending Genesis World → Sensors </user_guide/developers/sensors/index>`: the sensor pipeline and how to add your own sensor type.
+- {doc}`Extending Genesis World → Sensors </user_guide/sensing/custom_sensors/index>`: the sensor pipeline and how to add your own sensor type.
