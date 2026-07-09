@@ -1,4 +1,4 @@
-# Force fields
+# `ForceField`
 
 ```{eval-rst}
 .. automodule:: genesis.engine.force_fields
