@@ -82,10 +82,10 @@ This is the aggregate the constraint solver accumulated, so it reflects the reso
 
 ## When to use a contact sensor instead
 
-`get_contacts()` and `get_links_net_contact_force()` pull the whole contact set on demand, which is convenient for scripting and debugging. For a per-link signal you sample every step in a control or training loop (with history, noise, and delay handled for you), attach a contact sensor instead. `ContactForce` reports the net force on a link in its own frame, and the tactile probes estimate dense per-taxel forces. See {doc}`/user_guide/sensing/contact_and_tactile`.
+`get_contacts()` and `get_links_net_contact_force()` pull the whole contact set on demand, which is convenient for scripting and debugging. For a per-link signal you sample every step in a control or training loop (with history, noise, and delay handled for you), attach a contact sensor instead. `ContactForce` reports the net force on a link in its own frame, and the tactile probes estimate dense per-taxel forces. See {doc}`/user_guide/sensing/contact`.
 
 ## See also
 
 - {doc}`rigid_constraint_model`: how contacts, joint limits, and equality constraints are solved for the resulting motion.
 - {doc}`/user_guide/theory/support_field`: the acceleration structure behind MPR and GJK support queries.
-- {doc}`/user_guide/sensing/contact_and_tactile`: contact and tactile sensors for per-step readings.
+- {doc}`/user_guide/sensing/contact`: contact and tactile sensors for per-step readings.
