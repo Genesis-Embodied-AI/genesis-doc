@@ -1,4 +1,4 @@
-# The support field
+# Support field
 
 Genesis World detects collisions between convex shapes with algorithms that never touch a shape's full geometry directly. Instead, they ask one question repeatedly: *given a direction, which point of the shape lies farthest that way?* The answer is called a **support point**, the function that returns it is a **support function**, and the **support field** is the acceleration structure that answers this question in constant time for arbitrary convex meshes.
 

@@ -96,4 +96,4 @@ A hot pusher and dropped objects heat a sensorized platform, whose temperature g
 ## See also
 
 - {doc}`Sensors <index>`: the sensor pipeline, batched reads, and history.
-- {doc}`Recorders <recorders>`: saving sensor data alongside the simulation.
+- {doc}`Recording data <recorders>`: saving sensor data alongside the simulation.

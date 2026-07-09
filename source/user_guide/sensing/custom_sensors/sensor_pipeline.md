@@ -1,4 +1,4 @@
-# The sensor pipeline
+# Sensor pipeline
 
 This page explains what happens between `scene.step()` and the value a sensor's `read()` hands back: how the sensor manager updates every sensor once per step, how sensors of different types share expensive computation, and how buffering makes `read()` a constant-time memory lookup rather than a fresh acquisition. It is the runtime companion to {doc}`custom_sensors`, which covers the hooks you override to add a sensor. For the user-facing side (attach a sensor, step, read a tensor) start with the {doc}`sensor overview </user_guide/sensing/index>`.
 

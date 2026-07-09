@@ -67,7 +67,7 @@ If you omit `save_to_filename`, Genesis World generates a name from the calling 
 <source src="../../_static/videos/cam_record.mp4" type="video/mp4">
 </video>
 
-For recording sensor and simulation data (not just video) on a schedule, see {doc}`Recorders </user_guide/sensing/recorders>`.
+For recording sensor and simulation data (not just video) on a schedule, see {doc}`Recording data </user_guide/sensing/recorders>`.
 
 ## Lighting
 

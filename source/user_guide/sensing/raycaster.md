@@ -184,5 +184,5 @@ result.distances.shape  # (4, 128, 64)
 
 - {doc}`Sensors overview <index>`: the sensor pipeline, noise, delay, and batched reads.
 - {doc}`Camera sensors <camera_sensors>`: rendered RGB, depth, and segmentation through a camera.
-- {doc}`Recorders </user_guide/sensing/recorders>`: save depth images and point clouds alongside the simulation.
+- {doc}`Recording data </user_guide/sensing/recorders>`: save depth images and point clouds alongside the simulation.
 - {doc}`Conventions </user_guide/configuration/conventions>`: the Z-up frame and unit conventions the returned points follow.
