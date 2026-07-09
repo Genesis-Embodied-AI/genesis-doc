@@ -15,14 +15,11 @@ Thresholds each probe's penetration depth into a per-probe boolean contact flag.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.tactile.ContactProbe
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.kinematic_tactile.ContactProbeSensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## ContactDepthProbe
@@ -31,14 +28,11 @@ Reports the penetration depth at each probe, in meters.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.tactile.ContactDepthProbe
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.kinematic_tactile.ContactDepthProbeSensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## KinematicTaxel
@@ -47,18 +41,16 @@ Adds a spring-damper force model on top of the depth query, estimating per-taxel
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.tactile.KinematicTaxel
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.kinematic_tactile.KinematicTaxelSensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.kinematic_tactile.KinematicTaxelReturnType
-   :members:
-   :undoc-members:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## ElastomerTaxel
@@ -67,14 +59,11 @@ Models a soft tactile skin, reporting a 3D marker displacement per probe from in
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.tactile.ElastomerTaxel
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.point_cloud_tactile.ElastomerTaxelSensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## ProximityTaxel
@@ -83,22 +72,20 @@ Estimates per-taxel force and torque from a point cloud sampled on the tracked m
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.tactile.ProximityTaxel
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.point_cloud_tactile.ProximityTaxelSensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.point_cloud_tactile.ProximityTaxelReturnType
-   :members:
-   :undoc-members:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also
 
-- {doc}`index` - Sensor overview
-- {doc}`/user_guide/sensing/contact_and_tactile` - Usage, probe layout, and force models
-- {doc}`contact` - Solver-based contact and contact-force sensing
+- {doc}`index`: Sensor overview
+- {doc}`/user_guide/sensing/contact_and_tactile`: Usage, probe layout, and force models
+- {doc}`contact`: Solver-based contact and contact-force sensing

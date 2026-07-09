@@ -1,4 +1,5 @@
 # `gs.options.SFOptions`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.solvers.SFOptions
 ```

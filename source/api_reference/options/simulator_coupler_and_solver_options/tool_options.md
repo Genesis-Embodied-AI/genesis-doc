@@ -1,4 +1,5 @@
 # `gs.options.ToolOptions`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.solvers.ToolOptions
 ```

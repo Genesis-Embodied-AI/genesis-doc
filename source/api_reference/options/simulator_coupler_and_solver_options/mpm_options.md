@@ -1,4 +1,5 @@
 # `gs.options.MPMOptions`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.solvers.MPMOptions
 ```

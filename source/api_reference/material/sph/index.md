@@ -1,5 +1,0 @@
-# SPH
-
-```{toctree}
-liquid
-```

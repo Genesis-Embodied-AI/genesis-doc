@@ -1,5 +1,5 @@
 # `gs.surfaces.Rough`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.surfaces.Rough
-    :show-inheritance:
 ```

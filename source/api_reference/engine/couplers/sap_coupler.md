@@ -1,16 +1,8 @@
-# SAPCoupler
+# `SAPCoupler`
 
-The `SAPCoupler` (Sweep and Prune) provides efficient spatial acceleration for multi-physics coupling.
+The `SAPCoupler` resolves cross-solver contact with the Semi-Analytic Primal (SAP) contact solver used in [Drake](https://drake.mit.edu/). It targets accurate rigid-deformable contact, including hydroelastic contact against implicit FEM bodies. Select it by passing `gs.options.SAPCouplerOptions` to the scene.
 
-## Overview
-
-The SAP coupler:
-
-- Uses sweep-and-prune for broad-phase collision
-- Efficient for large numbers of objects
-- Reduces narrow-phase checks
-
-## Usage
+## Minimal example
 
 ```python
 import genesis as gs
@@ -21,7 +13,14 @@ scene = gs.Scene(
 )
 ```
 
+Coupling then happens automatically as the scene steps; there is no per-step coupling call.
+
+## Configuration
+
+`SAPCouplerOptions` exposes the SAP convergence controls (`n_sap_iterations`, `n_pcg_iterations`, `sap_convergence_atol`), the contact stiffnesses (`hydroelastic_stiffness` and `point_contact_stiffness`, both `1e8` by default), and the per-pair contact types (`fem_floor_contact_type`, `rigid_rigid_type`, and related fields). See {doc}`/api_reference/options/simulator_coupler_and_solver_options/sap_coupler_options` for the full list.
+
 ## See also
 
-- {doc}`index` - Coupler overview
-- {doc}`ipc_coupler` - IPC coupling
+- {doc}`index`: coupler overview and how to choose one.
+- {doc}`/user_guide/theory/couplers/index`: the theory behind each coupler.
+- {doc}`/api_reference/options/simulator_coupler_and_solver_options/sap_coupler_options`: SAP coupler options.

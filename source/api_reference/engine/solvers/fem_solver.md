@@ -1,25 +1,10 @@
-# FEMSolver
+# `FEMSolver`
 
-The `FEMSolver` implements the Finite Element Method for simulating deformable solids on tetrahedral meshes.
-
-## Overview
-
-The FEM solver:
-
-- Uses tetrahedral mesh elements.
-- Supports several constitutive models (linear, stable Neo-Hookean, linear corotated).
-- Handles large deformations (geometric nonlinearity).
-- Offers an explicit integrator by default and an optional implicit solver.
-
-## Supported materials
-
-| Material | Description |
-|----------|-------------|
-| `FEM.Elastic` | Elastic solid with selectable constitutive model |
-| `FEM.Muscle` | Active muscle contraction |
-| `FEM.Cloth` | Thin-shell cloth |
+The `FEMSolver` implements the Finite Element Method for simulating deformable solids on tetrahedral meshes. It supports several constitutive models (linear, stable Neo-Hookean, linear corotated), handles large deformations, and offers an explicit integrator by default with an optional implicit solver for stability at larger time steps. The materials it supports are listed in {doc}`/api_reference/material/fem/index`.
 
 ## Usage
+
+The solver activates when the scene contains an FEM entity. Configure it through `FEMOptions`; see {doc}`/api_reference/options/simulator_coupler_and_solver_options/fem_options` for the full option set.
 
 ```python
 import genesis as gs
@@ -47,17 +32,6 @@ scene.build()
 for i in range(1000):
     scene.step()
 ```
-
-## Configuration
-
-Key options in `FEMOptions`:
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `dt` | float | inherited | Substep duration in seconds. Inherits from `SimOptions` if not set. |
-| `damping` | float | `0.0` | Damping factor. |
-| `use_implicit_solver` | bool | `False` | Use the implicit solver, which is more stable at large time steps. |
-| `enable_vertex_constraints` | bool | `False` | Allow vertex constraints under the implicit solver. |
 
 ## Vertex constraints
 

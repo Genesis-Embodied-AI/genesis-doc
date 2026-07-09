@@ -1,4 +1,5 @@
 # `gs.morphs.Sphere`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.morphs.Sphere
 ```

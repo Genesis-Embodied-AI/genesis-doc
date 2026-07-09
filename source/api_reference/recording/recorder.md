@@ -1,4 +1,4 @@
-# Recorder
+# `Recorder`
 
 The `Recorder` class is the base class for all recording functionality in Genesis. It provides the interface for capturing and processing simulation data.
 
@@ -53,13 +53,13 @@ class MyRecorder(Recorder):
 
 ```{eval-rst}
 .. autoclass:: genesis.recorders.base_recorder.Recorder
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also
 
-- {doc}`recorder_manager` - Managing multiple recorders
-- {doc}`file_writers` - Built-in file writers
-- {doc}`plotters` - Built-in plotters
+- {doc}`recorder_manager`: Managing multiple recorders
+- {doc}`file_writers`: Built-in file writers
+- {doc}`plotters`: Built-in plotters

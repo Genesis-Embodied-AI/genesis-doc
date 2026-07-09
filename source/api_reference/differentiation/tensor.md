@@ -1,4 +1,4 @@
-# Tensor
+# `Tensor`
 
 The `genesis.grad.Tensor` class extends `torch.Tensor` to support end-to-end gradient flow through Genesis World simulations.
 
@@ -75,12 +75,12 @@ if pos.scene is not None:
 
 ```{eval-rst}
 .. autoclass:: genesis.grad.tensor.Tensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also
 
-- {doc}`index` - Differentiable simulation overview
-- {doc}`creation_ops` - Creating tensors
+- {doc}`index`: Differentiable simulation overview
+- {doc}`creation_ops`: Creating tensors

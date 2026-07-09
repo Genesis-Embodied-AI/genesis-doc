@@ -8,15 +8,17 @@ Genesis World defines several enums and constants for physics simulation configu
 import genesis as gs
 
 # Available backends
-gs.backend.cpu      # CPU backend
-gs.backend.gpu      # Auto-select GPU (CUDA on Linux, Metal on MacOS)
-gs.backend.cuda     # NVIDIA CUDA
-gs.backend.metal    # Apple Metal
-gs.backend.amdgpu   # AMD ROCm (HIP)
+gs.cpu      # CPU backend
+gs.gpu      # auto-select GPU (CUDA on Linux, Metal on macOS)
+gs.cuda     # NVIDIA CUDA
+gs.metal    # Apple Metal
+gs.amdgpu   # AMD ROCm (HIP)
 
 # Usage
 gs.init(backend=gs.gpu)
 ```
+
+After `gs.init()`, `gs.backend` holds the backend that was actually selected.
 
 ## Joint types
 
@@ -114,5 +116,5 @@ gs.INACTIVE  # Entity is inactive (0)
 
 ## See also
 
-- {doc}`device` - Device and platform utilities
-- {doc}`/api_reference/options/index` - Configuration options
+- {doc}`device`: Device and platform utilities
+- {doc}`/api_reference/options/index`: Configuration options

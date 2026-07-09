@@ -1,4 +1,5 @@
 # `gs.morphs.URDF`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.morphs.URDF
 ```

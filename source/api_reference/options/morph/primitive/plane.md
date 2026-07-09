@@ -1,4 +1,5 @@
 # `gs.morphs.Plane`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.morphs.Plane
 ```

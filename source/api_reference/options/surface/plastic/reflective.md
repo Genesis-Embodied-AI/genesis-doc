@@ -1,5 +1,5 @@
 # `gs.surfaces.Reflective`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.surfaces.Reflective
-    :show-inheritance:
 ```

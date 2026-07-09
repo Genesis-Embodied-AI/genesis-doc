@@ -1,4 +1,5 @@
 # `gs.surfaces.Gold`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.surfaces.Gold
 ```

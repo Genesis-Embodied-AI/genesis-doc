@@ -1,5 +1,5 @@
 # `gs.textures.Texture`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.textures.Texture
-    :show-inheritance:
 ```

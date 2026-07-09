@@ -142,22 +142,32 @@ depth = depth_cam.read_image()  # shape ([n_envs,] 72, 96), meters
 
 ## API reference
 
-### RaycasterSensor
+### `gs.sensors.Raycaster`
+
+Also available as `gs.sensors.Lidar`.
+
+```{eval-rst}
+.. autoclass:: genesis.options.sensors.options.Raycaster
+```
 
 ```{eval-rst}
 .. autoclass:: genesis.engine.sensors.raycaster.RaycasterSensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
-### DepthCameraSensor
+### `gs.sensors.DepthCamera`
+
+```{eval-rst}
+.. autoclass:: genesis.options.sensors.options.DepthCamera
+```
 
 ```{eval-rst}
 .. autoclass:: genesis.engine.sensors.depth_camera.DepthCameraSensor
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ### Ray patterns
@@ -166,27 +176,15 @@ A pattern is a local description of the rays: it fixes a start point and a unit 
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.raycaster.RaycastPattern
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 .. autoclass:: genesis.options.sensors.raycaster.SphericalPattern
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 .. autoclass:: genesis.options.sensors.raycaster.GridPattern
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 .. autoclass:: genesis.options.sensors.raycaster.DepthCameraPattern
-   :members:
-   :undoc-members:
-   :show-inheritance:
 ```
 
 ## See also
 
-- {doc}`index` - Sensor overview
-- {doc}`camera` - Visual sensing
+- {doc}`index`: Sensor overview
+- {doc}`camera`: Visual sensing

@@ -1,4 +1,5 @@
 # `gs.options.FEMOptions`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.solvers.FEMOptions
 ```

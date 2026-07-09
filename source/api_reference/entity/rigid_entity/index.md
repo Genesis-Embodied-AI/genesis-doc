@@ -1,4 +1,6 @@
-# RigidEntity
+# Rigid entity
+
+A `RigidEntity` is an articulated rigid body: a robot, mechanism, or rigid object simulated by the rigid solver. It is built from links connected by joints, each link carrying collision and visual geometry. These pages document the entity and its parts.
 
 ```{toctree}
 rigid_entity

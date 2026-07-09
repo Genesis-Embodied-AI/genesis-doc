@@ -1,4 +1,5 @@
 # `gs.options.Options`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.options.Options
 ```

@@ -25,8 +25,8 @@ rigid
 mpm/index
 fem/index
 pbd/index
-sph/index
-sf/index
+sph
+sf
 hybrid
 tool
 kinematic

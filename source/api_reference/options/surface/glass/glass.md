@@ -1,4 +1,5 @@
 # `gs.surfaces.Glass`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.surfaces.Glass
 ```

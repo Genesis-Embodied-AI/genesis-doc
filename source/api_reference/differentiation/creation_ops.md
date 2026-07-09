@@ -68,11 +68,12 @@ combined = pos + external  # Result is Genesis World tensor
 
 ```{eval-rst}
 .. automodule:: genesis.grad.creation_ops
-   :members:
-   :undoc-members:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also
 
-- {doc}`tensor` - Genesis World Tensor class
-- {doc}`index` - Differentiable simulation overview
+- {doc}`tensor`: Genesis World Tensor class
+- {doc}`index`: Differentiable simulation overview

@@ -130,8 +130,27 @@ def _add_favicon_links(app, pagename, templatename, context, doctree):
     context["metatags"] = context.get("metatags", "") + links
 
 
+def _clean_pydantic_signatures(app, what, name, obj, options, signature, return_annotation):
+    # Pydantic models keep the Annotated[...] validator metadata in their field
+    # annotations, which autodoc renders as unreadable
+    # `tuple[typing.Annotated[..., FieldInfo(...)]]` blobs in the class signature.
+    # Recompute the signature: sphinx's stringify_signature drops the Annotated
+    # extras, leaving clean, readable type hints (e.g. `tuple[float, ...] | float`).
+    import pydantic
+    from sphinx.util.inspect import signature as sphinx_signature, stringify_signature
+
+    if what != "class" or not isinstance(obj, type) or not issubclass(obj, pydantic.BaseModel):
+        return None
+    try:
+        cleaned = stringify_signature(sphinx_signature(obj))
+    except Exception:
+        return None
+    return cleaned, return_annotation
+
+
 def setup(app):
     app.connect("html-page-context", _add_favicon_links)
+    app.connect("autodoc-process-signature", _clean_pydantic_signatures)
 
 
 ### Autodoc configurations ###

@@ -76,5 +76,5 @@ gs.tc_int    # PyTorch int dtype
 
 ## See also
 
-- {doc}`constants` - Backend enums
-- {doc}`tensor_utils` - Tensor operations
+- {doc}`constants`: Backend enums
+- {doc}`tensor_utils`: Tensor operations

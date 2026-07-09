@@ -1,4 +1,5 @@
 # `gs.options.PBDOptions`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.solvers.PBDOptions
 ```

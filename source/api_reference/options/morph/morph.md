@@ -1,4 +1,5 @@
 # `gs.morphs.Morph`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.morphs.Morph
 ```

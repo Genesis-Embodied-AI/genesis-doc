@@ -1,5 +1,5 @@
 # `gs.surfaces.Plastic`
-```{eval-rst}  
+
+```{eval-rst}
 .. autoclass:: genesis.options.surfaces.Plastic
-    :show-inheritance:
 ```

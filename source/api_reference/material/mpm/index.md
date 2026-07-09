@@ -1,5 +1,7 @@
 # MPM
 
+The Material Point Method simulates elastic and plastic solids, granular media, and fluids. Each material below selects a constitutive model for the MPM solver.
+
 ```{toctree}
 elastic
 elasto_plastic
