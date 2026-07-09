@@ -113,7 +113,7 @@ print(imu.read())
 Both accept an optional `envs_idx` to select a subset of environments, and both are idempotent within a step: repeated calls in one control-loop timestep return the same value.
 
 <video preload="auto" controls="True" width="100%">
-<source src="../../../_static/videos/imu.mp4" type="video/mp4">
+<source src="../../_static/videos/imu.mp4" type="video/mp4">
 Your browser does not support the video tag; the clip shows the IMU arrows tracking a Franka end effector as it traces a circle.
 </video>
 

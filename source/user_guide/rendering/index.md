@@ -186,3 +186,11 @@ python examples/rigid/single_franka_batch_render.py
 - {doc}`Visualization </user_guide/interaction/visualization>`: the interactive viewer and the `gs` command-line tools.
 - {doc}`Surfaces and textures <surfaces_textures>`: how entities look when rendered.
 - {doc}`Nyx renderer <nyx_renderer>`: photorealistic path tracing in depth.
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+surfaces_textures
+nyx_renderer
+```

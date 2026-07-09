@@ -36,7 +36,7 @@ Set up all recording **before** `scene.build()`. `start_recording` asserts the s
 
 ## Recording sensor data
 
-For a {doc}`sensor <sensors/index>`, `sensor.start_recording` is the shortest path: it uses the sensor's own `read()` as the data function, so you only pass the recorder options.
+For a {doc}`sensor <index>`, `sensor.start_recording` is the shortest path: it uses the sensor's own `read()` as the data function, so you only pass the recorder options.
 
 ```python
 imu = scene.add_sensor(gs.sensors.IMU(entity_idx=franka.idx))
@@ -130,5 +130,5 @@ scene.stop_recording()  # flushes files, closes plot windows
 ## See also
 
 - {doc}`Recording API reference </api_reference/recording/index>`: `RecorderManager`, `Recorder`, and every recorder options class.
-- {doc}`Sensors <sensors/index>`: the contact, tactile, proximity, IMU, and temperature sensors you can record from.
-- {doc}`Camera sensors <sensors/camera_sensors>`: RGB, depth, segmentation, and normal outputs, which pair with `VideoFile` and `MPLImagePlot`.
+- {doc}`Sensors <index>`: the contact, tactile, proximity, IMU, and temperature sensors you can record from.
+- {doc}`Camera sensors <camera_sensors>`: RGB, depth, segmentation, and normal outputs, which pair with `VideoFile` and `MPLImagePlot`.

@@ -1,8 +1,8 @@
 # Visualization
 
-This page covers watching a Genesis World scene as it runs: the interactive **viewer** window, and the `gs` command-line tools that open it without writing a script. Reach for these while developing on a machine with a display. To render images off-screen (color, depth, segmentation, video) or produce photorealistic frames, see {doc}`Rendering </user_guide/rendering/rendering>`.
+This page covers watching a Genesis World scene as it runs: the interactive **viewer** window, and the `gs` command-line tools that open it without writing a script. Reach for these while developing on a machine with a display. To render images off-screen (color, depth, segmentation, video) or produce photorealistic frames, see {doc}`Rendering </user_guide/rendering/index>`.
 
-Every scene owns a `visualizer` (`scene.visualizer`) that drives both the viewer and camera sensors. The viewer runs in its own thread and follows the simulation in real time; camera sensors render frames on demand and work headless (see {doc}`Rendering </user_guide/rendering/rendering>`).
+Every scene owns a `visualizer` (`scene.visualizer`) that drives both the viewer and camera sensors. The viewer runs in its own thread and follows the simulation in real time; camera sensors render frames on demand and work headless (see {doc}`Rendering </user_guide/rendering/index>`).
 
 ## The viewer
 
@@ -30,7 +30,7 @@ scene = gs.Scene(
 
 `camera_pos` and `camera_lookat` are in meters, in the right-handed, Z-up world frame. `camera_fov` is the vertical field of view in degrees. If `res` is `None`, Genesis World opens a 4:3 window sized to half your display height.
 
-The viewer always renders with the rasterizer. To select the backend used by camera sensors (rasterizer, ray tracer, or batch renderer), see {doc}`Rendering backends </user_guide/rendering/rendering>`.
+The viewer always renders with the rasterizer. To select the backend used by camera sensors (rasterizer, ray tracer, or batch renderer), see {doc}`Rendering backends </user_guide/rendering/index>`.
 
 :::{note}
 To cap the viewer frame rate, set `refresh_rate` on `ViewerOptions`. The older `max_FPS` argument is deprecated and now maps to `refresh_rate`.
@@ -71,6 +71,6 @@ gs animate 'frames/*.png' --fps 60
 
 ## Next steps
 
-- {doc}`Rendering </user_guide/rendering/rendering>`: cameras, image types, video, lighting, and rendering backends.
+- {doc}`Rendering </user_guide/rendering/index>`: cameras, image types, video, lighting, and rendering backends.
 - {doc}`Interactive GUI and debugging </user_guide/interaction/interactive_debugging>`: inspecting objects, drawing debug geometry, and the in-viewer control panel.
 - {doc}`Viewer interaction and plugins </user_guide/interaction/viewer_plugin>`: extending the viewer with keybindings and plugins.

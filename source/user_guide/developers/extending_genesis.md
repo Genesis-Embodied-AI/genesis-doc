@@ -44,4 +44,4 @@ Because the two callables identify the registration, pass named functions (or ho
 ## See also
 
 - {doc}`/user_guide/configuration/initialization`: what `gs.init()` and `gs.destroy()` do.
-- {doc}`/user_guide/developers/sensors/index`: writing a custom sensor, another extension point.
+- {doc}`/user_guide/sensing/custom_sensors/index`: writing a custom sensor, another extension point.

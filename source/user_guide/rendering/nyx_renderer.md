@@ -10,7 +10,7 @@ That distinction is the whole idea. The other rendering backends are selected on
 
 ## When to use Nyx
 
-Genesis World offers several ways to turn a scene into pixels (see {doc}`Rendering <rendering>` for the full list). Choose by what you need:
+Genesis World offers several ways to turn a scene into pixels (see {doc}`Rendering <index>` for the full list). Choose by what you need:
 
 | You want… | Use |
 |---|---|

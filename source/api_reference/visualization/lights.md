@@ -26,7 +26,7 @@ scene = gs.Scene(
 )
 ```
 
-For the task-oriented explanation, see {doc}`/user_guide/rendering/rendering`.
+For the task-oriented explanation, see {doc}`/user_guide/rendering/index`.
 
 ## SphereLight
 

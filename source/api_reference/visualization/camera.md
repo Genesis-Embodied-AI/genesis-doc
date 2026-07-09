@@ -19,7 +19,7 @@ rgb, depth, segmentation, normal = cam.render(
 )
 ```
 
-Each array is shaped `(height, width, ...)`. For image types, video recording, moving and entity-following cameras, and choosing a backend, see {doc}`/user_guide/rendering/rendering`.
+Each array is shaped `(height, width, ...)`. For image types, video recording, moving and entity-following cameras, and choosing a backend, see {doc}`/user_guide/rendering/index`.
 
 :::{note}
 Do not confuse this with the {doc}`camera sensor </api_reference/sensor/camera>`. The camera sensor is added with `scene.add_sensor(gs.sensors.*CameraOptions(...))` and its `read()` returns a `CameraReturnType` carrying a single `rgb` field. The visualization camera here renders RGB together with depth, segmentation, and normals.
@@ -36,6 +36,6 @@ Do not confuse this with the {doc}`camera sensor </api_reference/sensor/camera>`
 
 ## See also
 
-- {doc}`/user_guide/rendering/rendering`: cameras, image types, and video
+- {doc}`/user_guide/rendering/index`: cameras, image types, and video
 - {doc}`renderers/index`: rendering backends
 - {doc}`/api_reference/sensor/index`: other sensor types
