@@ -1,14 +1,8 @@
-# SFSolver
+# `SFSolver`
 
 The `SFSolver` is the Stable Fluid solver: a grid-based (Eulerian) solver for gaseous phenomena such as smoke. It advects a velocity field and one or more scalar density fields on a fixed 3D grid, then makes the velocity field divergence-free with a Jacobi pressure projection.
 
-Unlike the particle- and mesh-based solvers, the Stable Fluid solver does not track Lagrangian entities. It solves everything on a uniform grid whose resolution you set through `SFOptions.res`, and gas is injected by velocity jets that you register on the solver.
-
-## Supported materials
-
-| Material | Description |
-|----------|-------------|
-| `SF.Smoke` | Smoke advected on the stable-fluid grid |
+Unlike the particle- and mesh-based solvers, the Stable Fluid solver does not track Lagrangian entities. It solves everything on a uniform grid whose resolution you set through `SFOptions.res`, and gas is injected by velocity jets that you register on the solver. It simulates the `SF.Smoke` material; see {doc}`/api_reference/material/sf`.
 
 ## Usage
 
@@ -40,17 +34,7 @@ for _ in range(200):
 
 See `examples/smoke.py` for the full runnable example, including the jet class and the code that writes the density field to images.
 
-## Configuration
-
-Key options in `SFOptions`:
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `res` | int | 128 | Grid resolution per axis; the grid is `res x res x res`. |
-| `solver_iters` | int | 500 | Jacobi iterations for the pressure projection. |
-| `decay` | float | 0.99 | Per-step decay applied to the advected scalar (density) field. |
-| `inlet_s` | float | 400.0 | Impulse scale applied at the jets when injecting momentum. |
-| `dt` | float | inherited | Substep duration in seconds. Inherits from `SimOptions` if not set. |
+Configure the grid resolution and projection through `SFOptions`; see {doc}`/api_reference/options/simulator_coupler_and_solver_options/sf_options` for the full option set.
 
 ## Behavior and guarantees
 
@@ -60,4 +44,5 @@ Key options in `SFOptions`:
 
 ## See also
 
+- {doc}`/api_reference/material/sf`: the smoke material simulated by this solver.
 - {doc}`/api_reference/options/simulator_coupler_and_solver_options/sf_options`: full options.

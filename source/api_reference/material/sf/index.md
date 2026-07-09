@@ -1,5 +1,0 @@
-# SF
-
-```{toctree}
-smoke
-```

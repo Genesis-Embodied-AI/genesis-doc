@@ -82,5 +82,5 @@ if pos.scene is not None:
 
 ## See also
 
-- {doc}`index` - Differentiable simulation overview
-- {doc}`creation_ops` - Creating tensors
+- {doc}`index`: Differentiable simulation overview
+- {doc}`creation_ops`: Creating tensors

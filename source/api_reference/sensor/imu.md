@@ -42,44 +42,7 @@ for i in range(1000):
     mag = data.mag        # ([n_envs,] 3) magnetic field in Tesla
 ```
 
-## Configuration
-
-```python
-gs.sensors.IMU(
-    # Attachment (inherited from RigidSensorOptionsMixin)
-    entity_idx=robot.idx,             # Global entity index
-    link_idx_local=base.idx_local,    # Local link index
-    pos_offset=(0.0, 0.0, 0.0),      # Position offset from link frame
-    euler_offset=(0.0, 0.0, 0.0),    # Rotation offset from link frame (degrees)
-
-    # Accelerometer parameters
-    acc_noise=(0.01, 0.01, 0.01),              # White noise std per axis (m/s^2)
-    acc_random_walk=(0.001, 0.001, 0.001),     # Bias drift std per axis (m/s^3)
-    acc_bias=(0.0, 0.0, 0.0),                  # Constant additive bias per axis
-    acc_cross_axis_coupling=0.0,               # Cross-axis misalignment
-    acc_resolution=0.0,                        # Measurement resolution (0 = no quantization)
-
-    # Gyroscope parameters
-    gyro_noise=(0.01, 0.01, 0.01),             # White noise std per axis (rad/s)
-    gyro_random_walk=(0.001, 0.001, 0.001),    # Bias drift std per axis (rad/s^2)
-    gyro_bias=(0.0, 0.0, 0.0),                # Constant additive bias per axis
-    gyro_cross_axis_coupling=0.0,              # Cross-axis misalignment
-    gyro_resolution=0.0,                       # Measurement resolution (0 = no quantization)
-
-    # Magnetometer parameters
-    mag_noise=(0.0, 0.0, 0.0),                # White noise std per axis
-    mag_random_walk=(0.0, 0.0, 0.0),          # Bias drift std per axis
-    mag_bias=(0.0, 0.0, 0.0),                 # Constant additive bias per axis
-    mag_cross_axis_coupling=0.0,               # Cross-axis misalignment
-    mag_resolution=0.0,                        # Measurement resolution (0 = no quantization)
-
-    # Timing
-    delay=0.0,                                 # Read delay in seconds
-    jitter=0.0,                                # Random delay jitter in seconds
-
-    draw_debug=True,
-)
-```
+The options passed to `gs.sensors.IMU` (attachment offsets and the accelerometer, gyroscope, and magnetometer noise models) are documented in the reference below.
 
 ## Output format
 
@@ -148,6 +111,12 @@ for i in range(1000):
 
 ## API reference
 
+### `gs.sensors.IMU`
+
+```{eval-rst}
+.. autoclass:: genesis.options.sensors.options.IMU
+```
+
 ```{eval-rst}
 .. autoclass:: genesis.engine.sensors.imu.IMUSensor
     :members:
@@ -157,5 +126,5 @@ for i in range(1000):
 
 ## See also
 
-- {doc}`index` - Sensor overview
-- {doc}`contact` - Contact force sensing
+- {doc}`index`: Sensor overview
+- {doc}`contact`: Contact force sensing

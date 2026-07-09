@@ -96,5 +96,5 @@ some_positions = robot.get_qpos(envs_idx=[0, 5, 10])
 
 ## See also
 
-- {doc}`device` - Device configuration
-- {doc}`/api_reference/engine/states/index` - State management
+- {doc}`device`: Device configuration
+- {doc}`/api_reference/engine/states/index`: State management

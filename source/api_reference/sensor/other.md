@@ -49,6 +49,6 @@ Measures the generalized effort delivered at each selected actuator's output sha
 
 ## See also
 
-- {doc}`index` - Sensor overview
-- {doc}`contact` - Contact and contact-force sensing
-- {doc}`raycaster` - Ray-based distance measurement
+- {doc}`index`: Sensor overview
+- {doc}`contact`: Contact and contact-force sensing
+- {doc}`raycaster`: Ray-based distance measurement

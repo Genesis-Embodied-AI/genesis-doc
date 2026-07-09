@@ -80,7 +80,7 @@ cam.stop_recording(save_to_filename="video.mp4", fps=60)
 
 ## See also
 
-- {doc}`/user_guide/sensing/recorders` - task-oriented guide to recording
-- {doc}`recorder` - base recorder class
+- {doc}`/user_guide/sensing/recorders`: task-oriented guide to recording
+- {doc}`recorder`: base recorder class
 - {doc}`file_writers` and {doc}`plotters` - the recorder options you pass to `start_recording`
-- {doc}`/api_reference/scene/scene` - `scene.start_recording` and `scene.stop_recording`
+- {doc}`/api_reference/scene/scene`: `scene.start_recording` and `scene.stop_recording`

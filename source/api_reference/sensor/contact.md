@@ -35,22 +35,6 @@ for i in range(1000):
     print(f"Contact force: {force}")
 ```
 
-### Configuration
-
-```python
-gs.sensors.ContactForce(
-    entity_idx=robot.idx,           # Global entity index
-    link_idx_local=finger.idx_local, # Local link index
-    pos_offset=(0.0, 0.0, 0.0),    # Position offset from link frame
-    euler_offset=(0.0, 0.0, 0.0),  # Rotation offset (degrees)
-    min_force=0.0,                  # Min detectable absolute force per axis (below → 0)
-    max_force=float("inf"),         # Max output absolute force per axis (above → clipped)
-    noise=0.0,                      # White noise std
-    bias=0.0,                       # Constant additive bias
-    draw_debug=True,
-)
-```
-
 ### Output format
 
 `read()` returns a plain `torch.Tensor` (float32):
@@ -58,6 +42,8 @@ gs.sensors.ContactForce(
 | Shape | Description |
 |-------|-------------|
 | `([n_envs,] 3)` | Total contact force in local link frame (Newtons) |
+
+The options passed to `gs.sensors.ContactForce` (offsets, force clamping, noise) are documented in the reference below.
 
 ## ContactSensor
 
@@ -94,7 +80,11 @@ in_contact = contact.read()  # ([n_envs,] 1) boolean tensor
 
 ## API reference
 
-### ContactForceSensor
+### `gs.sensors.ContactForce`
+
+```{eval-rst}
+.. autoclass:: genesis.options.sensors.options.ContactForce
+```
 
 ```{eval-rst}
 .. autoclass:: genesis.engine.sensors.contact_force.ContactForceSensor
@@ -103,7 +93,11 @@ in_contact = contact.read()  # ([n_envs,] 1) boolean tensor
     :show-inheritance:
 ```
 
-### ContactSensor
+### `gs.sensors.Contact`
+
+```{eval-rst}
+.. autoclass:: genesis.options.sensors.options.Contact
+```
 
 ```{eval-rst}
 .. autoclass:: genesis.engine.sensors.contact_force.ContactSensor
@@ -114,5 +108,5 @@ in_contact = contact.read()  # ([n_envs,] 1) boolean tensor
 
 ## See also
 
-- {doc}`index` - Sensor overview
-- {doc}`/api_reference/entity/rigid_entity/index` - RigidEntity and links
+- {doc}`index`: Sensor overview
+- {doc}`/api_reference/entity/rigid_entity/index`: RigidEntity and links

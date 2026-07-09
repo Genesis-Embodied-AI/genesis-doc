@@ -1,121 +1,32 @@
 # File writers
 
-Genesis World provides file writers for exporting simulation data to various formats.
+A file writer records sampled data to disk. Pass one as the `rec_options` argument of `scene.start_recording`, and the recorder manager samples your data function on schedule and writes each sample to the file. See {doc}`index` for the recording workflow and the shared options (`hz`, `buffer_size`, `save_on_reset`) that every writer inherits.
 
-## Available writers
+## `gs.recorders.NPZFile`
 
-| Writer | Format | Description |
-|--------|--------|-------------|
-| `CSVFileWriter` | `.csv` | Tabular data export |
-| `NPZFileWriter` | `.npz` | NumPy compressed arrays |
-| `VideoFileWriter` | `.mp4` | Video from camera/viewer |
-
-## CSVFile
-
-Export data as comma-separated values:
-
-```python
-import genesis as gs
-
-gs.init()
-scene = gs.Scene()
-robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
-scene.build()
-
-# Record joint positions to CSV
-scene.start_recording(
-    data_func=lambda: {
-        "q0": robot.get_qpos()[0],
-        "q1": robot.get_qpos()[1],
-        "q2": robot.get_qpos()[2],
-    },
-    rec_options=gs.recorders.CSVFile(
-        filename="joint_data.csv",
-        hz=100,
-    ),
-)
-
-for i in range(1000):
-    scene.step()
-scene.stop_recording()
-```
-
-## NPZFile
-
-Export data as NumPy compressed archive:
-
-```python
-scene.start_recording(
-    data_func=lambda: {
-        "pos": robot.get_pos(),
-        "qpos": robot.get_qpos(),
-        "qvel": robot.get_qvel(),
-    },
-    rec_options=gs.recorders.NPZFile(
-        filename="trajectory.npz",
-        hz=50,
-    ),
-)
-
-# ... simulation ...
-scene.stop_recording()
-
-# Load recorded data
-import numpy as np
-data = np.load("trajectory.npz")
-positions = data["pos"]
-```
-
-## VideoFile
-
-Record video from cameras or viewer:
-
-```python
-cam = scene.add_camera(
-    res=(1280, 720),
-    pos=(3, 0, 2),
-    lookat=(0, 0, 0.5),
-)
-
-scene.start_recording(
-    data_func=lambda: cam.render(rgb=True)[0],
-    rec_options=gs.recorders.VideoFile(
-        filename="simulation.mp4",
-    ),
-)
-
-for i in range(300):
-    scene.step()
-scene.stop_recording()
-```
-
-## Configuration options
-
-### Common options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `filename` | str | Required | Output file path |
-| `hz` | float | None | Recording frequency |
-| `async_mode` | bool | False | Background processing |
-
-### VideoFileWriter options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `fps` | int | 30 | Video frame rate |
-| `codec` | str | "libx264" | Video codec |
-
-## API reference
+Writes samples to a NumPy `.npz` archive. Best for numeric arrays you load back with `numpy.load`.
 
 ```{eval-rst}
-.. automodule:: genesis.recorders.file_writers
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autoclass:: genesis.options.recorders.NPZFile
+```
+
+## `gs.recorders.CSVFile`
+
+Writes samples as rows in a `.csv` file. Best for scalar or low-dimensional data you inspect in a spreadsheet.
+
+```{eval-rst}
+.. autoclass:: genesis.options.recorders.CSVFile
+```
+
+## `gs.recorders.VideoFile`
+
+Encodes a stream of image frames to a video file. Pair it with a data function that returns a rendered frame.
+
+```{eval-rst}
+.. autoclass:: genesis.options.recorders.VideoFile
 ```
 
 ## See also
 
-- {doc}`index` - Recording overview
-- {doc}`plotters` - Real-time visualization
+- {doc}`index`: the recording workflow and shared recorder options.
+- {doc}`plotters`: live plotting instead of writing to a file.

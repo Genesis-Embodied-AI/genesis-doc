@@ -75,5 +75,5 @@ combined = pos + external  # Result is Genesis World tensor
 
 ## See also
 
-- {doc}`tensor` - Genesis World Tensor class
-- {doc}`index` - Differentiable simulation overview
+- {doc}`tensor`: Genesis World Tensor class
+- {doc}`index`: Differentiable simulation overview

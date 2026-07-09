@@ -60,6 +60,6 @@ class MyRecorder(Recorder):
 
 ## See also
 
-- {doc}`recorder_manager` - Managing multiple recorders
-- {doc}`file_writers` - Built-in file writers
-- {doc}`plotters` - Built-in plotters
+- {doc}`recorder_manager`: Managing multiple recorders
+- {doc}`file_writers`: Built-in file writers
+- {doc}`plotters`: Built-in plotters

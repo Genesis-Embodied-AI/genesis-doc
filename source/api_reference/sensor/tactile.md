@@ -86,6 +86,6 @@ Estimates per-taxel force and torque from a point cloud sampled on the tracked m
 
 ## See also
 
-- {doc}`index` - Sensor overview
-- {doc}`/user_guide/sensing/contact_and_tactile` - Usage, probe layout, and force models
-- {doc}`contact` - Solver-based contact and contact-force sensing
+- {doc}`index`: Sensor overview
+- {doc}`/user_guide/sensing/contact_and_tactile`: Usage, probe layout, and force models
+- {doc}`contact`: Solver-based contact and contact-force sensing

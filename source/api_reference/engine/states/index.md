@@ -92,5 +92,5 @@ loss.backward()
 
 ## See also
 
-- {doc}`/api_reference/differentiation/index` - differentiable simulation
-- {doc}`/api_reference/scene/scene` - scene state methods (`get_state`, `reset`)
+- {doc}`/api_reference/differentiation/index`: differentiable simulation
+- {doc}`/api_reference/scene/scene`: scene state methods (`get_state`, `reset`)

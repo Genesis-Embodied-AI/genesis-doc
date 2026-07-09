@@ -13,6 +13,6 @@ Most advanced surface types are only supported by cameras using the `RayTracer` 
 surface
 plastic/index
 metal/index
-emission/index
+emission
 glass/index
 ```

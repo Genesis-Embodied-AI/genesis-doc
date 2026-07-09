@@ -1,4 +1,4 @@
-# RigidSolver
+# `RigidSolver`
 
 The `RigidSolver` handles rigid body dynamics, including articulated bodies, robots, and rigid objects.
 
@@ -40,20 +40,6 @@ robot.set_dofs_velocity(target_velocities)
 for i in range(1000):
     scene.step()
 ```
-
-## Configuration
-
-Key options in `RigidOptions`:
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `enable_collision` | bool | `True` | Enable collision detection. |
-| `enable_joint_limit` | bool | `True` | Enforce joint limits. |
-| `enable_self_collision` | bool | `True` | Enable self-collision within each entity. |
-| `constraint_solver` | enum | `Newton` | Constraint solver: `gs.constraint_solver.CG` or `gs.constraint_solver.Newton`. |
-| `iterations` | int | `50` | Constraint solver iterations. |
-| `max_collision_pairs` | int | `150` | Maximum number of candidate collision pairs. |
-| `max_contacts` | int \| None | `None` | Maximum contact points per environment; resolved automatically when `None`. |
 
 ## Collision detection
 
