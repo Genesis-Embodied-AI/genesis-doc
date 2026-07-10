@@ -49,14 +49,14 @@ depth = depth_probe.read()  # shape ([n_envs,] n_probes), m
 
 ## Kinematic taxels
 
-`KinematicTaxel` adds a spring-damper force model on top of the depth query. For each taxel it estimates a force from penetration along the probe normal and a torque from the twist, using the probe's motion relative to the object it touches:
+`KinematicTaxel` adds a spring-damper force model on top of the depth query. For each taxel it estimates a force from penetration along the contact surface normal and a torque from the twist, using the probe's motion relative to the object it touches:
 
 ```
 s = penetration ** normal_exponent
-F = -normal_stiffness * s * n  -  normal_damping * s * v_n  -  shear_scalar * v_t
+F = normal_stiffness * s * n  +  normal_damping * s * v_n  -  shear_scalar * v_t
 ```
 
-where `n` is the probe normal, `v_n` / `v_t` are the normal and tangential relative velocities. Use `normal_exponent=1.5` for Hertzian (spherical) contact; the default `1.0` is a linear spring.
+where `n` is the contact surface normal at the probe: the SDF gradient in `"sdf"` mode, or the nearest-triangle face normal in `"raycast"` mode (see `contact_depth_query` above). `v_n` / `v_t` are the normal and tangential relative velocities. Unlike the point-cloud taxels below, `KinematicTaxel` derives `n` from the queried geometry itself rather than from a user-supplied `probe_local_normal`. Use `normal_exponent=1.5` for Hertzian (spherical) contact; the default `1.0` is a linear spring.
 
 ```python
 taxel = scene.add_sensor(
@@ -103,7 +103,7 @@ tactile = scene.add_sensor(
 displacement = tactile.read()  # shape ([n_envs,] n_probes, 3), m
 ```
 
-`dilate_scale` and `shear_scale` scale the indentation and shear response; `lambda_d` and `lambda_s` control how far each effect spreads across neighboring markers. When `probe_local_pos` is a regular planar grid with a single shared normal, the dilation term is computed with an FFT to keep large arrays fast. The shear anchor is gated by the same `contact_threshold` / `release_threshold` Schmitt trigger (a tracked point begins anchoring shear at `contact_threshold` penetration and releases once it separates back to `release_threshold`).
+`dilate_scale` and `shear_scale` scale the indentation and shear response; `lambda_d` and `lambda_s` control how far each effect spreads across neighboring markers. The out-of-plane (normal) bulge scales as `depth ** normal_exponent` (default `2.0`, the HydroShear quadratic response); tangential dilation and shear stay linear in depth regardless of `normal_exponent`. When `probe_local_pos` is a regular planar grid with a single shared normal, the dilation term is computed with an FFT to keep large arrays fast. The shear anchor is gated by the same `contact_threshold` / `release_threshold` Schmitt trigger (a tracked point begins anchoring shear at `contact_threshold` penetration and releases once it separates back to `release_threshold`).
 
 <video preload="auto" controls="True" width="100%" aria-label="A Franka gripper with taxel grids on both fingertips grasping objects; marker displacement vectors on each fingertip deflect as the fingers make contact">
 <source src="../../_static/videos/tactile_fingertips.mp4" type="video/mp4">
@@ -148,7 +148,6 @@ On top of the generic per-sensor imperfections (`noise`, `bias`, `resolution`, `
 | Option(s) | Models | Applies to |
 |---|---|---|
 | `hysteresis_strength`, `hysteresis_tau` | Viscoelastic (single-Maxwell) hysteresis: a step input overshoots by `hysteresis_strength` and relaxes with time constant `hysteresis_tau` seconds; cyclic input traces a loading-unloading loop (equilibrium gain 1). | All probes and taxels |
-| `probe_radius_noise` | Additive uniform noise (meters) on the effective sensing radius used by the measured branch. | All probes and taxels |
 | `probe_gain`, `probe_gain_resample_range` | Per-taxel multiplicative gain on the measured contact depth (scalar or per-taxel array); with a range, resampled uniformly on each `scene.reset()`. | All probes and taxels |
 | `dead_taxel_probability`, `dead_taxel_value_range` | Per-taxel Bernoulli chance of going dead on each `scene.reset()`; a dead taxel's output is replaced by a constant drawn from `dead_taxel_value_range`. | All probes and taxels |
 | `crosstalk_strength`, `crosstalk_sigma` | Gaussian spatial crosstalk: each taxel's force/torque bleeds onto its grid neighbors (`crosstalk_strength=1` is a pure Gaussian blur of width `crosstalk_sigma`). | Grid taxels: `KinematicTaxel`, `ProximityTaxel` |
@@ -168,7 +167,6 @@ taxel = scene.add_sensor(
         # measured-branch imperfections:
         hysteresis_strength=0.5,
         hysteresis_tau=0.1,
-        probe_radius_noise=0.001,
         probe_gain=1.5,
         crosstalk_kernel=misc.gaussian_crosstalk_kernel(3, 3, sigma=1.0),
     )
