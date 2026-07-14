@@ -25,6 +25,7 @@ html[data-theme="light"] {
   --pst-color-border: #e2e6e8;
   --pst-color-inline-code: #1a1d34;
   --pst-color-inline-code-links: #b32c2c;
+  --pst-color-accent: #b32c2c;
 }
 
 html[data-theme="dark"] {
@@ -42,10 +43,20 @@ html[data-theme="dark"] {
   --pst-color-border: #1c2030;
   --pst-color-inline-code: #dee8eb;
   --pst-color-inline-code-links: #ee8a8a;
+  --pst-color-accent: #ee8a8a;
 }
 
 .logo__image {
   padding: 0.35rem 0;
+}
+
+/* Match the search field's active state to the Genesis red accent (the theme's
+   default focus ring and border are purple/blue). --pst-color-accent above
+   already recolors the box-shadow ring; this fixes the hardcoded blue border. */
+.bd-search input:focus,
+.search-button__search-container input:focus,
+form.bd-search input:focus {
+  border-color: var(--pst-color-accent);
 }
 
 /* Left sidebar: the top-level entries are now real section landing pages, so

@@ -65,7 +65,17 @@ html_title = "Genesis World"
 # browsers prefer the crisp, theme-aware SVG.
 html_favicon = "_static/favicon.ico"
 
-json_url = "_static/version_switcher.json"
+# On RTD, load the switcher list from a single canonical location (the `latest`
+# build) rather than each version's own _static copy, so every build shows the
+# same, complete list, maintained by editing one file on `main`. Locally, read the
+# in-tree copy instead so edits are previewable before they are deployed.
+if os.environ.get("READTHEDOCS"):
+    json_url = "https://genesis-world.readthedocs.io/en/latest/_static/version_switcher.json"
+else:
+    json_url = "_static/version_switcher.json"
+# On RTD this is the version slug being built (e.g. "latest", "v1.2.2"); it is
+# matched against the "version" field of each switcher entry to highlight the
+# active one. Falls back to the local package version for local builds.
 version_match = os.environ.get("READTHEDOCS_VERSION")
 if version_match is None:
     version_match = "v" + __version__
