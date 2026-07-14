@@ -85,20 +85,6 @@ gs.init(backend=gs.gpu, logging_level="warning")  # quiet: warnings and errors o
 
 Set `logger_verbose_time=True` to prefix each log line with a full timestamp instead of just the elapsed time. The `theme` argument (`"dark"`, `"light"`, or `"dumb"`) controls the terminal color scheme; use `"dumb"` to disable colors in environments that mangle ANSI codes.
 
-## Environment variables
-
-A few environment variables adjust backend and runtime behavior without changing your code, which is useful for CI, containers, and quick experiments:
-
-| Variable | Effect |
-|---|---|
-| `QD_ENABLE_<BACKEND>=0` | Skip a backend during `gs.gpu` resolution, e.g. `QD_ENABLE_METAL=0`. |
-| `GS_TORCH_FORCE_CPU_DEVICE=1` | Keep PyTorch tensors on the CPU even when the physics runs on a GPU. |
-| `QD_NUM_THREADS=N` | Cap the CPU thread and compile-thread count (defaults to 1 on CPU). |
-| `GS_ENABLE_NDARRAY=0` | Force static array mode in the compiler backend. |
-| `GS_ENABLE_ZEROCOPY=0/1` | Force zero-copy tensor sharing between PyTorch and the backend off or on. |
-
-For relocating the compilation caches (a separate concern, relevant to benchmarking), see {doc}`/user_guide/developers/profiling`.
-
 ## Performance mode
 
 With `performance_mode=True`, the compiler bakes static tensor shapes into its kernels for roughly 30% faster simulation, at the cost of recompiling whenever the scene changes (which can take several minutes). Leave it off for research, debugging, and interactive work; turn it on for policy training and production runs where the scene is fixed.

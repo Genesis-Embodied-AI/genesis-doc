@@ -1,6 +1,53 @@
 [
   {
+    "name": "latest",
     "version": "latest",
-    "url": "http://genesis-world.ai/docs/intro"
+    "url": "https://genesis-world.readthedocs.io/en/latest/",
+    "preferred": true
+  },
+  {
+    "name": "v1.2.2",
+    "version": "v1.2.2",
+    "url": "https://genesis-world.readthedocs.io/en/v1.2.2/"
+  },
+  {
+    "name": "v1.2.1",
+    "version": "v1.2.1",
+    "url": "https://genesis-world.readthedocs.io/en/v1.2.1/"
+  },
+  {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "url": "https://genesis-world.readthedocs.io/en/v1.0.0/"
+  },
+  {
+    "name": "v0.4.3",
+    "version": "v0.4.3",
+    "url": "https://genesis-world.readthedocs.io/en/v0.4.3/"
+  },
+  {
+    "name": "v0.3.14",
+    "version": "v0.3.14",
+    "url": "https://genesis-world.readthedocs.io/en/v0.3.14/"
+  },
+  {
+    "name": "v0.3.12",
+    "version": "v0.3.12",
+    "url": "https://genesis-world.readthedocs.io/en/v0.3.12/"
+  },
+  {
+    "name": "v0.3.10",
+    "version": "v0.3.10",
+    "url": "https://genesis-world.readthedocs.io/en/v0.3.10/"
+  },
+  {
+    "name": "v0.3.7",
+    "version": "v0.3.7",
+    "url": "https://genesis-world.readthedocs.io/en/v0.3.7/"
+  },
+  {
+    "name": "v0.3.3",
+    "version": "v0.3.3",
+    "url": "https://genesis-world.readthedocs.io/en/v0.3.3/"
   }
 ]

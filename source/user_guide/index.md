@@ -9,8 +9,8 @@ overview/index
 getting_started/index
 configuration/index
 interaction/index
-robot_control/index
 physics/index
+robot_control/index
 sensing/index
 rendering/index
 assets/index
