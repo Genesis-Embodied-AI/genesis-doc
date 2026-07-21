@@ -1,6 +1,6 @@
 # Sensors
 
-A sensor extracts information from a scene without modifying its physics. It models the robot-control view of an onboard device: attach it to a link, step the simulation, and read back a tensor. Genesis World ships sensors for contact and force, inertial measurement, ranging, rendering, proximity, and temperature.
+A sensor extracts information from a scene without modifying its physics. It models the robot-control view of an onboard device: attach it to a link, step the simulation, and read back a tensor. Genesis World ships sensors for contact and force, inertial measurement, ranging, rendering, surface distance, and temperature.
 
 ## The attach-and-read model
 
@@ -67,7 +67,7 @@ Each family has its own page. The `read()` return types and shapes below are the
 | {doc}`tactile` | `ContactProbe`, `ContactDepthProbe`, `KinematicTaxel`, `ElastomerTaxel`, `ProximityTaxel` | per-probe contact state/depth, per-taxel force/torque and displacement | bool / depth `([n_envs,] n_probes)`; per-taxel `force`/`torque` `([n_envs,] n_probes, 3)` |
 | {doc}`raycaster` | `Lidar` (alias of `Raycaster`), `DepthCamera` | ray-hit points and distances | `RaycasterReturnType(points, distances)`: points `([n_envs,] *pattern_shape, 3)`, distances `([n_envs,] *pattern_shape)` |
 | {doc}`camera_sensors` | `RasterizerCameraOptions`, `RaytracerCameraOptions`, `BatchRendererCameraOptions` | rendered RGB images | `CameraReturnType(rgb)`, shape `([n_envs,] height, width, 3)` |
-| {doc}`proximity` | `SurfaceDistanceProbe` | nearest distance from probes to tracked mesh surfaces | distances `([n_envs,] n_probes)`; `sensor.nearest_points` `([n_envs,] n_probes, 3)` |
+| {doc}`surface_distance` | `SurfaceDistanceProbe` | nearest distance from probes to tracked mesh surfaces | distances `([n_envs,] n_probes)`; `sensor.nearest_points` `([n_envs,] n_probes, 3)` |
 | {doc}`temperature_grid` | `TemperatureGrid` | per-cell temperature in Celsius over a voxel grid | `([n_envs,] grid_x, grid_y, grid_z)` |
 
 Runnable examples for every sensor live under `examples/sensors/`.
@@ -85,7 +85,7 @@ contact
 tactile
 raycaster
 camera_sensors
-proximity
+surface_distance
 temperature_grid
 recorders
 custom_sensors/index

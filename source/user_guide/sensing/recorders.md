@@ -130,5 +130,5 @@ scene.stop_recording()  # flushes files, closes plot windows
 ## See also
 
 - {doc}`Recording API reference </api_reference/recording/index>`: `RecorderManager`, `Recorder`, and every recorder options class.
-- {doc}`Sensors <index>`: the contact, tactile, proximity, IMU, and temperature sensors you can record from.
+- {doc}`Sensors <index>`: the contact, tactile, surface distance, IMU, and temperature sensors you can record from.
 - {doc}`Camera sensors <camera_sensors>`: RGB, depth, segmentation, and normal outputs, which pair with `VideoFile` and `MPLImagePlot`.

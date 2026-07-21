@@ -195,7 +195,7 @@ if not self.uses_ring_pipeline:
         gs.raise_exception(f"{type(self).__name__} does not support `delay`; ...")
 ```
 
-The standard sensors (contact, contact force, IMU, joint torque, ranging, proximity, temperature, and the tactile family) all derive from `SimpleSensor` and use the full pipeline described here.
+The standard sensors (contact, contact force, IMU, joint torque, ranging, surface distance, temperature, and the tactile family) all derive from `SimpleSensor` and use the full pipeline described here.
 
 ## See also
 
