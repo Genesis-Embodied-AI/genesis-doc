@@ -6,7 +6,7 @@ Create each one from its `gs.sensors.*` options object with `scene.add_sensor()`
 
 ## SurfaceDistanceProbe
 
-Reports the nearest distance from each probe point to the mesh surfaces of a set of tracked rigid links, clamped to `probe_radius` when nothing is in range. The matching nearest points are available on the `nearest_points` attribute. See {doc}`the proximity guide </user_guide/sensing/proximity>`.
+Reports the nearest distance from each probe point to the mesh surfaces of a set of tracked rigid links, clamped to `probe_radius` when nothing is in range. The matching nearest points are available on the `nearest_points` attribute. See {doc}`the surface distance guide </user_guide/sensing/surface_distance>`.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.options.SurfaceDistanceProbe

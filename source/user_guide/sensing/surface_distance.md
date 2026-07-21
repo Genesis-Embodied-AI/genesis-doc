@@ -1,4 +1,4 @@
-# Proximity
+# Surface distance
 
 `gs.sensors.SurfaceDistanceProbe` reports the nearest distance from one or more probe points to the mesh surfaces of a set of tracked rigid links. Each probe is mounted in the local frame of a link and moves with it, so the sensor answers "how close is this point on my robot to those objects?" as the scene evolves.
 
@@ -55,12 +55,6 @@ points = sensor.nearest_points  # shape ([n_envs,] n_probes, 3), world frame
 ```
 
 Both leading dimensions follow the batched-optional convention: the `[n_envs,]` axis is present only when the scene is built with multiple environments. `nearest_points` is written on each step, so read it after at least one `scene.step()`; before the first step it holds zeros.
-
-## Behavior and units
-
-- **Units.** Distances and probe positions are in meters. The scene uses a right-handed, Z-up frame, and `nearest_points` are in world coordinates.
-- **Clamping at `probe_radius`.** `probe_radius` is the maximum sensing range. When no tracked surface lies within it, the reported distance is clamped to `probe_radius` and the nearest point is the probe's own world position. `probe_radius` accepts a scalar shared by every probe, or a per-probe array matching the probe count; it defaults to 0.5 m.
-- **Debug drawing.** With `draw_debug=True` and an active visualizer, the sensor draws a small opaque marker sphere at each probe (`debug_probe_center_radius`, default 0.0008 m), a translucent outer sphere sized to `probe_radius` (`debug_probe_sphere_opacity`, default 0.3; set to `0.0` to hide it), and a line to the nearest surface point.
 
 <video preload="auto" controls="True" width="100%" aria-label="Shadow Hand with proximity probes on its palm and fingertips; lines connect each probe to the nearest point on a tracked duck mesh and box as the hand moves">
 <source src="../../_static/videos/proximity.mp4" type="video/mp4">

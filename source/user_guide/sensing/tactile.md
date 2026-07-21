@@ -11,6 +11,21 @@ Two families share this interface but estimate contact differently:
 
 Readings are geometric estimates, not solver impulses, and are uncalibrated. Treat them as relative signals unless you tune the coefficients to your setup. The taxels also expose hardware-style [imperfections](#sensor-imperfections) for sim-to-real robustness. For how sensors are sampled, read back, and batched, see the {doc}`sensors overview <index>`.
 
+:::{note}
+**Source and citation.** These tactile sensors were introduced in [Tactile Genesis: Exploring Tactile Sensors at Scale for Learning Dexterous Tasks](https://neuroagents-lab.github.io/tactile-genesis/) (CoRL 2026). If you use them in your research, please cite:
+
+```bibtex
+@inproceedings{chung2026tactilegenesis,
+  title     = {Tactile Genesis: Exploring Tactile Sensors at Scale for Learning Dexterous Tasks},
+  author    = {Chung, Trinity and Yamazaki, Kashu and Patel, Dhruv and Duburcq, Alexis and Qiao, Yiling and Fragkiadaki, Katerina and Nayebi, Aran},
+  booktitle = {Conference on Robot Learning (CoRL)},
+  year      = {2026}
+}
+```
+
+The implementation in Genesis World has since been improved and refined, so its behavior may differ from what the original paper reports.
+:::
+
 ## Choosing a sensor
 
 | Sensor | `read()` returns | Shape | Frame / units |
@@ -47,6 +62,11 @@ depth = depth_probe.read()  # shape ([n_envs,] n_probes), m
 
 `ContactProbe` gates its boolean output with a Schmitt trigger to suppress chatter: it latches on when depth reaches `contact_threshold` (default `1e-4` m) and releases when depth falls back to `release_threshold` (default equals `contact_threshold`, i.e. no hysteresis; may be negative to require separation before release).
 
+<video preload="auto" controls="True" width="100%" aria-label="A live plot of ContactDepthProbe readings across a taxel pad as an object presses in, each taxel's depth rising with local penetration">
+<source src="../../_static/videos/contact_depth_probe.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+
 ## Kinematic taxels
 
 `KinematicTaxel` adds a spring-damper force model on top of the depth query. For each taxel it estimates a force from penetration along the contact surface normal and a torque from the twist, using the probe's motion relative to the object it touches:
@@ -77,8 +97,8 @@ data.torque  # shape ([n_envs,] n_probes, 3), N·m, link frame
 
 `read()` returns a `KinematicTaxelReturnType` named tuple, so `data.force` and `data.torque` unpack by name.
 
-<video preload="auto" controls="True" width="100%" aria-label="A live vector-field plot of KinematicTaxel forces across a probe grid as an object presses into the sensor, with arrows growing where penetration is deepest">
-<source src="../../_static/videos/kin_probe_data.mp4" type="video/mp4">
+<video preload="auto" controls="True" width="100%" aria-label="A live vector-field plot of KinematicTaxel forces across a probe grid as an object presses into the sensor, with arrows growing where penetration is deepest and curved twist arrows tracking rotational slip">
+<source src="../../_static/videos/kinematic_taxel.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
 
@@ -105,8 +125,8 @@ displacement = tactile.read()  # shape ([n_envs,] n_probes, 3), m
 
 `dilate_scale` and `shear_scale` scale the indentation and shear response; `lambda_d` and `lambda_s` control how far each effect spreads across neighboring markers. The out-of-plane (normal) bulge scales as `depth ** normal_exponent` (default `2.0`, the HydroShear quadratic response); tangential dilation and shear stay linear in depth regardless of `normal_exponent`. When `probe_local_pos` is a regular planar grid with a single shared normal, the dilation term is computed with an FFT to keep large arrays fast. The shear anchor is gated by the same `contact_threshold` / `release_threshold` Schmitt trigger (a tracked point begins anchoring shear at `contact_threshold` penetration and releases once it separates back to `release_threshold`).
 
-<video preload="auto" controls="True" width="100%" aria-label="A Franka gripper with taxel grids on both fingertips grasping objects; marker displacement vectors on each fingertip deflect as the fingers make contact">
-<source src="../../_static/videos/tactile_fingertips.mp4" type="video/mp4">
+<video preload="auto" controls="True" width="100%" aria-label="A live vector-field plot of ElastomerTaxel marker displacements across a taxel pad as an object presses and slides, the dots deflecting under local indentation and shear">
+<source src="../../_static/videos/elastomer_taxel.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
 
@@ -136,8 +156,8 @@ data.torque  # shape ([n_envs,] n_probes, 3), N·m, link-local
 
 Like `KinematicTaxel`, it returns a named tuple (`ProximityTaxelReturnType`) with `force` and `torque` fields.
 
-<video preload="auto" controls="True" width="100%" aria-label="The tactile sandbox demo pressing objects into an elastomer taxel pad across four parallel environments, with marker displacement fields responding to each object's shape">
-<source src="../../_static/videos/elastomer_sandbox.mp4" type="video/mp4">
+<video preload="auto" controls="True" width="100%" aria-label="A live vector-field plot of ProximityTaxel force and twist across a taxel pad as an object approaches and presses in, the field responding before and through contact">
+<source src="../../_static/videos/proximity_taxel.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
 
@@ -174,6 +194,11 @@ taxel = scene.add_sensor(
 ```
 
 Pass `--noise` to `tactile_sandbox.py` to enable these imperfections in the interactive demo.
+
+<video preload="auto" controls="True" width="100%" aria-label="A live vector-field plot of KinematicTaxel forces with imperfections enabled, the field lagging and blurring across neighboring taxels from hysteresis and spatial crosstalk as an object presses in">
+<source src="../../_static/videos/imperfect_kinematic_taxel.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
 
 ## See also
 
