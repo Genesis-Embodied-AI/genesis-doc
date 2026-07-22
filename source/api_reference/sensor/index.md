@@ -30,50 +30,7 @@ Notes on the return types:
 - **`SurfaceDistanceProbe`:** `read()` returns the probe-to-surface distances; the corresponding nearest points are available as `sensor.nearest_points`, shape `([n_envs,] n_probes, 3)`.
 - **`Raycaster` patterns:** `pattern_shape` follows the ray pattern: for example `(n_horizontal, n_vertical)` for a spherical pattern and `(height, width)` for `DepthCamera`.
 
-## Quick start
-
-Attach a camera, a contact-force sensor, and an IMU, then read each after a step.
-
-```python
-import genesis as gs
-
-gs.init(backend=gs.gpu)
-scene = gs.Scene()
-scene.add_entity(gs.morphs.Plane())
-robot = scene.add_entity(gs.morphs.URDF(file="urdf/go2/urdf/go2.urdf"))
-
-cam = scene.add_camera(
-    res=(640, 480),
-    pos=(3, 0, 2),
-    lookat=(0, 0, 0.5),
-)
-
-contact_force = scene.add_sensor(
-    gs.sensors.ContactForce(
-        entity_idx=robot.idx,
-        link_idx_local=robot.get_link("FL_foot").idx_local,
-    )
-)
-
-imu = scene.add_sensor(
-    gs.sensors.IMU(
-        entity_idx=robot.idx,
-        link_idx_local=robot.get_link("base").idx_local,
-    )
-)
-
-scene.build()
-
-scene.step()
-
-rgb, _, _, _ = cam.render(rgb=True)  # rgb: uint8, shape ([n_envs,] height, width, 3)
-force = contact_force.read()         # float32, shape ([n_envs,] 3), Newtons in link frame
-imu_data = imu.read()                # IMUReturnType(lin_acc, ang_vel, mag)
-acceleration = imu_data.lin_acc      # shape ([n_envs,] 3)
-angular_velocity = imu_data.ang_vel  # shape ([n_envs,] 3)
-```
-
-Runnable examples for every sensor live under `examples/sensors/`.
+For usage, the attach-and-read model, imperfections, history, and batched reads, see the {doc}`sensors guide </user_guide/sensing/index>`. Runnable examples for every sensor live under `examples/sensors/`.
 
 ## Sensor reference pages
 

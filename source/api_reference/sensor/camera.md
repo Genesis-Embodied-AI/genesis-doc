@@ -4,33 +4,7 @@ A camera sensor renders an RGB image of the scene each step and returns it throu
 
 Do not confuse it with the visualization camera. The camera sensor is created with `scene.add_sensor(gs.sensors.*CameraOptions(...))` and its `read()` returns a `CameraReturnType` carrying a single `rgb` field. The visualization camera is created with `scene.add_camera(...)` and its `render()` returns RGB together with depth, segmentation, and surface normals. Reach for the visualization camera when you need those extra channels or the interactive viewer; see {doc}`/api_reference/visualization/camera`.
 
-## Minimal example
-
-```python
-import genesis as gs
-
-gs.init(backend=gs.gpu)
-scene = gs.Scene()
-scene.add_entity(gs.morphs.Plane())
-scene.add_entity(gs.morphs.URDF(file="urdf/go2/urdf/go2.urdf"))
-
-camera = scene.add_sensor(
-    gs.sensors.RasterizerCameraOptions(
-        res=(640, 480),      # (width, height)
-        pos=(3.5, 0.0, 1.5),
-        lookat=(0.0, 0.0, 0.5),
-        fov=60.0,            # vertical field of view, degrees
-    )
-)
-
-scene.build()
-scene.step()
-
-frame = camera.read()  # CameraReturnType
-rgb = frame.rgb        # uint8, shape ([n_envs,] height, width, 3)
-```
-
-`read()` renders lazily: the first call after a step renders the current state, and repeated calls within the same step reuse the cached image. Attach the camera to a link by passing `entity_idx` and `link_idx_local`, exactly as for other sensors; `pos`, `lookat`, and `up` are then interpreted relative to the link frame.
+`read()` renders lazily: the first call after a step renders the current state, and repeated calls within the same step reuse the cached image. Attach the camera to a link by passing `entity_idx` and `link_idx_local`, exactly as for other sensors; `pos`, `lookat`, and `up` are then interpreted relative to the link frame. For usage, see the {doc}`camera sensing guide </user_guide/sensing/camera_sensors>`.
 
 ## Choosing a backend
 

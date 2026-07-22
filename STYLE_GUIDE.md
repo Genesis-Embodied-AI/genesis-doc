@@ -73,10 +73,9 @@ One or two sentences: what you'll accomplish and the end result.
 ```
 # Name
 
-One sentence defining what it is and when to use it.
+One sentence: what it is and when to use it, with a link to the How-to in the User Guide.
 
-## Minimal example    -> construct it, use it, read one result (optional)
-## <autodoc>          -> `.. autoclass::` the options class, the sensor class, and the return type
+## <autodoc>   -> `.. autoclass::` the options class, the sensor class, and the return type
 ## See also
 ```
 
@@ -91,7 +90,7 @@ One sentence defining what it is and when to use it.
 
 **User Guide vs API Reference: one home per fact.** The two top-level sections have different jobs, and no fact should live in both.
 
-- **The API Reference is information-oriented and generated from the source docstrings** (`{eval-rst}` + `.. autoclass::`); its structure mirrors the code. A reference page carries a one-line "what and when," at most one minimal example, and the autodoc directives, nothing more. The docstring *is* the reference.
+- **The API Reference is information-oriented and generated from the source docstrings** (`{eval-rst}` + `.. autoclass::`); its structure mirrors the code. A reference page carries a one-line "what and when," the autodoc directives, and a link to the How-to in the User Guide. It hosts no usage examples; those live in the guide, never duplicated here. The docstring *is* the reference.
 - **The User Guide is task- and understanding-oriented:** the mental model, when to reach for a feature, how APIs combine, sensible values for a use case, and the gotchas, anchored by curated runnable examples.
 - **One home per fact.** Every parameter's type, default, and meaning lives once, in the source docstring the reference autodocs. Neither the guide nor a reference page's hand-written prose restates the full parameter or return list; they link to it with `{py:class}` or `{doc}`. Naming the few parameters a task needs, in a teaching example, is fine; reproducing the reference table is not. A compact table that helps a reader *choose between* sensors is navigation, not a restatement, and is welcome.
 - **Fix facts at the docstring.** Then the reference updates itself, and the guide keeps no version-fragile specifics that rot silently. If you find either side reproducing the reference, delete it and link.
