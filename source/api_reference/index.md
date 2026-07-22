@@ -1,6 +1,6 @@
 # API Reference
 
-This section provides comprehensive documentation for the Genesis World API. The reference is organized by functionality to help you find the classes and functions you need.
+This section documents the Genesis World API, grouped and ordered to follow how a simulation is built, configured, run, and observed.
 
 ## Core components
 
@@ -10,6 +10,25 @@ This section provides comprehensive documentation for the Genesis World API. The
 
 scene/index
 entity/index
+```
+
+## Configuration and options
+
+```{toctree}
+:titlesonly:
+:maxdepth: 2
+
+material/index
+options/index
+```
+
+## Physics engine
+
+```{toctree}
+:titlesonly:
+:maxdepth: 2
+
+engine/index
 ```
 
 ## Visualization and rendering
@@ -39,23 +58,13 @@ sensor/index
 recording/index
 ```
 
-## Physics engine
+## Differentiable simulation
 
 ```{toctree}
 :titlesonly:
 :maxdepth: 2
 
-engine/index
-```
-
-## Configuration and options
-
-```{toctree}
-:titlesonly:
-:maxdepth: 2
-
-material/index
-options/index
+differentiation/index
 ```
 
 ## Utilities and helpers
@@ -65,13 +74,4 @@ options/index
 :maxdepth: 2
 
 utilities/index
-```
-
-## Differentiable simulation
-
-```{toctree}
-:titlesonly:
-:maxdepth: 2
-
-differentiation/index
 ```
