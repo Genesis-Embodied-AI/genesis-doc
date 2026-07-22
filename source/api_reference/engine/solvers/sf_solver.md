@@ -4,11 +4,17 @@ The `SFSolver` is the Stable Fluid solver: a grid-based (Eulerian) solver for ga
 
 Unlike the particle- and mesh-based solvers, the Stable Fluid solver does not track Lagrangian entities. It solves everything on a uniform grid whose resolution you set through `SFOptions.res`, and gas is injected by velocity jets that you register on the solver. It simulates the `SF.Smoke` material; see {doc}`/api_reference/entity/material/sf`.
 
+## Options
+
+```{eval-rst}
+.. autoclass:: genesis.options.solvers.SFOptions
+```
+
 ## Usage
 
 The solver is driven by velocity jets registered directly on it with `set_jets`, and its density grid is read back for rendering. See `examples/smoke.py` for the full runnable example, including the jet class and the code that writes the density field to images.
 
-Configure the grid resolution and projection through `SFOptions`; see {doc}`/api_reference/engine/solvers/sf_options` for the full option set.
+Configure the grid resolution and projection through the `SFOptions` documented above.
 
 ## Behavior and guarantees
 
@@ -19,4 +25,3 @@ Configure the grid resolution and projection through `SFOptions`; see {doc}`/api
 ## See also
 
 - {doc}`/api_reference/entity/material/sf`: the smoke material simulated by this solver.
-- {doc}`/api_reference/engine/solvers/sf_options`: full options.

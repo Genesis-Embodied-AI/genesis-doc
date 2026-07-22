@@ -34,11 +34,8 @@ Once the coupler is set, coupling between entities happens automatically as the 
 
 coupler_options
 legacy_coupler
-legacy_coupler_options
 sap_coupler
-sap_coupler_options
 ipc_coupler
-ipc_coupler_options
 ```
 
 ## See also

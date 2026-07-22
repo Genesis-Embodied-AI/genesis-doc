@@ -4,7 +4,7 @@ The IPC coupler resolves contact with Incremental Potential Contact, a barrier-b
 
 Reach for IPC when accuracy and robustness matter more than speed: cloth with self-collision, FEM solids pressed hard against each other, or a gripper closing on a deformable object. For mixed continuum scenes (MPM, SPH, PBD) or when you only need coarse rigid contact, stay on the default legacy coupler. See {doc}`the couplers overview <index>` for the full comparison.
 
-Under the hood, FEM bodies are coupled directly from their vertex positions, while rigid bodies enter the IPC world as affine bodies (ABD). Time step, gravity, and differentiable-simulation mode come from {doc}`SimOptions </api_reference/scene/sim_options>`, so you set them there, not on the coupler.
+Under the hood, FEM bodies are coupled directly from their vertex positions, while rigid bodies enter the IPC world as affine bodies (ABD). Time step, gravity, and differentiable-simulation mode come from {doc}`SimOptions </api_reference/scene/simulator>`, so you set them there, not on the coupler.
 
 ## Prerequisites
 

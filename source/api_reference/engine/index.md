@@ -53,5 +53,5 @@ states/index
 
 ## See also
 
-- {doc}`/api_reference/scene/sim_options`: the global `SimOptions`. Per-solver and per-coupler options sit beside each solver and coupler.
+- {doc}`/api_reference/scene/simulator`: the global `SimOptions`. Per-solver and per-coupler options sit beside each solver and coupler.
 - {doc}`/api_reference/entity/index`: the entity types that select each solver.

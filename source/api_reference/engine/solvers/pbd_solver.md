@@ -2,6 +2,12 @@
 
 The `PBDSolver` implements Position Based Dynamics for simulating cloth, soft bodies, and particle systems with fast, stable steps. The materials it supports are listed in {doc}`/api_reference/entity/material/pbd/index`.
 
+## Options
+
+```{eval-rst}
+.. autoclass:: genesis.options.solvers.PBDOptions
+```
+
 ## Overview
 
 PBD works by:
@@ -19,7 +25,7 @@ Advantages:
 
 ## Usage
 
-The solver activates when the scene contains a PBD entity. Configure it through `PBDOptions`; see {doc}`/api_reference/engine/solvers/pbd_options` for the full option set. For usage, see {doc}`/user_guide/physics/beyond_rigid_bodies`.
+The solver activates when the scene contains a PBD entity. Configure it through the `PBDOptions` documented above. For usage, see {doc}`/user_guide/physics/beyond_rigid_bodies`.
 
 ## Constraint types
 
@@ -36,4 +42,3 @@ Each group has its own iteration count in `PBDOptions`.
 
 - {doc}`/api_reference/entity/pbd_entity/index`: PBD entities.
 - {doc}`/api_reference/entity/material/pbd/index`: PBD materials.
-- {doc}`/api_reference/engine/solvers/pbd_options`: full options.

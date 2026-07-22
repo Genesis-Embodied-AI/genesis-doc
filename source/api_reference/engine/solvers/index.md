@@ -16,15 +16,15 @@ You rarely construct a solver directly. You add an entity with a material, and t
 | `SFSolver` | Stable Fluid (Eulerian grid) | Gaseous phenomena such as smoke |
 | `ToolSolver` | Kinematic tool coupling | Rigid tools that drive soft bodies through one-way differentiable coupling |
 
-Each solver has its own page linked below, and its own options:
+Each solver has its own page linked below, documenting the solver and its options:
 
-- **RigidSolver:** {doc}`rigid_solver`, configured by {doc}`/api_reference/engine/solvers/rigid_options`.
-- **MPMSolver:** {doc}`mpm_solver`, configured by {doc}`/api_reference/engine/solvers/mpm_options`.
-- **FEMSolver:** {doc}`fem_solver`, configured by {doc}`/api_reference/engine/solvers/fem_options`.
-- **PBDSolver:** {doc}`pbd_solver`, configured by {doc}`/api_reference/engine/solvers/pbd_options`.
-- **SPHSolver:** {doc}`sph_solver`, configured by {doc}`/api_reference/engine/solvers/sph_options`.
-- **SFSolver:** {doc}`sf_solver`, configured by {doc}`/api_reference/engine/solvers/sf_options`.
-- **ToolSolver:** {doc}`tool_solver`, configured by {doc}`/api_reference/engine/solvers/tool_options`.
+- **RigidSolver:** {doc}`rigid_solver`.
+- **MPMSolver:** {doc}`mpm_solver`.
+- **FEMSolver:** {doc}`fem_solver`.
+- **PBDSolver:** {doc}`pbd_solver`.
+- **SPHSolver:** {doc}`sph_solver`.
+- **SFSolver:** {doc}`sf_solver`.
+- **ToolSolver:** {doc}`tool_solver`.
 
 :::{note}
 `ToolSolver` is a temporary solver that provides one-way differentiable coupling from a rigid tool to soft bodies. It will be removed once the `RigidSolver` supports differentiability directly.
@@ -34,19 +34,12 @@ Each solver has its own page linked below, and its own options:
 :titlesonly:
 
 rigid_solver
-rigid_options
 mpm_solver
-mpm_options
 fem_solver
-fem_options
 pbd_solver
-pbd_options
 sph_solver
-sph_options
 sf_solver
-sf_options
 tool_solver
-tool_options
 kinematic_options
 ```
 

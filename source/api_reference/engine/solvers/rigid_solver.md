@@ -2,6 +2,12 @@
 
 The `RigidSolver` handles rigid body dynamics, including articulated bodies, robots, and rigid objects.
 
+## Options
+
+```{eval-rst}
+.. autoclass:: genesis.options.solvers.RigidOptions
+```
+
 ## Overview
 
 The RigidSolver implements:
@@ -24,9 +30,8 @@ The RigidSolver uses support-function collision detection with optimized fallbac
 
 ## Constraint solving
 
-Contacts and joint constraints are resolved by an iterative solver. Two solvers are available through `constraint_solver`: `gs.constraint_solver.CG` and `gs.constraint_solver.Newton`. See {doc}`/api_reference/engine/solvers/rigid_options` for the tuning parameters.
+Contacts and joint constraints are resolved by an iterative solver. Two solvers are available through `constraint_solver`: `gs.constraint_solver.CG` and `gs.constraint_solver.Newton`. See the Options section above for the tuning parameters.
 
 ## See also
 
 - {doc}`/api_reference/entity/rigid_entity/index`: RigidEntity.
-- {doc}`/api_reference/engine/solvers/rigid_options`: full options.
