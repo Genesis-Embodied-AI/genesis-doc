@@ -44,7 +44,7 @@ cloth = scene.add_entity(
     material=gs.materials.FEM.Cloth(
         E=1e5,  # Young's modulus (Pa)
         nu=0.499,  # Poisson's ratio, nearly incompressible
-        rho=200,  # density (kg/m³)
+        rho=200,  # density (kg/m3)
         thickness=0.001,  # shell thickness (m)
         bending_stiffness=50.0,
     ),
@@ -115,7 +115,7 @@ scene = gs.Scene(
     coupler_options=gs.options.IPCCouplerOptions(
         constraint_strength_translation=10.0,
         constraint_strength_rotation=10.0,
-        enable_rigid_rigid_contact=False,  # only finger–cube contact matters here
+        enable_rigid_rigid_contact=False,  # only finger-cube contact matters here
         enable_rigid_ground_contact=False,
     ),
 )

@@ -32,7 +32,7 @@ import genesis as gs
 gs.init(backend=gs.cpu)
 
 scene = gs.Scene(
-    sim_options=gs.options.SimOptions(dt=0.01),  # gravity defaults to (0, 0, -9.81) m/s²
+    sim_options=gs.options.SimOptions(dt=0.01),  # gravity defaults to (0, 0, -9.81) m/s2
 )
 scene.add_entity(gs.morphs.Plane())
 drone = scene.add_entity(

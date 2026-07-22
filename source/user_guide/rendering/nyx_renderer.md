@@ -177,7 +177,7 @@ def main():
     plant = nps.LightFieldAsset()
     plant.type = nps.ELightFieldType.GaussianField
     plant.uri = PLANT_PLY
-    # Rotate 90° about Z to stand the capture upright in Genesis World's Z-up world.
+    # Rotate 90deg about Z to stand the capture upright in Genesis World's Z-up world.
     plant.rotation = nps.quaternion(0.0, 0.0, -0.70710678, 0.70710678)
 
     # HDRI env map lighting the simulated plane. The splat already bakes in

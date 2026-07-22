@@ -15,10 +15,10 @@ temperature_sensor = scene.add_sensor(
         link_idx_local=0,
         grid_size=(10, 10, 1),  # (nx, ny, nz) voxels over the link's local bounding box
         properties_dict=properties_dict,
-        ambient_temperature=22.0,  # °C
-        convection_coefficient=0.0,  # W/(m²·K); 0.0 disables surface cooling
+        ambient_temperature=22.0,  # degC
+        convection_coefficient=0.0,  # W/(m2*K); 0.0 disables surface cooling
         draw_debug=True,
-        debug_temperature_range=(0.0, 80.0),  # °C mapped to the blue→red debug colors
+        debug_temperature_range=(0.0, 80.0),  # degC mapped to the blue->red debug colors
     )
 )
 
@@ -28,7 +28,7 @@ scene.build()
 After the scene is built, `read()` returns the current temperature field:
 
 ```python
-data = temperature_sensor.read()  # shape ([n_envs,] nx, ny, nz), in °C
+data = temperature_sensor.read()  # shape ([n_envs,] nx, ny, nz), in degC
 t_min, t_max = float(data.min()), float(data.max())
 ```
 

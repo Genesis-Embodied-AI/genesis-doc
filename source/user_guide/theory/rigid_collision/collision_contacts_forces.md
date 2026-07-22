@@ -63,7 +63,7 @@ Each entry shares a leading contact axis. Index and scalar fields have shape `([
 To restrict the result to contacts against one other entity, pass `with_entity`. Passing the entity itself returns self-collisions only, and `exclude_self_contact=True` drops them:
 
 ```python
-contacts = ball.get_contacts(with_entity=plane)  # only ball–plane contacts
+contacts = ball.get_contacts(with_entity=plane)  # only ball-plane contacts
 ```
 
 :::{note}

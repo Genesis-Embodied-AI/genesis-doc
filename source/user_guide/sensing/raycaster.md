@@ -23,7 +23,7 @@ scene.add_entity(gs.morphs.Box(size=(0.5, 0.5, 1.0), pos=(2.0, 0.0, 0.5), fixed=
 
 lidar = scene.add_sensor(
     gs.sensors.Lidar(
-        pattern=gs.sensors.SphericalPattern(),  # 360° × 60° fov, 128 × 64 rays
+        pattern=gs.sensors.SphericalPattern(),  # 360deg x 60deg fov, 128 x 64 rays
         entity_idx=robot.idx,                   # mount on the robot's base link
         pos_offset=(0.3, 0.0, 0.1),             # meters, in the link frame
         max_range=20.0,                         # meters
@@ -82,7 +82,7 @@ Rays fan out over a horizontal (azimuth) and vertical (elevation) field of view.
 
 ```python
 gs.sensors.SphericalPattern(
-    fov=(360.0, 60.0),   # (horizontal, vertical) degrees; a scalar is centered on 0°,
+    fov=(360.0, 60.0),   # (horizontal, vertical) degrees; a scalar is centered on 0deg,
                          # a (min, max) tuple gives an asymmetric range
     n_points=(128, 64),  # (horizontal, vertical) ray counts -> return_shape (128, 64)
     # angular_resolution=(0.25, 0.5),  # degrees per ray; overrides n_points

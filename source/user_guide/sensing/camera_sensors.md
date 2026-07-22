@@ -35,7 +35,7 @@ scene.build()
 scene.step()
 
 data = camera.read()
-print(data.rgb.shape)  # (600, 500, 3) — (H, W, 3), H and W from res=(W, H)
+print(data.rgb.shape)  # (600, 500, 3) - (H, W, 3), H and W from res=(W, H)
 ```
 
 `add_sensor` returns the sensor object; interact with the camera through it rather than a global handle. The default renderer is the rasterizer, so this runs on any platform without extra setup.
@@ -46,7 +46,7 @@ print(data.rgb.shape)  # (600, 500, 3) — (H, W, 3), H and W from res=(W, H)
 
 ```python
 data = camera.read()
-rgb = data.rgb  # shape ([n_envs,] H, W, 3), dtype uint8, values 0–255
+rgb = data.rgb  # shape ([n_envs,] H, W, 3), dtype uint8, values 0-255
 ```
 
 The image is `(H, W, 3)` with `H = res[1]` and `W = res[0]`. Note that `res` is `(width, height)` but the array is row-major `(height, width)`, matching NumPy image conventions. The leading `n_envs` axis is present only when the scene is built with environments (`scene.build(n_envs=...)`); an unbatched `scene.build()` drops it.

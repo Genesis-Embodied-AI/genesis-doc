@@ -86,7 +86,7 @@ franka.set_dofs_kv(
     dofs_idx_local=motors_dof_idx,
 )
 franka.set_dofs_force_range(
-    lower=np.array([-87, -87, -87, -87, -12, -12, -12, -100, -100]),  # N·m / N
+    lower=np.array([-87, -87, -87, -87, -12, -12, -12, -100, -100]),  # N*m / N
     upper=np.array([87, 87, 87, 87, 12, 12, 12, 100, 100]),
     dofs_idx_local=motors_dof_idx,
 )

@@ -36,7 +36,7 @@ liquid = scene.add_entity(
 )
 
 # Instantiate, then register with the scene *before* building.
-wind = gs.force_fields.Constant(direction=(1, 0, 0), strength=5.0)  # 5 m/s² along +X
+wind = gs.force_fields.Constant(direction=(1, 0, 0), strength=5.0)  # 5 m/s2 along +X
 scene.add_force_field(wind)
 
 scene.build()
@@ -85,7 +85,7 @@ import quadrants as qd
 
 @qd.func
 def swirl(pos, vel, t, i):
-    return qd.Vector([-pos[1], pos[0], 0.0], dt=gs.qd_float)  # m/s²
+    return qd.Vector([-pos[1], pos[0], 0.0], dt=gs.qd_float)  # m/s2
 
 
 scene.add_force_field(gs.force_fields.Custom(swirl))

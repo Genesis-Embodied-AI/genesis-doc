@@ -35,7 +35,7 @@ The rigid material sets how a body interacts physically. Pass a configured `gs.m
 box = scene.add_entity(
     gs.morphs.Box(pos=(0, 0, 0.5), size=(0.2, 0.2, 0.2)),
     material=gs.materials.Rigid(
-        rho=1000.0,               # density in kg/m³, used to estimate mass
+        rho=1000.0,               # density in kg/m3, used to estimate mass
         friction=1.0,             # sliding (Coulomb) friction coefficient
         friction_torsional=0.005, # resists spin about the contact normal (meters)
         friction_rolling=0.0001,  # resists rolling about the tangent axes (meters)

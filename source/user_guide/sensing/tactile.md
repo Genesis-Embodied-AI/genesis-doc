@@ -93,7 +93,7 @@ taxel = scene.add_sensor(
 
 data = taxel.read()
 data.force   # shape ([n_envs,] n_probes, 3), N, link-local
-data.torque  # shape ([n_envs,] n_probes, 3), N·m, link-local
+data.torque  # shape ([n_envs,] n_probes, 3), N*m, link-local
 ```
 
 `read()` returns a `KinematicTaxelReturnType` named tuple, so `data.force` and `data.torque` unpack by name.
@@ -152,7 +152,7 @@ proximity = scene.add_sensor(
 
 data = proximity.read()
 data.force   # shape ([n_envs,] n_probes, 3), N, link-local
-data.torque  # shape ([n_envs,] n_probes, 3), N·m, link-local
+data.torque  # shape ([n_envs,] n_probes, 3), N*m, link-local
 ```
 
 Like `KinematicTaxel`, it returns a named tuple (`ProximityTaxelReturnType`) with `force` and `torque` fields.

@@ -10,9 +10,9 @@ A scene holds one simulator. The simulator holds the solvers active in the scene
 
 ```
 Scene
-└── Simulator
-    ├── solvers   — one per active physics method (rigid, MPM, FEM, …)
-    └── coupler   — resolves interactions across solvers
+`-- Simulator
+    |-- solvers   - one per active physics method (rigid, MPM, FEM, ...)
+    `-- coupler   - resolves interactions across solvers
 ```
 
 Each solver runs a specific physics method and is activated only when the scene contains at least one entity that needs it. A solver is chosen by an entity's material:
@@ -46,7 +46,7 @@ scene = gs.Scene(
     sim_options=gs.options.SimOptions(
         dt=0.01,               # control timestep, seconds
         substeps=4,            # physics substeps per step
-        gravity=(0, 0, -9.81), # Z-up, m/s²
+        gravity=(0, 0, -9.81), # Z-up, m/s2
     ),
 )
 
