@@ -12,18 +12,19 @@ Two families share this interface but estimate contact differently:
 Readings are geometric estimates, not solver impulses, and are uncalibrated. Treat them as relative signals unless you tune the coefficients to your setup. The taxels also expose hardware-style [imperfections](#sensor-imperfections) for sim-to-real robustness. For how sensors are sampled, read back, and batched, see the {doc}`sensors overview <index>`.
 
 :::{note}
-**Source and citation.** These tactile sensors were introduced in [Tactile Genesis: Exploring Tactile Sensors at Scale for Learning Dexterous Tasks](https://neuroagents-lab.github.io/tactile-genesis/) (CoRL 2026). If you use them in your research, please cite:
+These tactile sensors were introduced in [Tactile Genesis: Exploring Tactile Sensors at Scale for Learning Dexterous Tasks](https://neuroagents-lab.github.io/tactile-genesis/).
+The implementation in Genesis World has since been refined, so its behavior may differ from what the original paper reports.
+Still, if you use them in your research, **please cite**:
 
 ```bibtex
-@inproceedings{chung2026tactilegenesis,
-  title     = {Tactile Genesis: Exploring Tactile Sensors at Scale for Learning Dexterous Tasks},
-  author    = {Chung, Trinity and Yamazaki, Kashu and Patel, Dhruv and Duburcq, Alexis and Qiao, Yiling and Fragkiadaki, Katerina and Nayebi, Aran},
-  booktitle = {Conference on Robot Learning (CoRL)},
-  year      = {2026}
+@article{chung2026tactilegenesis,
+  title   = {Tactile Genesis: Exploring Tactile Sensors at Scale for Learning Dexterous Tasks},
+  author  = {Chung, Trinity and Yamazaki, Kashu and Patel, Dhruv and Duburcq, Alexis and Qiao, Yiling and Fragkiadaki, Katerina and Nayebi, Aran},
+  journal = {arXiv preprint},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2606.22332}
 }
 ```
-
-The implementation in Genesis World has since been improved and refined, so its behavior may differ from what the original paper reports.
 :::
 
 ## Choosing a sensor
