@@ -61,23 +61,22 @@ Structure every page so a reader can find their answer without reading the whole
 
 One or two sentences: what you'll accomplish and the end result.
 
-## Minimal working example      ← complete, runnable, copy-pasteable
-## Walkthrough                  ← explain the example in the order it executes
-## Variations / configuration   ← the next things a reader will want
-## Notes and gotchas            ← admonitions for pitfalls
-## See also                     ← links to related pages
+## Minimal working example      -> complete, runnable, copy-pasteable
+## Walkthrough                  -> explain the example in the order it executes
+## Variations / configuration   -> the next things a reader will want
+## Notes and gotchas            -> admonitions for pitfalls
+## See also                     -> links to related pages
 ```
 
-**A reference page (a class, a sensor, an API) follows this skeleton:**
+**A reference page (a class or a sensor) follows this skeleton. Genesis's API Reference is generated from the source docstrings via autodoc, so the page stays thin and the docstring carries the parameters, returns, and behavior:**
 
 ```
 # Name
 
 One sentence defining what it is and when to use it.
 
-## Minimal example              ← construct it, use it, read a result
-## Parameters / returns         ← precise, tabular where possible
-## Behavior and guarantees      ← edge cases, clamping, defaults, units
+## Minimal example    -> construct it, use it, read one result (optional)
+## <autodoc>          -> `.. autoclass::` the options class, the sensor class, and the return type
 ## See also
 ```
 
@@ -89,6 +88,13 @@ One sentence defining what it is and when to use it.
 - **Pull short excerpts into the page — one per teaching point.** An excerpt anchors an explanation; it does not reproduce the file. If an excerpt has nothing to teach, cut it.
 - **Comments say _what_; prose says _why_.** Don't write prose that restates the next line of code ("`scene.build()` builds the scene"). Explain the reason, the trade-off, or the gotcha instead.
 - A short, self-contained script (under ~15 lines) may be shown once in full as the minimal working example. Anything longer is excerpted, with the full file linked.
+
+**User Guide vs API Reference: one home per fact.** The two top-level sections have different jobs, and no fact should live in both.
+
+- **The API Reference is information-oriented and generated from the source docstrings** (`{eval-rst}` + `.. autoclass::`); its structure mirrors the code. A reference page carries a one-line "what and when," at most one minimal example, and the autodoc directives, nothing more. The docstring *is* the reference.
+- **The User Guide is task- and understanding-oriented:** the mental model, when to reach for a feature, how APIs combine, sensible values for a use case, and the gotchas, anchored by curated runnable examples.
+- **One home per fact.** Every parameter's type, default, and meaning lives once, in the source docstring the reference autodocs. Neither the guide nor a reference page's hand-written prose restates the full parameter or return list; they link to it with `{py:class}` or `{doc}`. Naming the few parameters a task needs, in a teaching example, is fine; reproducing the reference table is not. A compact table that helps a reader *choose between* sensors is navigation, not a restatement, and is welcome.
+- **Fix facts at the docstring.** Then the reference updates itself, and the guide keeps no version-fragile specifics that rot silently. If you find either side reproducing the reference, delete it and link.
 
 **Keep paragraphs short.** Three or four sentences maximum. Break dense material into lists, tables, or steps. A wall of text is where information goes to hide.
 
@@ -276,6 +282,7 @@ Before opening a docs PR, confirm:
 - [ ] Every fenced block is tagged with a lowercase language (`python`, `bash`, …).
 - [ ] No space-aligned keyword arguments; Python is `black`-clean.
 - [ ] The page leads with what it's for and a runnable example within one screen.
+- [ ] No parameter, type, default, or return fact is re-typed from the API Reference (the source docstring); the guide and reference-page prose link to it instead.
 - [ ] In-page headings are sentence case with no emoji; section/navigation titles (top-level section pages, toctree captions) are Title Case.
 - [ ] No page or section title begins with an article ("The", "A", "An").
 - [ ] Terminology matches §6; the product is "Genesis World" (not keyword-stuffed).
@@ -285,4 +292,3 @@ Before opening a docs PR, confirm:
 - [ ] Tensor shapes, coordinate frame, quaternion order, and units are stated where relevant.
 - [ ] Alt text on every image; assets live under `_static/` and are referenced relatively.
 - [ ] I read the page top to bottom and deleted every sentence that didn't help the reader act.
-```
