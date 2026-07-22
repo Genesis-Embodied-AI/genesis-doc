@@ -35,13 +35,27 @@ The rigid material sets how a body interacts physically. Pass a configured `gs.m
 box = scene.add_entity(
     gs.morphs.Box(pos=(0, 0, 0.5), size=(0.2, 0.2, 0.2)),
     material=gs.materials.Rigid(
-        rho=1000.0,     # density in kg/m³, used to estimate mass
-        friction=1.0,   # surface friction coefficient
+        rho=1000.0,               # density in kg/m³, used to estimate mass
+        friction=1.0,             # sliding (Coulomb) friction coefficient
+        friction_torsional=0.005, # resists spin about the contact normal (meters)
+        friction_rolling=0.0001,  # resists rolling about the tangent axes (meters)
     ),
 )
 ```
 
-Contact, collision geometry, and constraints, how these bodies actually push on each other, are governed by the rigid solver and documented under {doc}`Theory and modelling </user_guide/theory/rigid_collision/index>`.
+Torsional and rolling friction stay inert until enabled on the solver, since they add constraint rows to every contact:
+
+```python
+scene = gs.Scene(
+    rigid_options=gs.options.RigidOptions(
+        friction_cone=gs.friction_cone.elliptic,  # exact isotropic cone (default: pyramidal)
+        enable_torsional_friction=True,
+        enable_rolling_friction=True,              # requires enable_torsional_friction
+    ),
+)
+```
+
+Reach for the elliptic `friction_cone` when resting objects must stay put instead of slowly creeping. Contact, collision geometry, and constraints, how these bodies actually push on each other, are governed by the rigid solver and documented under {doc}`Theory and modelling </user_guide/theory/rigid_collision/index>`.
 
 ## See also
 

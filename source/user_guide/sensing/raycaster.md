@@ -62,6 +62,7 @@ distances = result.distances  # shape ([n_envs,] *return_shape),    meters
 
 - **`distances`** is the along-ray hit distance in meters, with misses filled by `no_hit_value`.
 - **`points`** is the hit location per ray. With `return_world_frame=True` it is in the world frame (Z-up, meters); with the default `return_world_frame=False` it is in the sensor's local frame.
+- **`return_points=False`** measures the hit distances only: `read().points` is `None`, and the sensor's memory and per-step cost drop to about a quarter. Use it for distance-only sensing (e.g. depth images); keep the default `True` when you need the point cloud.
 
 The `return_shape` is set by the pattern, so the trailing axes match the pattern's own layout: `(128, 64)` for the default spherical scan, `(height, width)` for a depth camera, `(n_x, n_y)` for a grid. The leading `[n_envs,]` axis is present only when the scene is built with multiple environments (see [Multiple environments](#multiple-environments)).
 
@@ -141,7 +142,7 @@ scene.step()
 depth = depth_cam.read_image()  # shape ([n_envs,] 72, 96), meters
 ```
 
-`read_image()` returns the `distances` field alone, reshaped to `([n_envs,] height, width)`; misses carry `no_hit_value`. The point cloud is still available through `read().points`. Because a depth camera shares the raycasting backend with any lidar in the scene, the two cast against the same geometry.
+`read_image()` returns the `distances` field alone, reshaped to `([n_envs,] height, width)`; misses carry `no_hit_value`. The point cloud is still available through `read().points`, unless the camera is created with `return_points=False`, which skips it to save memory when only depth is needed. Because a depth camera shares the raycasting backend with any lidar in the scene, the two cast against the same geometry.
 
 Running `python examples/sensors/lidar_teleop.py --pattern depth` teleoperates a depth camera on the Go2 (`--pattern` also accepts `spherical` and `grid`):
 
@@ -164,6 +165,7 @@ gs.sensors.Lidar(
     max_range=20.0,              # meters
     no_hit_value=None,           # value for a miss; defaults to max_range
     return_world_frame=False,    # world frame if True, else the sensor's local frame
+    return_points=True,          # False measures distances only; read().points is then None
     draw_debug=False,            # draw ray starts and hit points in the viewer
 )
 ```

@@ -6,7 +6,7 @@ You describe the layout once with `probe_local_pos`, a set of `(x, y, z)` offset
 
 Two families share this interface but estimate contact differently:
 
-- **SDF-query probes** (`ContactProbe`, `ContactDepthProbe`, and `KinematicTaxel`) query the signed distance from each probe to nearby collision geometry directly. They need no list of target links.
+- **SDF-query probes** (`ContactProbe`, `ContactDepthProbe`, and `KinematicTaxel`) query the signed distance from each probe to nearby collision geometry directly. They need no list of target links, though an optional `filter_link_idx` (global link indices) can exclude chosen counterpart links from the query.
 - **Point-cloud probes** (`ElastomerTaxel` and `ProximityTaxel`) sample a point cloud from the meshes named in `track_link_idx` (global link indices) and measure against those points. `n_sample_points` sets the sample budget.
 
 Readings are geometric estimates, not solver impulses, and are uncalibrated. Treat them as relative signals unless you tune the coefficients to your setup. The taxels also expose hardware-style [imperfections](#sensor-imperfections) for sim-to-real robustness. For how sensors are sampled, read back, and batched, see the {doc}`sensors overview <index>`.
@@ -33,8 +33,8 @@ Still, if you use them in your research, **please cite**:
 |---|---|---|---|
 | `ContactProbe` | in-contact flag per probe | `([n_envs,] n_probes)` | bool |
 | `ContactDepthProbe` | penetration depth per probe | `([n_envs,] n_probes)` | m |
-| `KinematicTaxel` | `(force, torque)` per probe | each `([n_envs,] n_probes, 3)` | link frame, N / N·m |
-| `ElastomerTaxel` | marker displacement per probe | `([n_envs,] n_probes, 3)` | link frame, m |
+| `KinematicTaxel` | `(force, torque)` per probe | each `([n_envs,] n_probes, 3)` | link-local, N / N·m |
+| `ElastomerTaxel` | marker displacement per probe | `([n_envs,] n_probes, 3)` | link-local, m |
 | `ProximityTaxel` | `(force, torque)` per probe | each `([n_envs,] n_probes, 3)` | link-local, N / N·m |
 
 Two interactive demos drive these sensors:
@@ -92,8 +92,8 @@ taxel = scene.add_sensor(
 )
 
 data = taxel.read()
-data.force   # shape ([n_envs,] n_probes, 3), N, link frame
-data.torque  # shape ([n_envs,] n_probes, 3), N·m, link frame
+data.force   # shape ([n_envs,] n_probes, 3), N, link-local
+data.torque  # shape ([n_envs,] n_probes, 3), N·m, link-local
 ```
 
 `read()` returns a `KinematicTaxelReturnType` named tuple, so `data.force` and `data.torque` unpack by name.
@@ -121,7 +121,7 @@ tactile = scene.add_sensor(
     )
 )
 
-displacement = tactile.read()  # shape ([n_envs,] n_probes, 3), m
+displacement = tactile.read()  # shape ([n_envs,] n_probes, 3), m, link-local
 ```
 
 `dilate_scale` and `shear_scale` scale the indentation and shear response; `lambda_d` and `lambda_s` control how far each effect spreads across neighboring markers. The out-of-plane (normal) bulge scales as `depth ** normal_exponent` (default `2.0`, the HydroShear quadratic response); tangential dilation and shear stay linear in depth regardless of `normal_exponent`. When `probe_local_pos` is a regular planar grid with a single shared normal, the dilation term is computed with an FFT to keep large arrays fast. The shear anchor is gated by the same `contact_threshold` / `release_threshold` Schmitt trigger (a tracked point begins anchoring shear at `contact_threshold` penetration and releases once it separates back to `release_threshold`).

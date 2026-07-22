@@ -48,7 +48,8 @@ force = sensor.read()  # shape ([n_envs,] 3), N, in the link-local frame
 
 Configuration:
 
-- `Contact` accepts `threshold` (a positive force magnitude registers as contact above this value; default `0.0`) and `filter_link_idx`, a list of **global** link indices whose contacts with the sensor link are ignored.
+- Both `Contact` and `ContactForce` accept `filter_link_idx`, a list of **global** link indices whose contacts with the sensor link are ignored: the sensor reads as if those counterparts were not touching. Use it to scope a reading (e.g. a foot's force from the ground, excluding self-contact). Defaults to empty (no filtering).
+- `Contact` also accepts `threshold`: a force magnitude registers as contact above this value (default `0.0`).
 - `ContactForce` clamps each axis to `[min_force, max_force]`; readings below `min_force` are zeroed and readings above `max_force` are saturated. Both default to no clamping.
 
 ```{figure} ../../_static/images/contact_force_sensor.png

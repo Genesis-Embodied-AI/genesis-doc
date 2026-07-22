@@ -32,7 +32,7 @@ for _ in range(1000):
 |---|---|---|
 | `lin_acc` | linear acceleration (accelerometer) | m/s² |
 | `ang_vel` | angular velocity (gyroscope) | rad/s |
-| `mag` | magnetic field (magnetometer) | Tesla |
+| `mag` | magnetic field (magnetometer) | tesla |
 
 ## Frame and conventions
 

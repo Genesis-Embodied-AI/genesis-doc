@@ -56,7 +56,7 @@ points = sensor.nearest_points  # shape ([n_envs,] n_probes, 3), world frame
 
 Both leading dimensions follow the batched-optional convention: the `[n_envs,]` axis is present only when the scene is built with multiple environments. `nearest_points` is written on each step, so read it after at least one `scene.step()`; before the first step it holds zeros.
 
-<video preload="auto" controls="True" width="100%" aria-label="Shadow Hand with proximity probes on its palm and fingertips; lines connect each probe to the nearest point on a tracked duck mesh and box as the hand moves">
+<video preload="auto" controls="True" width="100%" aria-label="Shadow Hand with surface-distance probes on its palm and fingertips; lines connect each probe to the nearest point on a tracked duck mesh and box as the hand moves">
 <source src="../../_static/videos/proximity.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
