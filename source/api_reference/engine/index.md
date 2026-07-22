@@ -33,43 +33,9 @@ The coupler resolves contact and exchange between entities owned by different so
 
 ## The step loop
 
-`scene.step()` advances the simulation by one control step, which is divided into `substeps` physics substeps. Within each substep the simulator runs the active solvers, invokes the coupler to resolve their interactions, then lets the solvers finish the substep:
+`scene.step()` advances the simulation by one control step, which is divided into `substeps` physics substeps. Within each substep the simulator runs the active solvers, invokes the coupler to resolve their interactions, then lets the solvers finish the substep.
 
-```python
-import genesis as gs
-
-gs.init()
-
-scene = gs.Scene(
-    sim_options=gs.options.SimOptions(
-        dt=0.01,               # control timestep, seconds
-        substeps=4,            # physics substeps per step
-        gravity=(0, 0, -9.81), # Z-up, m/s2
-    ),
-)
-
-# ... add entities ...
-scene.build()
-
-for _ in range(1000):
-    scene.step()  # runs substeps, coupling, and state updates
-```
-
-Each solver reads its parameters from the matching options object, so you can tune solvers independently within one scene:
-
-```python
-scene = gs.Scene(
-    sim_options=gs.options.SimOptions(dt=0.01, substeps=4),
-    rigid_options=gs.options.RigidOptions(
-        enable_collision=True,
-        enable_joint_limit=True,
-    ),
-    mpm_options=gs.options.MPMOptions(
-        lower_bound=(-1, -1, 0),
-        upper_bound=(1, 1, 2),
-    ),
-)
-```
+Each solver reads its parameters from the matching options object, so you can tune solvers independently within one scene. For a worked example of building and stepping a scene, see {doc}`/user_guide/getting_started/hello_genesis`.
 
 ## Subsections
 

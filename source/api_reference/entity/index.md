@@ -8,18 +8,7 @@ You create an entity by calling {py:meth}`scene.add_entity <genesis.engine.scene
 - **Material:** the physical model that decides which solver simulates the entity and how it responds to forces. See {doc}`/api_reference/entity/material/index`.
 - **Surface:** the visual appearance used for rendering: color, texture, and visualization mode. See {doc}`/api_reference/entity/surface/index`.
 
-```python
-import genesis as gs
-
-gs.init()
-scene = gs.Scene()
-
-franka = scene.add_entity(
-    gs.morphs.MJCF(file="xml/franka_emika_panda/panda.xml"),
-)
-
-scene.build()  # required before stepping or reading state
-```
+For a worked example of adding an entity and stepping the scene, see {doc}`/user_guide/getting_started/hello_genesis`.
 
 `add_entity` returns the entity object. Its concrete type depends on the material's solver: a rigid material yields a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`, an MPM material yields an `MPMEntity`, and so on.
 

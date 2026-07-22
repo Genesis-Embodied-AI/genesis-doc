@@ -4,21 +4,6 @@ The interactive window that renders a scene in real time, with mouse and keyboar
 
 The viewer is configured by two options objects: `ViewerOptions` sets its initial camera pose, resolution, and refresh rate; `VisOptions` sets viewer-independent visualization such as lighting, world-frame display, and segmentation level.
 
-```python
-scene = gs.Scene(
-    viewer_options=gs.options.ViewerOptions(
-        camera_pos=(3.0, 0.0, 2.0),
-        camera_lookat=(0.0, 0.0, 0.5),
-        camera_fov=40,
-        refresh_rate=60,  # frames per second cap
-    ),
-    show_viewer=True,
-)
-for _ in range(1000):
-    scene.step()
-    scene.visualizer.update()  # refresh the viewer
-```
-
 ## Viewer
 
 ```{eval-rst}

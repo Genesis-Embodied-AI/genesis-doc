@@ -4,36 +4,7 @@ The `MPMSolver` implements the Material Point Method (MPM) for simulating a wide
 
 ## Usage
 
-The solver activates when the scene contains an MPM entity. Configure the background grid through `MPMOptions`; see {doc}`/api_reference/engine/solvers/mpm_options` for the full option set.
-
-```python
-import genesis as gs
-
-gs.init()
-scene = gs.Scene(
-    mpm_options=gs.options.MPMOptions(
-        dt=1e-4,
-        lower_bound=(-1, -1, 0),
-        upper_bound=(1, 1, 2),
-        grid_density=64,
-    ),
-)
-
-# Add MPM entity
-soft_box = scene.add_entity(
-    gs.morphs.Box(pos=(0, 0, 0.5), size=(0.2, 0.2, 0.2)),
-    material=gs.materials.MPM.Elastic(
-        E=1e5,      # Young's modulus
-        nu=0.3,     # Poisson's ratio
-        rho=1000,   # Density
-    ),
-)
-
-scene.build()
-
-for i in range(1000):
-    scene.step()
-```
+The solver activates when the scene contains an MPM entity. Configure the background grid through `MPMOptions`; see {doc}`/api_reference/engine/solvers/mpm_options` for the full option set. For usage, see {doc}`/user_guide/physics/beyond_rigid_bodies`.
 
 ## See also
 

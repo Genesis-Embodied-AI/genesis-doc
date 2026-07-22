@@ -13,64 +13,13 @@ This page is the API overview for the `genesis.recorders` module. For a task-ori
 
 All recorder options classes are exported from `gs.recorders`.
 
-## Minimal example
+## Workflow
 
-Register a recorder with `scene.start_recording` before `scene.build()`, passing a zero-argument data function and a recorder options object. The manager samples the data function for you on each step.
+Register a recorder with `scene.start_recording` before `scene.build()`, passing a zero-argument data function and a recorder options object from `gs.recorders`. The manager samples the data function on each step and either writes it to a file or draws it in a live plot. A `dict` return value becomes one labeled subplot per key. Recording stops and flushes on `scene.stop_recording()`, or automatically when the scene is destroyed.
 
-```python
-import genesis as gs
+A camera exposes its own recording path, separate from the recorder framework: it buffers every frame produced by `cam.render()` between `cam.start_recording()` and `cam.stop_recording(...)`, then writes them to a video file. Unlike `scene.start_recording`, `cam.start_recording` requires a built scene.
 
-gs.init()
-scene = gs.Scene()
-franka = scene.add_entity(gs.morphs.MJCF(file="xml/franka_emika_panda/panda.xml"))
-
-scene.start_recording(
-    data_func=lambda: franka.get_qpos(),
-    rec_options=gs.recorders.NPZFile(filename="qpos.npz", hz=50),  # 50 samples/second
-)
-
-scene.build()
-
-for _ in range(1000):
-    scene.step()
-
-scene.stop_recording()  # flushes files and closes plot windows
-```
-
-Recording also stops and flushes when the scene is destroyed, so short scripts need no explicit `stop_recording`.
-
-## Recording a live plot
-
-Swap the file writer for a plotter to visualize data as it is produced. A `dict` return value becomes one labeled subplot per key.
-
-```python
-scene.start_recording(
-    data_func=lambda: franka.get_qpos(),
-    rec_options=gs.recorders.MPLLinePlot(title="Joint positions"),
-)
-```
-
-## Recording camera video
-
-A camera exposes its own recording path, separate from the recorder framework. It buffers every frame produced by `cam.render()` while recording is active, then writes them to a video file on stop. Unlike `scene.start_recording`, `cam.start_recording` requires a built scene.
-
-```python
-import genesis as gs
-
-gs.init()
-scene = gs.Scene()
-scene.add_entity(gs.morphs.Plane())
-scene.add_entity(gs.morphs.Box(pos=(0, 0, 1), size=(1.0, 1.0, 1.0)))
-cam = scene.add_camera(res=(640, 480), pos=(3, 0, 2), lookat=(0, 0, 0.5))
-
-scene.build()
-
-cam.start_recording()
-for _ in range(200):
-    scene.step()
-    cam.render()
-cam.stop_recording(save_to_filename="simulation.mp4", fps=60)
-```
+For usage, see {doc}`/user_guide/sensing/recorders`.
 
 ## Components reference
 

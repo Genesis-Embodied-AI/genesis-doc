@@ -4,30 +4,16 @@ The `ToolSolver` handles kinematic tools and end-effectors that drive other phys
 
 ## Usage
 
-The solver activates when the scene contains a tool entity. Configure it through `ToolOptions`; see {doc}`/api_reference/engine/solvers/tool_options` for the full option set.
+The solver activates when the scene contains a tool entity, added with the `gs.materials.Tool` material. Configure it through `ToolOptions`; see {doc}`/api_reference/engine/solvers/tool_options` for the full option set.
 
 ```python
-import genesis as gs
-
-gs.init()
-scene = gs.Scene(
-    tool_options=gs.options.ToolOptions(),
-)
-
-# Add a kinematic tool
 tool = scene.add_entity(
     gs.morphs.Mesh(file="tool.obj"),
     material=gs.materials.Tool(),
 )
-
-scene.build()
-
-# Drive the tool kinematically
-for i in range(1000):
-    tool.set_position(new_position)      # (x, y, z), meters
-    tool.set_quaternion(new_orientation)  # (w, x, y, z), scalar-first
-    scene.step()
 ```
+
+The tool is then driven kinematically each step with `tool.set_position(...)` and `tool.set_quaternion(...)`.
 
 ## Interaction with other solvers
 

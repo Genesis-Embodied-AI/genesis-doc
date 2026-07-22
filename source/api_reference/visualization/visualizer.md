@@ -1,16 +1,6 @@
 # `Visualizer`
 
-The orchestrator behind `scene.visualizer`, created automatically with every scene. It owns the interactive viewer, the camera sensors, and the renderer backend, and it refreshes them when you call `scene.visualizer.update()`. You rarely construct or call it directly: add cameras with `scene.add_camera(...)`, open the viewer with `show_viewer=True`, and drive both by stepping the scene and calling `update()` each step.
-
-```python
-scene = gs.Scene(show_viewer=True)
-scene.add_entity(gs.morphs.Plane())
-scene.build()
-
-for _ in range(1000):
-    scene.step()
-    scene.visualizer.update()  # refresh viewer and camera sensors
-```
+The orchestrator behind `scene.visualizer`, created automatically with every scene. It owns the interactive viewer, the camera sensors, and the renderer backend, and it refreshes them when you call `scene.visualizer.update()`. You rarely construct or call it directly: add cameras with `scene.add_camera(...)`, open the viewer with `show_viewer=True`, and drive both by stepping the scene and calling `update()` each step. For usage, see {doc}`/user_guide/interaction/visualization`.
 
 ## API reference
 

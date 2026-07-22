@@ -4,51 +4,11 @@ The `FEMSolver` implements the Finite Element Method for simulating deformable s
 
 ## Usage
 
-The solver activates when the scene contains an FEM entity. Configure it through `FEMOptions`; see {doc}`/api_reference/engine/solvers/fem_options` for the full option set.
-
-```python
-import genesis as gs
-
-gs.init()
-scene = gs.Scene(
-    fem_options=gs.options.FEMOptions(
-        dt=1e-3,
-        damping=0.1,
-    ),
-)
-
-# Add an FEM entity
-soft_body = scene.add_entity(
-    gs.morphs.Mesh(file="soft_object.obj"),
-    material=gs.materials.FEM.Elastic(
-        E=1e5,     # Young's modulus, Pa
-        nu=0.4,    # Poisson's ratio
-        rho=1000,  # density, kg/m^3
-    ),
-)
-
-scene.build()
-
-for i in range(1000):
-    scene.step()
-```
+The solver activates when the scene contains an FEM entity. Configure it through `FEMOptions`; see {doc}`/api_reference/engine/solvers/fem_options` for the full option set. For usage, see {doc}`/user_guide/physics/beyond_rigid_bodies`.
 
 ## Vertex constraints
 
-Pin vertices to fixed targets or to a rigid link with `set_vertex_constraints`. Under the implicit solver, set `enable_vertex_constraints=True` first.
-
-```python
-# Pin the given vertices at their current positions
-soft_body.set_vertex_constraints(verts_idx_local=[0, 1, 2])
-
-# Pull vertices toward a target with a soft spring constraint
-soft_body.set_vertex_constraints(
-    verts_idx_local=[0, 1, 2],
-    target_poss=[(0.0, 0.0, 0.5)] * 3,
-    is_soft_constraint=True,
-    stiffness=1e3,
-)
-```
+Pin vertices to fixed targets or to a rigid link with `set_vertex_constraints`. Under the implicit solver, set `enable_vertex_constraints=True` first. See {doc}`/user_guide/physics/soft_robots` for muscle-driven deformable bodies.
 
 ## See also
 

@@ -4,31 +4,6 @@ The `RecorderManager` is the per-scene component that drives every recorder: it 
 
 For a task-oriented walkthrough with runnable examples, see {doc}`/user_guide/sensing/recorders`. This page is the API reference.
 
-## Minimal example
-
-Register a recorder before the scene is built, then step as usual. The manager samples the data function and hands the result to the recorder each step.
-
-```python
-import genesis as gs
-
-gs.init(backend=gs.cpu)
-scene = gs.Scene()
-robot = scene.add_entity(gs.morphs.URDF(file="urdf/anymal_c/urdf/anymal_c.urdf"))
-
-# Register a recorder BEFORE build. data_func comes first, rec_options second.
-scene.start_recording(
-    data_func=lambda: robot.get_qpos(),
-    rec_options=gs.recorders.NPZFile(filename="qpos.npz"),
-)
-
-scene.build()  # every registered recorder is built and started here
-
-for _ in range(1000):
-    scene.step()
-
-scene.stop_recording()  # flushes files, closes plot windows
-```
-
 ## Registering recorders
 
 Recorders are registered through the scene and its sensors, not on the manager. Each call pairs a zero-argument data function with a recorder options object from `gs.recorders`.
@@ -46,20 +21,7 @@ There is no `scene.add_recorder` and no `scene.is_recording`; register with `sta
 
 ## Camera video recording
 
-Camera video capture is a separate mechanism from the recorder manager. A camera stores the RGB frames produced by `cam.render()` and writes them to a video file:
-
-```python
-cam = scene.add_camera(res=(640, 480), pos=(3, 0, 2), lookat=(0, 0, 0.5), GUI=False)
-scene.build()
-
-cam.start_recording()
-for _ in range(120):
-    scene.step()
-    cam.render()  # each rendered RGB frame is stored while recording
-cam.stop_recording(save_to_filename="video.mp4", fps=60)
-```
-
-`cam.start_recording()` takes no arguments. `cam.stop_recording(save_to_filename=None, fps=60)` writes the stored frames; if `save_to_filename` is omitted the file is named after the calling script, the camera index, and a timestamp.
+Camera video capture is a separate mechanism from the recorder manager. A camera stores the RGB frames produced by `cam.render()` while recording is active and writes them to a video file. `cam.start_recording()` takes no arguments. `cam.stop_recording(save_to_filename=None, fps=60)` writes the stored frames; if `save_to_filename` is omitted the file is named after the calling script, the camera index, and a timestamp.
 
 ## Lifecycle and guarantees
 

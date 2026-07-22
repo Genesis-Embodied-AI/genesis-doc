@@ -62,36 +62,7 @@ Every solver derives from a common `Solver` base class and follows the same thre
 
 ## Combining solvers
 
-Adding entities with different materials activates their solvers automatically. All active solvers step together within one `scene.step()`:
-
-```python
-import genesis as gs
-
-gs.init()
-scene = gs.Scene()
-
-# Rigid robot -> RigidSolver
-robot = scene.add_entity(gs.morphs.URDF(file="urdf/franka_panda/panda.urdf"))
-
-# Deformable solid -> MPMSolver
-soft = scene.add_entity(
-    gs.morphs.Box(pos=(0.5, 0.0, 0.5), size=(0.2, 0.2, 0.2)),
-    material=gs.materials.MPM.Elastic(),
-)
-
-# Cloth -> PBDSolver
-cloth = scene.add_entity(
-    gs.morphs.Mesh(file="meshes/cloth.obj"),
-    material=gs.materials.PBD.Cloth(),
-)
-
-scene.build()
-
-for _ in range(1000):
-    scene.step()  # every active solver advances one step
-```
-
-Forces are exchanged between solvers by a coupler; see {doc}`/api_reference/engine/couplers/index`.
+Adding entities with different materials activates their solvers automatically. All active solvers step together within one `scene.step()`, and forces are exchanged between them by a coupler; see {doc}`/api_reference/engine/couplers/index`. For a worked multi-solver example, see {doc}`/user_guide/physics/beyond_rigid_bodies`.
 
 ## Performance
 

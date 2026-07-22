@@ -69,20 +69,6 @@ A rigid transform is a rotation plus a translation, stored either as a `(trans, 
 | `normalize(x, eps=1e-12)` | Scale a vector or batch to unit length |
 | `spherical_to_cartesian(theta, phi)` | Spherical angles to a unit `(x, y, z)` direction |
 
-## Example: orienting an entity
-
-```python
-import genesis as gs
-
-gs.init()
-scene = gs.Scene()
-box = scene.add_entity(gs.morphs.Box(pos=(0, 0, 0.5), size=(1.0, 1.0, 1.0)))
-scene.build()
-
-# Rotate 45 degrees about the world Z axis.
-box.set_quat(gs.euler_to_quat((0, 0, 45)))
-```
-
 ## See also
 
 - {doc}`/user_guide/configuration/conventions`: coordinate frame, rotation, and quaternion conventions

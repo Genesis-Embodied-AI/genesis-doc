@@ -64,45 +64,6 @@ vel = robot.get_vel()  # shape ([n_envs,] 3)
 
 Positions are in meters, velocities in m/s. The coordinate system is right-handed and Z-up, with gravity along `-Z` at 9.81 m/s² by default.
 
-## Example: trajectory optimization
-
-Optimize a full control sequence to drive the robot's base to a target. The scene is reset each step so every backward pass runs against a fresh forward trajectory:
-
-```python
-import genesis as gs
-import torch
-
-gs.init(backend=gs.gpu)
-
-scene = gs.Scene(
-    sim_options=gs.options.SimOptions(
-        dt=0.01,  # seconds
-        requires_grad=True,
-    ),
-)
-robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
-scene.build()
-
-n_steps = 100
-controls = torch.zeros(n_steps, robot.n_dofs, device=gs.device, requires_grad=True)
-optimizer = torch.optim.Adam([controls], lr=0.01)
-target = torch.tensor([1.0, 0.0, 0.5], device=gs.device)
-
-for step in range(100):
-    scene.reset()
-    for t in range(n_steps):
-        robot.control_dofs_force(controls[t])
-        scene.step()
-
-    loss = torch.nn.functional.mse_loss(robot.get_pos(), target)
-
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
-
-    print(f"step {step}: loss = {loss.item():.4f}")
-```
-
 ## Detaching from the scene
 
 To stop gradients from flowing back into the simulation, drop the tensor's scene association:

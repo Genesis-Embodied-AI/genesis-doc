@@ -9,83 +9,22 @@ Genesis World uses:
 - **PyTorch tensors**: For state access and differentiability
 - **NumPy arrays**: For data export and visualization
 
-## Tensor conversion
+## Conversion helpers
 
-### To NumPy
-
-```python
-import genesis as gs
-
-gs.init()
-scene = gs.Scene()
-robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
-scene.build()
-
-# Get state as NumPy array
-qpos = robot.get_qpos()
-qpos_np = gs.utils.tensor_to_array(qpos)
-print(type(qpos_np))  # numpy.ndarray
-```
-
-### To CPU
+The helpers below are exposed under `gs.utils`. They accept Genesis, PyTorch, or array-like inputs and handle any GPU-to-CPU transfer internally.
 
 ```python
-# Move tensor to CPU (if on GPU)
-qpos_cpu = gs.utils.tensor_to_cpu(qpos)
-```
+# Convert a tensor to a NumPy array (handles GPU transfer; pass dtype= to set the output dtype)
+arr = gs.utils.tensor_to_array(tensor)
 
-### Creating tensors
+# Move a tensor to CPU, leaving its dtype unchanged
+cpu_tensor = gs.utils.tensor_to_cpu(tensor)
 
-```python
-import torch
-
-# Create tensor on correct device
-tensor = torch.zeros(10, device=gs.device, dtype=gs.tc_float)
-
-# Or use Genesis World wrapper
+# Wrap array-like data as a Genesis tensor on the configured device and default dtype
 tensor = gs.utils.to_gs_tensor([1.0, 2.0, 3.0])
 ```
 
-## Common patterns
-
-### Getting entity state
-
-```python
-# Returns PyTorch tensor
-positions = robot.get_qpos()
-velocities = robot.get_qvel()
-
-# Convert to NumPy for processing
-import numpy as np
-pos_np = positions.cpu().numpy()
-```
-
-### Setting entity state
-
-```python
-import torch
-
-# From NumPy
-target = np.array([0.1, 0.2, 0.3])
-robot.set_dofs_position(torch.from_numpy(target).to(gs.device))
-
-# From list
-robot.set_dofs_position([0.1, 0.2, 0.3])
-```
-
-### Batched tensors
-
-With `n_envs > 1`:
-
-```python
-scene.build(n_envs=16)
-
-# Batched output: (n_envs, n_dofs)
-all_positions = robot.get_qpos()
-
-# Select specific environments
-some_positions = robot.get_qpos(envs_idx=[0, 5, 10])
-```
+State getters such as `robot.get_qpos()` already return tensors on `gs.device`; setters such as `robot.set_dofs_position(...)` accept array-like inputs directly and broadcast scalars across dofs.
 
 ## Data types
 

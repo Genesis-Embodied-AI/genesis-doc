@@ -11,65 +11,11 @@ Genesis World Tensors:
 - Support all standard PyTorch operations
 - Track parent tensors for gradient flow
 
-## Usage
+## Behavior
 
-Genesis World Tensors are automatically created when you access state:
+State getters such as `robot.get_pos()`, `robot.get_vel()`, and `robot.get_qpos()` return a `genesis.grad.Tensor` when the scene is built with `requires_grad=True`. It behaves like a `torch.Tensor` in every operation and additionally carries a link to the scene it came from, which is what lets `loss.backward()` flow gradients through the physics.
 
-```python
-import genesis as gs
-import torch
-
-gs.init()
-
-scene = gs.Scene(
-    sim_options=gs.options.SimOptions(
-        requires_grad=True,
-    ),
-)
-
-robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
-scene.build()
-
-# These return genesis.grad.Tensor
-pos = robot.get_pos()       # Genesis World Tensor
-vel = robot.get_vel()       # Genesis World Tensor
-qpos = robot.get_qpos()     # Genesis World Tensor
-```
-
-## Gradient flow
-
-```python
-# Forward pass
-scene.step()
-pos = robot.get_pos()
-
-# Compute loss
-target = torch.tensor([1.0, 0.0, 0.5], device=gs.device)
-loss = (pos - target).pow(2).sum()
-
-# Backward pass - flows through simulation
-loss.backward()
-```
-
-## Detaching from scene
-
-To prevent gradients from flowing through the simulation:
-
-```python
-# Detach and remove scene tracking
-pos_detached = pos.detach(sceneless=True)
-
-# Or explicitly
-pos_sceneless = pos.sceneless()
-```
-
-## Checking scene association
-
-```python
-# Check if tensor is associated with a scene
-if pos.scene is not None:
-    print(f"Tensor from scene: {pos.scene.uid}")
-```
+To stop gradients flowing back into the simulation, use `tensor.detach()` (which drops the scene link by default) or `tensor.sceneless()` (which keeps autograd but drops only the scene link). Read `tensor.scene` to see which scene, if any, a tensor is bound to. For the end-to-end differentiable workflow, see {doc}`index`.
 
 ## API reference
 

@@ -20,33 +20,7 @@ The renderer is selected once for the whole scene and applies to its camera sens
 
 **Nyx** is a separate photorealistic path tracer, distributed as the `gs-nyx` package. Unlike the backends above, it is not a scene-wide renderer: it attaches per camera as a sensor through `scene.add_sensor(...)`, so one scene can pair fast rasterized cameras with a photorealistic Nyx camera. See {doc}`/user_guide/rendering/nyx_renderer` for details.
 
-## Minimal example
-
-```python
-import genesis as gs
-
-gs.init()
-
-scene = gs.Scene(
-    vis_options=gs.options.VisOptions(
-        show_world_frame=True,
-    ),
-    viewer_options=gs.options.ViewerOptions(
-        camera_pos=(3.0, 0.0, 2.0),
-        camera_lookat=(0.0, 0.0, 0.5),
-    ),
-    show_viewer=True,
-    # renderer defaults to gs.renderers.Rasterizer()
-)
-
-scene.add_entity(gs.morphs.Plane())
-scene.add_entity(gs.morphs.Box(pos=(0.0, 0.0, 0.5), size=(1.0, 1.0, 1.0)))
-scene.build()
-
-for _ in range(1000):
-    scene.step()
-    scene.visualizer.update()  # refresh the viewer and camera sensors
-```
+For usage, see {doc}`/user_guide/interaction/visualization` for the interactive viewer and {doc}`/user_guide/rendering/index` for camera rendering.
 
 ## Reference
 
