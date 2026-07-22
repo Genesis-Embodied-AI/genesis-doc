@@ -1,86 +1,29 @@
 # Contact sensors
 
-Genesis World provides sensors for detecting and measuring contact forces. These are essential for manipulation tasks, grasping, and understanding physical interactions.
+Sensors that report contact on a rigid link, for manipulation, grasping, and physical-interaction tasks. For the attach-and-read model and how to scope a reading with `filter_link_idx`, see the {doc}`contact sensing guide </user_guide/sensing/contact>`.
 
-## ContactForceSensor
+## `gs.sensors.ContactForce`
 
-The `ContactForceSensor` measures the total contact force being applied to the associated rigid link in its local frame.
-
-### Usage
+The total contact force on the associated link, in its local frame.
 
 ```python
 import genesis as gs
 
 gs.init()
 scene = gs.Scene()
-robot = scene.add_entity(gs.morphs.URDF(file="gripper.urdf"))
-finger = robot.get_link("finger_link")
+robot = scene.add_entity(gs.morphs.URDF(file="urdf/go2/urdf/go2.urdf"))
 
-# Add contact force sensor to gripper finger
-contact_sensor = scene.add_sensor(
+sensor = scene.add_sensor(
     gs.sensors.ContactForce(
         entity_idx=robot.idx,
-        link_idx_local=finger.idx_local,
+        link_idx_local=robot.get_link("FR_foot").idx_local,
     )
 )
-
-scene.build()
-
-# Simulation loop
-for i in range(1000):
-    scene.step()
-
-    # Get contact force (plain tensor, not NamedTuple)
-    force = contact_sensor.read()  # ([n_envs,] 3) force in Newtons
-    print(f"Contact force: {force}")
-```
-
-### Output format
-
-`read()` returns a plain `torch.Tensor` (float32):
-
-| Shape | Description |
-|-------|-------------|
-| `([n_envs,] 3)` | Total contact force in local link frame (Newtons) |
-
-The options passed to `gs.sensors.ContactForce` (offsets, force clamping, noise) are documented in the reference below.
-
-## ContactSensor
-
-The `ContactSensor` detects whether the associated rigid link is in contact (boolean).
-
-### Usage
-
-```python
-import genesis as gs
-
-gs.init()
-scene = gs.Scene()
-robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
-
-contact = scene.add_sensor(
-    gs.sensors.Contact(
-        entity_idx=robot.idx,
-        link_idx_local=robot.get_link("base").idx_local,
-    )
-)
-
 scene.build()
 scene.step()
-in_contact = contact.read()  # ([n_envs,] 1) boolean tensor
+
+force = sensor.read()  # shape ([n_envs,] 3), Newtons, link-local frame
 ```
-
-### Output format
-
-`read()` returns a plain `torch.Tensor` (bool):
-
-| Shape | Description |
-|-------|-------------|
-| `([n_envs,] 1)` | True if link is in contact |
-
-## API reference
-
-### `gs.sensors.ContactForce`
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.options.ContactForce
@@ -93,7 +36,23 @@ in_contact = contact.read()  # ([n_envs,] 1) boolean tensor
     :show-inheritance:
 ```
 
-### `gs.sensors.Contact`
+## `gs.sensors.Contact`
+
+A boolean: whether the associated link is in contact.
+
+```python
+# ... scene and robot set up as above ...
+contact = scene.add_sensor(
+    gs.sensors.Contact(
+        entity_idx=robot.idx,
+        link_idx_local=robot.get_link("FR_foot").idx_local,
+    )
+)
+scene.build()
+scene.step()
+
+in_contact = contact.read()  # shape ([n_envs,] 1), bool
+```
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.options.Contact
@@ -108,5 +67,6 @@ in_contact = contact.read()  # ([n_envs,] 1) boolean tensor
 
 ## See also
 
-- {doc}`index`: Sensor overview
-- {doc}`/api_reference/entity/rigid_entity/index`: RigidEntity and links
+- {doc}`index`: sensor overview.
+- {doc}`/user_guide/sensing/contact`: the contact sensing guide.
+- {doc}`/api_reference/entity/rigid_entity/index`: RigidEntity and links.
