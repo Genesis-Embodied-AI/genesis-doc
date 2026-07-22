@@ -18,13 +18,13 @@ You rarely construct a solver directly. You add an entity with a material, and t
 
 Each solver has its own page linked below, and its own options:
 
-- **RigidSolver:** {doc}`rigid_solver`, configured by {doc}`/api_reference/options/simulator_coupler_and_solver_options/rigid_options`.
-- **MPMSolver:** {doc}`mpm_solver`, configured by {doc}`/api_reference/options/simulator_coupler_and_solver_options/mpm_options`.
-- **FEMSolver:** {doc}`fem_solver`, configured by {doc}`/api_reference/options/simulator_coupler_and_solver_options/fem_options`.
-- **PBDSolver:** {doc}`pbd_solver`, configured by {doc}`/api_reference/options/simulator_coupler_and_solver_options/pbd_options`.
-- **SPHSolver:** {doc}`sph_solver`, configured by {doc}`/api_reference/options/simulator_coupler_and_solver_options/sph_options`.
-- **SFSolver:** {doc}`sf_solver`, configured by {doc}`/api_reference/options/simulator_coupler_and_solver_options/sf_options`.
-- **ToolSolver:** {doc}`tool_solver`, configured by {doc}`/api_reference/options/simulator_coupler_and_solver_options/tool_options`.
+- **RigidSolver:** {doc}`rigid_solver`, configured by {doc}`/api_reference/engine/solvers/rigid_options`.
+- **MPMSolver:** {doc}`mpm_solver`, configured by {doc}`/api_reference/engine/solvers/mpm_options`.
+- **FEMSolver:** {doc}`fem_solver`, configured by {doc}`/api_reference/engine/solvers/fem_options`.
+- **PBDSolver:** {doc}`pbd_solver`, configured by {doc}`/api_reference/engine/solvers/pbd_options`.
+- **SPHSolver:** {doc}`sph_solver`, configured by {doc}`/api_reference/engine/solvers/sph_options`.
+- **SFSolver:** {doc}`sf_solver`, configured by {doc}`/api_reference/engine/solvers/sf_options`.
+- **ToolSolver:** {doc}`tool_solver`, configured by {doc}`/api_reference/engine/solvers/tool_options`.
 
 :::{note}
 `ToolSolver` is a temporary solver that provides one-way differentiable coupling from a rigid tool to soft bodies. It will be removed once the `RigidSolver` supports differentiability directly.
@@ -34,12 +34,20 @@ Each solver has its own page linked below, and its own options:
 :titlesonly:
 
 rigid_solver
+rigid_options
 mpm_solver
+mpm_options
 fem_solver
+fem_options
 pbd_solver
+pbd_options
 sph_solver
+sph_options
 sf_solver
+sf_options
 tool_solver
+tool_options
+kinematic_options
 ```
 
 ## Shared lifecycle
@@ -93,4 +101,3 @@ Solvers run on the GPU through Quadrants, the just-in-time compiler that generat
 
 - {doc}`/user_guide/theory/solvers_and_coupling`: how solvers are combined and coupled.
 - {doc}`/api_reference/engine/couplers/index`: the couplers that exchange forces between solvers.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/index`: per-solver options.

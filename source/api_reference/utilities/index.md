@@ -42,8 +42,9 @@ device
 tensor_utils
 geometry
 file_io
+options
 ```
 
 ## See also
 
-- {doc}`/api_reference/options/index`: configuration options passed to the scene and solvers.
+- {doc}`options`: the Pydantic base class every configuration object inherits.

@@ -14,4 +14,5 @@ mjcf
 usd
 terrain
 drone
+coacd_options
 ```

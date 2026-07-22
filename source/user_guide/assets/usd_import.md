@@ -179,4 +179,4 @@ If you see a `Baking process failed: ...` warning, the usual causes are an unacc
 - {doc}`/user_guide/configuration/conventions`: coordinate frame, units, and Y-up ↔ Z-up handling.
 - {doc}`/user_guide/getting_started/control_your_robot` and {doc}`/user_guide/robot_control/inverse_kinematics_motion_planning`: actuating and planning for a USD-loaded articulation.
 - {doc}`/user_guide/getting_started/parallel_simulation`: running USD assets across many environments on the GPU.
-- {doc}`/api_reference/options/morph/index`: the full `gs.morphs` reference, including every `USD` option.
+- {doc}`/api_reference/entity/morph/index`: the full `gs.morphs` reference, including every `USD` option.

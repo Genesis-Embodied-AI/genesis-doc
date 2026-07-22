@@ -12,7 +12,7 @@ A **scene** (see the {doc}`Scene API </api_reference/scene/scene>`) is the top-l
 
 An **entity** is one object in the scene, such as a robot, a rigid body, or a body of fluid. You interact with it through its own methods and attributes rather than a global handle. Each entity is described by three pieces:
 
-- **Morph:** the geometry and initial pose, either a primitive shape or a loaded model (see the {doc}`morph API </api_reference/options/morph/index>`).
+- **Morph:** the geometry and initial pose, either a primitive shape or a loaded model (see the {doc}`morph API </api_reference/entity/morph/index>`).
 - **Material:** the physical model. The material chooses which solver simulates the entity. Liquids exist for both MPM and SPH, for example, and they behave differently.
 - **Surface:** the visual surface properties, such as texture, roughness, and reflectivity.
 

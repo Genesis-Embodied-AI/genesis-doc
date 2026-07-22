@@ -1,10 +1,10 @@
 # `FEMSolver`
 
-The `FEMSolver` implements the Finite Element Method for simulating deformable solids on tetrahedral meshes. It supports several constitutive models (linear, stable Neo-Hookean, linear corotated), handles large deformations, and offers an explicit integrator by default with an optional implicit solver for stability at larger time steps. The materials it supports are listed in {doc}`/api_reference/material/fem/index`.
+The `FEMSolver` implements the Finite Element Method for simulating deformable solids on tetrahedral meshes. It supports several constitutive models (linear, stable Neo-Hookean, linear corotated), handles large deformations, and offers an explicit integrator by default with an optional implicit solver for stability at larger time steps. The materials it supports are listed in {doc}`/api_reference/entity/material/fem/index`.
 
 ## Usage
 
-The solver activates when the scene contains an FEM entity. Configure it through `FEMOptions`; see {doc}`/api_reference/options/simulator_coupler_and_solver_options/fem_options` for the full option set.
+The solver activates when the scene contains an FEM entity. Configure it through `FEMOptions`; see {doc}`/api_reference/engine/solvers/fem_options` for the full option set.
 
 ```python
 import genesis as gs
@@ -53,5 +53,5 @@ soft_body.set_vertex_constraints(
 ## See also
 
 - {doc}`/api_reference/entity/fem_entity`: FEMEntity.
-- {doc}`/api_reference/material/fem/index`: FEM materials.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/fem_options`: full options.
+- {doc}`/api_reference/entity/material/fem/index`: FEM materials.
+- {doc}`/api_reference/engine/solvers/fem_options`: full options.

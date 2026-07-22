@@ -15,4 +15,5 @@ plastic/index
 metal/index
 emission
 glass/index
+foam_options
 ```

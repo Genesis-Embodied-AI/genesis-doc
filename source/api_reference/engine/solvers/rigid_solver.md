@@ -64,4 +64,4 @@ rigid_options = gs.options.RigidOptions(
 ## See also
 
 - {doc}`/api_reference/entity/rigid_entity/index`: RigidEntity.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/rigid_options`: full options.
+- {doc}`/api_reference/engine/solvers/rigid_options`: full options.

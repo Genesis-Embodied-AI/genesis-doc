@@ -2,7 +2,7 @@
 
 The `SFSolver` is the Stable Fluid solver: a grid-based (Eulerian) solver for gaseous phenomena such as smoke. It advects a velocity field and one or more scalar density fields on a fixed 3D grid, then makes the velocity field divergence-free with a Jacobi pressure projection.
 
-Unlike the particle- and mesh-based solvers, the Stable Fluid solver does not track Lagrangian entities. It solves everything on a uniform grid whose resolution you set through `SFOptions.res`, and gas is injected by velocity jets that you register on the solver. It simulates the `SF.Smoke` material; see {doc}`/api_reference/material/sf`.
+Unlike the particle- and mesh-based solvers, the Stable Fluid solver does not track Lagrangian entities. It solves everything on a uniform grid whose resolution you set through `SFOptions.res`, and gas is injected by velocity jets that you register on the solver. It simulates the `SF.Smoke` material; see {doc}`/api_reference/entity/material/sf`.
 
 ## Usage
 
@@ -34,7 +34,7 @@ for _ in range(200):
 
 See `examples/smoke.py` for the full runnable example, including the jet class and the code that writes the density field to images.
 
-Configure the grid resolution and projection through `SFOptions`; see {doc}`/api_reference/options/simulator_coupler_and_solver_options/sf_options` for the full option set.
+Configure the grid resolution and projection through `SFOptions`; see {doc}`/api_reference/engine/solvers/sf_options` for the full option set.
 
 ## Behavior and guarantees
 
@@ -44,5 +44,5 @@ Configure the grid resolution and projection through `SFOptions`; see {doc}`/api
 
 ## See also
 
-- {doc}`/api_reference/material/sf`: the smoke material simulated by this solver.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/sf_options`: full options.
+- {doc}`/api_reference/entity/material/sf`: the smoke material simulated by this solver.
+- {doc}`/api_reference/engine/solvers/sf_options`: full options.

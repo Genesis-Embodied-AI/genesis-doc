@@ -5,6 +5,8 @@ A `genesis.Scene` wraps every component of a simulation: a simulator (which hold
 ```{toctree}
 scene
 simulator
+sim_options
+profiling_options
 mesh
 force_field
 ```

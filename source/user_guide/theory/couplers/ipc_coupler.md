@@ -4,7 +4,7 @@ The IPC coupler resolves contact with Incremental Potential Contact, a barrier-b
 
 Reach for IPC when accuracy and robustness matter more than speed: cloth with self-collision, FEM solids pressed hard against each other, or a gripper closing on a deformable object. For mixed continuum scenes (MPM, SPH, PBD) or when you only need coarse rigid contact, stay on the default legacy coupler. See {doc}`the couplers overview <index>` for the full comparison.
 
-Under the hood, FEM bodies are coupled directly from their vertex positions, while rigid bodies enter the IPC world as affine bodies (ABD). Time step, gravity, and differentiable-simulation mode come from {doc}`SimOptions </api_reference/options/simulator_coupler_and_solver_options/sim_options>`, so you set them there, not on the coupler.
+Under the hood, FEM bodies are coupled directly from their vertex positions, while rigid bodies enter the IPC world as affine bodies (ABD). Time step, gravity, and differentiable-simulation mode come from {doc}`SimOptions </api_reference/scene/sim_options>`, so you set them there, not on the coupler.
 
 ## Prerequisites
 
@@ -36,7 +36,7 @@ scene = gs.Scene(
 )
 ```
 
-Entities join the IPC world through their {doc}`material </api_reference/material/index>`. A cloth is an FEM shell:
+Entities join the IPC world through their {doc}`material </api_reference/entity/material/index>`. A cloth is an FEM shell:
 
 ```python
 cloth = scene.add_entity(
@@ -66,7 +66,7 @@ The example downloads a coarse `grid20x20.obj` cloth mesh rather than a dense on
 
 ## How entities couple
 
-You do not register links with the coupler directly. Instead, each entity's {doc}`Rigid material </api_reference/material/rigid>` declares how it participates through `coup_type`:
+You do not register links with the coupler directly. Instead, each entity's {doc}`Rigid material </api_reference/entity/material/rigid>` declares how it participates through `coup_type`:
 
 - **`two_way_soft_constraint`:** Genesis and IPC exchange forces through a soft position-and-orientation constraint. Use it for a floating-base robot or any rigid body whose motion Genesis controls but that must also feel contact.
 - **`external_articulation`:** joint-level coupling for articulated robots: IPC couples at the dof level rather than per link. Use it for a fixed-base arm.
@@ -89,7 +89,7 @@ franka = scene.add_entity(
 
 ## Coupler options
 
-`IPCCouplerOptions` exposes the Genesis-side coupling behavior plus pass-through knobs for the libuipc solver. Most solver knobs default to `None`, meaning libuipc's own default applies; the fields below are the ones you are most likely to set. See the {doc}`coupler options API </api_reference/options/simulator_coupler_and_solver_options/coupler_options>` for the complete list, including the Newton, line-search, and linear-system parameters.
+`IPCCouplerOptions` exposes the Genesis-side coupling behavior plus pass-through knobs for the libuipc solver. Most solver knobs default to `None`, meaning libuipc's own default applies; the fields below are the ones you are most likely to set. See the {doc}`coupler options API </api_reference/engine/couplers/coupler_options>` for the complete list, including the Newton, line-search, and linear-system parameters.
 
 | Parameter | Default | Description |
 |---|---|---|

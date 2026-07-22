@@ -116,4 +116,4 @@ To hold a target vertex of an FEM body in place (a fixed constraint rather than 
 
 - {doc}`IPC coupler <ipc_coupler>`: barrier-based contact for cloth and highly deformable bodies.
 - {doc}`Solvers and coupling </user_guide/theory/solvers_and_coupling>`: how solvers and couplers fit together.
-- {doc}`FEM options </api_reference/options/simulator_coupler_and_solver_options/fem_options>` and {doc}`FEM elastic material </api_reference/material/fem/elastic>`: configuring the deformable bodies SAP couples.
+- {doc}`FEM options </api_reference/engine/solvers/fem_options>` and {doc}`FEM elastic material </api_reference/entity/material/fem/elastic>`: configuring the deformable bodies SAP couples.

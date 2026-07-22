@@ -32,13 +32,16 @@ Once the coupler is set, coupling between entities happens automatically as the 
 ```{toctree}
 :titlesonly:
 
+coupler_options
 legacy_coupler
+legacy_coupler_options
 sap_coupler
+sap_coupler_options
 ipc_coupler
+ipc_coupler_options
 ```
 
 ## See also
 
 - {doc}`/user_guide/theory/couplers/index`: choosing and configuring a coupler
 - {doc}`/api_reference/engine/solvers/index`: the physics solvers being coupled
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/coupler_options`: coupler options reference

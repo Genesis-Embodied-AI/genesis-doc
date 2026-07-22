@@ -1,6 +1,6 @@
 # `PBDSolver`
 
-The `PBDSolver` implements Position Based Dynamics for simulating cloth, soft bodies, and particle systems with fast, stable steps. The materials it supports are listed in {doc}`/api_reference/material/pbd/index`.
+The `PBDSolver` implements Position Based Dynamics for simulating cloth, soft bodies, and particle systems with fast, stable steps. The materials it supports are listed in {doc}`/api_reference/entity/material/pbd/index`.
 
 ## Overview
 
@@ -19,7 +19,7 @@ Advantages:
 
 ## Usage
 
-The solver activates when the scene contains a PBD entity. Configure it through `PBDOptions`; see {doc}`/api_reference/options/simulator_coupler_and_solver_options/pbd_options` for the full option set.
+The solver activates when the scene contains a PBD entity. Configure it through `PBDOptions`; see {doc}`/api_reference/engine/solvers/pbd_options` for the full option set.
 
 ```python
 import genesis as gs
@@ -64,5 +64,5 @@ Each group has its own iteration count in `PBDOptions`.
 ## See also
 
 - {doc}`/api_reference/entity/pbd_entity/index`: PBD entities.
-- {doc}`/api_reference/material/pbd/index`: PBD materials.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/pbd_options`: full options.
+- {doc}`/api_reference/entity/material/pbd/index`: PBD materials.
+- {doc}`/api_reference/engine/solvers/pbd_options`: full options.

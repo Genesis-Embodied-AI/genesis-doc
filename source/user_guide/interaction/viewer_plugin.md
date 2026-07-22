@@ -65,7 +65,7 @@ Pass `key_mods=(kb.KeyMod.CTRL,)` to require modifiers, and `args` / `kwargs` to
 :alt: Viewer overlay listing keyboard instructions, including custom keybindings
 ```
 
-Registered keybindings appear in the viewer's instructions overlay, so users can discover controls without reading the code. To hide that overlay or drop the default camera and recording shortcuts, set the corresponding {doc}`ViewerOptions </api_reference/options/index>` fields when creating the scene:
+Registered keybindings appear in the viewer's instructions overlay, so users can discover controls without reading the code. To hide that overlay or drop the default camera and recording shortcuts, set the corresponding {doc}`ViewerOptions </api_reference/visualization/viewer>` fields when creating the scene:
 
 ```python
 scene = gs.Scene(

@@ -3,7 +3,7 @@
 Lights illuminate a rendered scene. How you add them depends on the backend:
 
 - **Rasterizer (and the viewer):** lights come from the `lights` list on `gs.options.VisOptions`, using the light classes in `gs.options.vis`. With no configuration the scene gets a single directional light, so it is lit out of the box. Ambient fill is set separately through `VisOptions.ambient_light`.
-- **RayTracer:** there are no light objects. Lights are entities with an `Emission` {doc}`surface </api_reference/options/surface/emission>`, plus optional `SphereLight` area lights (below).
+- **RayTracer:** there are no light objects. Lights are entities with an `Emission` {doc}`surface </api_reference/entity/surface/emission>`, plus optional `SphereLight` area lights (below).
 - **BatchRenderer:** lights are added at runtime with `scene.add_light(...)`; see {doc}`renderers/batch_renderer`.
 
 ```python
@@ -68,4 +68,4 @@ A spherical area light for the `RayTracer` renderer. Add one or more to a scene 
 
 - {doc}`viewer`: `VisOptions`, which holds the rasterizer light list
 - {doc}`renderers/raytracer`: photorealistic rendering
-- {doc}`/api_reference/options/surface/emission`: emissive surfaces
+- {doc}`/api_reference/entity/surface/emission`: emissive surfaces

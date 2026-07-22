@@ -38,7 +38,7 @@ All `gs.options.*` classes derive from `gs.options.Options`, a [Pydantic](https:
 - **Fields are typed and validated on construction.** A value of the wrong type, or out of range, raises immediately with a readable message, not deep inside the first `scene.step()`.
 - **Unknown fields are rejected.** The base sets `extra="forbid"`, so a misspelled argument such as `gravty=(0, 0, -9.81)` raises `Unrecognized attribute 'gravty'` instead of being silently ignored.
 
-You never instantiate `Options` directly; you always use a concrete subclass. See the {doc}`Options API </api_reference/options/index>` for the full class list.
+You never instantiate `Options` directly; you always use a concrete subclass. Each option class is documented in the {doc}`API Reference </api_reference/index>` alongside the component it configures.
 
 ## Simulator options override solver options
 
@@ -77,7 +77,7 @@ Each of these is an optional argument to `gs.Scene(...)`. Pass an instance to co
 | `gs.options.ProfilingOptions` | `profiling_options` | Timing and FPS reporting. |
 | `gs.renderers.RendererOptions` | `renderer` | Rendering backend: `Rasterizer`, `RayTracer`, or `BatchRenderer`. |
 
-The scene- and solver-level options are documented in the {doc}`simulator, coupler, and solver options reference </api_reference/options/simulator_coupler_and_solver_options/index>`; the viewer, visualization, and renderer options in the {doc}`visualization reference </api_reference/visualization/index>`.
+The solver and coupler options are documented beside their solver and coupler in the {doc}`physics engine reference </api_reference/engine/index>`, the global `SimOptions` under {doc}`Scene </api_reference/scene/index>`, and the viewer, visualization, and renderer options in the {doc}`visualization reference </api_reference/visualization/index>`.
 
 :::{note}
 Not every solver runs in every scene. A solver is only active once you add an entity whose material targets it: adding a rigid entity activates the rigid solver, and so on. Options for an inactive solver are simply unused.
@@ -95,7 +95,7 @@ franka = scene.add_entity(
 )
 ```
 
-- **Morph:** the entity's geometry and initial pose. See {doc}`/user_guide/getting_started/hello_genesis` for loading morphs and the {doc}`morph API </api_reference/options/morph/index>`.
+- **Morph:** the entity's geometry and initial pose. See {doc}`/user_guide/getting_started/hello_genesis` for loading morphs and the {doc}`morph API </api_reference/entity/morph/index>`.
 - **Material:** how the entity responds to physical forces, and which solver simulates it. See {doc}`/user_guide/physics/beyond_rigid_bodies`.
 - **Surface:** how the entity looks when rendered. See {doc}`/user_guide/rendering/surfaces_textures`.
 
@@ -104,4 +104,4 @@ franka = scene.add_entity(
 - {doc}`/user_guide/getting_started/hello_genesis`: the minimal scene that uses these options.
 - {doc}`/user_guide/interaction/visualization`: the interactive viewer and command-line tools.
 - {doc}`/user_guide/rendering/index`: cameras, image types, video, and rendering backends.
-- {doc}`Options API reference </api_reference/options/index>`: every option class and its fields.
+- {doc}`API Reference </api_reference/index>`: each option class, documented with the component it configures.

@@ -156,6 +156,6 @@ Generating a terrain (the height field, the collision mesh, and the visual mesh)
 
 ## See also
 
-- {doc}`gs.morphs.Terrain API reference </api_reference/options/morph/file_morph/terrain>`: every keyword argument.
+- {doc}`gs.morphs.Terrain API reference </api_reference/entity/morph/file_morph/terrain>`: every keyword argument.
 - {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`: the init–scene–build–step loop these examples assume.
 - {doc}`Locomotion training </user_guide/policy_training/examples/locomotion>`: training a walking policy, where terrain becomes the training ground.

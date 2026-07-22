@@ -17,10 +17,10 @@ Coupling then happens automatically as the scene steps; there is no per-step cou
 
 ## Configuration
 
-`SAPCouplerOptions` exposes the SAP convergence controls (`n_sap_iterations`, `n_pcg_iterations`, `sap_convergence_atol`), the contact stiffnesses (`hydroelastic_stiffness` and `point_contact_stiffness`, both `1e8` by default), and the per-pair contact types (`fem_floor_contact_type`, `rigid_rigid_type`, and related fields). See {doc}`/api_reference/options/simulator_coupler_and_solver_options/sap_coupler_options` for the full list.
+`SAPCouplerOptions` exposes the SAP convergence controls (`n_sap_iterations`, `n_pcg_iterations`, `sap_convergence_atol`), the contact stiffnesses (`hydroelastic_stiffness` and `point_contact_stiffness`, both `1e8` by default), and the per-pair contact types (`fem_floor_contact_type`, `rigid_rigid_type`, and related fields). See {doc}`/api_reference/engine/couplers/sap_coupler_options` for the full list.
 
 ## See also
 
 - {doc}`index`: coupler overview and how to choose one.
 - {doc}`/user_guide/theory/couplers/index`: the theory behind each coupler.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/sap_coupler_options`: SAP coupler options.
+- {doc}`/api_reference/engine/couplers/sap_coupler_options`: SAP coupler options.

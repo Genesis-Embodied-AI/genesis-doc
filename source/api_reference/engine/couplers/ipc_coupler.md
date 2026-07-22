@@ -19,10 +19,10 @@ Coupling then happens automatically as the scene steps; there is no per-step cou
 
 ## Configuration
 
-`IPCCouplerOptions` exposes the Newton solver controls (`newton_max_iterations`, `newton_tolerance`), the contact settings (`contact_d_hat`, the barrier activation distance, and `contact_friction_enable`), and the linear-system solver choice. Fields left as `None` fall back to the libuipc defaults (for example `contact_d_hat` defaults to `0.01`). See {doc}`/api_reference/options/simulator_coupler_and_solver_options/ipc_coupler_options` for the full list.
+`IPCCouplerOptions` exposes the Newton solver controls (`newton_max_iterations`, `newton_tolerance`), the contact settings (`contact_d_hat`, the barrier activation distance, and `contact_friction_enable`), and the linear-system solver choice. Fields left as `None` fall back to the libuipc defaults (for example `contact_d_hat` defaults to `0.01`). See {doc}`/api_reference/engine/couplers/ipc_coupler_options` for the full list.
 
 ## See also
 
 - {doc}`index`: coupler overview and how to choose one.
 - {doc}`/user_guide/theory/couplers/index`: the theory behind each coupler.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/ipc_coupler_options`: IPC coupler options.
+- {doc}`/api_reference/engine/couplers/ipc_coupler_options`: IPC coupler options.

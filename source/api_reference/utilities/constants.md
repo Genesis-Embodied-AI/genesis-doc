@@ -117,4 +117,4 @@ gs.INACTIVE  # Entity is inactive (0)
 ## See also
 
 - {doc}`device`: Device and platform utilities
-- {doc}`/api_reference/options/index`: Configuration options
+- {doc}`/api_reference/index`: configuration options, documented with each component

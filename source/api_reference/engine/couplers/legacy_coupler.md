@@ -24,10 +24,10 @@ scene = gs.Scene(
 
 ## Configuration
 
-Each field of `LegacyCouplerOptions` is a boolean that enables one solver pair (`rigid_mpm`, `rigid_sph`, `rigid_pbd`, `rigid_fem`, `mpm_sph`, `mpm_pbd`, `fem_mpm`, `fem_sph`), all `True` by default. See {doc}`/api_reference/options/simulator_coupler_and_solver_options/legacy_coupler_options` for the full list.
+Each field of `LegacyCouplerOptions` is a boolean that enables one solver pair (`rigid_mpm`, `rigid_sph`, `rigid_pbd`, `rigid_fem`, `mpm_sph`, `mpm_pbd`, `fem_mpm`, `fem_sph`), all `True` by default. See {doc}`/api_reference/engine/couplers/legacy_coupler_options` for the full list.
 
 ## See also
 
 - {doc}`index`: coupler overview and how to choose one.
 - {doc}`/user_guide/theory/couplers/index`: the theory behind each coupler.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/legacy_coupler_options`: legacy coupler options.
+- {doc}`/api_reference/engine/couplers/legacy_coupler_options`: legacy coupler options.

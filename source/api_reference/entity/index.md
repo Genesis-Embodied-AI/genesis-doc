@@ -4,9 +4,9 @@ An entity is a single simulated object in a Genesis World scene: a robot, a rigi
 
 You create an entity by calling {py:meth}`scene.add_entity <genesis.engine.scene.Scene.add_entity>`, which combines three ingredients:
 
-- **Morph:** the geometry and pose: a primitive shape, a mesh, or a robot description loaded from URDF, MJCF, or USD. See {doc}`/api_reference/options/morph/index`.
-- **Material:** the physical model that decides which solver simulates the entity and how it responds to forces. See {doc}`/api_reference/material/index`.
-- **Surface:** the visual appearance used for rendering: color, texture, and visualization mode. See {doc}`/api_reference/options/surface/index`.
+- **Morph:** the geometry and pose: a primitive shape, a mesh, or a robot description loaded from URDF, MJCF, or USD. See {doc}`/api_reference/entity/morph/index`.
+- **Material:** the physical model that decides which solver simulates the entity and how it responds to forces. See {doc}`/api_reference/entity/material/index`.
+- **Surface:** the visual appearance used for rendering: color, texture, and visualization mode. See {doc}`/api_reference/entity/surface/index`.
 
 ```python
 import genesis as gs
@@ -55,4 +55,17 @@ drone_entity
 hybrid_entity
 tool_entity
 emitter
+```
+
+## Building blocks
+
+The three ingredients passed to `add_entity` each have their own reference: the morph (geometry and pose), the material (physical model and solver), and the surface (appearance), with textures supplying per-point surface values.
+
+```{toctree}
+:titlesonly:
+
+morph/index
+material/index
+surface/index
+texture/index
 ```

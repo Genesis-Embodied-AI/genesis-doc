@@ -70,7 +70,7 @@ Here `dt` is the simulation timestep in seconds, `gravity` points down along `-Z
 
 Objects and robots are {doc}`entities </api_reference/entity/index>`. Genesis World is object-oriented: you interact with an entity through its own methods and attributes, not through a global handle or id.
 
-The first argument to `add_entity` is a {doc}`morph </api_reference/options/morph/index>`: a combined description of an entity's geometry *and* initial pose. You can build a morph from a shape primitive or load one from a file:
+The first argument to `add_entity` is a {doc}`morph </api_reference/entity/morph/index>`: a combined description of an entity's geometry *and* initial pose. You can build a morph from a shape primitive or load one from a file:
 
 ```python
 plane = scene.add_entity(gs.morphs.Plane())

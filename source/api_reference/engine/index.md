@@ -2,7 +2,7 @@
 
 The engine is the layer beneath {doc}`Scene </api_reference/scene/scene>` that actually advances the simulation. A `Simulator` owns a set of physics **solvers**, a **coupler** that resolves interactions between them, and the per-solver **states** that hold runtime data. You rarely construct these objects directly. The scene builds them from the entities you add and the options you pass, then drives them each time you call `scene.step()`.
 
-This page describes how those pieces fit together and links to the reference for each. For the tunable parameters, see {doc}`/api_reference/options/simulator_coupler_and_solver_options/index`.
+This page describes how those pieces fit together and links to the reference for each. Each solver's and coupler's tunable parameters are documented on its own options page, beside it under {doc}`Solvers </api_reference/engine/solvers/index>` and {doc}`Couplers </api_reference/engine/couplers/index>`.
 
 ## Architecture
 
@@ -87,5 +87,5 @@ states/index
 
 ## See also
 
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/index`: simulator, solver, and coupler options.
+- {doc}`/api_reference/scene/sim_options`: the global `SimOptions`. Per-solver and per-coupler options sit beside each solver and coupler.
 - {doc}`/api_reference/entity/index`: the entity types that select each solver.

@@ -1,10 +1,10 @@
 # `SPHSolver`
 
-The `SPHSolver` implements Smoothed Particle Hydrodynamics for liquid simulation. It approximates fluid dynamics with particles, deriving pressure forces from local density, viscosity forces from velocity differences, and surface tension, with free-surface handling. Two pressure solvers are available through `pressure_solver`: weakly compressible SPH (`"WCSPH"`, the default) and divergence-free SPH (`"DFSPH"`). It simulates the `SPH.Liquid` material; see {doc}`/api_reference/material/sph`.
+The `SPHSolver` implements Smoothed Particle Hydrodynamics for liquid simulation. It approximates fluid dynamics with particles, deriving pressure forces from local density, viscosity forces from velocity differences, and surface tension, with free-surface handling. Two pressure solvers are available through `pressure_solver`: weakly compressible SPH (`"WCSPH"`, the default) and divergence-free SPH (`"DFSPH"`). It simulates the `SPH.Liquid` material; see {doc}`/api_reference/entity/material/sph`.
 
 ## Usage
 
-The solver activates when the scene contains an SPH entity. Configure it through `SPHOptions`; see {doc}`/api_reference/options/simulator_coupler_and_solver_options/sph_options` for the full option set.
+The solver activates when the scene contains an SPH entity. Configure it through `SPHOptions`; see {doc}`/api_reference/engine/solvers/sph_options` for the full option set.
 
 ```python
 import genesis as gs
@@ -39,5 +39,5 @@ for i in range(1000):
 ## See also
 
 - {doc}`/api_reference/entity/sph_entity`: SPHEntity.
-- {doc}`/api_reference/material/sph`: SPH materials.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/sph_options`: full options.
+- {doc}`/api_reference/entity/material/sph`: SPH materials.
+- {doc}`/api_reference/engine/solvers/sph_options`: full options.

@@ -66,6 +66,6 @@ For MJCF and URDF, you can also pass inline XML content as `file` instead of a p
 
 ## See also
 
-- {doc}`/api_reference/options/morph/index`: the full morph reference, with every per-format option.
+- {doc}`/api_reference/entity/morph/index`: the full morph reference, with every per-format option.
 - {doc}`/user_guide/assets/usd_import`: importing USD stages.
 - {doc}`/user_guide/assets/mesh_processing`: convex decomposition, decimation, and other mesh preparation.

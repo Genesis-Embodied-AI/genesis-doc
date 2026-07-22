@@ -4,7 +4,7 @@ The `ToolSolver` handles kinematic tools and end-effectors that drive other phys
 
 ## Usage
 
-The solver activates when the scene contains a tool entity. Configure it through `ToolOptions`; see {doc}`/api_reference/options/simulator_coupler_and_solver_options/tool_options` for the full option set.
+The solver activates when the scene contains a tool entity. Configure it through `ToolOptions`; see {doc}`/api_reference/engine/solvers/tool_options` for the full option set.
 
 ```python
 import genesis as gs
@@ -42,6 +42,6 @@ The coupling is handled automatically by the coupler.
 
 ## See also
 
-- {doc}`/api_reference/material/tool`: the tool material and its parameters.
+- {doc}`/api_reference/entity/material/tool`: the tool material and its parameters.
 - {doc}`/api_reference/engine/couplers/index`: coupling with other solvers.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/tool_options`: full options.
+- {doc}`/api_reference/engine/solvers/tool_options`: full options.

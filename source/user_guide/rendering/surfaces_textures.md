@@ -2,9 +2,9 @@
 
 A **surface** describes how an entity *looks* when rendered: its color, glossiness, transparency, and texture maps. It is separate from the entity's shape and its physics. When you add an entity you pass up to three independent descriptions:
 
-- a {doc}`morph </api_reference/options/morph/index>`: geometry and initial pose,
-- a {doc}`material </api_reference/material/index>`: physical behavior (mass, stiffness, friction),
-- a {doc}`surface </api_reference/options/surface/index>`: visual appearance, the subject of this page.
+- a {doc}`morph </api_reference/entity/morph/index>`: geometry and initial pose,
+- a {doc}`material </api_reference/entity/material/index>`: physical behavior (mass, stiffness, friction),
+- a {doc}`surface </api_reference/entity/surface/index>`: visual appearance, the subject of this page.
 
 Changing a surface never changes how an entity moves or collides; it only changes the rendered image. If you omit the surface, Genesis World uses `gs.surfaces.Default` (a Disney principled BSDF) and honors any material the asset file already defines.
 

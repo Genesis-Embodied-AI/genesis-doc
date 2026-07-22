@@ -113,5 +113,5 @@ plane = scene.add_entity(gs.morphs.Plane())
 
 ## See also
 
-- {doc}`/api_reference/options/morph/file_morph/index`: File-based morphs
+- {doc}`/api_reference/entity/morph/file_morph/index`: File-based morphs
 - {doc}`/api_reference/entity/index`: Entity loading

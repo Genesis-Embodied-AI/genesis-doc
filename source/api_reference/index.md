@@ -12,16 +12,6 @@ scene/index
 entity/index
 ```
 
-## Configuration and options
-
-```{toctree}
-:titlesonly:
-:maxdepth: 2
-
-material/index
-options/index
-```
-
 ## Physics engine
 
 ```{toctree}
