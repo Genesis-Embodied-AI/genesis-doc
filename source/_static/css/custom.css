@@ -50,20 +50,14 @@ html[data-theme="dark"] {
   padding: 0.35rem 0;
 }
 
-/* Match the search field's active state to the Genesis red accent (the theme's
-   default focus ring and border are purple/blue). --pst-color-accent above
-   already recolors the box-shadow ring; this fixes the hardcoded blue border. */
 .bd-search input:focus,
 .search-button__search-container input:focus,
 form.bd-search input:focus {
   border-color: var(--pst-color-accent);
 }
 
-/* Left sidebar: the top-level entries are now real section landing pages, so
-   drop the "Section Navigation" header and give those entries the regular
-   high-contrast body-text color instead of the muted link color the theme
-   uses for all sidebar links. The active section still gets the primary
-   highlight (theme's `.current > a`), so exclude it here. */
+/* Top-level sidebar entries are section landing pages: drop the header and give
+   them body-text contrast, but leave the active section its primary highlight. */
 nav.bd-links p.bd-links__title {
   display: none;
 }
@@ -92,10 +86,12 @@ a:active {
   color: #ff5656 !important;
 }
 
+/* Text color is deliberately excluded: animating it during a theme switch dips
+   through a mid-gray that briefly matches the fading background. */
 *,
 *::before,
 *::after {
-  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 html[data-theme] div.highlight,
@@ -215,7 +211,6 @@ html[data-theme="dark"] #pst-back-to-top:hover {
   text-decoration: none;
 }
 
-/* Footer: Genesis company logo (left corner), kept small; light/dark variants toggled by theme. */
 .footer-logo {
   display: inline-flex;
   align-items: center;
@@ -236,11 +231,8 @@ html[data-theme="dark"] .footer-logo-dark {
   display: block;
 }
 
-/* The code background is dark (#1a1d34) in both themes, so token colors must be
-   light-on-dark. The overrides above cover most tokens, but a few Pygments
-   classes fell through to the light-mode brown (#7F4707) and rendered poorly on
-   the dark background (notably the bibtex cite key, Name.Label, in the citation
-   block). Give those stragglers colors consistent with the scheme above. */
+/* The code background is dark in both themes, so these stragglers need
+   light-on-dark colors too (they otherwise fall through to a light-mode brown). */
 html[data-theme] .highlight .nl {  /* Name.Label, e.g. a bibtex cite key */
   color: #86ccf0;
 }
