@@ -8,12 +8,10 @@ This page describes how those pieces fit together and links to the reference for
 
 A scene holds one simulator. The simulator holds the solvers active in the scene and a single coupler:
 
-```
-Scene
-`-- Simulator
-    |-- solvers   - one per active physics method (rigid, MPM, FEM, ...)
-    `-- coupler   - resolves interactions across solvers
-```
+- **Scene**
+  - **Simulator**
+    - **solvers:** one per active physics method (rigid, MPM, FEM, ...)
+    - **coupler:** resolves interactions across solvers
 
 Each solver runs a specific physics method and is activated only when the scene contains at least one entity that needs it. A solver is chosen by an entity's material:
 
