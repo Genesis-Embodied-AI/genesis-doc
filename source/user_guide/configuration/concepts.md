@@ -8,15 +8,15 @@ Every Genesis World program is built from the same handful of objects, and every
 :alt: Diagram of the Genesis World object model, showing a scene that contains entities and a simulator, where the simulator holds physics solvers and a coupler
 ```
 
-A **scene** (see the {doc}`Scene API </api_reference/scene/scene>`) is the top-level container. It owns two things: a simulator that advances the physics, and a visualizer that draws what you see. You add everything to the scene, then build and step it.
+A **scene** (see the {doc}`Scene API </api_reference/engine/scene>`) is the top-level container. It owns two things: a simulator that advances the physics, and a visualizer that draws what you see. You add everything to the scene, then build and step it.
 
 An **entity** is one object in the scene, such as a robot, a rigid body, or a body of fluid. You interact with it through its own methods and attributes rather than a global handle. Each entity is described by three pieces:
 
-- **Morph:** the geometry and initial pose, either a primitive shape or a loaded model (see the {doc}`morph API </api_reference/entity/morph/index>`).
+- **Morph:** the geometry and initial pose, either a primitive shape or a loaded model (see the {doc}`morph API </api_reference/engine/entity/morph/index>`).
 - **Material:** the physical model. The material chooses which solver simulates the entity. Liquids exist for both MPM and SPH, for example, and they behave differently.
 - **Surface:** the visual surface properties, such as texture, roughness, and reflectivity.
 
-The scene delegates all physics to a **simulator** (see the {doc}`Simulator API </api_reference/scene/simulator>`), which coordinates two kinds of component:
+The scene delegates all physics to a **simulator** (see the {doc}`Simulator API </api_reference/engine/simulator>`), which coordinates two kinds of component:
 
 - **Solver:** a physics engine for one class of material. Genesis World ships solvers for rigid bodies, the Material Point Method (MPM), the Finite Element Method (FEM), Position-Based Dynamics (PBD), and Smoothed-Particle Hydrodynamics (SPH), among others. Each entity belongs to exactly one solver, chosen by its material.
 - **Coupler:** the bridge between solvers. It transfers forces and resolves interactions across material types, so an MPM fluid can push a rigid body it lands on.
@@ -37,7 +37,7 @@ Before `build()`, the scene is just a description. Adding entities registers the
 
 `n_envs` controls parallelism. Left at `0`, the scene runs a single environment and results have no batch dimension. Set greater than `0`, it replicates the scene across that many parallel **environments** (**env**), and a leading batch dimension appears on every input and output. This is why shapes throughout the docs are written `([n_envs,] ...)`: the `n_envs` axis is present when you built with multiple environments and absent otherwise. See {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>`.
 
-Each `scene.step()` advances the simulation by one timestep `dt`. To capture or restore the full simulation at a point in time, use `scene.get_state()`, which returns a `SimState`, and `scene.reset(state)`.
+Each `scene.step()` advances the simulation by one timestep `dt`. To capture or restore the full simulation at a point in time, use `scene.get_state()`, which returns a {py:class}`SimState <genesis.engine.states.solvers.SimState>`, and `scene.reset(state)`.
 
 :::{note}
 The first build of a new configuration compiles kernels on the fly and is slow. Genesis World caches them, so later runs with the same configuration start quickly. See {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` for the caching details.

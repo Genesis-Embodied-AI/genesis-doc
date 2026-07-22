@@ -6,12 +6,12 @@ Almost everything you put in a scene, a robot, a rigid object, a static mesh, co
 
 | Morph | Formats | Use for |
 |---|---|---|
-| `gs.morphs.MJCF` | `.xml` | MuJoCo robot and scene models |
-| `gs.morphs.URDF` | `.urdf`, `.xacro` | robot descriptions (`.xacro` is preprocessed automatically) |
-| `gs.morphs.Mesh` | `.obj`, `.stl`, `.dae`, `.glb`, `.gltf` | non-articulated meshes |
-| `gs.morphs.USD` | `.usd`, `.usda`, `.usdc`, `.usdz` | Universal Scene Description stages |
+| {py:class}`gs.morphs.MJCF <genesis.options.morphs.MJCF>` | `.xml` | MuJoCo robot and scene models |
+| {py:class}`gs.morphs.URDF <genesis.options.morphs.URDF>` | `.urdf`, `.xacro` | robot descriptions (`.xacro` is preprocessed automatically) |
+| {py:class}`gs.morphs.Mesh <genesis.options.morphs.Mesh>` | `.obj`, `.stl`, `.dae`, `.glb`, `.gltf` | non-articulated meshes |
+| {py:class}`gs.morphs.USD <genesis.options.morphs.USD>` | `.usd`, `.usda`, `.usdc`, `.usdz` | Universal Scene Description stages |
 
-Shape primitives, `gs.morphs.Plane`, `Box`, `Cylinder`, `Sphere`, `Terrain`, and `Drone`, need no file. See the {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` tutorial for a first load, {doc}`USD import </user_guide/assets/usd_import>` for USD stages, and {doc}`mesh processing </user_guide/assets/mesh_processing>` for preparing meshes.
+Shape primitives, {py:class}`gs.morphs.Plane <genesis.options.morphs.Plane>`, {py:class}`Box <genesis.options.morphs.Box>`, {py:class}`Cylinder <genesis.options.morphs.Cylinder>`, {py:class}`Sphere <genesis.options.morphs.Sphere>`, {py:class}`Terrain <genesis.options.morphs.Terrain>`, and {py:class}`Drone <genesis.options.morphs.Drone>`, need no file. See the {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` tutorial for a first load, {doc}`USD import </user_guide/assets/usd_import>` for USD stages, and {doc}`mesh processing </user_guide/assets/mesh_processing>` for preparing meshes.
 
 ```python
 franka = scene.add_entity(
@@ -66,6 +66,6 @@ For MJCF and URDF, you can also pass inline XML content as `file` instead of a p
 
 ## See also
 
-- {doc}`/api_reference/entity/morph/index`: the full morph reference, with every per-format option.
+- {doc}`/api_reference/engine/entity/morph/index`: the full morph reference, with every per-format option.
 - {doc}`/user_guide/assets/usd_import`: importing USD stages.
 - {doc}`/user_guide/assets/mesh_processing`: convex decomposition, decimation, and other mesh preparation.

@@ -261,4 +261,4 @@ object instead.
 
 - {doc}`hello_genesis`: the minimal scene this tutorial builds on.
 - {doc}`/user_guide/robot_control/inverse_kinematics_motion_planning`: solving for joint targets from a desired end-effector pose.
-- {doc}`/api_reference/entity/index`: the full entity control API.
+- {doc}`/api_reference/engine/entity/index`: the full entity control API.

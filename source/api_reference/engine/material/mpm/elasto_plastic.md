@@ -1,0 +1,5 @@
+# ElastoPlastic
+
+```{eval-rst}
+.. autoclass:: genesis.engine.materials.MPM.elasto_plastic.ElastoPlastic
+```

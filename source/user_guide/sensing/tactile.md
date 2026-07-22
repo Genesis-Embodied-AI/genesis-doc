@@ -6,8 +6,8 @@ You describe the layout once with `probe_local_pos`, a set of `(x, y, z)` offset
 
 Two families share this interface but estimate contact differently:
 
-- **SDF-query probes** (`ContactProbe`, `ContactDepthProbe`, and `KinematicTaxel`) query the signed distance from each probe to nearby collision geometry directly. They need no list of target links, though an optional `filter_link_idx` (global link indices) can exclude chosen counterpart links from the query.
-- **Point-cloud probes** (`ElastomerTaxel` and `ProximityTaxel`) sample a point cloud from the meshes named in `track_link_idx` (global link indices) and measure against those points. `n_sample_points` sets the sample budget.
+- **SDF-query probes** ({py:class}`ContactProbe <genesis.options.sensors.tactile.ContactProbe>`, {py:class}`ContactDepthProbe <genesis.options.sensors.tactile.ContactDepthProbe>`, and {py:class}`KinematicTaxel <genesis.options.sensors.tactile.KinematicTaxel>`) query the signed distance from each probe to nearby collision geometry directly. They need no list of target links, though an optional `filter_link_idx` (global link indices) can exclude chosen counterpart links from the query.
+- **Point-cloud probes** ({py:class}`ElastomerTaxel <genesis.options.sensors.tactile.ElastomerTaxel>` and {py:class}`ProximityTaxel <genesis.options.sensors.tactile.ProximityTaxel>`) sample a point cloud from the meshes named in `track_link_idx` (global link indices) and measure against those points. `n_sample_points` sets the sample budget.
 
 Readings are geometric estimates, not solver impulses, and are uncalibrated. Treat them as relative signals unless you tune the coefficients to your setup. The taxels also expose hardware-style [imperfections](#sensor-imperfections) for sim-to-real robustness. For how sensors are sampled, read back, and batched, see the {doc}`sensors overview <index>`.
 
@@ -96,7 +96,7 @@ data.force   # shape ([n_envs,] n_probes, 3), N, link-local
 data.torque  # shape ([n_envs,] n_probes, 3), N*m, link-local
 ```
 
-`read()` returns a `KinematicTaxelReturnType` named tuple, so `data.force` and `data.torque` unpack by name.
+`read()` returns a {py:class}`KinematicTaxelReturnType <genesis.engine.sensors.kinematic_tactile.KinematicTaxelReturnType>` named tuple, so `data.force` and `data.torque` unpack by name.
 
 <video preload="auto" controls="True" width="100%" aria-label="A live vector-field plot of KinematicTaxel forces across a probe grid as an object presses into the sensor, with arrows growing where penetration is deepest and curved twist arrows tracking rotational slip">
 <source src="../../_static/videos/kinematic_taxel.mp4" type="video/mp4">
@@ -155,7 +155,7 @@ data.force   # shape ([n_envs,] n_probes, 3), N, link-local
 data.torque  # shape ([n_envs,] n_probes, 3), N*m, link-local
 ```
 
-Like `KinematicTaxel`, it returns a named tuple (`ProximityTaxelReturnType`) with `force` and `torque` fields.
+Like `KinematicTaxel`, it returns a named tuple ({py:class}`ProximityTaxelReturnType <genesis.engine.sensors.point_cloud_tactile.ProximityTaxelReturnType>`) with `force` and `torque` fields.
 
 <video preload="auto" controls="True" width="100%" aria-label="A live vector-field plot of ProximityTaxel force and twist across a taxel pad as an object approaches and presses in, the field responding before and through contact">
 <source src="../../_static/videos/proximity_taxel.mp4" type="video/mp4">

@@ -11,7 +11,7 @@ The two runnable examples referenced throughout are the source of truth for the 
 
 ## Loading a mesh
 
-A non-articulated mesh is loaded through `gs.morphs.Mesh`, which accepts `.obj`, `.stl`, `.glb`, and `.gltf` files (see {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` for the morph basics and {doc}`Conventions </user_guide/configuration/conventions>` for Y-up versus Z-up handling):
+A non-articulated mesh is loaded through {py:class}`gs.morphs.Mesh <genesis.options.morphs.Mesh>`, which accepts `.obj`, `.stl`, `.glb`, and `.gltf` files (see {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` for the morph basics and {doc}`Conventions </user_guide/configuration/conventions>` for Y-up versus Z-up handling):
 
 ```python
 import genesis as gs
@@ -29,7 +29,7 @@ tank = scene.add_entity(
 The `vis_mode` shortcut is how you inspect the result of processing. It renders either `"visual"` (the default) or `"collision"` geometry, so you can see exactly what the solver sees.
 
 :::{note}
-The processing described below applies when the morph becomes a `RigidEntity`. Deformable entities (FEM, MPM, and other particle-based materials) do not convexify their meshes; see {doc}`Beyond rigid bodies </user_guide/physics/beyond_rigid_bodies>`.
+The processing described below applies when the morph becomes a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`. Deformable entities (FEM, MPM, and other particle-based materials) do not convexify their meshes; see {doc}`Beyond rigid bodies </user_guide/physics/beyond_rigid_bodies>`.
 :::
 
 ## The collision pipeline
@@ -83,7 +83,7 @@ The older `decompose_nonconvex` argument is deprecated. Use `convexify` together
 
 ### Tuning CoACD
 
-When a full decomposition does run, pass a `gs.options.CoacdOptions` to control the quality-versus-count trade-off:
+When a full decomposition does run, pass a {py:class}`gs.options.CoacdOptions <genesis.options.misc.CoacdOptions>` to control the quality-versus-count trade-off:
 
 ```python
 gs.morphs.Mesh(

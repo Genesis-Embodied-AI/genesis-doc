@@ -1,23 +1,6 @@
-# `Tensor`
+# Tensor
 
-The `genesis.grad.Tensor` class extends `torch.Tensor` to support end-to-end gradient flow through Genesis World simulations.
-
-## Overview
-
-Genesis World Tensors:
-
-- Extend PyTorch tensors with scene tracking
-- Enable automatic gradient propagation through physics
-- Support all standard PyTorch operations
-- Track parent tensors for gradient flow
-
-## Behavior
-
-State getters such as `robot.get_pos()`, `robot.get_vel()`, and `robot.get_qpos()` return a `genesis.grad.Tensor` when the scene is built with `requires_grad=True`. It behaves like a `torch.Tensor` in every operation and additionally carries a link to the scene it came from, which is what lets `loss.backward()` flow gradients through the physics.
-
-To stop gradients flowing back into the simulation, use `tensor.detach()` (which drops the scene link by default) or `tensor.sceneless()` (which keeps autograd but drops only the scene link). Read `tensor.scene` to see which scene, if any, a tensor is bound to. For the end-to-end differentiable workflow, see {doc}`index`.
-
-## API reference
+`genesis.grad.Tensor` extends `torch.Tensor` with a link to the scene it came from, which is what lets a loss computed from scene state backpropagate through the physics. State getters (`get_pos()`, `get_vel()`, `get_qpos()`, ...) return it when the scene is built with `requires_grad=True`. For the workflow, see {doc}`/user_guide/theory/differentiable_simulation`.
 
 ```{eval-rst}
 .. autoclass:: genesis.grad.tensor.Tensor
@@ -28,5 +11,5 @@ To stop gradients flowing back into the simulation, use `tensor.detach()` (which
 
 ## See also
 
-- {doc}`index`: Differentiable simulation overview
-- {doc}`creation_ops`: Creating tensors
+- {doc}`/user_guide/theory/differentiable_simulation`: the differentiable-simulation workflow.
+- {doc}`creation_ops`: creating tensors for differentiable simulation.

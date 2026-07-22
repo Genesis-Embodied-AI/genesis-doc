@@ -114,7 +114,7 @@ The available primitives:
 | `draw_debug_box` | An axis-aligned box | `bounds`, `color`, `wireframe`, `wireframe_radius` |
 | `draw_debug_frame` / `draw_debug_frames` | One or many coordinate frames | `T` / `Ts`, `axis_length`, `origin_size`, `axis_radius` |
 
-See {doc}`/api_reference/scene/scene` for the full signatures and defaults.
+See {doc}`/api_reference/engine/scene` for the full signatures and defaults.
 
 ## The interactive GUI panel
 
@@ -135,7 +135,7 @@ pip install "genesis-world[render]"
 If pre-built `imgui-bundle` wheels are unavailable for your Python and OS combination (for example Python 3.10 on Linux aarch64), install with `pip install imgui-bundle`, which builds from source and requires CMake. Enabling the GUI without the dependency raises an error pointing back at this step.
 :::
 
-The simplest way to get the panel is to set `enable_gui=True` on `ViewerOptions`. The viewer attaches the overlay for you and lets it manage scene editing internally, so a plain `gs.Scene` is the whole setup:
+The simplest way to get the panel is to set `enable_gui=True` on `ViewerOptions`. The viewer attaches the overlay for you and lets it manage scene editing internally, so a plain {py:class}`gs.Scene <genesis.engine.scene.Scene>` is the whole setup:
 
 ```python
 scene = gs.Scene(

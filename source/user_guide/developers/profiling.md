@@ -45,7 +45,7 @@ The rate is measured over fixed wall-clock windows and lightly smoothed with an 
 
 ### Configuring the counter
 
-The counter is controlled by `gs.options.ProfilingOptions`, passed to the scene:
+The counter is controlled by {py:class}`gs.options.ProfilingOptions <genesis.options.profiling.ProfilingOptions>`, passed to the scene:
 
 ```python
 scene = gs.Scene(

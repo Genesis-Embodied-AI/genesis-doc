@@ -6,7 +6,7 @@ Hibernation builds on **contact islands**: the rigid solver partitions each step
 
 ## Enabling hibernation
 
-Hibernation is a rigid-solver option, off by default. Turn it on through `gs.options.RigidOptions`:
+Hibernation is a rigid-solver option, off by default. Turn it on through {py:class}`gs.options.RigidOptions <genesis.options.solvers.RigidOptions>`:
 
 ```python
 import genesis as gs

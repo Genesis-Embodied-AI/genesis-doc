@@ -30,7 +30,7 @@ The number of candidate pairs the broad phase may emit is bounded by the `max_co
 
 ## Reading contacts
 
-Read the contacts from the most recent `scene.step()` with `get_contacts()` on any {doc}`rigid entity </api_reference/entity/rigid_entity/rigid_entity>`. It returns a dict of parallel arrays, one entry per contact that involves the entity.
+Read the contacts from the most recent `scene.step()` with `get_contacts()` on any {doc}`rigid entity </api_reference/engine/entity/rigid_entity/rigid_entity>`. It returns a dict of parallel arrays, one entry per contact that involves the entity.
 
 ```python
 import genesis as gs
@@ -82,7 +82,7 @@ This is the aggregate the constraint solver accumulated, so it reflects the reso
 
 ## When to use a contact sensor instead
 
-`get_contacts()` and `get_links_net_contact_force()` pull the whole contact set on demand, which is convenient for scripting and debugging. For a per-link signal you sample every step in a control or training loop (with history, noise, and delay handled for you), attach a contact sensor instead. `ContactForce` reports the net force on a link in its own frame, and the tactile probes estimate dense per-taxel forces. See {doc}`/user_guide/sensing/contact`.
+`get_contacts()` and `get_links_net_contact_force()` pull the whole contact set on demand, which is convenient for scripting and debugging. For a per-link signal you sample every step in a control or training loop (with history, noise, and delay handled for you), attach a contact sensor instead. {py:class}`ContactForce <genesis.options.sensors.options.ContactForce>` reports the net force on a link in its own frame, and the tactile probes estimate dense per-taxel forces. See {doc}`/user_guide/sensing/contact`.
 
 ## See also
 

@@ -6,7 +6,7 @@ The complete script is [`examples/sensors/temperature_grid.py`](https://github.c
 
 ## Minimal example
 
-A temperature sensor attaches to one link of a rigid {doc}`entity </api_reference/entity/index>`. `entity_idx` selects the entity and `link_idx_local` the link within it; `grid_size` sets the resolution as `(nx, ny, nz)`.
+A temperature sensor attaches to one link of a rigid {doc}`entity </api_reference/engine/entity/index>`. `entity_idx` selects the entity and `link_idx_local` the link within it; `grid_size` sets the resolution as `(nx, ny, nz)`.
 
 ```python
 temperature_sensor = scene.add_sensor(
@@ -36,7 +36,7 @@ The `[n_envs,]` axis is present only when the scene is built with multiple {doc}
 
 ## Material properties
 
-Heat only flows between links that carry thermal properties. You supply these through `properties_dict`, which maps a global rigid-link index to a `TemperatureProperties` entry. Key `-1` is the default applied to any link not listed explicitly; omit it and unlisted links are ignored in contacts entirely.
+Heat only flows between links that carry thermal properties. You supply these through `properties_dict`, which maps a global rigid-link index to a {py:class}`TemperatureProperties <genesis.options.sensors.options.TemperatureProperties>` entry. Key `-1` is the default applied to any link not listed explicitly; omit it and unlisted links are ignored in contacts entirely.
 
 ```python
 properties_dict = {

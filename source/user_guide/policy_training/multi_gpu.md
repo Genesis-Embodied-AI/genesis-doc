@@ -135,4 +135,4 @@ Batch as many environments as fit on one GPU before adding a second. Watch memor
 
 - {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>`: batching environments on one GPU, and the `([n_envs,] ...)` shape convention.
 - {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`: the single-GPU program that each process in these patterns runs.
-- {doc}`Scene API </api_reference/scene/scene>`: `build`, `step`, and the `n_envs` and `env_spacing` arguments.
+- {doc}`Scene API </api_reference/engine/scene>`: `build`, `step`, and the `n_envs` and `env_spacing` arguments.

@@ -48,7 +48,7 @@ The two link indices are the same across environments; only the environment sele
 
 ## Budgeting for dynamic constraints
 
-Runtime welds draw from a fixed pool sized before the scene is built. The pool holds `max_dynamic_constraints` welds (default 8), set on `gs.options.RigidOptions`:
+Runtime welds draw from a fixed pool sized before the scene is built. The pool holds `max_dynamic_constraints` welds (default 8), set on {py:class}`gs.options.RigidOptions <genesis.options.solvers.RigidOptions>`:
 
 ```python
 scene = gs.Scene(

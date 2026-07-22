@@ -94,7 +94,7 @@ Parallel IK is most effective on a GPU backend, where all environments are solve
 
 Inverse kinematics is built on two lower-level operations the same solver exposes directly, and both are useful on their own for analytic control. Forward kinematics is IK's inverse: it maps a joint configuration to the resulting link poses. The Jacobian relates joint velocities to the end-effector's spatial velocity, which is the quantity IK differentiates to take each step; it also underpins Jacobian-transpose control and manipulability analysis.
 
-Both require an entity created with `requires_jac_and_IK=True`, which is the default for the `MJCF` and `URDF` robot morphs.
+Both require an entity created with `requires_jac_and_IK=True`, which is the default for the {py:class}`MJCF <genesis.options.morphs.MJCF>` and {py:class}`URDF <genesis.options.morphs.URDF>` robot morphs.
 
 ```python
 ee_link = robot.get_link("hand")

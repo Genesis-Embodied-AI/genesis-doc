@@ -2,7 +2,7 @@
 
 Genesis World is configured through **options objects**: small, typed parameter groups under `gs.options.*` that you pass to `gs.Scene(...)` and to `scene.add_entity(...)`. Rather than a scene taking dozens of loose keyword arguments, each concern (the global simulator, one physics solver, the viewer, a renderer) gets its own object with its own defaults. This page explains what those objects are, how they compose into a scene, and how a setting given in two places is resolved.
 
-If you have not built a scene yet, read {doc}`/user_guide/getting_started/hello_genesis` first. It uses `SimOptions` and `ViewerOptions` in passing. This page is the conceptual reference behind that usage.
+If you have not built a scene yet, read {doc}`/user_guide/getting_started/hello_genesis` first. It uses {py:class}`SimOptions <genesis.options.solvers.SimOptions>` and {py:class}`ViewerOptions <genesis.options.ViewerOptions>` in passing. This page is the conceptual reference behind that usage.
 
 ## A scene is assembled from options
 
@@ -33,7 +33,7 @@ The options split into three roles, plus a set of per-entity options passed to `
 
 ## Every options object shares one base
 
-All `gs.options.*` classes derive from `gs.options.Options`, a [Pydantic](https://docs.pydantic.dev/) model. Two properties of that base matter in practice:
+All `gs.options.*` classes derive from {py:class}`gs.options.Options <genesis.options.options.Options>`, a [Pydantic](https://docs.pydantic.dev/) model. Two properties of that base matter in practice:
 
 - **Fields are typed and validated on construction.** A value of the wrong type, or out of range, raises immediately with a readable message, not deep inside the first `scene.step()`.
 - **Unknown fields are rejected.** The base sets `extra="forbid"`, so a misspelled argument such as `gravty=(0, 0, -9.81)` raises `Unrecognized attribute 'gravty'` instead of being silently ignored.
@@ -62,22 +62,22 @@ Each of these is an optional argument to `gs.Scene(...)`. Pass an instance to co
 
 | Options class | `Scene` argument | Configures |
 |---|---|---|
-| `gs.options.SimOptions` | `sim_options` | Global timestep, gravity, substeps, differentiable mode. |
-| `gs.options.BaseCouplerOptions` | `coupler_options` | Coupling between solvers. Concrete variants: `LegacyCouplerOptions`, `SAPCouplerOptions`, `IPCCouplerOptions`. |
-| `gs.options.RigidOptions` | `rigid_options` | Rigid-body dynamics: contact, collision, constraints, integrator. |
-| `gs.options.MPMOptions` | `mpm_options` | Material Point Method solver (elastic, plastic, granular, fluid). |
-| `gs.options.SPHOptions` | `sph_options` | Smoothed Particle Hydrodynamics solver (fluids, granular flow). |
-| `gs.options.FEMOptions` | `fem_options` | Finite Element Method solver (elastic material). |
-| `gs.options.SFOptions` | `sf_options` | Stable Fluid solver (Eulerian gaseous simulation). |
-| `gs.options.PBDOptions` | `pbd_options` | Position-Based Dynamics solver (cloth, deformables, liquids, particles). |
-| `gs.options.KinematicOptions` | `kinematic_options` | Kinematic (non-dynamic) entities. |
-| `gs.options.ToolOptions` | `tool_options` | Legacy tool solver. Slated for deprecation. |
-| `gs.options.VisOptions` | `vis_options` | Visualization independent of any viewer or camera. |
-| `gs.options.ViewerOptions` | `viewer_options` | The interactive viewer: camera pose, resolution, refresh rate. |
-| `gs.options.ProfilingOptions` | `profiling_options` | Timing and FPS reporting. |
-| `gs.renderers.RendererOptions` | `renderer` | Rendering backend: `Rasterizer`, `RayTracer`, or `BatchRenderer`. |
+| {py:class}`gs.options.SimOptions <genesis.options.solvers.SimOptions>` | `sim_options` | Global timestep, gravity, substeps, differentiable mode. |
+| {py:class}`gs.options.BaseCouplerOptions <genesis.options.solvers.BaseCouplerOptions>` | `coupler_options` | Coupling between solvers. Concrete variants: {py:class}`LegacyCouplerOptions <genesis.options.solvers.LegacyCouplerOptions>`, {py:class}`SAPCouplerOptions <genesis.options.solvers.SAPCouplerOptions>`, {py:class}`IPCCouplerOptions <genesis.options.solvers.IPCCouplerOptions>`. |
+| {py:class}`gs.options.RigidOptions <genesis.options.solvers.RigidOptions>` | `rigid_options` | Rigid-body dynamics: contact, collision, constraints, integrator. |
+| {py:class}`gs.options.MPMOptions <genesis.options.solvers.MPMOptions>` | `mpm_options` | Material Point Method solver (elastic, plastic, granular, fluid). |
+| {py:class}`gs.options.SPHOptions <genesis.options.solvers.SPHOptions>` | `sph_options` | Smoothed Particle Hydrodynamics solver (fluids, granular flow). |
+| {py:class}`gs.options.FEMOptions <genesis.options.solvers.FEMOptions>` | `fem_options` | Finite Element Method solver (elastic material). |
+| {py:class}`gs.options.SFOptions <genesis.options.solvers.SFOptions>` | `sf_options` | Stable Fluid solver (Eulerian gaseous simulation). |
+| {py:class}`gs.options.PBDOptions <genesis.options.solvers.PBDOptions>` | `pbd_options` | Position-Based Dynamics solver (cloth, deformables, liquids, particles). |
+| {py:class}`gs.options.KinematicOptions <genesis.options.solvers.KinematicOptions>` | `kinematic_options` | Kinematic (non-dynamic) entities. |
+| {py:class}`gs.options.ToolOptions <genesis.options.solvers.ToolOptions>` | `tool_options` | Legacy tool solver. Slated for deprecation. |
+| {py:class}`gs.options.VisOptions <genesis.options.VisOptions>` | `vis_options` | Visualization independent of any viewer or camera. |
+| {py:class}`gs.options.ViewerOptions <genesis.options.ViewerOptions>` | `viewer_options` | The interactive viewer: camera pose, resolution, refresh rate. |
+| {py:class}`gs.options.ProfilingOptions <genesis.options.profiling.ProfilingOptions>` | `profiling_options` | Timing and FPS reporting. |
+| {py:class}`gs.renderers.RendererOptions <genesis.options.renderers.RendererOptions>` | `renderer` | Rendering backend: `Rasterizer`, `RayTracer`, or `BatchRenderer`. |
 
-The solver and coupler options are documented beside their solver and coupler in the {doc}`physics engine reference </api_reference/engine/index>`, the global `SimOptions` under {doc}`Scene </api_reference/scene/index>`, and the viewer, visualization, and renderer options in the {doc}`visualization reference </api_reference/visualization/index>`.
+The solver and coupler options are documented beside their solver and coupler in the {doc}`physics engine reference </api_reference/engine/index>`, the global `SimOptions` under {doc}`Scene </api_reference/engine/index>`, and the viewer, visualization, and renderer options in the {doc}`visualization reference </api_reference/visualization/index>`.
 
 :::{note}
 Not every solver runs in every scene. A solver is only active once you add an entity whose material targets it: adding a rigid entity activates the rigid solver, and so on. Options for an inactive solver are simply unused.
@@ -95,7 +95,7 @@ franka = scene.add_entity(
 )
 ```
 
-- **Morph:** the entity's geometry and initial pose. See {doc}`/user_guide/getting_started/hello_genesis` for loading morphs and the {doc}`morph API </api_reference/entity/morph/index>`.
+- **Morph:** the entity's geometry and initial pose. See {doc}`/user_guide/getting_started/hello_genesis` for loading morphs and the {doc}`morph API </api_reference/engine/entity/morph/index>`.
 - **Material:** how the entity responds to physical forces, and which solver simulates it. See {doc}`/user_guide/physics/beyond_rigid_bodies`.
 - **Surface:** how the entity looks when rendered. See {doc}`/user_guide/rendering/surfaces_textures`.
 

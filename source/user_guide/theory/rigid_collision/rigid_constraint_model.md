@@ -51,7 +51,7 @@ A non-negative multiplier on any edge produces a force whose tangential part is 
 
 The reference acceleration is driven by the penetration depth under either cone, so a deeper contact pushes back harder.
 
-**Torsional and rolling friction.** A point contact transmits no torque, so by default nothing resists a body spinning in place or a ball rolling to rest. Setting `enable_torsional_friction` adds one row per point resisting spin about the normal; `enable_rolling_friction` (which requires torsional friction) adds two more resisting rolling about the tangent axes. Their strength is set per geometry by the `gs.materials.Rigid` coefficients `friction_torsional` and `friction_rolling`, each an effective contact-patch radius in meters, and the coefficient of a contacting pair is the larger of the two geoms' values. These rows cost solve time on every contact, so enable them only when spin or rolling resistance matters.
+**Torsional and rolling friction.** A point contact transmits no torque, so by default nothing resists a body spinning in place or a ball rolling to rest. Setting `enable_torsional_friction` adds one row per point resisting spin about the normal; `enable_rolling_friction` (which requires torsional friction) adds two more resisting rolling about the tangent axes. Their strength is set per geometry by the {py:class}`gs.materials.Rigid <genesis.engine.materials.rigid.Rigid>` coefficients `friction_torsional` and `friction_rolling`, each an effective contact-patch radius in meters, and the coefficient of a contacting pair is the larger of the two geoms' values. These rows cost solve time on every contact, so enable them only when spin or rolling resistance matters.
 
 ### Joint limits
 
@@ -110,7 +110,7 @@ where $\overline{m}$ is the mean inertia, or after `iterations` iterations, whic
 
 ## Key options
 
-These `RigidOptions` fields control the model and the solve. Pass them through `gs.options.RigidOptions` when building the scene.
+These `RigidOptions` fields control the model and the solve. Pass them through {py:class}`gs.options.RigidOptions <genesis.options.solvers.RigidOptions>` when building the scene.
 
 | Option | Default | Effect |
 |---|---|---|

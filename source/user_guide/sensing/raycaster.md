@@ -3,9 +3,9 @@
 A raycaster measures the scene geometrically: it casts a fixed pattern of rays from the sensor's frame, finds where each ray first hits scene geometry, and returns the hit points and their distances. Two concrete sensors share this machinery and differ only in how you interpret the result:
 
 - `gs.sensors.Lidar` returns the raw hit set (a point cloud and per-ray distances) for range sensing, mapping, and obstacle avoidance.
-- `gs.sensors.DepthCamera` casts a pinhole-camera ray grid and reshapes the distances into a depth image.
+- {py:class}`gs.sensors.DepthCamera <genesis.options.sensors.options.DepthCamera>` casts a pinhole-camera ray grid and reshapes the distances into a depth image.
 
-The ray count and directions come from a **pattern** (`gs.sensors.RaycastPattern`). Two runnable examples are the source of truth for this page: a teleoperated sensor mounted on a Go2 in [`examples/sensors/lidar_teleop.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/lidar_teleop.py), and depth cameras on rigid and deforming geometry in [`examples/sensors/depth_camera_custom_vverts.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/depth_camera_custom_vverts.py).
+The ray count and directions come from a **pattern** ({py:class}`gs.sensors.RaycastPattern <genesis.options.sensors.raycaster.RaycastPattern>`). Two runnable examples are the source of truth for this page: a teleoperated sensor mounted on a Go2 in [`examples/sensors/lidar_teleop.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/lidar_teleop.py), and depth cameras on rigid and deforming geometry in [`examples/sensors/depth_camera_custom_vverts.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/depth_camera_custom_vverts.py).
 
 ## Minimal example
 
@@ -52,7 +52,7 @@ Attach a sensor to a link by setting `entity_idx` and `link_idx_local`; the rays
 
 ## Reading data
 
-`read()` returns a `RaycasterReturnType`, a `NamedTuple` of `points` and `distances`:
+`read()` returns a {py:class}`RaycasterReturnType <genesis.engine.sensors.raycaster.RaycasterReturnType>`, a `NamedTuple` of `points` and `distances`:
 
 ```python
 result = lidar.read()
@@ -72,9 +72,9 @@ The pattern decides what the sensor is. All three are constructed under `gs.sens
 
 | Pattern | Ray layout | Typical hardware |
 |---|---|---|
-| `SphericalPattern` | azimuth × elevation scan lines | 3D lidar (Velodyne, Ouster) |
-| `DepthCameraPattern` | pinhole image grid | depth cameras (RealSense, Kinect) |
-| `GridPattern` | parallel rays on a plane | height maps, planar sensing |
+| {py:class}`SphericalPattern <genesis.options.sensors.raycaster.SphericalPattern>` | azimuth × elevation scan lines | 3D lidar (Velodyne, Ouster) |
+| {py:class}`DepthCameraPattern <genesis.options.sensors.raycaster.DepthCameraPattern>` | pinhole image grid | depth cameras (RealSense, Kinect) |
+| {py:class}`GridPattern <genesis.options.sensors.raycaster.GridPattern>` | parallel rays on a plane | height maps, planar sensing |
 
 ### SphericalPattern
 
@@ -89,6 +89,8 @@ gs.sensors.SphericalPattern(
     # angles=(h_angles, v_angles),     # explicit angle arrays; overrides the rest
 )
 ```
+
+**First mention of SphericalPattern:**
 
 To model a real unit, set the fov and ray counts from its datasheet. For example, a Velodyne VLP-16 is `fov=(360.0, 30.0), n_points=(1800, 16)`.
 

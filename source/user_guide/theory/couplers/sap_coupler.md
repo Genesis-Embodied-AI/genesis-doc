@@ -9,7 +9,7 @@ SAP handles two solvers: `Rigid` and `FEM`. For cloth and highly deformable bodi
 SAP coupling imposes three hard requirements. Each is checked at build time and raises if unmet:
 
 - **64-bit precision:** initialize with `precision="64"`. The solver is ill-conditioned in 32-bit and refuses to run.
-- **Implicit FEM solver:** any FEM entity must be simulated with `FEMOptions(use_implicit_solver=True)`.
+- **Implicit FEM solver:** any FEM entity must be simulated with {py:class}`FEMOptions <genesis.options.solvers.FEMOptions>`(use_implicit_solver=True).
 - **Rigid or FEM only:** SAP couples the rigid and FEM solvers. Other solvers (MPM, SPH, PBD) are not supported.
 
 SAP does not support differentiable simulation. Calls into the gradient path raise and direct you to the default coupler.
@@ -30,7 +30,7 @@ scene = gs.Scene(
 )
 ```
 
-Selecting the coupler is a single line: pass `SAPCouplerOptions()` as `coupler_options`. Everything else is a normal Genesis scene. Add FEM entities with an elastic material and step as usual:
+Selecting the coupler is a single line: pass {py:class}`SAPCouplerOptions <genesis.options.solvers.SAPCouplerOptions>`() as `coupler_options`. Everything else is a normal Genesis scene. Add FEM entities with an elastic material and step as usual:
 
 ```python
 sphere = scene.add_entity(
@@ -116,4 +116,4 @@ To hold a target vertex of an FEM body in place (a fixed constraint rather than 
 
 - {doc}`IPC coupler <ipc_coupler>`: barrier-based contact for cloth and highly deformable bodies.
 - {doc}`Solvers and coupling </user_guide/theory/solvers_and_coupling>`: how solvers and couplers fit together.
-- {doc}`FEM options </api_reference/engine/solvers/fem_solver>` and {doc}`FEM elastic material </api_reference/entity/material/fem/elastic>`: configuring the deformable bodies SAP couples.
+- {doc}`FEM options </api_reference/engine/solvers/fem_solver>` and {doc}`FEM elastic material </api_reference/engine/material/fem/elastic>`: configuring the deformable bodies SAP couples.

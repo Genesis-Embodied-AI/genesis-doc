@@ -4,7 +4,7 @@ A rigid body is the default kind of entity in Genesis World: a solid that does n
 
 ## Adding a rigid body
 
-An entity is rigid whenever its `material` is `gs.materials.Rigid`, which is the default, so you usually pass only a {doc}`morph </user_guide/assets/loading_assets>`:
+An entity is rigid whenever its `material` is {py:class}`gs.materials.Rigid <genesis.engine.materials.rigid.Rigid>`, which is the default, so you usually pass only a {doc}`morph </user_guide/assets/loading_assets>`:
 
 ```python
 box = scene.add_entity(gs.morphs.Box(pos=(0, 0, 0.5), size=(0.2, 0.2, 0.2)))
@@ -15,7 +15,7 @@ Both are rigid entities. The box is a single body; the Franka is **articulated**
 
 ## Single bodies and articulated bodies
 
-Every rigid entity is a `RigidEntity`, and you interact with it through its own methods rather than a global handle. An articulated entity exposes its structure:
+Every rigid entity is a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`, and you interact with it through its own methods rather than a global handle. An articulated entity exposes its structure:
 
 - **Links** (`entity.links`, `entity.n_links`): the individual rigid bodies in the tree.
 - **Joints** (`entity.joints`, `entity.n_joints`): the connections between links.

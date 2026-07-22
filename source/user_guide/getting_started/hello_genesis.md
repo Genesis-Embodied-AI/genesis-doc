@@ -44,7 +44,7 @@ For the full set of `gs.init()` arguments (backend selection and fallback, preci
 
 ## Create a scene
 
-Every object, robot, camera, and light lives in a scene (see the {doc}`Scene API </api_reference/scene/scene>`). A scene owns a `simulator` (the physics solvers) and a `visualizer` (everything you see):
+Every object, robot, camera, and light lives in a scene (see the {doc}`Scene API </api_reference/engine/scene>`). A scene owns a `simulator` (the physics solvers) and a `visualizer` (everything you see):
 
 ```python
 scene = gs.Scene()
@@ -68,9 +68,9 @@ Here `dt` is the simulation timestep in seconds, `gravity` points down along `-Z
 
 ## Add entities
 
-Objects and robots are {doc}`entities </api_reference/entity/index>`. Genesis World is object-oriented: you interact with an entity through its own methods and attributes, not through a global handle or id.
+Objects and robots are {doc}`entities </api_reference/engine/entity/index>`. Genesis World is object-oriented: you interact with an entity through its own methods and attributes, not through a global handle or id.
 
-The first argument to `add_entity` is a {doc}`morph </api_reference/entity/morph/index>`: a combined description of an entity's geometry *and* initial pose. You can build a morph from a shape primitive or load one from a file:
+The first argument to `add_entity` is a {doc}`morph </api_reference/engine/entity/morph/index>`: a combined description of an entity's geometry *and* initial pose. You can build a morph from a shape primitive or load one from a file:
 
 ```python
 plane = scene.add_entity(gs.morphs.Plane())
@@ -81,10 +81,10 @@ franka = scene.add_entity(
 
 Shape primitives include `Plane`, `Box`, `Cylinder`, `Sphere`, `Terrain` (see the {doc}`terrain tutorial </user_guide/physics/terrain>`), and `Drone`. Supported file formats include:
 
-- `gs.morphs.MJCF`: MuJoCo `.xml` models
-- `gs.morphs.URDF`: robot descriptions (`.urdf`, and `.xacro`, which is preprocessed automatically)
-- `gs.morphs.USD`: Universal Scene Description (`.usd`, `.usda`, `.usdc`, `.usdz`); see the {doc}`USD import tutorial </user_guide/assets/usd_import>`
-- `gs.morphs.Mesh`: non-articulated meshes (`.obj`, `.stl`, `.glb`, `.gltf`); see {doc}`Conventions </user_guide/configuration/conventions>` for Y-up vs. Z-up handling
+- {py:class}`gs.morphs.MJCF <genesis.options.morphs.MJCF>`: MuJoCo `.xml` models
+- {py:class}`gs.morphs.URDF <genesis.options.morphs.URDF>`: robot descriptions (`.urdf`, and `.xacro`, which is preprocessed automatically)
+- {py:class}`gs.morphs.USD <genesis.options.morphs.USD>`: Universal Scene Description (`.usd`, `.usda`, `.usdc`, `.usdz`); see the {doc}`USD import tutorial </user_guide/assets/usd_import>`
+- {py:class}`gs.morphs.Mesh <genesis.options.morphs.Mesh>`: non-articulated meshes (`.obj`, `.stl`, `.glb`, `.gltf`); see {doc}`Conventions </user_guide/configuration/conventions>` for Y-up vs. Z-up handling
 
 A morph also accepts pose and scale. Orientation is either `euler` (SciPy extrinsic x-y-z, in degrees) or `quat` (`(w, x, y, z)`):
 

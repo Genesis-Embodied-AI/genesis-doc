@@ -7,8 +7,10 @@ Genesis World bundles a set of helper modules under `genesis.utils` for the oper
 - **{doc}`constants`:** enums and named constants for compute backends, joint types, and geometry types.
 - **{doc}`device`:** detecting the platform and selecting the compute backend and PyTorch device.
 - **{doc}`tensor_utils`:** converting between Quadrants fields, PyTorch tensors, and NumPy arrays.
-- **{doc}`geometry`:** quaternion, rotation, and coordinate-transform helpers in `genesis.utils.geom`.
+- **{doc}`geom`:** quaternion, rotation, and coordinate-transform helpers in `genesis.utils.geom`.
+- **{doc}`mesh`:** loading meshes, generating primitives, and tetrahedralizing solids in `genesis.utils.mesh`.
 - **{doc}`file_io`:** cache and source directory paths, plus loading URDF and MJCF descriptions.
+- **{doc}`tools`:** timing loops and saving media in `genesis.utils.tools`.
 
 ## Initialization and globals
 
@@ -40,11 +42,12 @@ After `gs.init()` returns, these globals hold the resolved configuration:
 constants
 device
 tensor_utils
-geometry
+geom
+mesh
 file_io
-options
+tools
 ```
 
 ## See also
 
-- {doc}`options`: the Pydantic base class every configuration object inherits.
+- {doc}`/api_reference/options/index`: the options classes that configure a scene, including the Pydantic base class every one inherits.

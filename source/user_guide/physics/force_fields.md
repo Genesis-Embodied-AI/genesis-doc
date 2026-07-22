@@ -7,7 +7,7 @@ Despite the name, a force field is an **acceleration field**: it contributes an 
 Force fields act only on **particle-based entities** stepped by the PBD and SPH solvers (fluids, cloth, and other particle materials). They do not affect rigid bodies, MPM, or FEM entities. To apply a world force to a rigid body, use its entity API instead.
 
 :::{note}
-No runnable example ships for this feature yet, so the snippet below is illustrative. Every symbol and argument in it is taken from the live API (`gs.force_fields`) and the {doc}`Force field API </api_reference/scene/force_field>`, but the script has not been added to `examples/`.
+No runnable example ships for this feature yet, so the snippet below is illustrative. Every symbol and argument in it is taken from the live API (`gs.force_fields`) and the {doc}`Force field API </api_reference/engine/force_field>`, but the script has not been added to `examples/`.
 :::
 
 ## Minimal example
@@ -108,4 +108,4 @@ scene.add_force_field(gs.force_fields.Custom(swirl))
 
 - {doc}`emitters` for spawning streams of particles that a force field can then push around.
 - {doc}`beyond_rigid_bodies` for an overview of the particle-based solvers force fields act on.
-- {doc}`Force field API </api_reference/scene/force_field>` for the full parameter reference.
+- {doc}`Force field API </api_reference/engine/force_field>` for the full parameter reference.

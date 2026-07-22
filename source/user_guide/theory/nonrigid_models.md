@@ -22,12 +22,12 @@ Several models factor $\mathbf F$ before building a stress. The polar decomposit
 
 An elastic material returns to its rest shape when unloaded: all deformation is stored as recoverable energy. Genesis provides elastic models across three solvers, and the elastic classes are the base that plasticity and muscle models extend.
 
-**`gs.materials.MPM.Elastic`** offers two stress models through its `model` argument:
+**{py:class}`gs.materials.MPM.Elastic <genesis.engine.materials.MPM.elastic.Elastic>`** offers two stress models through its `model` argument:
 
 - **`"corotation"`** (the default): the fixed-corotated model, whose energy penalizes deviation from the nearest rotation, $\psi(\mathbf F) = \mu\,\lVert \mathbf F - \mathbf R\rVert_F^2 + \tfrac{\lambda}{2}(J-1)^2$. It handles large rotations cleanly and is a good default for stiff, chalk-like solids.
 - **`"neohooken"`**: a Neo-Hookean model, $\psi(\mathbf F) = \tfrac{\mu}{2}(\operatorname{tr}(\mathbf F^\top\mathbf F) - 3) - \mu\ln J + \tfrac{\lambda}{2}(\ln J)^2$. It reads $\mathbf F$ and $J$ directly and skips the SVD, so it is cheaper per particle. The accepted literal is spelled `"neohooken"`.
 
-**`gs.materials.FEM.Elastic`** solves elasticity on a tetrahedral mesh and exposes three models, defaulting to `"linear"`:
+**{py:class}`gs.materials.FEM.Elastic <genesis.engine.materials.FEM.elastic.Elastic>`** solves elasticity on a tetrahedral mesh and exposes three models, defaulting to `"linear"`:
 
 ```python
 soft = scene.add_entity(
@@ -40,18 +40,18 @@ soft = scene.add_entity(
 - **`"stable_neohookean"`:** the rest-stable Neo-Hookean formulation. Its energy stays well-defined for inverted or degenerate elements, which makes it the robust choice for large deformation and contact-rich scenes.
 - **`"linear_corotated"`:** linear elasticity evaluated in a per-element rotated frame, recovering correct behavior under large rotation while keeping a linear stress response to stretch.
 
-**`gs.materials.PBD.Elastic`** takes a different route. Position-Based Dynamics does not integrate a stress; it enforces geometric constraints on particle positions. Stiffness is expressed as **compliance** (inverse stiffness) rather than a modulus, with `stretch_compliance`, `bending_compliance`, and `volume_compliance` controlling edge, bending, and volume constraints. In the XPBD formulation a constraint's effective compliance is $\alpha = \text{compliance}/\Delta t^2$, so a compliance of `0.0` is perfectly rigid. Reach for it when speed and stability matter more than physical accuracy.
+**{py:class}`gs.materials.PBD.Elastic <genesis.engine.materials.PBD.elastic.Elastic>`** takes a different route. Position-Based Dynamics does not integrate a stress; it enforces geometric constraints on particle positions. Stiffness is expressed as **compliance** (inverse stiffness) rather than a modulus, with `stretch_compliance`, `bending_compliance`, and `volume_compliance` controlling edge, bending, and volume constraints. In the XPBD formulation a constraint's effective compliance is $\alpha = \text{compliance}/\Delta t^2$, so a compliance of `0.0` is perfectly rigid. Reach for it when speed and stability matter more than physical accuracy.
 
 ## Elastoplasticity: permanent deformation
 
 A plastic material keeps part of its deformation after unloading. Genesis models this by splitting $\mathbf F$ into an elastic part that stores energy and a plastic part that does not. Each step first computes a trial elastic state, then a **return mapping** projects it back onto a yield surface, moving any excess into the permanent plastic part.
 
-**`gs.materials.MPM.ElastoPlastic`** supports two yield criteria through `use_von_mises`:
+**{py:class}`gs.materials.MPM.ElastoPlastic <genesis.engine.materials.MPM.elasto_plastic.ElastoPlastic>`** supports two yield criteria through `use_von_mises`:
 
 - **von Mises (`use_von_mises=True`, the default):** yielding is governed by the deviatoric (shape-changing) part of the Hencky strain $\boldsymbol\varepsilon = \ln\boldsymbol\Sigma$. The material flows once $\lVert \operatorname{dev}\boldsymbol\varepsilon\rVert$ exceeds $\tau_Y / (2\mu)$, where the threshold `von_mises_yield_stress` is $\tau_Y$. This models a metal- or clay-like solid that dents and holds the dent.
 - **Singular-value clamping (`use_von_mises=False`):** the principal stretches are clamped into $[\,1-\texttt{yield\_lower},\ 1+\texttt{yield\_higher}\,]$, capping how far the material may stretch or compress elastically before the rest is made permanent.
 
-**`gs.materials.MPM.Sand`** implements a Drucker-Prager model for cohesionless granular media. Its yield surface is a cone in stress space set by `friction_angle` (degrees): particles resist shear only under confining pressure, so sand piles up to an angle of repose and otherwise flows.
+**{py:class}`gs.materials.MPM.Sand <genesis.engine.materials.MPM.sand.Sand>`** implements a Drucker-Prager model for cohesionless granular media. Its yield surface is a cone in stress space set by `friction_angle` (degrees): particles resist shear only under confining pressure, so sand piles up to an angle of repose and otherwise flows.
 
 ```python
 sand = scene.add_entity(
@@ -60,28 +60,28 @@ sand = scene.add_entity(
 )
 ```
 
-**`gs.materials.MPM.Snow`** is a specialization of `ElastoPlastic` that uses singular-value clamping (it does not support von Mises) and additionally *hardens* as it compacts: the more it is compressed, the stiffer it becomes. This reproduces the way snow packs into a firm, shape-holding solid.
+**{py:class}`gs.materials.MPM.Snow <genesis.engine.materials.MPM.snow.Snow>`** is a specialization of `ElastoPlastic` that uses singular-value clamping (it does not support von Mises) and additionally *hardens* as it compacts: the more it is compressed, the stiffer it becomes. This reproduces the way snow packs into a firm, shape-holding solid.
 
 ## Liquids
 
 Liquids sustain no shear stress at rest; they resist only changes in volume. Three material classes model them, differing in how strictly incompressibility is enforced.
 
-**`gs.materials.MPM.Liquid`** is weakly compressible. Each step it discards the shape of $\mathbf F$, keeping only its volumetric part $J^{1/3}\mathbf I$, so no shear stress accumulates and the material flows freely; pressure comes from the volume change alone. Set `viscous=True` to retain a deviatoric viscous term for a thicker fluid.
+**{py:class}`gs.materials.MPM.Liquid <genesis.engine.materials.MPM.liquid.Liquid>`** is weakly compressible. Each step it discards the shape of $\mathbf F$, keeping only its volumetric part $J^{1/3}\mathbf I$, so no shear stress accumulates and the material flows freely; pressure comes from the volume change alone. Set `viscous=True` to retain a deviatoric viscous term for a thicker fluid.
 
-**`gs.materials.SPH.Liquid`** is a purely particle-based fluid whose pressure follows a Tait equation of state,
+**{py:class}`gs.materials.SPH.Liquid <genesis.engine.materials.SPH.liquid.Liquid>`** is a purely particle-based fluid whose pressure follows a Tait equation of state,
 
 $$p_i = k\left[\left(\frac{\rho_i}{\rho_0}\right)^{n} - 1\right],$$
 
 where $k$ is `stiffness`, $n$ is `exponent`, and $\rho_0$ is the rest density `rho`. It exposes fluid parameters directly: `mu` sets viscosity and `gamma` sets surface tension. Choose SPH when you want a free-surface liquid tuned by physical fluid properties.
 
-**`gs.materials.PBD.Liquid`** enforces a per-particle density constraint positionally rather than through pressure, tuned by `density_relaxation` and `viscosity_relaxation`. It is the fastest liquid model and the least physically precise.
+**{py:class}`gs.materials.PBD.Liquid <genesis.engine.materials.PBD.liquid.Liquid>`** enforces a per-particle density constraint positionally rather than through pressure, tuned by `density_relaxation` and `viscosity_relaxation`. It is the fastest liquid model and the least physically precise.
 
 ## Muscles: active materials
 
 A muscle is an elastic material with an extra, controllable stress. On top of the passive elastic response, it adds an **active stress** along an embedded fiber direction $\mathbf m$, proportional to a per-step actuation signal. Contracting the fiber pulls the body into a new shape; releasing it lets the elastic part restore the rest configuration.
 
-- **`gs.materials.MPM.Muscle`:** actuated per particle; extends `MPM.Elastic` and defaults to the `"neohooken"` passive model.
-- **`gs.materials.FEM.Muscle`:** actuated per tetrahedral element; extends `FEM.Elastic` and defaults to the `"linear"` passive model.
+- **{py:class}`gs.materials.MPM.Muscle <genesis.engine.materials.MPM.muscle.Muscle>`:** actuated per particle; extends `MPM.Elastic` and defaults to the `"neohooken"` passive model.
+- **{py:class}`gs.materials.FEM.Muscle <genesis.engine.materials.FEM.muscle.Muscle>`:** actuated per tetrahedral element; extends `FEM.Elastic` and defaults to the `"linear"` passive model.
 
 Both accept `n_groups` to define independently actuated fiber groups. The end-to-end control loop is covered in {doc}`/user_guide/physics/soft_robots`.
 
@@ -89,8 +89,8 @@ Both accept `n_groups` to define independently actuated fiber groups. The end-to
 
 Cloth is a two-dimensional material: it stretches and bends but has negligible thickness. Two classes model it.
 
-- **`gs.materials.PBD.Cloth`:** a constraint-based sheet with separate `stretch_compliance` and `bending_compliance`. Its `rho` is a surface density in kg/m², and entity mass is `rho` times surface area. This is the fast, interactive option for garments and flags.
-- **`gs.materials.FEM.Cloth`:** a thin-shell FEM material for the IPC contact backend, parameterized by `thickness` (m) and optional `bending_stiffness`. Use it when cloth must resolve accurate, penetration-free contact against other bodies.
+- **{py:class}`gs.materials.PBD.Cloth <genesis.engine.materials.PBD.cloth.Cloth>`:** a constraint-based sheet with separate `stretch_compliance` and `bending_compliance`. Its `rho` is a surface density in kg/m², and entity mass is `rho` times surface area. This is the fast, interactive option for garments and flags.
+- **{py:class}`gs.materials.FEM.Cloth <genesis.engine.materials.FEM.cloth.Cloth>`:** a thin-shell FEM material for the IPC contact backend, parameterized by `thickness` (m) and optional `bending_stiffness`. Use it when cloth must resolve accurate, penetration-free contact against other bodies.
 
 ## Choosing a model
 

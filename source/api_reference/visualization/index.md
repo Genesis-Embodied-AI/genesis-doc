@@ -10,17 +10,7 @@ Genesis World turns a simulation into pixels through two independent paths: an i
 - **Renderers:** the backend that camera sensors use to produce images. Choose one per scene with `gs.Scene(renderer=...)`; the choice does not affect the viewer.
 - **Lights:** the light sources that illuminate a rendered scene.
 
-## Renderer backends
-
-The renderer is selected once for the whole scene and applies to its camera sensors. Pass an instance of one of the `gs.renderers.*` options classes to `gs.Scene(renderer=...)`:
-
-- **`gs.renderers.Rasterizer`:** the default. Fast, non-photorealistic rendering for real-time viewing, control loops, and reinforcement-learning rollouts.
-- **`gs.renderers.RayTracer`:** a path tracer backed by LuisaRender (Luisa), for photorealistic stills. It is being deprecated in favor of Nyx.
-- **`gs.renderers.BatchRenderer`:** high-throughput rendering across many environments in parallel on the GPU, for large-scale data collection.
-
-**Nyx** is a separate photorealistic path tracer, distributed as the `gs-nyx` package. Unlike the backends above, it is not a scene-wide renderer: it attaches per camera as a sensor through `scene.add_sensor(...)`, so one scene can pair fast rasterized cameras with a photorealistic Nyx camera. See {doc}`/user_guide/rendering/nyx_renderer` for details.
-
-For usage, see {doc}`/user_guide/interaction/visualization` for the interactive viewer and {doc}`/user_guide/rendering/index` for camera rendering.
+For the interactive viewer see {doc}`/user_guide/interaction/visualization`, and for camera rendering and choosing a backend see {doc}`/user_guide/rendering/index`.
 
 ## Reference
 
@@ -38,4 +28,4 @@ lights
 
 - {doc}`/user_guide/interaction/visualization`: the interactive viewer and command-line tools
 - {doc}`/user_guide/rendering/index`: cameras, image types, video, and rendering backends
-- {doc}`/api_reference/sensor/camera`: the camera sensor, read through the sensor interface
+- {doc}`/api_reference/engine/sensors/camera`: the camera sensor, read through the sensor interface

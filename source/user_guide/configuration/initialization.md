@@ -1,6 +1,6 @@
 # Initialization and backends
 
-Every Genesis World program begins with a single call to `gs.init()`. It selects the compute backend, fixes the numeric precision, seeds the random number generators, and configures logging: the global state that every scene you build afterward relies on. Call it once, before you construct a `gs.Scene` or any options object. If you skip it, the first API call raises `GenesisException: Genesis hasn't been initialized. Did you call gs.init()?`.
+Every Genesis World program begins with a single call to `gs.init()`. It selects the compute backend, fixes the numeric precision, seeds the random number generators, and configures logging: the global state that every scene you build afterward relies on. Call it once, before you construct a {py:class}`gs.Scene <genesis.engine.scene.Scene>` or any options object. If you skip it, the first API call raises `GenesisException: Genesis hasn't been initialized. Did you call gs.init()?`.
 
 ## Minimal example
 

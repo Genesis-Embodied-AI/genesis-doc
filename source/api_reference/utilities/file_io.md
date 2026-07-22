@@ -2,19 +2,16 @@
 
 Genesis World provides utilities for file operations, path handling, and loading robot/scene descriptions.
 
-## Cache directories
+## Cache and source directories
 
-Genesis World caches compiled kernels and processed assets:
+Genesis World caches compiled kernels and processed assets. These helpers, exposed under `gs.utils`, resolve the cache, source, and asset directories.
 
-```python
-import genesis as gs
-
-# Get cache directory paths
-cache_dir = gs.utils.get_cache_dir()
-gsd_cache = gs.utils.get_gsd_cache_dir()
-
-# Get source directory
-src_dir = gs.utils.get_src_dir()
+```{eval-rst}
+.. autofunction:: genesis.utils.misc.get_cache_dir
+.. autofunction:: genesis.utils.misc.get_gsd_cache_dir
+.. autofunction:: genesis.utils.misc.get_src_dir
+.. autofunction:: genesis.utils.misc.get_assets_dir
+.. autofunction:: genesis.utils.misc.clear_caches
 ```
 
 ## Loading models and meshes
@@ -29,7 +26,7 @@ Robot descriptions and meshes are loaded by passing a file-based morph (`gs.morp
 | DAE | `.dae` | COLLADA |
 | USD | `.usd`, `.usda`, `.usdc`, `.usdz` | Universal Scene Description (via `gs.morphs.USD`) |
 
-For usage, see {doc}`/user_guide/assets/loading_assets`. Each morph and its options are documented under {doc}`/api_reference/entity/morph/file_morph/index`.
+For usage, see {doc}`/user_guide/assets/loading_assets`. Each morph and its options are documented under {doc}`/api_reference/engine/entity/morph/file_morph/index`.
 
 ## Asset paths
 
@@ -42,5 +39,5 @@ Genesis World resolves a morph's `file` in order:
 ## See also
 
 - {doc}`/user_guide/assets/loading_assets`: loading robot descriptions and meshes
-- {doc}`/api_reference/entity/morph/file_morph/index`: File-based morphs
-- {doc}`/api_reference/entity/index`: Entity loading
+- {doc}`/api_reference/engine/entity/morph/file_morph/index`: File-based morphs
+- {doc}`/api_reference/engine/entity/index`: Entity loading

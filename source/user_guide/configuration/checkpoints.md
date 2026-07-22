@@ -4,7 +4,7 @@ A checkpoint is a snapshot of the dynamic state of a scene at one instant: the n
 
 Genesis World exposes two levels of this. The state model is the same underneath; the difference is where the snapshot lives.
 
-- **In memory:** `scene.get_state()` returns a `SimState` object, and `scene.reset(state=...)` writes it back. Fast, and the basis of episode resets in reinforcement learning.
+- **In memory:** `scene.get_state()` returns a {py:class}`SimState <genesis.engine.states.solvers.SimState>` object, and `scene.reset(state=...)` writes it back. Fast, and the basis of episode resets in reinforcement learning.
 - **On disk:** `scene.save_checkpoint(path)` pickles the full physics state to one file, and `scene.load_checkpoint(path)` restores it into a matching scene. Use it to persist a run across processes.
 
 All of these operate on a built scene. Build first, then snapshot.
@@ -141,6 +141,6 @@ with open("state.pkl", "wb") as f:
 ## See also
 
 - {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>`: how state is batched over environments.
-- {doc}`Scene API </api_reference/scene/scene>`: the full signatures of `get_state`, `reset`, `save_checkpoint`, and `load_checkpoint`.
+- {doc}`Scene API </api_reference/engine/scene>`: the full signatures of `get_state`, `reset`, `save_checkpoint`, and `load_checkpoint`.
 </content>
 </invoke>

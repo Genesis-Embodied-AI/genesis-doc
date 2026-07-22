@@ -71,13 +71,29 @@ One or two sentences: what you'll accomplish and the end result.
 **A reference page (a class or a sensor) follows this skeleton. Genesis's API Reference is generated from the source docstrings via autodoc, so the page stays thin and the docstring carries the parameters, returns, and behavior:**
 
 ```
-# Name
+# Name                    -> plain text, never wrapped in backticks (see below)
 
 One sentence: what it is and when to use it, with a link to the How-to in the User Guide.
 
-## <autodoc>   -> `.. autoclass::` the options class, the sensor class, and the return type
+## Options                -> `.. autoclass::` the options class(es)
+## <ObjectName>           -> `.. autoclass::` the built object, under its own heading
 ## See also
 ```
+
+**Page titles are plain text, never backticked.** The H1 becomes the sidebar and cross-reference label, so
+`# Scene` and `# gs.morphs.Box`, not `` # `Scene` ``. Backticked titles make the navigation read unevenly; drop
+the code formatting even when the title names a class or a `gs.*` symbol. (Inline code inside the body keeps its
+backticks as normal.)
+
+**The API Reference mirrors the code.** Its top-level sections correspond to `genesis` subpackages, so the reference tree and import paths line up: the `engine` section mirrors `genesis.engine` (scene, simulator, entities, materials, solvers, couplers, sensors, states), and `visualization`, `recording`, `differentiation`, and `utilities` mirror `genesis.vis`, `genesis.recorders`, `genesis.grad`, and `genesis.utils`. When you add a component, place its page where the code lives, not by theme. Utilities autodoc individual symbols with explicit `.. autofunction::` / `.. autoclass::` rather than `.. automodule:: :members:`, because the global `undoc-members` setting would otherwise surface internal helpers.
+
+**Options come first, the built object below, each under its own heading.** Most components pair an options class the user configures (`RigidOptions`, `IMU`, `Rasterizer`) with the built object the engine constructs from it (`RigidSolver`, `IMUSensor`, the rasterizer backend). On a page that documents both, keep the options class co-located with its object (do not split options into a separate section), and give each its own `##` heading so the reader sees a clear boundary between what to set and what to call:
+
+- **`## Options`** holds the options autoclass(es). Name the heading for the specific class instead when the component takes several option bundles or the options are a minor part of it (e.g. `## Profiling options` on the Scene page, because a Scene is built from a large options bundle).
+- **The built object gets its own heading** below Options, never an autoclass rendered flush under `## Options`. Use the object's class name (`## Simulator`, `## Viewer`) when the object is user-facing; use `## Implementation` when the runtime class is an internal backend fronted by the options as the public API (the renderers).
+- **Catalog pages** that document several objects (the sensor pages) use one `##` heading per item, with the options autoclass then the object autoclass inside it; the autoclass signature boxes provide the separation, so no `## Options` sub-heading is needed there.
+
+A configuration class that is itself the public API with no separate built object (morph, material, surface, texture) stands alone on its own page. An options class that configures a component with no page of its own (the base `Options`, and `ProfilingOptions`, since a scene has no separate profiler object) lives on the top-level `Options` page, which also indexes every co-located options class. Give an options class a page next to its component whenever one exists rather than leaving it on the hub (e.g. `KinematicOptions` sits with the KinematicSolver, `BaseCouplerOptions` on the Couplers page). This convention is explained for readers on the API Reference landing page.
 
 **One page, one job.** If a page is teaching a concept, don't bury an API dump in it. If it's a reference, don't turn it into a tutorial. Link between them instead.
 
@@ -222,8 +238,9 @@ We build with Sphinx + MyST Markdown (`pydata_sphinx_theme`). Use the following,
 - Don't skip levels (no H2 → H4). `myst_heading_anchors` generates anchors down to H4; keep meaningful headings within that depth.
 
 **Cross-references** — prefer Sphinx roles over bare Markdown links for anything inside the docs, so links survive file moves and are checked at build time:
-- Another doc page: `` {doc}`/api_reference/scene/scene` `` (leading `/` = path from `source/`).
-- A Python object: `` {py:class}`genesis.Scene` `` / `` {py:meth}`genesis.Scene.build` `` where autodoc targets exist.
+- Another doc page: `` {doc}`/api_reference/engine/scene` `` (leading `/` = path from `source/`).
+- A Python object: `` {py:class}`genesis.engine.scene.Scene` `` / `` {py:meth}`genesis.engine.scene.Scene.build` `` where autodoc targets exist.
+- **Link the first mention of each API symbol per guide page.** When prose names a public class (`gs.materials.MPM.Muscle`, `gs.options.SimOptions`, `gs.morphs.Box`), link it the first time it appears on the page and leave later repeats as plain inline code. Use the full public name as the display text over the real autodoc target: `` {py:class}`gs.materials.MPM.Muscle <genesis.engine.materials.MPM.muscle.Muscle>` `` (the `gs.*` alias is not itself a resolvable target, so the FQN goes in the angle brackets). Do not link inside code blocks, and do not link backend constants or enum values (`gs.gpu`, `gs.tc_float`, `gs.constraint_solver.Newton`) that are documented as prose rather than autodoc classes.
 - Use a plain Markdown link `[text](https://…)` only for **external** URLs.
 - Never hard-code `https://…/genesis-doc/...` links to our own pages or assets — they break across versions and forks.
 

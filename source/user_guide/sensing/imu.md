@@ -26,7 +26,7 @@ for _ in range(1000):
     acc = data.lin_acc  # m/s^2, shape ([n_envs,] 3)
 ```
 
-`read()` returns an `IMUReturnType` NamedTuple with fields `lin_acc`, `ang_vel`, and `mag`, each a tensor of shape `([n_envs,] 3)` in the sensor body frame. See {doc}`the IMU reference </api_reference/sensor/imu>` for the units and full type.
+`read()` returns an `IMUReturnType` NamedTuple with fields `lin_acc`, `ang_vel`, and `mag`, each a tensor of shape `([n_envs,] 3)` in the sensor body frame. See {doc}`the IMU reference </api_reference/engine/sensors/imu>` for the units and full type.
 
 ## Frame and conventions
 
@@ -78,7 +78,7 @@ imu = scene.add_sensor(
 )
 ```
 
-Each channel takes the same family of knobs: `*_noise` (white-noise standard deviation), `*_bias` (constant offset), `*_random_walk` (drift standard deviation), `*_cross_axis_coupling` (axis misalignment), and `*_resolution` (quantization step), plus the shared `delay` and `jitter` timing. Their exact meanings and defaults are in {doc}`the IMU reference </api_reference/sensor/imu>` and the {doc}`sensors overview <index>`; set them from your target hardware's datasheet.
+Each channel takes the same family of knobs: `*_noise` (white-noise standard deviation), `*_bias` (constant offset), `*_random_walk` (drift standard deviation), `*_cross_axis_coupling` (axis misalignment), and `*_resolution` (quantization step), plus the shared `delay` and `jitter` timing. Their exact meanings and defaults are in {doc}`the IMU reference </api_reference/engine/sensors/imu>` and the {doc}`sensors overview <index>`; set them from your target hardware's datasheet.
 
 The magnetometer also reads a global field, set by `magnetic_field` (default `(0.0, 0.0, 0.5)` T in the world frame) and returned in the body frame.
 
