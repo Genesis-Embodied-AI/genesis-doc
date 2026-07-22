@@ -1,12 +1,12 @@
 # Solvers and coupling
 
-A single Genesis World `Scene` can hold a rigid robot, a pool of water, a pile of sand, and a sheet of cloth at once. It does this by running several physics **solvers** side by side and letting a **coupler** exchange forces wherever materials from different solvers meet. This page explains what each solver models, how they share one scene and one set of state fields, and how coupling moves momentum across material boundaries.
+A single Genesis World {py:class}`Scene <genesis.engine.scene.Scene>` can hold a rigid robot, a pool of water, a pile of sand, and a sheet of cloth at once. It does this by running several physics **solvers** side by side and letting a **coupler** exchange forces wherever materials from different solvers meet. This page explains what each solver models, how they share one scene and one set of state fields, and how coupling moves momentum across material boundaries.
 
 It is a conceptual overview. For the equations each solver integrates, see {doc}`Non-rigid dynamics <nonrigid_models>`; to pick a solver and run it, see {doc}`Beyond rigid bodies </user_guide/physics/beyond_rigid_bodies>`; for the contact backends, see {doc}`Couplers </user_guide/theory/couplers/index>`.
 
 ## The solvers
 
-A **solver** is the set of algorithms that advances one family of materials. You never instantiate a solver directly. You assign a `material` to an entity, and the scene routes that entity to the solver its material belongs to. `gs.materials.MPM.Liquid` goes to the Material Point Method solver; `gs.materials.Rigid` goes to the rigid solver, and so on.
+A **solver** is the set of algorithms that advances one family of materials. You never instantiate a solver directly. You assign a `material` to an entity, and the scene routes that entity to the solver its material belongs to. {py:class}`gs.materials.MPM.Liquid <genesis.engine.materials.MPM.liquid.Liquid>` goes to the Material Point Method solver; {py:class}`gs.materials.Rigid <genesis.engine.materials.rigid.Rigid>` goes to the rigid solver, and so on.
 
 Genesis World ships six physics solvers, each suited to a different representation of matter:
 
@@ -56,11 +56,11 @@ The coupler is selected by the type of `coupler_options` you pass to the scene. 
 
 | Coupler | Options class | Best for | Contact model |
 |---|---|---|---|
-| **Legacy** (default) | `LegacyCouplerOptions` | Particle and grid solvers (MPM, SPH, PBD) and differentiable simulation | Impulse-based |
-| **SAP** | `SAPCouplerOptions` | Accurate rigid-FEM contact, such as grasping deformables | Semi-analytic primal |
-| **IPC** | `IPCCouplerOptions` | Cloth and highly deformable bodies in contact with rigid tools | Barrier-based (Incremental Potential Contact) |
+| **Legacy** (default) | {py:class}`gs.options.LegacyCouplerOptions <genesis.options.solvers.LegacyCouplerOptions>` | Particle and grid solvers (MPM, SPH, PBD) and differentiable simulation | Impulse-based |
+| **SAP** | {py:class}`gs.options.SAPCouplerOptions <genesis.options.solvers.SAPCouplerOptions>` | Accurate rigid-FEM contact, such as grasping deformables | Semi-analytic primal |
+| **IPC** | {py:class}`gs.options.IPCCouplerOptions <genesis.options.solvers.IPCCouplerOptions>` | Cloth and highly deformable bodies in contact with rigid tools | Barrier-based (Incremental Potential Contact) |
 
-All three inherit from `BaseCouplerOptions`. Passing an options object both selects the coupler and configures it:
+All three inherit from {py:class}`gs.options.BaseCouplerOptions <genesis.options.solvers.BaseCouplerOptions>`. Passing an options object both selects the coupler and configures it:
 
 ```python
 import genesis as gs

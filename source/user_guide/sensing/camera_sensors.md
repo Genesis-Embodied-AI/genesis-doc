@@ -35,7 +35,7 @@ scene.build()
 scene.step()
 
 data = camera.read()
-print(data.rgb.shape)  # (600, 500, 3) — (H, W, 3), H and W from res=(W, H)
+print(data.rgb.shape)  # (600, 500, 3) - (H, W, 3), H and W from res=(W, H)
 ```
 
 `add_sensor` returns the sensor object; interact with the camera through it rather than a global handle. The default renderer is the rasterizer, so this runs on any platform without extra setup.
@@ -46,7 +46,7 @@ print(data.rgb.shape)  # (600, 500, 3) — (H, W, 3), H and W from res=(W, H)
 
 ```python
 data = camera.read()
-rgb = data.rgb  # shape ([n_envs,] H, W, 3), dtype uint8, values 0–255
+rgb = data.rgb  # shape ([n_envs,] H, W, 3), dtype uint8, values 0-255
 ```
 
 The image is `(H, W, 3)` with `H = res[1]` and `W = res[0]`. Note that `res` is `(width, height)` but the array is row-major `(height, width)`, matching NumPy image conventions. The leading `n_envs` axis is present only when the scene is built with environments (`scene.build(n_envs=...)`); an unbatched `scene.build()` drops it.
@@ -74,9 +74,9 @@ Three backends render RGB. They share the common options below and differ in spe
 
 | Options class | Backend | Environments | Best for |
 |---|---|---|---|
-| `RasterizerCameraOptions` | OpenGL | sequential | fast real-time rendering on any platform |
-| `RaytracerCameraOptions` | LuisaRender | single environment | photo-realistic offline renders |
-| `BatchRendererCameraOptions` | Madrona (GPU) | parallel | high-throughput RL training (CUDA only) |
+| {py:class}`RasterizerCameraOptions <genesis.options.sensors.camera.RasterizerCameraOptions>` | OpenGL | sequential | fast real-time rendering on any platform |
+| {py:class}`RaytracerCameraOptions <genesis.options.sensors.camera.RaytracerCameraOptions>` | LuisaRender | single environment | photo-realistic offline renders |
+| {py:class}`BatchRendererCameraOptions <genesis.options.sensors.camera.BatchRendererCameraOptions>` | Madrona (GPU) | parallel | high-throughput RL training (CUDA only) |
 
 Select a backend by choosing the matching options class; no separate scene `renderer` argument is required for the rasterizer. For photo-realistic path tracing, prefer the Nyx renderer described in {doc}`/user_guide/rendering/nyx_renderer`.
 

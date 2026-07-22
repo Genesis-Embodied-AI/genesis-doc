@@ -95,13 +95,13 @@ scene = gs.Scene(
 
 Two light types are available:
 
-- **`DirectionalLight`:** parallel rays from a fixed direction, like sunlight. Set `dir` (the direction the light travels), `color`, and `intensity`. Position does not matter.
-- **`PointLight`:** light radiating outward from a point. Set `pos`, `color`, and `intensity`.
+- **{py:class}`DirectionalLight <genesis.options.vis.DirectionalLight>`:** parallel rays from a fixed direction, like sunlight. Set `dir` (the direction the light travels), `color`, and `intensity`. Position does not matter.
+- **{py:class}`PointLight <genesis.options.vis.PointLight>`:** light radiating outward from a point. Set `pos`, `color`, and `intensity`.
 
 Ambient light is a separate, uniform fill set through the `ambient_light` field rather than an entry in `lights`.
 
 :::{note}
-This controls the rasterizer only. The ray tracer has no light objects: lights there are entities with an `Emission` surface, covered in {doc}`Surfaces and textures <surfaces_textures>`. The `BatchRenderer` backend instead takes lights at runtime through `scene.add_light(...)`.
+This controls the rasterizer only. The ray tracer has no light objects: lights there are entities with an {py:class}`Emission <genesis.options.surfaces.Emission>` surface, covered in {doc}`Surfaces and textures <surfaces_textures>`. The `BatchRenderer` backend instead takes lights at runtime through `scene.add_light(...)`.
 :::
 
 ## Rendering backends
@@ -179,6 +179,21 @@ Then run the bundled example, which writes frames to `./image_output`:
 
 ```bash
 python examples/rigid/single_franka_batch_render.py
+```
+
+Unlike the rasterizer, the batch renderer takes its lights at runtime through `scene.add_light(...)` after the scene is created, rather than from `VisOptions`:
+
+```python
+scene.add_light(
+    pos=(0.0, 0.0, 10.0),   # position, used for positional lights
+    dir=(0.0, 0.0, -1.0),   # direction the light travels, normalized internally
+    color=(1.0, 1.0, 1.0),  # RGB, each channel in [0, 1]
+    intensity=1.0,
+    directional=True,       # parallel rays if True, positional if False
+    castshadow=True,
+    cutoff=45.0,            # spotlight cutoff angle, degrees
+    attenuation=0.0,        # distance falloff for positional lights
+)
 ```
 
 ## See also

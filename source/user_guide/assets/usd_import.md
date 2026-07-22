@@ -1,6 +1,6 @@
 # Importing USD assets
 
-[Universal Scene Description (USD)](https://openusd.org/) is Pixar's open framework for describing and composing 3D scenes. Genesis World imports USD files (`.usd`, `.usda`, `.usdc`, `.usdz`) through `gs.morphs.USD`, reading geometry, materials, and `UsdPhysics` joint definitions. A single file may hold one articulated robot, one rigid object, or a whole environment of many entities, like the assets that NVIDIA Isaac Sim and similar tools export.
+[Universal Scene Description (USD)](https://openusd.org/) is Pixar's open framework for describing and composing 3D scenes. Genesis World imports USD files (`.usd`, `.usda`, `.usdc`, `.usdz`) through {py:class}`gs.morphs.USD <genesis.options.morphs.USD>`, reading geometry, materials, and `UsdPhysics` joint definitions. A single file may hold one articulated robot, one rigid object, or a whole environment of many entities, like the assets that NVIDIA Isaac Sim and similar tools export.
 
 Two runnable examples are the source of truth for this page:
 
@@ -51,7 +51,7 @@ for _ in range(1000):
     scene.step()
 ```
 
-`add_stage` returns a `list` of the {doc}`entities </api_reference/entity/index>` it created, one per rigid body or articulation found in the file. The refrigerator is a single articulation, so the list has one element; a room scene returns many. See {doc}`/user_guide/getting_started/hello_genesis` for the initialize / scene / build / step lifecycle that every Genesis World program shares.
+`add_stage` returns a `list` of the {doc}`entities </api_reference/engine/entity/index>` it created, one per rigid body or articulation found in the file. The refrigerator is a single articulation, so the list has one element; a room scene returns many. See {doc}`/user_guide/getting_started/hello_genesis` for the initialize / scene / build / step lifecycle that every Genesis World program shares.
 
 ## `add_stage` vs. `add_entity`
 
@@ -179,4 +179,4 @@ If you see a `Baking process failed: ...` warning, the usual causes are an unacc
 - {doc}`/user_guide/configuration/conventions`: coordinate frame, units, and Y-up ↔ Z-up handling.
 - {doc}`/user_guide/getting_started/control_your_robot` and {doc}`/user_guide/robot_control/inverse_kinematics_motion_planning`: actuating and planning for a USD-loaded articulation.
 - {doc}`/user_guide/getting_started/parallel_simulation`: running USD assets across many environments on the GPU.
-- {doc}`/api_reference/options/morph/index`: the full `gs.morphs` reference, including every `USD` option.
+- {doc}`/api_reference/engine/entity/morph/index`: the full `gs.morphs` reference, including every `USD` option.

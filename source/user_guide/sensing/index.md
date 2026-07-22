@@ -58,17 +58,17 @@ contact_batch = data[gs.sensors.types.Contact]
 
 ## Sensor types
 
-Each family has its own page. The `read()` return types and shapes below are the per-sensor outputs; the bulk `read_sensors()` tensors flatten these along the last axis.
+Each family has its own page. Pick by what you need to measure; the `read()` return types and shapes are cataloged in {doc}`the sensor reference </api_reference/engine/sensors/index>`.
 
-| Page | Options classes (`gs.sensors.*`) | Measures | `read()` returns |
-|---|---|---|---|
-| {doc}`imu` | `IMU` | linear acceleration, angular velocity, magnetic field | `IMUReturnType(lin_acc, ang_vel, mag)`, each `([n_envs,] 3)` |
-| {doc}`contact` | `Contact`, `ContactForce`, `JointTorque` | contact state, net force, joint effort | bool `([n_envs,] 1)`; force `([n_envs,] 3)`; effort `([n_envs,] n_dofs)` |
-| {doc}`tactile` | `ContactProbe`, `ContactDepthProbe`, `KinematicTaxel`, `ElastomerTaxel`, `ProximityTaxel` | per-probe contact state/depth, per-taxel force/torque and displacement | bool / depth `([n_envs,] n_probes)`; per-taxel `force`/`torque` `([n_envs,] n_probes, 3)` |
-| {doc}`raycaster` | `Lidar` (alias of `Raycaster`), `DepthCamera` | ray-hit points and distances | `RaycasterReturnType(points, distances)`: points `([n_envs,] *pattern_shape, 3)`, distances `([n_envs,] *pattern_shape)` |
-| {doc}`camera_sensors` | `RasterizerCameraOptions`, `RaytracerCameraOptions`, `BatchRendererCameraOptions` | rendered RGB images | `CameraReturnType(rgb)`, shape `([n_envs,] height, width, 3)` |
-| {doc}`surface_distance` | `SurfaceDistanceProbe` | nearest distance from probes to tracked mesh surfaces | distances `([n_envs,] n_probes)`; `sensor.nearest_points` `([n_envs,] n_probes, 3)` |
-| {doc}`temperature_grid` | `TemperatureGrid` | per-cell temperature in Celsius over a voxel grid | `([n_envs,] grid_x, grid_y, grid_z)` |
+| Page | Options classes (`gs.sensors.*`) | Measures |
+|---|---|---|
+| {doc}`imu` | {py:class}`IMU <genesis.options.sensors.options.IMU>` | linear acceleration, angular velocity, magnetic field |
+| {doc}`contact` | {py:class}`Contact <genesis.options.sensors.options.Contact>`, {py:class}`ContactForce <genesis.options.sensors.options.ContactForce>`, {py:class}`JointTorque <genesis.options.sensors.options.JointTorque>` | contact state, net force, joint effort |
+| {doc}`tactile` | {py:class}`ContactProbe <genesis.options.sensors.tactile.ContactProbe>`, {py:class}`ContactDepthProbe <genesis.options.sensors.tactile.ContactDepthProbe>`, {py:class}`KinematicTaxel <genesis.options.sensors.tactile.KinematicTaxel>`, {py:class}`ElastomerTaxel <genesis.options.sensors.tactile.ElastomerTaxel>`, {py:class}`ProximityTaxel <genesis.options.sensors.tactile.ProximityTaxel>` | per-probe contact state/depth, per-taxel force/torque and displacement |
+| {doc}`raycaster` | `Lidar` (alias of {py:class}`Raycaster <genesis.options.sensors.options.Raycaster>`), {py:class}`DepthCamera <genesis.options.sensors.options.DepthCamera>` | ray-hit points and distances |
+| {doc}`camera_sensors` | {py:class}`RasterizerCameraOptions <genesis.options.sensors.camera.RasterizerCameraOptions>`, {py:class}`RaytracerCameraOptions <genesis.options.sensors.camera.RaytracerCameraOptions>`, {py:class}`BatchRendererCameraOptions <genesis.options.sensors.camera.BatchRendererCameraOptions>` | rendered RGB images |
+| {doc}`surface_distance` | {py:class}`SurfaceDistanceProbe <genesis.options.sensors.options.SurfaceDistanceProbe>` | nearest distance from probes to tracked mesh surfaces |
+| {doc}`temperature_grid` | {py:class}`TemperatureGrid <genesis.options.sensors.options.TemperatureGrid>` | per-cell temperature over a voxel grid |
 
 Runnable examples for every sensor live under `examples/sensors/`.
 

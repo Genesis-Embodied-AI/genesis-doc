@@ -1,70 +1,6 @@
 # Creation operations
 
-Functions for creating Genesis World tensors that are compatible with differentiable simulation.
-
-## Overview
-
-When working with differentiable simulation, use these functions to create tensors that properly integrate with the gradient system.
-
-## Creating tensors
-
-### From Python values
-
-```python
-import genesis as gs
-import torch
-
-gs.init()
-
-# Create tensor on correct device
-tensor = torch.tensor([1.0, 2.0, 3.0], device=gs.device, dtype=gs.tc_float)
-
-# With gradient tracking
-tensor = torch.tensor(
-    [1.0, 2.0, 3.0],
-    device=gs.device,
-    dtype=gs.tc_float,
-    requires_grad=True,
-)
-```
-
-### Zeros/ones
-
-```python
-# Create zero tensor
-zeros = torch.zeros(10, device=gs.device, dtype=gs.tc_float)
-
-# Create ones tensor
-ones = torch.ones(10, device=gs.device, dtype=gs.tc_float)
-
-# With gradient tracking
-zeros_grad = torch.zeros(10, device=gs.device, dtype=gs.tc_float, requires_grad=True)
-```
-
-### Random tensors
-
-```python
-# Random uniform [0, 1)
-rand = torch.rand(10, device=gs.device, dtype=gs.tc_float)
-
-# Random normal
-randn = torch.randn(10, device=gs.device, dtype=gs.tc_float)
-```
-
-## Converting to Genesis World tensors
-
-Standard PyTorch tensors become Genesis World tensors when combined with scene state:
-
-```python
-# Standard PyTorch tensor
-external = torch.tensor([1.0, 2.0, 3.0], device=gs.device, requires_grad=True)
-
-# Combine with scene state -> Genesis World tensor
-pos = robot.get_pos()
-combined = pos + external  # Result is Genesis World tensor
-```
-
-## API reference
+Tensor-creation functions in `genesis.grad.creation_ops` that produce Genesis World tensors compatible with differentiable simulation. For the workflow, see {doc}`/user_guide/theory/differentiable_simulation`.
 
 ```{eval-rst}
 .. automodule:: genesis.grad.creation_ops
@@ -75,5 +11,5 @@ combined = pos + external  # Result is Genesis World tensor
 
 ## See also
 
-- {doc}`tensor`: Genesis World Tensor class
-- {doc}`index`: Differentiable simulation overview
+- {doc}`tensor`: the differentiable tensor class.
+- {doc}`/user_guide/theory/differentiable_simulation`: the differentiable-simulation workflow.

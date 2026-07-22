@@ -1,6 +1,6 @@
 # Surface distance
 
-`gs.sensors.SurfaceDistanceProbe` reports the nearest distance from one or more probe points to the mesh surfaces of a set of tracked rigid links. Each probe is mounted in the local frame of a link and moves with it, so the sensor answers "how close is this point on my robot to those objects?" as the scene evolves.
+{py:class}`gs.sensors.SurfaceDistanceProbe <genesis.options.sensors.options.SurfaceDistanceProbe>` reports the nearest distance from one or more probe points to the mesh surfaces of a set of tracked rigid links. Each probe is mounted in the local frame of a link and moves with it, so the sensor answers "how close is this point on my robot to those objects?" as the scene evolves.
 
 The complete script is [`examples/sensors/surface_distance_shadowhand.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/surface_distance_shadowhand.py), which mounts probes on the palm and fingertips of a Shadow Hand and measures distance to a duck mesh and a box under keyboard teleoperation.
 
@@ -56,7 +56,7 @@ points = sensor.nearest_points  # shape ([n_envs,] n_probes, 3), world frame
 
 Both leading dimensions follow the batched-optional convention: the `[n_envs,]` axis is present only when the scene is built with multiple environments. `nearest_points` is written on each step, so read it after at least one `scene.step()`; before the first step it holds zeros.
 
-<video preload="auto" controls="True" width="100%" aria-label="Shadow Hand with proximity probes on its palm and fingertips; lines connect each probe to the nearest point on a tracked duck mesh and box as the hand moves">
+<video preload="auto" controls="True" width="100%" aria-label="Shadow Hand with surface-distance probes on its palm and fingertips; lines connect each probe to the nearest point on a tracked duck mesh and box as the hand moves">
 <source src="../../_static/videos/proximity.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>

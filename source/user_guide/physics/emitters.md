@@ -40,7 +40,7 @@ for i in range(500):
 
 ## Add the emitter
 
-`scene.add_emitter()` must run before `scene.build()`, like any other entity. It allocates the particle entity and returns an {doc}`Emitter </api_reference/entity/emitter>` handle you call each step:
+`scene.add_emitter()` must run before `scene.build()`, like any other entity. It allocates the particle entity and returns an {doc}`Emitter </api_reference/engine/entity/emitter>` handle you call each step:
 
 ```python
 emitter = scene.add_emitter(
@@ -50,7 +50,7 @@ emitter = scene.add_emitter(
 )
 ```
 
-- `material` selects the solver and the physical behavior. It must be one of `gs.materials.MPM.Base`, `gs.materials.SPH.Base`, `gs.materials.PBD.Particle`, or `gs.materials.PBD.Liquid` (or a subclass: `SPH.Liquid`, `MPM.Liquid`, `MPM.Sand`, `PBD.Liquid`). Passing an unsupported material raises at `add_emitter` time.
+- `material` selects the solver and the physical behavior. Pass any MPM or SPH material — for example {py:class}`gs.materials.SPH.Liquid <genesis.engine.materials.SPH.liquid.Liquid>`, {py:class}`gs.materials.MPM.Liquid <genesis.engine.materials.MPM.liquid.Liquid>`, or {py:class}`gs.materials.MPM.Sand <genesis.engine.materials.MPM.sand.Sand>` — or one of {py:class}`gs.materials.PBD.Particle <genesis.engine.materials.PBD.particle.Particle>` and {py:class}`gs.materials.PBD.Liquid <genesis.engine.materials.PBD.liquid.Liquid>`. Any other material raises at `add_emitter` time.
 - `max_particles` caps how many particles the emitter holds. Once emission reaches the cap, the oldest particles are recycled, so a long-running stream stays bounded in memory. Default is `20000`.
 - `surface` controls appearance only. If omitted, the emitter uses `gs.surfaces.Default(color=(0.6, 0.8, 1.0, 1.0))`. `vis_mode="visual"` is not supported for emitters; use the default `"particle"`, or `"recon"` to render a reconstructed fluid surface.
 

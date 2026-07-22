@@ -10,43 +10,7 @@ Genesis World turns a simulation into pixels through two independent paths: an i
 - **Renderers:** the backend that camera sensors use to produce images. Choose one per scene with `gs.Scene(renderer=...)`; the choice does not affect the viewer.
 - **Lights:** the light sources that illuminate a rendered scene.
 
-## Renderer backends
-
-The renderer is selected once for the whole scene and applies to its camera sensors. Pass an instance of one of the `gs.renderers.*` options classes to `gs.Scene(renderer=...)`:
-
-- **`gs.renderers.Rasterizer`:** the default. Fast, non-photorealistic rendering for real-time viewing, control loops, and reinforcement-learning rollouts.
-- **`gs.renderers.RayTracer`:** a path tracer backed by LuisaRender (Luisa), for photorealistic stills. It is being deprecated in favor of Nyx.
-- **`gs.renderers.BatchRenderer`:** high-throughput rendering across many environments in parallel on the GPU, for large-scale data collection.
-
-**Nyx** is a separate photorealistic path tracer, distributed as the `gs-nyx` package. Unlike the backends above, it is not a scene-wide renderer: it attaches per camera as a sensor through `scene.add_sensor(...)`, so one scene can pair fast rasterized cameras with a photorealistic Nyx camera. See {doc}`/user_guide/rendering/nyx_renderer` for details.
-
-## Minimal example
-
-```python
-import genesis as gs
-
-gs.init()
-
-scene = gs.Scene(
-    vis_options=gs.options.VisOptions(
-        show_world_frame=True,
-    ),
-    viewer_options=gs.options.ViewerOptions(
-        camera_pos=(3.0, 0.0, 2.0),
-        camera_lookat=(0.0, 0.0, 0.5),
-    ),
-    show_viewer=True,
-    # renderer defaults to gs.renderers.Rasterizer()
-)
-
-scene.add_entity(gs.morphs.Plane())
-scene.add_entity(gs.morphs.Box(pos=(0.0, 0.0, 0.5), size=(1.0, 1.0, 1.0)))
-scene.build()
-
-for _ in range(1000):
-    scene.step()
-    scene.visualizer.update()  # refresh the viewer and camera sensors
-```
+For the interactive viewer see {doc}`/user_guide/interaction/visualization`, and for camera rendering and choosing a backend see {doc}`/user_guide/rendering/index`.
 
 ## Reference
 
@@ -64,4 +28,4 @@ lights
 
 - {doc}`/user_guide/interaction/visualization`: the interactive viewer and command-line tools
 - {doc}`/user_guide/rendering/index`: cameras, image types, video, and rendering backends
-- {doc}`/api_reference/sensor/camera`: the camera sensor, read through the sensor interface
+- {doc}`/api_reference/engine/sensors/camera`: the camera sensor, read through the sensor interface

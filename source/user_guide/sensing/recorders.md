@@ -87,18 +87,18 @@ Pass any of these to `start_recording` as the recorder options. All are exported
 
 | Recorder | Writes | Notes |
 |---|---|---|
-| `NPZFile` | `.npz` | Buffers everything and writes once at stop. Handles arrays and dicts of arrays. |
-| `CSVFile` | `.csv` | One row per sample. Pass `header` to name columns; `save_every_write=True` to flush continuously. |
-| `VideoFile` | `.mp4` | Streams frames straight to file via PyAV. Data must be a `[H, W]` or `[H, W, 3]` `uint8` image. |
+| {py:class}`NPZFile <genesis.options.recorders.NPZFile>` | `.npz` | Buffers everything and writes once at stop. Handles arrays and dicts of arrays. |
+| {py:class}`CSVFile <genesis.options.recorders.CSVFile>` | `.csv` | One row per sample. Pass `header` to name columns; `save_every_write=True` to flush continuously. |
+| {py:class}`VideoFile <genesis.options.recorders.VideoFile>` | `.mp4` | Streams frames straight to file via PyAV. Data must be a `[H, W]` or `[H, W, 3]` `uint8` image. |
 
 **Plotters** visualize data live, and can also save the animation via `save_to_filename`:
 
 | Recorder | Shows | Data shape |
 |---|---|---|
-| `PyQtLinePlot` | Live line plot (PyQtGraph) | scalars, tuples, or dicts of them |
-| `MPLLinePlot` | Live line plot (matplotlib) | scalars, tuples, or dicts of them |
-| `MPLImagePlot` | Live image | `(H, W)`, `(H, W, 1/3/4)` |
-| `MPLVectorFieldPlot` | 3D vectors projected to a plane, colored by magnitude | `(N, 3)` at fixed `positions` |
+| {py:class}`PyQtLinePlot <genesis.options.recorders.PyQtLinePlot>` | Live line plot (PyQtGraph) | scalars, tuples, or dicts of them |
+| {py:class}`MPLLinePlot <genesis.options.recorders.MPLLinePlot>` | Live line plot (matplotlib) | scalars, tuples, or dicts of them |
+| {py:class}`MPLImagePlot <genesis.options.recorders.MPLImagePlot>` | Live image | `(H, W)`, `(H, W, 1/3/4)` |
+| {py:class}`MPLVectorFieldPlot <genesis.options.recorders.MPLVectorFieldPlot>` | 3D vectors projected to a plane, colored by magnitude | `(N, 3)` at fixed `positions` |
 
 `PyQtGraph` and `matplotlib` are optional dependencies. The example probes for them and falls back gracefully. See `IS_PYQTGRAPH_AVAILABLE` / `IS_MATPLOTLIB_AVAILABLE` in `genesis.recorders.plotters`.
 

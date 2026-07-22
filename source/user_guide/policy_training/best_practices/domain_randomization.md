@@ -57,7 +57,7 @@ robot.set_dofs_armature(0.01 + 0.02 * torch.rand(scene.n_envs, robot.n_dofs), mo
 `set_dofs_kp` and `set_dofs_kv` set the position and velocity gains of the PD controller; `set_dofs_armature` sets the reflected motor inertia, which stabilizes stiff joints. The second positional argument is `dofs_idx_local`, the entity-local dof indices to update, matching the `motors_dof_idx` you build from joint names.
 
 :::{warning}
-Per-environment dof gains require batched dof info. The controller gains live in the model's static info fields, which are stored per environment only when the scene is built with the corresponding option. Enable it in `RigidOptions`:
+Per-environment dof gains require batched dof info. The controller gains live in the model's static info fields, which are stored per environment only when the scene is built with the corresponding option. Enable it in {py:class}`RigidOptions <genesis.options.solvers.RigidOptions>`:
 
 ```python
 scene = gs.Scene(

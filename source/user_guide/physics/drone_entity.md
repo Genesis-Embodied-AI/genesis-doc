@@ -1,8 +1,8 @@
 # Drone entity
 
-A `DroneEntity` is a quadrotor whose actuation is its four propeller speeds. Unlike a robot arm, you do not command joint torques or positions; you set each propeller's angular velocity in **RPM** (revolutions per minute), and Genesis World converts those speeds into the aerodynamic forces that lift and steer the drone.
+A {py:class}`DroneEntity <genesis.engine.entities.drone_entity.DroneEntity>` is a quadrotor whose actuation is its four propeller speeds. Unlike a robot arm, you do not command joint torques or positions; you set each propeller's angular velocity in **RPM** (revolutions per minute), and Genesis World converts those speeds into the aerodynamic forces that lift and steer the drone.
 
-This page explains that RPM-to-motion mapping and how to drive it. It uses the Crazyflie 2.X model that ships with Genesis World. For the class API, see the {doc}`DroneEntity reference </api_reference/entity/drone_entity>`.
+This page explains that RPM-to-motion mapping and how to drive it. It uses the Crazyflie 2.X model that ships with Genesis World. For the class API, see the {doc}`DroneEntity reference </api_reference/engine/entity/drone_entity>`.
 
 ## How propeller RPM becomes motion
 
@@ -32,7 +32,7 @@ import genesis as gs
 gs.init(backend=gs.cpu)
 
 scene = gs.Scene(
-    sim_options=gs.options.SimOptions(dt=0.01),  # gravity defaults to (0, 0, -9.81) m/s²
+    sim_options=gs.options.SimOptions(dt=0.01),  # gravity defaults to (0, 0, -9.81) m/s2
 )
 scene.add_entity(gs.morphs.Plane())
 drone = scene.add_entity(
@@ -51,7 +51,7 @@ The hover RPM is model-specific; it is the value at which `4 · KF · rpm²` equ
 
 ## The drone morph
 
-The morph is a URDF loaded through `gs.morphs.Drone`. The defaults match the Crazyflie model, so `file` and `pos` are usually all you need:
+The morph is a URDF loaded through {py:class}`gs.morphs.Drone <genesis.options.morphs.Drone>`. The defaults match the Crazyflie model, so `file` and `pos` are usually all you need:
 
 ```python
 drone = scene.add_entity(
@@ -136,4 +136,4 @@ drone.set_propellers_rpm(rpms)
 
 - {doc}`Training a drone to hover </user_guide/policy_training/examples/hover_env>`: a complete reinforcement-learning environment built on this entity.
 - {doc}`Training locomotion policies </user_guide/policy_training/examples/locomotion>`: the same training workflow applied to legged robots.
-- {doc}`DroneEntity reference </api_reference/entity/drone_entity>`: the full class API.
+- {doc}`DroneEntity reference </api_reference/engine/entity/drone_entity>`: the full class API.

@@ -41,7 +41,44 @@ gs.unregister_external_module(my_init, my_destroy)
 Because the two callables identify the registration, pass named functions (or hold onto the references) rather than throwaway lambdas, otherwise you cannot unregister them later.
 :::
 
+## Writing a custom recorder
+
+The built-in file writers and plotters cover most needs, but you can capture data any way you like by subclassing `genesis.recorders.Recorder` and passing your options to `scene.start_recording`. A recorder follows a five-method lifecycle driven by the scene, not called directly:
+
+1. **`__init__`** configures the recorder from its options.
+2. **`build()`** initializes resources (called during `scene.build()`).
+3. **`process(data, cur_time)`** handles each sampled value during recording.
+4. **`cleanup()`** finalizes and releases resources (called when recording stops).
+5. **`reset(envs_idx=None)`** resets state for a new episode.
+
+```python
+import genesis as gs
+from genesis.recorders import Recorder
+
+class MyRecorder(Recorder):
+    def __init__(self, manager, options, data_func):
+        super().__init__(manager, options, data_func)
+        self.data_buffer = []
+
+    def build(self):
+        super().build()
+        self.data_buffer = []
+
+    def process(self, data, cur_time):
+        self.data_buffer.append({"time": cur_time, "data": data})
+
+    def cleanup(self):
+        print(f"Recorded {len(self.data_buffer)} samples")
+        self.data_buffer = []
+
+    def reset(self, envs_idx=None):
+        self.data_buffer = []
+```
+
+For the recording workflow and the built-in recorders, see {doc}`/user_guide/sensing/recorders`.
+
 ## See also
 
 - {doc}`/user_guide/configuration/initialization`: what `gs.init()` and `gs.destroy()` do.
 - {doc}`/user_guide/sensing/custom_sensors/index`: writing a custom sensor, another extension point.
+- {doc}`/api_reference/recording/recorder`: the `Recorder` base-class reference.

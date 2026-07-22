@@ -4,8 +4,8 @@ A soft robot is a deformable body with **muscle fibers** embedded in it. Instead
 
 Genesis World simulates muscles with two deformable solvers, and you pick one through the entity's material:
 
-- `gs.materials.MPM.Muscle`: the Material Point Method solver, actuated per **particle**.
-- `gs.materials.FEM.Muscle`: the Finite Element Method solver, actuated per tetrahedral **element**.
+- {py:class}`gs.materials.MPM.Muscle <genesis.engine.materials.MPM.muscle.Muscle>`: the Material Point Method solver, actuated per **particle**.
+- {py:class}`gs.materials.FEM.Muscle <genesis.engine.materials.FEM.muscle.Muscle>`: the Finite Element Method solver, actuated per tetrahedral **element**.
 
 Both share the same control interface, so you can swap solvers without rewriting your control loop. The {doc}`beyond_rigid_bodies` tutorial covers the underlying solvers in more depth.
 
@@ -25,7 +25,7 @@ Only two things distinguish a soft robot from an ordinary deformable body. First
 
 ```python
 E, nu = 3.0e4, 0.45  # Young's modulus (Pa) and Poisson ratio
-rho = 1000.0  # density, kg/m³
+rho = 1000.0  # density, kg/m3
 
 robot_mpm = scene.add_entity(
     morph=gs.morphs.Sphere(pos=(0.5, 0.2, 0.3), radius=0.1),
@@ -110,7 +110,7 @@ scene.build(n_envs=3)
 The worm example carves the body into upper/lower and fore/hind quarters by particle position, then points every fiber along `+Y`:
 
 ```python
-pos = worm.get_state().pos[0]  # ([n_envs,] n_particles, 3) — take env 0
+pos = worm.get_state().pos[0]  # ([n_envs,] n_particles, 3) - take env 0
 n_units = worm.n_particles  # FEM instead uses worm.n_elements
 
 pos_max, pos_min = pos.max(dim=0).values, pos.min(dim=0).values
@@ -148,7 +148,7 @@ The full script is [`examples/tutorials/advanced_worm.py`](https://github.com/Ge
 
 ## Hybrid rigid-soft robots
 
-A hybrid robot drives a soft outer skin with a rigid inner skeleton: the skeleton carries the degrees of freedom, and the skin deforms around it. Build one with `gs.materials.Hybrid`, which pairs a `gs.materials.Rigid` skeleton with a soft material that must be `gs.materials.MPM.Muscle`:
+A hybrid robot drives a soft outer skin with a rigid inner skeleton: the skeleton carries the degrees of freedom, and the skin deforms around it. Build one with {py:class}`gs.materials.Hybrid <genesis.engine.materials.hybrid.Hybrid>`, which pairs a {py:class}`gs.materials.Rigid <genesis.engine.materials.rigid.Rigid>` skeleton with a soft material that must be `gs.materials.MPM.Muscle`:
 
 ```python
 robot = scene.add_entity(

@@ -6,7 +6,7 @@ Hibernation builds on **contact islands**: the rigid solver partitions each step
 
 ## Enabling hibernation
 
-Hibernation is a rigid-solver option, off by default. Turn it on through `gs.options.RigidOptions`:
+Hibernation is a rigid-solver option, off by default. Turn it on through {py:class}`gs.options.RigidOptions <genesis.options.solvers.RigidOptions>`:
 
 ```python
 import genesis as gs
@@ -56,4 +56,4 @@ As bodies settle, `n_awake` drops and the step rate climbs.
 - The runnable example [`examples/rigid/hibernation.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/hibernation.py) drops a grid of objects and plots the step rate against the awake-body count as they settle.
 - {doc}`/user_guide/theory/solvers_and_coupling`: how the rigid solver partitions and integrates the scene.
 - {doc}`/user_guide/developers/profiling`: measuring simulation throughput.
-- {doc}`/api_reference/options/simulator_coupler_and_solver_options/rigid_options`: the full `RigidOptions` reference.
+- {doc}`/api_reference/engine/solvers/rigid_solver`: the full `RigidOptions` reference.

@@ -38,16 +38,11 @@ gs.init(backend=gs.metal)   # Apple Metal
 gs.init(backend=gs.cpu)     # CPU fallback
 ```
 
-## Random seed
+## Functions
 
-```python
-import genesis as gs
-
-# Set random seed for reproducibility
-gs.init(seed=42)
-
-# Or set later
-gs.set_random_seed(42)
+```{eval-rst}
+.. autofunction:: genesis.utils.misc.get_device
+.. autofunction:: genesis.utils.misc.set_random_seed
 ```
 
 ## Global variables

@@ -4,7 +4,7 @@ A rigid body is the default kind of entity in Genesis World: a solid that does n
 
 ## Adding a rigid body
 
-An entity is rigid whenever its `material` is `gs.materials.Rigid`, which is the default, so you usually pass only a {doc}`morph </user_guide/assets/loading_assets>`:
+An entity is rigid whenever its `material` is {py:class}`gs.materials.Rigid <genesis.engine.materials.rigid.Rigid>`, which is the default, so you usually pass only a {doc}`morph </user_guide/assets/loading_assets>`:
 
 ```python
 box = scene.add_entity(gs.morphs.Box(pos=(0, 0, 0.5), size=(0.2, 0.2, 0.2)))
@@ -15,7 +15,7 @@ Both are rigid entities. The box is a single body; the Franka is **articulated**
 
 ## Single bodies and articulated bodies
 
-Every rigid entity is a `RigidEntity`, and you interact with it through its own methods rather than a global handle. An articulated entity exposes its structure:
+Every rigid entity is a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`, and you interact with it through its own methods rather than a global handle. An articulated entity exposes its structure:
 
 - **Links** (`entity.links`, `entity.n_links`): the individual rigid bodies in the tree.
 - **Joints** (`entity.joints`, `entity.n_joints`): the connections between links.
@@ -35,13 +35,27 @@ The rigid material sets how a body interacts physically. Pass a configured `gs.m
 box = scene.add_entity(
     gs.morphs.Box(pos=(0, 0, 0.5), size=(0.2, 0.2, 0.2)),
     material=gs.materials.Rigid(
-        rho=1000.0,     # density in kg/m³, used to estimate mass
-        friction=1.0,   # surface friction coefficient
+        rho=1000.0,               # density in kg/m3, used to estimate mass
+        friction=1.0,             # sliding (Coulomb) friction coefficient
+        friction_torsional=0.005, # resists spin about the contact normal (meters)
+        friction_rolling=0.0001,  # resists rolling about the tangent axes (meters)
     ),
 )
 ```
 
-Contact, collision geometry, and constraints, how these bodies actually push on each other, are governed by the rigid solver and documented under {doc}`Theory and modelling </user_guide/theory/rigid_collision/index>`.
+Torsional and rolling friction stay inert until enabled on the solver, since they add constraint rows to every contact:
+
+```python
+scene = gs.Scene(
+    rigid_options=gs.options.RigidOptions(
+        friction_cone=gs.friction_cone.elliptic,  # exact isotropic cone (default: pyramidal)
+        enable_torsional_friction=True,
+        enable_rolling_friction=True,              # requires enable_torsional_friction
+    ),
+)
+```
+
+Reach for the elliptic `friction_cone` when resting objects must stay put instead of slowly creeping. Contact, collision geometry, and constraints, how these bodies actually push on each other, are governed by the rigid solver and documented under {doc}`Theory and modelling </user_guide/theory/rigid_collision/index>`.
 
 ## See also
 

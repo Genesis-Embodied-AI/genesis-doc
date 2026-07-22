@@ -2,11 +2,11 @@
 
 A **surface** describes how an entity *looks* when rendered: its color, glossiness, transparency, and texture maps. It is separate from the entity's shape and its physics. When you add an entity you pass up to three independent descriptions:
 
-- a {doc}`morph </api_reference/options/morph/index>`: geometry and initial pose,
-- a {doc}`material </api_reference/material/index>`: physical behavior (mass, stiffness, friction),
-- a {doc}`surface </api_reference/options/surface/index>`: visual appearance, the subject of this page.
+- a {doc}`morph </api_reference/engine/entity/morph/index>`: geometry and initial pose,
+- a {doc}`material </api_reference/engine/material/index>`: physical behavior (mass, stiffness, friction),
+- a {doc}`surface </api_reference/engine/entity/surface/index>`: visual appearance, the subject of this page.
 
-Changing a surface never changes how an entity moves or collides; it only changes the rendered image. If you omit the surface, Genesis World uses `gs.surfaces.Default` (a Disney principled BSDF) and honors any material the asset file already defines.
+Changing a surface never changes how an entity moves or collides; it only changes the rendered image. If you omit the surface, Genesis World uses {py:class}`gs.surfaces.Default <genesis.options.surfaces.Default>` (a Disney principled BSDF) and honors any material the asset file already defines.
 
 The runnable script that exercises every surface type is [`examples/rendering/demo.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rendering/demo.py):
 
@@ -25,16 +25,16 @@ Every surface is a physically based (PBR) material; the classes differ only in t
 
 | Surface | What it is | Notable defaults |
 |---|---|---|
-| `gs.surfaces.Default` | Disney principled BSDF; the general-purpose surface | alias for `BSDF` |
-| `gs.surfaces.Rough` | Matte plastic | `roughness=1.0`, `ior=1.5` |
-| `gs.surfaces.Smooth` | Glossy plastic | `roughness=0.1`, `ior=1.5` |
-| `gs.surfaces.Reflective` | Near-mirror plastic | `roughness=0.01`, `ior=2.0` |
-| `gs.surfaces.Metal` | Conductor with a spectral tint | `metal_type="iron"`, `roughness=0.1` |
-| `gs.surfaces.Glass` | Specular reflection and refraction | `roughness=0.0`, `ior=1.5` |
-| `gs.surfaces.Water` | Glass tuned for water | `ior=1.2`, `roughness=0.2` |
-| `gs.surfaces.Emission` | Emits light; used as a light source | — |
+| `gs.surfaces.Default` | Disney principled BSDF; the general-purpose surface | alias for {py:class}`BSDF <genesis.options.surfaces.BSDF>` |
+| {py:class}`gs.surfaces.Rough <genesis.options.surfaces.Rough>` | Matte plastic | `roughness=1.0`, `ior=1.5` |
+| {py:class}`gs.surfaces.Smooth <genesis.options.surfaces.Smooth>` | Glossy plastic | `roughness=0.1`, `ior=1.5` |
+| {py:class}`gs.surfaces.Reflective <genesis.options.surfaces.Reflective>` | Near-mirror plastic | `roughness=0.01`, `ior=2.0` |
+| {py:class}`gs.surfaces.Metal <genesis.options.surfaces.Metal>` | Conductor with a spectral tint | `metal_type="iron"`, `roughness=0.1` |
+| {py:class}`gs.surfaces.Glass <genesis.options.surfaces.Glass>` | Specular reflection and refraction | `roughness=0.0`, `ior=1.5` |
+| {py:class}`gs.surfaces.Water <genesis.options.surfaces.Water>` | Glass tuned for water | `ior=1.2`, `roughness=0.2` |
+| {py:class}`gs.surfaces.Emission <genesis.options.surfaces.Emission>` | Emits light; used as a light source | — |
 
-`Iron`, `Gold`, `Copper`, and `Aluminium` are shortcuts for `Metal` with the matching `metal_type`. The full set of `metal_type` values is `"aluminium"`, `"gold"`, `"copper"`, `"brass"`, `"iron"`, `"titanium"`, `"vanadium"`, and `"lithium"`, each carrying its own index of refraction.
+{py:class}`Iron <genesis.options.surfaces.Iron>`, {py:class}`Gold <genesis.options.surfaces.Gold>`, {py:class}`Copper <genesis.options.surfaces.Copper>`, and {py:class}`Aluminium <genesis.options.surfaces.Aluminium>` are shortcuts for `Metal` with the matching `metal_type`. The full set of `metal_type` values is `"aluminium"`, `"gold"`, `"copper"`, `"brass"`, `"iron"`, `"titanium"`, `"vanadium"`, and `"lithium"`, each carrying its own index of refraction.
 
 ```python
 # both spheres are gold; the second spells out what the shortcut sets
@@ -72,7 +72,7 @@ When a property varies across a surface (a wood grain, a painted logo, a roughne
 
 - `gs.textures.ColorTexture(color=...)`: a single uniform color. Equivalent to the `color` shortcut, useful when an argument requires a texture object.
 - `gs.textures.ImageTexture(image_path=..., encoding=...)`: an image map sampled over the mesh's UV coordinates.
-- `gs.textures.BatchTexture`: a stack of textures, one per environment, for {doc}`parallel rendering </user_guide/getting_started/parallel_simulation>`.
+- {py:class}`gs.textures.BatchTexture <genesis.options.textures.BatchTexture>`: a stack of textures, one per environment, for {doc}`parallel rendering </user_guide/getting_started/parallel_simulation>`.
 
 Assign a texture to the channel it drives. The base color goes to `diffuse_texture`; data maps go to `roughness_texture`, `normal_texture`, `opacity_texture`, and so on:
 
@@ -153,7 +153,7 @@ scene.add_entity(
 )
 ```
 
-`gs.options.FoamOptions` splits the effect into three populations, each with its own dissipation rate (a larger value clears that population faster):
+{py:class}`gs.options.FoamOptions <genesis.options.misc.FoamOptions>` splits the effect into three populations, each with its own dissipation rate (a larger value clears that population faster):
 
 - **`radius_scale`:** foam particle radius as a fraction of the fluid particle radius. Defaults to `0.2`.
 - **`k_foam`:** number of foam particles generated per frame. Defaults to `1000.0`.

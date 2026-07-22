@@ -70,13 +70,13 @@ Three MPM objects falling and deforming: an elastic cube, a liquid cube, and an 
 
 ## FEM: accurate elasticity and muscles
 
-The Finite Element Method discretizes an entity into a tetrahedral mesh and solves the elasticity equations on it. Choose FEM over MPM when mesh-level accuracy matters: stiff elastic bodies, volumetric muscles, and contact-rich soft-body manipulation. `gs.materials.FEM.Elastic` exposes the physical parameters directly, such as Young's modulus `E` (Pa) and Poisson ratio `nu`.
+The Finite Element Method discretizes an entity into a tetrahedral mesh and solves the elasticity equations on it. Choose FEM over MPM when mesh-level accuracy matters: stiff elastic bodies, volumetric muscles, and contact-rich soft-body manipulation. {py:class}`gs.materials.FEM.Elastic <genesis.engine.materials.FEM.elastic.Elastic>` exposes the physical parameters directly, such as Young's modulus `E` (Pa) and Poisson ratio `nu`.
 
 FEM underpins the {doc}`soft robots tutorial <soft_robots>`, which actuates a volumetric muscle. FEM entities also couple to rigid arms for grasping; see [`examples/coupling/fem_cube_linked_with_arm.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/coupling/fem_cube_linked_with_arm.py).
 
 ## PBD: cloth and topology-preserving deformables
 
-Position-Based Dynamics represents an entity as particles linked by constraints and solves for positions directly, which makes it fast and stable for cloth, ropes, and other 1D/2D/3D bodies that keep their topology. `gs.materials.PBD.Cloth` loads a 2D mesh as a sheet.
+Position-Based Dynamics represents an entity as particles linked by constraints and solves for positions directly, which makes it fast and stable for cloth, ropes, and other 1D/2D/3D bodies that keep their topology. {py:class}`gs.materials.PBD.Cloth <genesis.engine.materials.PBD.cloth.Cloth>` loads a 2D mesh as a sheet.
 
 You can pin individual particles after building. `find_closest_particle` locates the particle nearest a world-space point (meters), and `fix_particles` anchors it:
 
@@ -125,6 +125,14 @@ An SPH liquid block collapsing and spreading across the ground, contained within
 :::{note}
 The `Liquid` material accepts a `sampler` that controls how particles fill the morph: `"regular"` (a grid lattice, the SPH default for numerical stability), `"pbs"` (physics-based sampling, which runs extra steps for a natural arrangement), or `"random"`.
 :::
+
+## SF: gaseous phenomena (smoke)
+
+The Stable Fluid solver is grid-based (Eulerian), not particle-based: it advects a velocity field and one or more scalar density fields on a fixed 3D grid, then makes the velocity divergence-free with a Jacobi pressure projection. Reach for it for smoke and other gases. Set the grid resolution with `SFOptions.res`.
+
+Unlike the other non-rigid solvers, SF has no Lagrangian entity you add and move. Gas enters through velocity **jets** you register on the solver, and the solver stays inactive until at least one jet exists. Each substep advects the velocity and density fields (RK3 backtracing with trilinear interpolation), injects momentum at the jets, then runs `solver_iters` Jacobi pressure iterations to keep the velocity divergence-free. State lives on the fixed grid, so there are no per-entity get/set methods, and SF does not participate in checkpointing. Read the density grid back for rendering.
+
+Full script, including the jet class and writing the density field to images: [`examples/smoke.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/smoke.py).
 
 ## Next steps
 

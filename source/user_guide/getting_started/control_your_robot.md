@@ -86,7 +86,7 @@ franka.set_dofs_kv(
     dofs_idx_local=motors_dof_idx,
 )
 franka.set_dofs_force_range(
-    lower=np.array([-87, -87, -87, -87, -12, -12, -12, -100, -100]),  # N·m / N
+    lower=np.array([-87, -87, -87, -87, -12, -12, -12, -100, -100]),  # N*m / N
     upper=np.array([87, 87, 87, 87, 12, 12, 12, 100, 100]),
     dofs_idx_local=motors_dof_idx,
 )
@@ -261,4 +261,4 @@ object instead.
 
 - {doc}`hello_genesis`: the minimal scene this tutorial builds on.
 - {doc}`/user_guide/robot_control/inverse_kinematics_motion_planning`: solving for joint targets from a desired end-effector pose.
-- {doc}`/api_reference/entity/index`: the full entity control API.
+- {doc}`/api_reference/engine/entity/index`: the full entity control API.

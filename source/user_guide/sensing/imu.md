@@ -26,13 +26,7 @@ for _ in range(1000):
     acc = data.lin_acc  # m/s^2, shape ([n_envs,] 3)
 ```
 
-`read()` returns an `IMUReturnType`, a `NamedTuple` with three fields, each a tensor of shape `([n_envs,] 3)`:
-
-| Field | Meaning | Units |
-|---|---|---|
-| `lin_acc` | linear acceleration (accelerometer) | m/s² |
-| `ang_vel` | angular velocity (gyroscope) | rad/s |
-| `mag` | magnetic field (magnetometer) | Tesla |
+`read()` returns an `IMUReturnType` NamedTuple with fields `lin_acc`, `ang_vel`, and `mag`, each a tensor of shape `([n_envs,] 3)` in the sensor body frame. See {doc}`the IMU reference </api_reference/engine/sensors/imu>` for the units and full type.
 
 ## Frame and conventions
 
@@ -84,18 +78,7 @@ imu = scene.add_sensor(
 )
 ```
 
-| Parameter | Effect |
-|---|---|
-| `*_noise` | standard deviation of per-axis Gaussian white noise |
-| `*_bias` | constant additive offset per axis |
-| `*_random_walk` | standard deviation of the drift that accumulates over time |
-| `*_cross_axis_coupling` | axis misalignment; a scalar, a 3-vector, or a full 3×3 rotation matrix |
-| `*_resolution` | quantization step; `0.0` (default) means no quantization |
-
-Two timing parameters, shared across channels, are given in seconds:
-
-- `delay`: how far behind real time a read lags. Must be a multiple of the simulation timestep `dt`.
-- `jitter`: a random extra delay sampled uniformly in `[0, jitter)` each step. Cannot exceed `delay`.
+Each channel takes the same family of knobs: `*_noise` (white-noise standard deviation), `*_bias` (constant offset), `*_random_walk` (drift standard deviation), `*_cross_axis_coupling` (axis misalignment), and `*_resolution` (quantization step), plus the shared `delay` and `jitter` timing. Their exact meanings and defaults are in {doc}`the IMU reference </api_reference/engine/sensors/imu>` and the {doc}`sensors overview <index>`; set them from your target hardware's datasheet.
 
 The magnetometer also reads a global field, set by `magnetic_field` (default `(0.0, 0.0, 0.5)` T in the world frame) and returned in the body frame.
 

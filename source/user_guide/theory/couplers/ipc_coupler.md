@@ -4,7 +4,7 @@ The IPC coupler resolves contact with Incremental Potential Contact, a barrier-b
 
 Reach for IPC when accuracy and robustness matter more than speed: cloth with self-collision, FEM solids pressed hard against each other, or a gripper closing on a deformable object. For mixed continuum scenes (MPM, SPH, PBD) or when you only need coarse rigid contact, stay on the default legacy coupler. See {doc}`the couplers overview <index>` for the full comparison.
 
-Under the hood, FEM bodies are coupled directly from their vertex positions, while rigid bodies enter the IPC world as affine bodies (ABD). Time step, gravity, and differentiable-simulation mode come from {doc}`SimOptions </api_reference/options/simulator_coupler_and_solver_options/sim_options>`, so you set them there, not on the coupler.
+Under the hood, FEM bodies are coupled directly from their vertex positions, while rigid bodies enter the IPC world as affine bodies (ABD). Time step, gravity, and differentiable-simulation mode come from {doc}`SimOptions </api_reference/engine/simulator>`, so you set them there, not on the coupler.
 
 ## Prerequisites
 
@@ -15,12 +15,12 @@ pip install pyuipc
 ```
 
 :::{warning}
-`pyuipc` currently supports only x86 Linux and Windows, on CPU or an NVIDIA GPU. On any other platform the IPC coupler is unavailable. If the import fails, Genesis World raises an error when you build a scene that uses `IPCCouplerOptions`.
+`pyuipc` currently supports only x86 Linux and Windows, on CPU or an NVIDIA GPU. On any other platform the IPC coupler is unavailable. If the import fails, Genesis World raises an error when you build a scene that uses {py:class}`IPCCouplerOptions <genesis.options.solvers.IPCCouplerOptions>`.
 :::
 
 ## Minimal example
 
-The complete script is [`examples/IPC_Solver/ipc_objects_falling.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/IPC_Solver/ipc_objects_falling.py): a cloth sheet falls onto a rigid box and a soft FEM ball, all resolved by IPC. Select the coupler by passing `IPCCouplerOptions` to the {doc}`Scene </api_reference/scene/scene>`:
+The complete script is [`examples/IPC_Solver/ipc_objects_falling.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/IPC_Solver/ipc_objects_falling.py): a cloth sheet falls onto a rigid box and a soft FEM ball, all resolved by IPC. Select the coupler by passing `IPCCouplerOptions` to the {doc}`Scene </api_reference/engine/scene>`:
 
 ```python
 import genesis as gs
@@ -36,7 +36,7 @@ scene = gs.Scene(
 )
 ```
 
-Entities join the IPC world through their {doc}`material </api_reference/material/index>`. A cloth is an FEM shell:
+Entities join the IPC world through their {doc}`material </api_reference/engine/material/index>`. A cloth is an FEM shell:
 
 ```python
 cloth = scene.add_entity(
@@ -44,7 +44,7 @@ cloth = scene.add_entity(
     material=gs.materials.FEM.Cloth(
         E=1e5,  # Young's modulus (Pa)
         nu=0.499,  # Poisson's ratio, nearly incompressible
-        rho=200,  # density (kg/m³)
+        rho=200,  # density (kg/m3)
         thickness=0.001,  # shell thickness (m)
         bending_stiffness=50.0,
     ),
@@ -66,7 +66,7 @@ The example downloads a coarse `grid20x20.obj` cloth mesh rather than a dense on
 
 ## How entities couple
 
-You do not register links with the coupler directly. Instead, each entity's {doc}`Rigid material </api_reference/material/rigid>` declares how it participates through `coup_type`:
+You do not register links with the coupler directly. Instead, each entity's {doc}`Rigid material </api_reference/engine/material/rigid>` declares how it participates through `coup_type`:
 
 - **`two_way_soft_constraint`:** Genesis and IPC exchange forces through a soft position-and-orientation constraint. Use it for a floating-base robot or any rigid body whose motion Genesis controls but that must also feel contact.
 - **`external_articulation`:** joint-level coupling for articulated robots: IPC couples at the dof level rather than per link. Use it for a fixed-base arm.
@@ -89,7 +89,7 @@ franka = scene.add_entity(
 
 ## Coupler options
 
-`IPCCouplerOptions` exposes the Genesis-side coupling behavior plus pass-through knobs for the libuipc solver. Most solver knobs default to `None`, meaning libuipc's own default applies; the fields below are the ones you are most likely to set. See the {doc}`coupler options API </api_reference/options/simulator_coupler_and_solver_options/coupler_options>` for the complete list, including the Newton, line-search, and linear-system parameters.
+`IPCCouplerOptions` exposes the Genesis-side coupling behavior plus pass-through knobs for the libuipc solver. Most solver knobs default to `None`, meaning libuipc's own default applies; the fields below are the ones you are most likely to set. See the {doc}`IPCCoupler options API </api_reference/engine/couplers/ipc_coupler>` for the complete list, including the Newton, line-search, and linear-system parameters.
 
 | Parameter | Default | Description |
 |---|---|---|
@@ -103,7 +103,7 @@ franka = scene.add_entity(
 | `enable_rigid_ground_contact` | `True` | Whether IPC bodies collide with the ground plane. Disable to avoid double-counting ground contact already handled by Genesis. |
 | `enable_rigid_rigid_contact` | `True` | Whether IPC detects contact between rigid (ABD) bodies. Disable to keep only soft-soft and soft-rigid contact. |
 
-Friction is a per-material property, not a coupler-wide setting: set `coup_friction` on a `gs.materials.Rigid` and `friction_mu` on an FEM material.
+Friction is a per-material property, not a coupler-wide setting: set `coup_friction` on a {py:class}`gs.materials.Rigid <genesis.engine.materials.rigid.Rigid>` and `friction_mu` on an FEM material.
 
 ## Robot grasping
 
@@ -115,7 +115,7 @@ scene = gs.Scene(
     coupler_options=gs.options.IPCCouplerOptions(
         constraint_strength_translation=10.0,
         constraint_strength_rotation=10.0,
-        enable_rigid_rigid_contact=False,  # only finger–cube contact matters here
+        enable_rigid_rigid_contact=False,  # only finger-cube contact matters here
         enable_rigid_ground_contact=False,
     ),
 )

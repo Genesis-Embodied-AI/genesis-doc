@@ -10,6 +10,7 @@ rigid_collision/index
 solvers_and_coupling
 couplers/index
 nonrigid_models
+differentiable_simulation
 support_field
 hibernation
 ```

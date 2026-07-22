@@ -105,4 +105,4 @@ For the concrete field layouts of each solver (the full state and info structs),
 
 - {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`: where `name` and entities are first introduced.
 - {doc}`Control your robot </user_guide/getting_started/control_your_robot>`: local dof indices in a full control loop.
-- {doc}`RigidJoint API </api_reference/entity/rigid_entity/rigid_joint>` and {doc}`RigidEntity API </api_reference/entity/rigid_entity/rigid_entity>`: the `dofs_idx` / `dofs_idx_local` properties and the `*_idx_local` methods.
+- {doc}`RigidJoint API </api_reference/engine/entity/rigid_entity/rigid_joint>` and {doc}`RigidEntity API </api_reference/engine/entity/rigid_entity/rigid_entity>`: the `dofs_idx` / `dofs_idx_local` properties and the `*_idx_local` methods.

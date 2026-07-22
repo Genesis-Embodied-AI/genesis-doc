@@ -27,7 +27,7 @@ g = M\,(a - a^{\text{unc}}) + J^\top D\,(Ja - a_{\text{ref}}),
 H = M + J^\top D\,J.
 $$
 
-Equality constraints act in both directions and are always present. Contacts and joint limits are *inequalities*: a contact may only push, never pull, and a joint limit resists only once the joint reaches it. Such a row is active only while it is violated, and friction rows are additionally capped by the friction pyramid. The solver decides which inequality rows are active as part of the solve, through the line search described below.
+Equality constraints act in both directions and are always present. Contacts and joint limits are *inequalities*: a contact may only push, never pull, and a joint limit resists only once the joint reaches it. Such a row is active only while it is violated, and friction rows are additionally capped by the friction cone. The solver decides which inequality rows are active as part of the solve, through the line search described below.
 
 ## Constraint types
 
@@ -35,7 +35,9 @@ Every constraint reduces to the same three ingredients: a Jacobian row $J$, a re
 
 ### Contacts and friction
 
-Each contact point in the buffer becomes **four** constraints, so the contact-constraint buffer is sized at four rows per point (this is what `max_contacts` bounds). Together the four rows approximate the Coulomb friction cone by a pyramid. Rather than one row for the normal and separate rows for friction, each pyramid edge mixes the two. With contact normal $\mathbf n$, tangent directions $\mathbf d_1, \mathbf d_2$, and friction coefficient $\mu$, the four edge directions are
+Each contact point expands into a small block of constraint rows -- between three and ten, depending on the friction cone selected by `friction_cone` and on which extra friction axes are enabled -- and `max_contacts` bounds the number of points.
+
+**Pyramidal cone (default).** With `friction_cone=gs.friction_cone.pyramidal` a point becomes **four** rows that approximate the Coulomb friction cone by a pyramid. Rather than one row for the normal and separate rows for friction, each pyramid edge mixes the two. With contact normal $\mathbf n$, tangent directions $\mathbf d_1, \mathbf d_2$, and friction coefficient $\mu$, the four edge directions are
 
 $$
 \pm\,\mu\,\mathbf d_1 - \mathbf n
@@ -43,7 +45,13 @@ $$
 \pm\,\mu\,\mathbf d_2 - \mathbf n .
 $$
 
-A non-negative multiplier on any edge produces a force whose tangential part is bounded by $\mu$ times its normal part, so the total contact force stays inside the pyramid $|\mathbf f_t| \le \mu f_n$. The reference acceleration is driven by the penetration depth, so a deeper contact pushes back harder. Replacing the true cone by a pyramid introduces mild direction dependence in friction; adding more edges would reduce it at a proportional cost.
+A non-negative multiplier on any edge produces a force whose tangential part is bounded by $\mu$ times its normal part, so the total contact force stays inside the pyramid $|\mathbf f_t| \le \mu f_n$. Approximating the cone by a pyramid makes the friction limit mildly direction-dependent.
+
+**Elliptic cone.** With `friction_cone=gs.friction_cone.elliptic` the normal and tangential rows stay separate and friction is bounded by its true Euclidean limit $\sqrt{f_{t_1}^2 + f_{t_2}^2} \le \mu f_n$ in every direction, so it is isotropic. Paired with a high `impratio` (the tangential-to-normal impedance ratio, which defaults to 100 under this cone) it holds resting stacks firmly instead of letting them creep tangentially, at the cost of a harder, more numerically sensitive solve. It is unsupported with the noslip solver and with differentiable simulation.
+
+The reference acceleration is driven by the penetration depth under either cone, so a deeper contact pushes back harder.
+
+**Torsional and rolling friction.** A point contact transmits no torque, so by default nothing resists a body spinning in place or a ball rolling to rest. Setting `enable_torsional_friction` adds one row per point resisting spin about the normal; `enable_rolling_friction` (which requires torsional friction) adds two more resisting rolling about the tangent axes. Their strength is set per geometry by the {py:class}`gs.materials.Rigid <genesis.engine.materials.rigid.Rigid>` coefficients `friction_torsional` and `friction_rolling`, each an effective contact-patch radius in meters, and the coefficient of a contacting pair is the larger of the two geoms' values. These rows cost solve time on every contact, so enable them only when spin or rolling resistance matters.
 
 ### Joint limits
 
@@ -102,7 +110,7 @@ where $\overline{m}$ is the mean inertia, or after `iterations` iterations, whic
 
 ## Key options
 
-These `RigidOptions` fields control the model and the solve. Pass them through `gs.options.RigidOptions` when building the scene.
+These `RigidOptions` fields control the model and the solve. Pass them through {py:class}`gs.options.RigidOptions <genesis.options.solvers.RigidOptions>` when building the scene.
 
 | Option | Default | Effect |
 |---|---|---|

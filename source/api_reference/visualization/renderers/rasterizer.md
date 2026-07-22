@@ -1,4 +1,4 @@
-# `gs.renderers.Rasterizer`
+# Rasterizer
 
 The default renderer: fast, GPU-accelerated rasterization for real-time viewing, control loops, and reinforcement-learning rollouts. It is also the backend the interactive viewer always uses. Enable it explicitly with `gs.Scene(renderer=gs.renderers.Rasterizer())`, though it is already the default when `renderer` is omitted.
 

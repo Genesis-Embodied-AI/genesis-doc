@@ -22,7 +22,7 @@ The scripts require `rsl-rl-lib>=5.0.0` and raise an `ImportError` at startup if
 
 ## The environment
 
-`Go2Env` is a standard RL environment: it owns a Genesis World {doc}`scene </api_reference/scene/scene>` built across many {doc}`environments </user_guide/getting_started/parallel_simulation>`, and it exposes `reset()` and `step(actions)`. Training runs thousands of copies of the robot in parallel on one GPU, so every buffer carries a leading `n_envs` dimension and the step logic stays vectorized on the device.
+`Go2Env` is a standard RL environment: it owns a Genesis World {doc}`scene </api_reference/engine/scene>` built across many {doc}`environments </user_guide/getting_started/parallel_simulation>`, and it exposes `reset()` and `step(actions)`. Training runs thousands of copies of the robot in parallel on one GPU, so every buffer carries a leading `n_envs` dimension and the step logic stays vectorized on the device.
 
 The constructor builds the scene once for all environments:
 

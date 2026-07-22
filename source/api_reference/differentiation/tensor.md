@@ -1,77 +1,6 @@
-# `Tensor`
+# Tensor
 
-The `genesis.grad.Tensor` class extends `torch.Tensor` to support end-to-end gradient flow through Genesis World simulations.
-
-## Overview
-
-Genesis World Tensors:
-
-- Extend PyTorch tensors with scene tracking
-- Enable automatic gradient propagation through physics
-- Support all standard PyTorch operations
-- Track parent tensors for gradient flow
-
-## Usage
-
-Genesis World Tensors are automatically created when you access state:
-
-```python
-import genesis as gs
-import torch
-
-gs.init()
-
-scene = gs.Scene(
-    sim_options=gs.options.SimOptions(
-        requires_grad=True,
-    ),
-)
-
-robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
-scene.build()
-
-# These return genesis.grad.Tensor
-pos = robot.get_pos()       # Genesis World Tensor
-vel = robot.get_vel()       # Genesis World Tensor
-qpos = robot.get_qpos()     # Genesis World Tensor
-```
-
-## Gradient flow
-
-```python
-# Forward pass
-scene.step()
-pos = robot.get_pos()
-
-# Compute loss
-target = torch.tensor([1.0, 0.0, 0.5], device=gs.device)
-loss = (pos - target).pow(2).sum()
-
-# Backward pass - flows through simulation
-loss.backward()
-```
-
-## Detaching from scene
-
-To prevent gradients from flowing through the simulation:
-
-```python
-# Detach and remove scene tracking
-pos_detached = pos.detach(sceneless=True)
-
-# Or explicitly
-pos_sceneless = pos.sceneless()
-```
-
-## Checking scene association
-
-```python
-# Check if tensor is associated with a scene
-if pos.scene is not None:
-    print(f"Tensor from scene: {pos.scene.uid}")
-```
-
-## API reference
+`genesis.grad.Tensor` extends `torch.Tensor` with a link to the scene it came from, which is what lets a loss computed from scene state backpropagate through the physics. State getters (`get_pos()`, `get_vel()`, `get_qpos()`, ...) return it when the scene is built with `requires_grad=True`. For the workflow, see {doc}`/user_guide/theory/differentiable_simulation`.
 
 ```{eval-rst}
 .. autoclass:: genesis.grad.tensor.Tensor
@@ -82,5 +11,5 @@ if pos.scene is not None:
 
 ## See also
 
-- {doc}`index`: Differentiable simulation overview
-- {doc}`creation_ops`: Creating tensors
+- {doc}`/user_guide/theory/differentiable_simulation`: the differentiable-simulation workflow.
+- {doc}`creation_ops`: creating tensors for differentiable simulation.

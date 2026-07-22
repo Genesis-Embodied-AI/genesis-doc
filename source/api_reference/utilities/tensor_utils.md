@@ -9,82 +9,15 @@ Genesis World uses:
 - **PyTorch tensors**: For state access and differentiability
 - **NumPy arrays**: For data export and visualization
 
-## Tensor conversion
+## Conversion helpers
 
-### To NumPy
+The helpers below are exposed under `gs.utils`. They accept Genesis, PyTorch, or array-like inputs and handle any GPU-to-CPU transfer internally.
 
-```python
-import genesis as gs
-
-gs.init()
-scene = gs.Scene()
-robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
-scene.build()
-
-# Get state as NumPy array
-qpos = robot.get_qpos()
-qpos_np = gs.utils.tensor_to_array(qpos)
-print(type(qpos_np))  # numpy.ndarray
-```
-
-### To CPU
-
-```python
-# Move tensor to CPU (if on GPU)
-qpos_cpu = gs.utils.tensor_to_cpu(qpos)
-```
-
-### Creating tensors
-
-```python
-import torch
-
-# Create tensor on correct device
-tensor = torch.zeros(10, device=gs.device, dtype=gs.tc_float)
-
-# Or use Genesis World wrapper
-tensor = gs.utils.to_gs_tensor([1.0, 2.0, 3.0])
-```
-
-## Common patterns
-
-### Getting entity state
-
-```python
-# Returns PyTorch tensor
-positions = robot.get_qpos()
-velocities = robot.get_qvel()
-
-# Convert to NumPy for processing
-import numpy as np
-pos_np = positions.cpu().numpy()
-```
-
-### Setting entity state
-
-```python
-import torch
-
-# From NumPy
-target = np.array([0.1, 0.2, 0.3])
-robot.set_dofs_position(torch.from_numpy(target).to(gs.device))
-
-# From list
-robot.set_dofs_position([0.1, 0.2, 0.3])
-```
-
-### Batched tensors
-
-With `n_envs > 1`:
-
-```python
-scene.build(n_envs=16)
-
-# Batched output: (n_envs, n_dofs)
-all_positions = robot.get_qpos()
-
-# Select specific environments
-some_positions = robot.get_qpos(envs_idx=[0, 5, 10])
+```{eval-rst}
+.. autofunction:: genesis.utils.misc.tensor_to_array
+.. autofunction:: genesis.utils.misc.tensor_to_cpu
+.. autofunction:: genesis.utils.misc.to_gs_tensor
+.. autofunction:: genesis.utils.misc.assert_gs_tensor
 ```
 
 ## Data types

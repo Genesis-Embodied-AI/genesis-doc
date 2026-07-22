@@ -6,8 +6,8 @@ You describe the layout once with `probe_local_pos`, a set of `(x, y, z)` offset
 
 Two families share this interface but estimate contact differently:
 
-- **SDF-query probes** (`ContactProbe`, `ContactDepthProbe`, and `KinematicTaxel`) query the signed distance from each probe to nearby collision geometry directly. They need no list of target links.
-- **Point-cloud probes** (`ElastomerTaxel` and `ProximityTaxel`) sample a point cloud from the meshes named in `track_link_idx` (global link indices) and measure against those points. `n_sample_points` sets the sample budget.
+- **SDF-query probes** ({py:class}`ContactProbe <genesis.options.sensors.tactile.ContactProbe>`, {py:class}`ContactDepthProbe <genesis.options.sensors.tactile.ContactDepthProbe>`, and {py:class}`KinematicTaxel <genesis.options.sensors.tactile.KinematicTaxel>`) query the signed distance from each probe to nearby collision geometry directly. They need no list of target links, though an optional `filter_link_idx` (global link indices) can exclude chosen counterpart links from the query.
+- **Point-cloud probes** ({py:class}`ElastomerTaxel <genesis.options.sensors.tactile.ElastomerTaxel>` and {py:class}`ProximityTaxel <genesis.options.sensors.tactile.ProximityTaxel>`) sample a point cloud from the meshes named in `track_link_idx` (global link indices) and measure against those points. `n_sample_points` sets the sample budget.
 
 Readings are geometric estimates, not solver impulses, and are uncalibrated. Treat them as relative signals unless you tune the coefficients to your setup. The taxels also expose hardware-style [imperfections](#sensor-imperfections) for sim-to-real robustness. For how sensors are sampled, read back, and batched, see the {doc}`sensors overview <index>`.
 
@@ -33,8 +33,8 @@ Still, if you use them in your research, **please cite**:
 |---|---|---|---|
 | `ContactProbe` | in-contact flag per probe | `([n_envs,] n_probes)` | bool |
 | `ContactDepthProbe` | penetration depth per probe | `([n_envs,] n_probes)` | m |
-| `KinematicTaxel` | `(force, torque)` per probe | each `([n_envs,] n_probes, 3)` | link frame, N / N·m |
-| `ElastomerTaxel` | marker displacement per probe | `([n_envs,] n_probes, 3)` | link frame, m |
+| `KinematicTaxel` | `(force, torque)` per probe | each `([n_envs,] n_probes, 3)` | link-local, N / N·m |
+| `ElastomerTaxel` | marker displacement per probe | `([n_envs,] n_probes, 3)` | link-local, m |
 | `ProximityTaxel` | `(force, torque)` per probe | each `([n_envs,] n_probes, 3)` | link-local, N / N·m |
 
 Two interactive demos drive these sensors:
@@ -92,11 +92,11 @@ taxel = scene.add_sensor(
 )
 
 data = taxel.read()
-data.force   # shape ([n_envs,] n_probes, 3), N, link frame
-data.torque  # shape ([n_envs,] n_probes, 3), N·m, link frame
+data.force   # shape ([n_envs,] n_probes, 3), N, link-local
+data.torque  # shape ([n_envs,] n_probes, 3), N*m, link-local
 ```
 
-`read()` returns a `KinematicTaxelReturnType` named tuple, so `data.force` and `data.torque` unpack by name.
+`read()` returns a {py:class}`KinematicTaxelReturnType <genesis.engine.sensors.kinematic_tactile.KinematicTaxelReturnType>` named tuple, so `data.force` and `data.torque` unpack by name.
 
 <video preload="auto" controls="True" width="100%" aria-label="A live vector-field plot of KinematicTaxel forces across a probe grid as an object presses into the sensor, with arrows growing where penetration is deepest and curved twist arrows tracking rotational slip">
 <source src="../../_static/videos/kinematic_taxel.mp4" type="video/mp4">
@@ -121,7 +121,7 @@ tactile = scene.add_sensor(
     )
 )
 
-displacement = tactile.read()  # shape ([n_envs,] n_probes, 3), m
+displacement = tactile.read()  # shape ([n_envs,] n_probes, 3), m, link-local
 ```
 
 `dilate_scale` and `shear_scale` scale the indentation and shear response; `lambda_d` and `lambda_s` control how far each effect spreads across neighboring markers. The out-of-plane (normal) bulge scales as `depth ** normal_exponent` (default `2.0`, the HydroShear quadratic response); tangential dilation and shear stay linear in depth regardless of `normal_exponent`. When `probe_local_pos` is a regular planar grid with a single shared normal, the dilation term is computed with an FFT to keep large arrays fast. The shear anchor is gated by the same `contact_threshold` / `release_threshold` Schmitt trigger (a tracked point begins anchoring shear at `contact_threshold` penetration and releases once it separates back to `release_threshold`).
@@ -152,10 +152,10 @@ proximity = scene.add_sensor(
 
 data = proximity.read()
 data.force   # shape ([n_envs,] n_probes, 3), N, link-local
-data.torque  # shape ([n_envs,] n_probes, 3), N·m, link-local
+data.torque  # shape ([n_envs,] n_probes, 3), N*m, link-local
 ```
 
-Like `KinematicTaxel`, it returns a named tuple (`ProximityTaxelReturnType`) with `force` and `torque` fields.
+Like `KinematicTaxel`, it returns a named tuple ({py:class}`ProximityTaxelReturnType <genesis.engine.sensors.point_cloud_tactile.ProximityTaxelReturnType>`) with `force` and `torque` fields.
 
 <video preload="auto" controls="True" width="100%" aria-label="A live vector-field plot of ProximityTaxel force and twist across a taxel pad as an object approaches and presses in, the field responding before and through contact">
 <source src="../../_static/videos/proximity_taxel.mp4" type="video/mp4">

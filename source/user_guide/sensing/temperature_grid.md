@@ -6,7 +6,7 @@ The complete script is [`examples/sensors/temperature_grid.py`](https://github.c
 
 ## Minimal example
 
-A temperature sensor attaches to one link of a rigid {doc}`entity </api_reference/entity/index>`. `entity_idx` selects the entity and `link_idx_local` the link within it; `grid_size` sets the resolution as `(nx, ny, nz)`.
+A temperature sensor attaches to one link of a rigid {doc}`entity </api_reference/engine/entity/index>`. `entity_idx` selects the entity and `link_idx_local` the link within it; `grid_size` sets the resolution as `(nx, ny, nz)`.
 
 ```python
 temperature_sensor = scene.add_sensor(
@@ -15,10 +15,10 @@ temperature_sensor = scene.add_sensor(
         link_idx_local=0,
         grid_size=(10, 10, 1),  # (nx, ny, nz) voxels over the link's local bounding box
         properties_dict=properties_dict,
-        ambient_temperature=22.0,  # °C
-        convection_coefficient=0.0,  # W/(m²·K); 0.0 disables surface cooling
+        ambient_temperature=22.0,  # degC
+        convection_coefficient=0.0,  # W/(m2*K); 0.0 disables surface cooling
         draw_debug=True,
-        debug_temperature_range=(0.0, 80.0),  # °C mapped to the blue→red debug colors
+        debug_temperature_range=(0.0, 80.0),  # degC mapped to the blue->red debug colors
     )
 )
 
@@ -28,7 +28,7 @@ scene.build()
 After the scene is built, `read()` returns the current temperature field:
 
 ```python
-data = temperature_sensor.read()  # shape ([n_envs,] nx, ny, nz), in °C
+data = temperature_sensor.read()  # shape ([n_envs,] nx, ny, nz), in degC
 t_min, t_max = float(data.min()), float(data.max())
 ```
 
@@ -36,7 +36,7 @@ The `[n_envs,]` axis is present only when the scene is built with multiple {doc}
 
 ## Material properties
 
-Heat only flows between links that carry thermal properties. You supply these through `properties_dict`, which maps a global rigid-link index to a `TemperatureProperties` entry. Key `-1` is the default applied to any link not listed explicitly; omit it and unlisted links are ignored in contacts entirely.
+Heat only flows between links that carry thermal properties. You supply these through `properties_dict`, which maps a global rigid-link index to a {py:class}`TemperatureProperties <genesis.options.sensors.options.TemperatureProperties>` entry. Key `-1` is the default applied to any link not listed explicitly; omit it and unlisted links are ignored in contacts entirely.
 
 ```python
 properties_dict = {

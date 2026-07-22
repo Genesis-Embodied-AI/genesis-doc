@@ -1,6 +1,6 @@
 # Contact and force sensors
 
-`Contact`, `ContactForce`, and `JointTorque` read how a rigid link or joint interacts with the rest of the scene straight from the rigid solver. They are **solver-based**: physically consistent with the simulation, but they only report where the solver actually resolves a contact. Reach for them when you want ground-truth, link-level interaction rather than a spatially resolved tactile field. For a dense field of per-taxel readings across a surface, use the {doc}`tactile sensors <tactile>` instead.
+{py:class}`Contact <genesis.options.sensors.options.Contact>`, {py:class}`ContactForce <genesis.options.sensors.options.ContactForce>`, and {py:class}`JointTorque <genesis.options.sensors.options.JointTorque>` read how a rigid link or joint interacts with the rest of the scene straight from the rigid solver. They are **solver-based**: physically consistent with the simulation, but they only report where the solver actually resolves a contact. Reach for them when you want ground-truth, link-level interaction rather than a spatially resolved tactile field. For a dense field of per-taxel readings across a surface, use the {doc}`tactile sensors <tactile>` instead.
 
 For how sensors are sampled, read back, batched with `scene.read_sensors()`, and configured with noise, delay, and `history_length`, see the {doc}`sensors overview <index>`.
 
@@ -46,10 +46,7 @@ A sensor is bound to one link by `entity_idx` and the entity-local `link_idx_loc
 force = sensor.read()  # shape ([n_envs,] 3), N, in the link-local frame
 ```
 
-Configuration:
-
-- `Contact` accepts `threshold` (a positive force magnitude registers as contact above this value; default `0.0`) and `filter_link_idx`, a list of **global** link indices whose contacts with the sensor link are ignored.
-- `ContactForce` clamps each axis to `[min_force, max_force]`; readings below `min_force` are zeroed and readings above `max_force` are saturated. Both default to no clamping.
+Both `Contact` and `ContactForce` accept `filter_link_idx`, a list of **global** link indices to ignore, so the sensor reads as if those counterparts were not touching. Use it to scope a reading, for example a foot's force from the ground while excluding self-contact. `Contact` additionally has a contact `threshold`, and `ContactForce` clamps each axis to `[min_force, max_force]`; see {doc}`the contact reference </api_reference/engine/sensors/contact>` for these and their defaults.
 
 ```{figure} ../../_static/images/contact_force_sensor.png
 :alt: A Go2 quadruped standing on a ground plane, with a magenta arrow drawn at each foot showing the contact force reported by that foot's ContactForce sensor
