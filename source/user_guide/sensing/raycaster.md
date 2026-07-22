@@ -118,6 +118,32 @@ gs.sensors.GridPattern(
 )
 ```
 
+### Custom pattern
+
+There is no `ray_directions` argument. To cast an arbitrary set of rays, subclass `gs.sensors.RaycastPattern`: return the layout shape from `_get_return_shape()` and fill `_ray_dirs` (unit directions in the sensor frame) in `compute_ray_dirs()`.
+
+```python
+import torch
+
+class CrossPattern(gs.sensors.RaycastPattern):
+    def _get_return_shape(self):
+        return (4,)
+
+    def compute_ray_dirs(self):
+        self._ray_dirs[:] = torch.tensor(
+            [
+                [1.0, 0.0, 0.0],   # forward
+                [0.0, 1.0, 0.0],   # left
+                [-1.0, 0.0, 0.0],  # back
+                [0.0, -1.0, 0.0],  # right
+            ],
+            dtype=gs.tc_float,
+            device=gs.device,
+        )
+
+sensor = scene.add_sensor(gs.sensors.Lidar(pattern=CrossPattern(), entity_idx=robot.idx))
+```
+
 ## Depth cameras
 
 `gs.sensors.DepthCamera` is a raycaster with a `DepthCameraPattern`. It exposes everything a lidar does, plus `read_image()`, which reshapes the per-ray distances into a depth image:

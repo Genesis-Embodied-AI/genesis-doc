@@ -46,11 +46,7 @@ A sensor is bound to one link by `entity_idx` and the entity-local `link_idx_loc
 force = sensor.read()  # shape ([n_envs,] 3), N, in the link-local frame
 ```
 
-Configuration:
-
-- Both `Contact` and `ContactForce` accept `filter_link_idx`, a list of **global** link indices whose contacts with the sensor link are ignored: the sensor reads as if those counterparts were not touching. Use it to scope a reading (e.g. a foot's force from the ground, excluding self-contact). Defaults to empty (no filtering).
-- `Contact` also accepts `threshold`: a force magnitude registers as contact above this value (default `0.0`).
-- `ContactForce` clamps each axis to `[min_force, max_force]`; readings below `min_force` are zeroed and readings above `max_force` are saturated. Both default to no clamping.
+Both `Contact` and `ContactForce` accept `filter_link_idx`, a list of **global** link indices to ignore, so the sensor reads as if those counterparts were not touching. Use it to scope a reading, for example a foot's force from the ground while excluding self-contact. `Contact` additionally has a contact `threshold`, and `ContactForce` clamps each axis to `[min_force, max_force]`; see {doc}`the contact reference </api_reference/sensor/contact>` for these and their defaults.
 
 ```{figure} ../../_static/images/contact_force_sensor.png
 :alt: A Go2 quadruped standing on a ground plane, with a magenta arrow drawn at each foot showing the contact force reported by that foot's ContactForce sensor
