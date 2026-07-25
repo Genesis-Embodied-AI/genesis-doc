@@ -118,7 +118,7 @@ Start training:
 python examples/manipulation/grasp_train.py --stage=rl
 ```
 
-By default this runs 2048 parallel environments (`-B/--num_envs`) for 300 iterations. More environments give PPO more samples per update; the ceiling is your GPU memory. See {doc}`Efficient environment design </user_guide/policy_training/best_practices/efficient_environment>` for how to push batch sizes higher.
+By default this runs 2048 parallel environments (`-b/--num-envs`) for 300 iterations. More environments give PPO more samples per update; the ceiling is your GPU memory. See {doc}`Efficient environment design </user_guide/policy_training/best_practices/efficient_environment>` for how to push batch sizes higher.
 
 Monitor progress with TensorBoard:
 

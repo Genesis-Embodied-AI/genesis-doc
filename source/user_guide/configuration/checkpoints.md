@@ -49,7 +49,7 @@ rigid_state = state.solvers_state[scene.solvers.index(scene.rigid_solver)]
 qpos = rigid_state.qpos  # shape ([n_envs,] n_qs)
 ```
 
-The differentiable example [`examples/differentiable_push.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/differentiable_push.py) uses this pattern: it calls `scene.reset()` to restart each optimization pass from a fixed initial state, and reads `scene.get_state().solvers_state[...]` to compute a loss from particle positions mid-rollout.
+The differentiable example [`examples/deformable/differentiable_push.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/deformable/differentiable_push.py) uses this pattern: it calls `scene.reset()` to restart each optimization pass from a fixed initial state, and reads `scene.get_state().solvers_state[...]` to compute a loss from particle positions mid-rollout.
 
 ## Resetting environments in parallel simulation
 

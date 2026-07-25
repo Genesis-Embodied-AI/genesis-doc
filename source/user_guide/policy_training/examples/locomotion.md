@@ -133,7 +133,7 @@ Start training from the repository root:
 python examples/locomotion/go2_train.py
 ```
 
-By default this runs 4096 environments in parallel for 101 iterations under the experiment name `go2-walking`, saving checkpoints and a `cfgs.pkl` (the exact configs used) into `logs/go2-walking/`. Override any of these with `-B/--num_envs`, `--max_iterations`, or `-e/--exp_name`.
+By default this runs 4096 environments in parallel for 101 iterations under the experiment name `go2-walking`, saving checkpoints and a `cfgs.pkl` (the exact configs used) into `logs/go2-walking/`. Override any of these with `-b/--num-envs`, `--max-iterations`, or `-e/--exp-name`.
 
 Monitor progress with TensorBoard:
 

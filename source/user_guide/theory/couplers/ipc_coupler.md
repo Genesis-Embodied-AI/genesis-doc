@@ -20,7 +20,7 @@ pip install pyuipc
 
 ## Minimal example
 
-The complete script is [`examples/IPC_Solver/ipc_objects_falling.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/IPC_Solver/ipc_objects_falling.py): a cloth sheet falls onto a rigid box and a soft FEM ball, all resolved by IPC. Select the coupler by passing `IPCCouplerOptions` to the {doc}`Scene </api_reference/engine/scene>`:
+The complete script is [`examples/ipc/ipc_objects_falling.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/ipc/ipc_objects_falling.py): a cloth sheet falls onto a rigid box and a soft FEM ball, all resolved by IPC. Select the coupler by passing `IPCCouplerOptions` to the {doc}`Scene </api_reference/engine/scene>`:
 
 ```python
 import genesis as gs
@@ -107,7 +107,7 @@ Friction is a per-material property, not a coupler-wide setting: set `coup_frict
 
 ## Robot grasping
 
-The complete script is [`examples/IPC_Solver/ipc_robot_grasp_cube.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/IPC_Solver/ipc_robot_grasp_cube.py): a Franka arm grasps and lifts a deformable cube. Here IPC couples only the fingers, while the deformable cube is an FEM solid:
+The complete script is [`examples/ipc/ipc_robot_grasp_cube.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/ipc/ipc_robot_grasp_cube.py): a Franka arm grasps and lifts a deformable cube. Here IPC couples only the fingers, while the deformable cube is an FEM solid:
 
 ```python
 scene = gs.Scene(
@@ -141,7 +141,7 @@ cube = scene.add_entity(
 )
 ```
 
-For an interactive version you can teleoperate from the keyboard, see [`examples/IPC_Solver/ipc_robot_cloth_teleop.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/IPC_Solver/ipc_robot_cloth_teleop.py).
+For an interactive version you can teleoperate from the keyboard, see [`examples/ipc/ipc_robot_cloth_teleop.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/ipc/ipc_robot_cloth_teleop.py).
 
 ## See also
 

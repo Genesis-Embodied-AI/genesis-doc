@@ -127,7 +127,7 @@ class MyPlugin(ViewerPlugin):
 
 ### Dragging bodies: MouseInteractionPlugin
 
-`gs.vis.viewer_plugins.MouseInteractionPlugin` lets you click and drag rigid bodies. By default it moves a body toward the cursor with a spring force (`use_force=True`); pass `use_force=False` to set the body's position directly instead. The full script, including the `--use_force` command-line flag and a multi-environment build, is [`examples/viewer_plugin/mouse_interaction.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/viewer_plugin/mouse_interaction.py):
+`gs.vis.viewer_plugins.MouseInteractionPlugin` lets you click and drag rigid bodies. By default it moves a body toward the cursor with a spring force (`use_force=True`); pass `use_force=False` to set the body's position directly instead. The full script, including the `--use-force` command-line flag and a multi-environment build, is [`examples/viewer_plugin/mouse_interaction.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/viewer_plugin/mouse_interaction.py):
 
 ```python
 scene.viewer.add_plugin(

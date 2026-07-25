@@ -7,7 +7,7 @@ Reach for multiple GPUs only after you have saturated one. A single modern GPU r
 Two runnable examples are the source of truth for the patterns below:
 
 - [`examples/rigid/multi_gpu.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/multi_gpu.py): one simulation process per GPU, launched with `multiprocessing`.
-- [`examples/ddp_multi_gpu.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/ddp_multi_gpu.py): data-parallel training over several GPUs with PyTorch DDP and `torchrun`.
+- [`examples/rigid/ddp_multi_gpu.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/ddp_multi_gpu.py): data-parallel training over several GPUs with PyTorch DDP and `torchrun`.
 
 ## The one-process-per-GPU model
 
@@ -49,12 +49,12 @@ This pattern fits embarrassingly parallel work: independent rollouts, sweeps, or
 
 ## Data-parallel training with PyTorch DDP
 
-[`examples/ddp_multi_gpu.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/ddp_multi_gpu.py) trains a policy across GPUs with PyTorch [DistributedDataParallel](https://docs.pytorch.org/docs/stable/notes/ddp.html). Each rank owns a full Genesis scene with its own batch of environments; DDP keeps a replica of the model on each rank and averages gradients across ranks on every backward pass. The effective batch is the per-GPU `n_envs` times the number of GPUs, so adding GPUs lowers gradient noise rather than changing any single scene.
+[`examples/rigid/ddp_multi_gpu.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/ddp_multi_gpu.py) trains a policy across GPUs with PyTorch [DistributedDataParallel](https://docs.pytorch.org/docs/stable/notes/ddp.html). Each rank owns a full Genesis scene with its own batch of environments; DDP keeps a replica of the model on each rank and averages gradients across ranks on every backward pass. The effective batch is the per-GPU `n_envs` times the number of GPUs, so adding GPUs lowers gradient noise rather than changing any single scene.
 
 Launch it with `torchrun`, which starts one process per GPU and sets the rendezvous variables DDP reads:
 
 ```bash
-torchrun --standalone --nnodes=1 --nproc_per_node=2 examples/ddp_multi_gpu.py
+torchrun --standalone --nnodes=1 --nproc_per_node=2 examples/rigid/ddp_multi_gpu.py
 ```
 
 Each worker reads its rank, pins itself to the matching GPU, and seeds Genesis per rank so the environments are decorrelated across GPUs rather than identical:
@@ -124,7 +124,7 @@ Set the device environment variables before `gs.init()`. They are read once at i
 :::
 
 :::{note}
-Pinning the rendering GPU with `EGL_DEVICE_ID` is not reliable on every machine. `examples/ddp_multi_gpu.py` leaves it unset for that reason. On-GPU rendering is not required for headless simulation or training, so omit it unless you specifically render images per rank and have confirmed it works on your hardware.
+Pinning the rendering GPU with `EGL_DEVICE_ID` is not reliable on every machine. `examples/rigid/ddp_multi_gpu.py` leaves it unset for that reason. On-GPU rendering is not required for headless simulation or training, so omit it unless you specifically render images per rank and have confirmed it works on your hardware.
 :::
 
 :::{tip}
