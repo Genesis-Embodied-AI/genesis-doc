@@ -70,7 +70,7 @@ gs.init(backend=gs.gpu, seed=local_rank)  # distinct seed per rank
 Build the scene and initialize the process group afterward. Because `CUDA_VISIBLE_DEVICES` already narrowed this process to one GPU, that device is `cuda:0` here and the DDP wrapper binds to it:
 
 ```python
-scene.build(n_envs=args.n_envs)
+scene.build(n_envs=args.num_envs)
 
 gpu_id = 0
 torch.cuda.set_device(gpu_id)

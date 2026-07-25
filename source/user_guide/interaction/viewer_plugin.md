@@ -10,7 +10,7 @@ This scene adds the built-in `MouseInteractionPlugin` so you can click and drag 
 
 ```python
 import genesis as gs
-import genesis.vis.keybindings as kb
+from genesis.vis.keybindings import Key, KeyAction, Keybind
 
 gs.init(backend=gs.cpu)
 
@@ -31,7 +31,7 @@ def stop():
 
 # register_keybinds requires a built scene; call it after build().
 scene.viewer.register_keybinds(
-    kb.Keybind("quit", kb.Key.ESCAPE, kb.KeyAction.RELEASE, callback=stop),
+    Keybind("quit", Key.ESCAPE, KeyAction.RELEASE, callback=stop),
 )
 
 while is_running:
@@ -43,23 +43,23 @@ while is_running:
 A keybinding maps a key (optionally with modifiers) to a callback. Register one or more with `scene.viewer.register_keybinds()`, passing `genesis.vis.keybindings.Keybind` objects:
 
 ```python
-import genesis.vis.keybindings as kb
+from genesis.vis.keybindings import Key, KeyAction, Keybind
 
 scene.viewer.register_keybinds(
-    kb.Keybind("greeting", kb.Key.G, kb.KeyAction.PRESS, callback=lambda: print("Hello!")),
-    kb.Keybind("quit", kb.Key.ESCAPE, kb.KeyAction.RELEASE, callback=stop),
+    Keybind("greeting", Key.G, KeyAction.PRESS, callback=lambda: print("Hello!")),
+    Keybind("quit", Key.ESCAPE, KeyAction.RELEASE, callback=stop),
 )
 ```
 
 `register_keybinds` requires a built scene. It raises if called before `scene.build()`. Register keys after building, as in the example above.
 
-A `Keybind` takes a unique `name`, a `key` from the `kb.Key` enum, and a `key_action`:
+A `Keybind` takes a unique `name`, a `key` from the `Key` enum, and a `key_action`:
 
-- `kb.KeyAction.PRESS` fires once when the key goes down.
-- `kb.KeyAction.HOLD` fires repeatedly while the key is held.
-- `kb.KeyAction.RELEASE` fires once when the key is released.
+- `KeyAction.PRESS` fires once when the key goes down.
+- `KeyAction.HOLD` fires repeatedly while the key is held.
+- `KeyAction.RELEASE` fires once when the key is released.
 
-Pass `key_mods=(kb.KeyMod.CTRL,)` to require modifiers, and `args` / `kwargs` to forward arguments to the callback. Names must be unique; reusing a key with the same action raises unless you pass `overwrite=True`.
+Pass `key_mods=(KeyMod.CTRL,)` to require modifiers, and `args` / `kwargs` to forward arguments to the callback. Names must be unique; reusing a key with the same action raises unless you pass `overwrite=True`.
 
 ```{figure} ../../_static/images/keybindings_instructions.png
 :alt: Viewer overlay listing keyboard instructions, including custom keybindings
