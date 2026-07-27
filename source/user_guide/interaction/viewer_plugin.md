@@ -43,7 +43,7 @@ while is_running:
 A keybinding maps a key (optionally with modifiers) to a callback. Register one or more with `scene.viewer.register_keybinds()`, passing `genesis.vis.keybindings.Keybind` objects:
 
 ```python
-from genesis.vis.keybindings import Key, KeyAction, Keybind
+from genesis.vis.keybindings import Key, KeyAction, Keybind, KeyMod
 
 scene.viewer.register_keybinds(
     Keybind("greeting", Key.G, KeyAction.PRESS, callback=lambda: print("Hello!")),
