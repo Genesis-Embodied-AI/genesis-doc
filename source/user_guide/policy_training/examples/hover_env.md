@@ -154,7 +154,7 @@ python hover_eval.py -e drone-hovering --ckpt 300 --record
 ```
 
 - **`--ckpt 300`:** loads `logs/drone-hovering/model_300.pt`.
-- **`--record`:** attaches a camera and saves the rollout to `video.mp4`.
+- **`--record`:** attaches a camera and saves the rollout to `out/hover.mp4`.
 
 If evaluation is slow or unstable, drop `--record` to disable rendering.
 

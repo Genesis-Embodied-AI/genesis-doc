@@ -175,7 +175,7 @@ Install the package first. Prebuilt wheels are available on PyPI for x86 and Pyt
 pip install gs-madrona
 ```
 
-Then run the bundled example, which writes frames to `data/test`, or elsewhere with `-o`:
+Then run the bundled example, which writes frames to `out/batch_render`, or elsewhere with `-o`:
 
 ```bash
 python examples/rigid/single_franka_batch_render.py
