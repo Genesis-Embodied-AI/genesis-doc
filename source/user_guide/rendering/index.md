@@ -43,29 +43,32 @@ OpenCV windows opened with `GUI=True` sometimes render black on the first frame.
 
 ## Recording a video
 
-To capture a video, call `start_recording()`, render a frame each step, then `stop_recording()` to encode the accumulated frames. Every `cam.render()` call between the two is added to the recording. Here the camera orbits the scene while the simulation steps:
+To capture a video, call `start_recording()` with the output file and framerate, step the scene, then `stop_recording()` to finalize the file. The camera renders itself from inside `scene.step()` whenever a frame is due, and each frame is encoded and streamed to disk straight away, so the length of a recording is not bounded by memory. Here the camera orbits the scene while the simulation steps:
 
 ```python
 import math
 
-cam.start_recording()
+cam.start_recording(save_to_filename="video.mp4", fps=60)
 
 for i in range(120):
-    scene.step()
     cam.set_pose(
         pos=(3.0 * math.sin(i / 60), 3.0 * math.cos(i / 60), 2.5),
         lookat=(0, 0, 0.5),
     )
-    cam.render()
+    scene.step()
 
-cam.stop_recording(save_to_filename="video.mp4", fps=60)
+cam.stop_recording()
 ```
 
-If you omit `save_to_filename`, Genesis World generates a name from the calling script. The result:
+If you omit `save_to_filename`, Genesis World generates a name from the calling script, and `fps` defaults to 60. Two frames are always a whole number of simulation steps apart, so the highest framerate a scene can record is one frame per step, `1 / dt`; a framerate off that grid is rounded to it and logged. One second of video stands for one second of `realtime_factor`-paced time (see {doc}`the viewer </user_guide/interaction/visualization>`), so with the default `realtime_factor=1.0` playback runs at real time whatever the framerate. The result:
 
 <video preload="auto" controls="True" width="100%">
 <source src="../../_static/videos/cam_record.mp4" type="video/mp4">
 </video>
+
+Call `cam.pause_recording()` to keep a span of the simulation out of the video, a settling phase for instance, then `cam.start_recording()` with no argument to resume the same file; the paused span leaves no gap in the video. The filename and framerate are fixed for the whole of a video, so passing either one when resuming raises. After `stop_recording()`, the camera can record again to a new file at a new framerate.
+
+With `env_separate_rigid=True` in `VisOptions`, a camera in a batched scene records one file per rendered environment, each suffixed with its environment index (`video_0.mp4`, `video_1.mp4`, ...).
 
 For recording sensor and simulation data (not just video) on a schedule, see {doc}`Recording data </user_guide/sensing/recorders>`.
 

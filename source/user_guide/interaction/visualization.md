@@ -36,6 +36,8 @@ The viewer always renders with the rasterizer. To select the backend used by cam
 To cap the viewer frame rate, set `refresh_rate` on `ViewerOptions`. The older `max_FPS` argument is deprecated and now maps to `refresh_rate`.
 :::
 
+`realtime_factor` sets the pace of the simulation itself: the multiple of wall-clock real time that one second of simulated time stands for, `1.0` for real time and `2.0` for twice as fast. When the viewer is shown, the simulation is throttled to it and falls behind gracefully when it cannot keep up; set it to `None` to always run as fast as possible. It also fixes the playback speed of the videos recorded by {doc}`camera sensors </user_guide/rendering/index>`, viewer or not, and `scene.viewer.realtime_factor` changes it while the scene runs.
+
 Once the scene exists, reach the viewer through the `scene.viewer` shortcut to read or set the camera pose at runtime:
 
 ```python

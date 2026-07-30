@@ -51,6 +51,13 @@ A non-negative multiplier on any edge produces a force whose tangential part is 
 
 The reference acceleration is driven by the penetration depth under either cone, so a deeper contact pushes back harder.
 
+**Contact resolution.** `contact_resolution` decides how a contact's normal force and its friction force are resolved against each other, and with it whether sliding can inflate the normal force.
+
+- **`gs.contact_resolution.convex`:** the whole contact is one smooth convex cost, and the solver trades the normal residual against the tangential one. Because the friction limit $|\mathbf f_t| \le \mu f_n$ bounds the pair jointly, a contact sliding fast enough that its friction rows ask for more force than the cone allows can be answered by raising $f_n$ instead: a body launched horizontally lifts off a flat floor, by more the faster it slides. In exchange the whole problem stays a single convex program, which converges predictably on stiff articulated chains and high mass ratios.
+- **`gs.contact_resolution.signorini`:** friction is bounded by the normal force the contact has actually developed, so that force follows the contact's own normal state rather than tangential demand. A sliding body then decelerates at $\mu g$ and stays down at any speed. Contacts are resolved by successive approximation, which costs extra solver iterations and gives up the single-convex-program guarantee.
+
+Prefer `signorini` whenever sliding contact matters, and `convex` for parity with engines built on that formulation or when a stiff scene converges better under it. `signorini` needs the elliptic cone, whose rows split into a normal row and a friction disc, and the Newton solver, the only one that reaches the fixed point of the successive approximation. Leaving `contact_resolution` unset resolves it to `signorini` under those two, and to `convex` otherwise; `enable_mujoco_compatibility` keeps `convex`, since letting sliding inflate the normal force is part of the behavior being reproduced. Asking for `signorini` where it is unavailable raises at build time instead of falling back silently.
+
 **Torsional and rolling friction.** A point contact transmits no torque, so by default nothing resists a body spinning in place or a ball rolling to rest. Setting `enable_torsional_friction` adds one row per point resisting spin about the normal; `enable_rolling_friction` (which requires torsional friction) adds two more resisting rolling about the tangent axes. Their strength is set per geometry by the {py:class}`gs.materials.Rigid <genesis.engine.materials.rigid.Rigid>` coefficients `friction_torsional` and `friction_rolling`, each an effective contact-patch radius in meters, and the coefficient of a contacting pair is the larger of the two geoms' values. These rows cost solve time on every contact, so enable them only when spin or rolling resistance matters.
 
 ### Joint limits
@@ -115,6 +122,7 @@ These `RigidOptions` fields control the model and the solve. Pass them through {
 | Option | Default | Effect |
 |---|---|---|
 | `constraint_solver` | `Newton` | Newton–Cholesky or conjugate gradient. |
+| `contact_resolution` | auto | Whether sliding may inflate the contact normal force. |
 | `iterations` | `50` | Maximum solver iterations. |
 | `tolerance` | precision-dependent | Convergence threshold (scaled by inertia and dof count). |
 | `ls_iterations` | `50` | Maximum line-search iterations per solver iteration. |

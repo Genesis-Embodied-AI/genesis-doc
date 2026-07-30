@@ -81,6 +81,36 @@ rigid_options = gs.options.RigidOptions(
 )
 ```
 
+## Friction cones
+
+```python
+# Friction cone models
+gs.friction_cone.pyramidal  # four-edge pyramid approximation
+gs.friction_cone.elliptic   # exact isotropic cone
+
+# Usage
+rigid_options = gs.options.RigidOptions(
+    friction_cone=gs.friction_cone.elliptic,
+)
+```
+
+## Contact resolutions
+
+```python
+# How a contact's normal and friction forces are resolved against each other
+gs.contact_resolution.convex     # single convex program; fast sliding may inflate the normal force
+gs.contact_resolution.signorini  # friction bounded by the developed normal force
+
+# Usage: 'signorini' requires the elliptic cone and the Newton solver
+rigid_options = gs.options.RigidOptions(
+    friction_cone=gs.friction_cone.elliptic,
+    constraint_solver=gs.constraint_solver.Newton,
+    contact_resolution=gs.contact_resolution.signorini,
+)
+```
+
+See {doc}`/user_guide/theory/rigid_collision/rigid_constraint_model` for how each cone and resolution enters the solve.
+
 ## Broadphase traversal
 
 ```python
