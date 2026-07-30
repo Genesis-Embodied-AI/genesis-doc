@@ -121,7 +121,7 @@ runner.learn(num_learning_iterations=args.max_iterations, init_at_random_ep_len=
 The actor and critic are both two-layer MLPs (`[128, 128]`, `tanh`), configured in `get_train_cfg`. Start training with:
 
 ```bash
-python hover_train.py -e drone-hovering -b 8192 --max-iterations 301
+python examples/drone/hover_train.py -e drone-hovering -b 8192 --max-iterations 301
 ```
 
 - **`-e drone-hovering`:** experiment name; checkpoints and configs are written to `logs/drone-hovering/`.
@@ -150,7 +150,7 @@ With `-v`, the viewer shows a handful of environments training in parallel:
 `hover_eval.py` reloads the saved configs, rebuilds the environment with a single drone and the viewer open, and rolls out the trained policy deterministically:
 
 ```bash
-python hover_eval.py -e drone-hovering --ckpt 300 --record
+python examples/drone/hover_eval.py -e drone-hovering --ckpt 300 --record
 ```
 
 - **`--ckpt 300`:** loads `logs/drone-hovering/model_300.pt`.
