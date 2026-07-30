@@ -127,7 +127,7 @@ class MyPlugin(ViewerPlugin):
 
 ### Dragging bodies: MouseInteractionPlugin
 
-`gs.vis.viewer_plugins.MouseInteractionPlugin` lets you click and drag rigid bodies. By default it moves a body toward the cursor with a spring force (`use_force=True`); pass `use_force=False` to set the body's position directly instead. The full script, including the `--use-force` command-line flag and a multi-environment build, is [`examples/viewer_plugin/mouse_interaction.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/viewer_plugin/mouse_interaction.py):
+`gs.vis.viewer_plugins.MouseInteractionPlugin` lets you click and drag rigid bodies. By default it moves a body toward the cursor with a spring force (`use_force=True`); pass `use_force=False` to set the body's position directly instead. It also takes the `use_visual_geom` option described below. The full script, including the `--use-force` and `--use-visual-geom` command-line flags and a multi-environment build, is [`examples/viewer_plugin/mouse_interaction.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/viewer_plugin/mouse_interaction.py):
 
 ```python
 scene.viewer.add_plugin(
@@ -145,9 +145,11 @@ scene.viewer.add_plugin(
 
 ### Screen-to-world rays: RaycasterViewerPlugin
 
-Click-to-select and drag-in-3D need a ray from the camera through the cursor. Subclass `RaycasterViewerPlugin` instead of `ViewerPlugin`: it builds a raycaster over the scene's rigid geometry and gives you `_screen_position_to_ray(x, y)`, which returns a `Ray` (origin and direction in the world frame). It also overrides `update_on_sim_step()` to keep the raycaster in sync as bodies move, so hits stay accurate while the simulation runs.
+Click-to-select and drag-in-3D need a ray from the camera through the cursor. Subclass `RaycasterViewerPlugin` instead of `ViewerPlugin`: it builds a raycaster over the scene's rigid collision geometry and gives you `_screen_position_to_ray(x, y)`, which returns a `Ray` (origin and direction in the world frame). It also overrides `update_on_sim_step()` to keep the raycaster in sync as bodies move, so hits stay accurate while the simulation runs.
 
-Cast the ray with `self._raycaster.cast(*ray)`. A hit is a `RayHit` with `distance`, `position`, `normal` (all in the world frame), and `geom`, the `RigidGeom` that was struck; `geom.link` is the owning link:
+Pass `use_visual_geom=True` to cast against visual meshes instead, so picking follows what is drawn on screen and reaches entities whose only geometry is visual. The cost is rescanning every visual triangle each step, several times the price of the collision meshes on detailed geometry. Only entities whose material sets `use_visual_raycasting=True` are visible to that cast, the same opt-in the {doc}`raycaster sensors </user_guide/sensing/raycaster>` use.
+
+Cast the ray with `self._raycaster.cast(*ray)`. A hit is a `RayHit` with `distance`, `position`, `normal` (all in the world frame), and `geom`, the `RigidGeom` that was struck, or the `RigidVisGeom` under `use_visual_geom=True`; `geom.link` is the owning link:
 
 ```python
 from genesis.vis.viewer_plugins import RaycasterViewerPlugin, EVENT_HANDLED
