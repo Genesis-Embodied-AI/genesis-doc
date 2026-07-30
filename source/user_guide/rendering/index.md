@@ -175,11 +175,13 @@ Install the package first. Prebuilt wheels are available on PyPI for x86 and Pyt
 pip install gs-madrona
 ```
 
-Then run the bundled example, which writes frames to `./image_output`:
+Then run the bundled example, which writes frames to `out/batch_render`, or elsewhere with `-o`:
 
 ```bash
 python examples/rigid/single_franka_batch_render.py
 ```
+
+The batch renderer runs on CUDA only, so this example has no CPU backend to fall back on.
 
 Unlike the rasterizer, the batch renderer takes its lights at runtime through `scene.add_light(...)` after the scene is created, rather than from `VisOptions`:
 

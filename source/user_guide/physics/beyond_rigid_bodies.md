@@ -132,11 +132,11 @@ The Stable Fluid solver is grid-based (Eulerian), not particle-based: it advects
 
 Unlike the other non-rigid solvers, SF has no Lagrangian entity you add and move. Gas enters through velocity **jets** you register on the solver, and the solver stays inactive until at least one jet exists. Each substep advects the velocity and density fields (RK3 backtracing with trilinear interpolation), injects momentum at the jets, then runs `solver_iters` Jacobi pressure iterations to keep the velocity divergence-free. State lives on the fixed grid, so there are no per-entity get/set methods, and SF does not participate in checkpointing. Read the density grid back for rendering.
 
-Full script, including the jet class and writing the density field to images: [`examples/smoke.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/smoke.py).
+Full script, including the jet class and writing the density field to images: [`examples/fluid/smoke.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/fluid/smoke.py).
 
 ## Next steps
 
 - {doc}`Soft robots <soft_robots>`: actuate MPM and FEM muscles.
 - {doc}`Hybrid entities <hybrid_entity>`: couple a rigid skeleton to a soft skin.
 - {doc}`Particle emitters <emitters>`: stream MPM, SPH, or PBD particles into a scene.
-- {doc}`Solvers and coupling </user_guide/theory/solvers_and_coupling>`: how solvers exchange forces across material boundaries. Runnable pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling), and the IPC contact solver for stiff soft-body contact in [`examples/IPC_Solver`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/IPC_Solver).
+- {doc}`Solvers and coupling </user_guide/theory/solvers_and_coupling>`: how solvers exchange forces across material boundaries. Runnable pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling), and the IPC contact solver for stiff soft-body contact in [`examples/ipc`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/ipc).

@@ -9,11 +9,11 @@ The complete runnable example for this page is [`examples/sensors/imu_franka.py`
 ```python
 scene.start_recording(
     data_func=lambda: imu.read()._asdict(),
-    rec_options=gs.recorders.NPZFile(filename="imu_data.npz"),
+    rec_options=gs.recorders.NPZFile(filename="out/imu_data.npz"),
 )
 ```
 
-That single call captures IMU readings every step and writes them to `imu_data.npz` when recording stops.
+That single call captures IMU readings every step and writes them to `out/imu_data.npz` when recording stops.
 
 ## How recording works
 
@@ -40,7 +40,7 @@ For a {doc}`sensor <index>`, `sensor.start_recording` is the shortest path: it u
 
 ```python
 imu = scene.add_sensor(gs.sensors.IMU(entity_idx=franka.idx))
-imu.start_recording(gs.recorders.NPZFile(filename="imu_data.npz"))
+imu.start_recording(gs.recorders.NPZFile(filename="out/imu_data.npz"))
 ```
 
 ## Recording arbitrary data

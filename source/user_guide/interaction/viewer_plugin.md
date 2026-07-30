@@ -10,7 +10,7 @@ This scene adds the built-in `MouseInteractionPlugin` so you can click and drag 
 
 ```python
 import genesis as gs
-import genesis.vis.keybindings as kb
+from genesis.vis.keybindings import Key, KeyAction, Keybind
 
 gs.init(backend=gs.cpu)
 
@@ -31,7 +31,7 @@ def stop():
 
 # register_keybinds requires a built scene; call it after build().
 scene.viewer.register_keybinds(
-    kb.Keybind("quit", kb.Key.ESCAPE, kb.KeyAction.RELEASE, callback=stop),
+    Keybind("quit", Key.ESCAPE, KeyAction.RELEASE, callback=stop),
 )
 
 while is_running:
@@ -43,23 +43,23 @@ while is_running:
 A keybinding maps a key (optionally with modifiers) to a callback. Register one or more with `scene.viewer.register_keybinds()`, passing `genesis.vis.keybindings.Keybind` objects:
 
 ```python
-import genesis.vis.keybindings as kb
+from genesis.vis.keybindings import Key, KeyAction, Keybind, KeyMod
 
 scene.viewer.register_keybinds(
-    kb.Keybind("greeting", kb.Key.G, kb.KeyAction.PRESS, callback=lambda: print("Hello!")),
-    kb.Keybind("quit", kb.Key.ESCAPE, kb.KeyAction.RELEASE, callback=stop),
+    Keybind("greeting", Key.G, KeyAction.PRESS, callback=lambda: print("Hello!")),
+    Keybind("quit", Key.ESCAPE, KeyAction.RELEASE, callback=stop),
 )
 ```
 
 `register_keybinds` requires a built scene. It raises if called before `scene.build()`. Register keys after building, as in the example above.
 
-A `Keybind` takes a unique `name`, a `key` from the `kb.Key` enum, and a `key_action`:
+A `Keybind` takes a unique `name`, a `key` from the `Key` enum, and a `key_action`:
 
-- `kb.KeyAction.PRESS` fires once when the key goes down.
-- `kb.KeyAction.HOLD` fires repeatedly while the key is held.
-- `kb.KeyAction.RELEASE` fires once when the key is released.
+- `KeyAction.PRESS` fires once when the key goes down.
+- `KeyAction.HOLD` fires repeatedly while the key is held.
+- `KeyAction.RELEASE` fires once when the key is released.
 
-Pass `key_mods=(kb.KeyMod.CTRL,)` to require modifiers, and `args` / `kwargs` to forward arguments to the callback. Names must be unique; reusing a key with the same action raises unless you pass `overwrite=True`.
+Pass `key_mods=(KeyMod.CTRL,)` to require modifiers, and `args` / `kwargs` to forward arguments to the callback. Names must be unique; reusing a key with the same action raises unless you pass `overwrite=True`.
 
 ```{figure} ../../_static/images/keybindings_instructions.png
 :alt: Viewer overlay listing keyboard instructions, including custom keybindings
@@ -127,7 +127,7 @@ class MyPlugin(ViewerPlugin):
 
 ### Dragging bodies: MouseInteractionPlugin
 
-`gs.vis.viewer_plugins.MouseInteractionPlugin` lets you click and drag rigid bodies. By default it moves a body toward the cursor with a spring force (`use_force=True`); pass `use_force=False` to set the body's position directly instead. The full script, including the `--use_force` command-line flag and a multi-environment build, is [`examples/viewer_plugin/mouse_interaction.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/viewer_plugin/mouse_interaction.py):
+`gs.vis.viewer_plugins.MouseInteractionPlugin` lets you click and drag rigid bodies. By default it moves a body toward the cursor with a spring force (`use_force=True`); pass `use_force=False` to set the body's position directly instead. It also takes the `use_visual_geom` option described below. The full script, including the `--use-force` and `--use-visual-geom` command-line flags and a multi-environment build, is [`examples/viewer_plugin/mouse_interaction.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/viewer_plugin/mouse_interaction.py):
 
 ```python
 scene.viewer.add_plugin(
@@ -145,9 +145,11 @@ scene.viewer.add_plugin(
 
 ### Screen-to-world rays: RaycasterViewerPlugin
 
-Click-to-select and drag-in-3D need a ray from the camera through the cursor. Subclass `RaycasterViewerPlugin` instead of `ViewerPlugin`: it builds a raycaster over the scene's rigid geometry and gives you `_screen_position_to_ray(x, y)`, which returns a `Ray` (origin and direction in the world frame). It also overrides `update_on_sim_step()` to keep the raycaster in sync as bodies move, so hits stay accurate while the simulation runs.
+Click-to-select and drag-in-3D need a ray from the camera through the cursor. Subclass `RaycasterViewerPlugin` instead of `ViewerPlugin`: it builds a raycaster over the scene's rigid collision geometry and gives you `_screen_position_to_ray(x, y)`, which returns a `Ray` (origin and direction in the world frame). It also overrides `update_on_sim_step()` to keep the raycaster in sync as bodies move, so hits stay accurate while the simulation runs.
 
-Cast the ray with `self._raycaster.cast(*ray)`. A hit is a `RayHit` with `distance`, `position`, `normal` (all in the world frame), and `geom`, the `RigidGeom` that was struck; `geom.link` is the owning link:
+Pass `use_visual_geom=True` to cast against visual meshes instead, so picking follows what is drawn on screen and reaches entities whose only geometry is visual. The cost is rescanning every visual triangle each step, several times the price of the collision meshes on detailed geometry. Only entities whose material sets `use_visual_raycasting=True` are visible to that cast, the same opt-in the {doc}`raycaster sensors </user_guide/sensing/raycaster>` use.
+
+Cast the ray with `self._raycaster.cast(*ray)`. A hit is a `RayHit` with `distance`, `position`, `normal` (all in the world frame), and `geom`, the `RigidGeom` that was struck, or the `RigidVisGeom` under `use_visual_geom=True`; `geom.link` is the owning link:
 
 ```python
 from genesis.vis.viewer_plugins import RaycasterViewerPlugin, EVENT_HANDLED
