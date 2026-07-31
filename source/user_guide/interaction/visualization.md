@@ -2,7 +2,7 @@
 
 This page covers watching a Genesis World scene as it runs: the interactive **viewer** window, and the `gs` command-line tools that open it without writing a script. Reach for these while developing on a machine with a display. To render images off-screen (color, depth, segmentation, video) or produce photorealistic frames, see {doc}`Rendering </user_guide/rendering/index>`.
 
-Every scene owns a `visualizer` (`scene.visualizer`) that drives both the viewer and camera sensors. The viewer runs in its own thread and follows the simulation in real time; camera sensors render frames on demand and work headless (see {doc}`Rendering </user_guide/rendering/index>`).
+Every scene owns a `visualizer` (`scene.visualizer`) that drives both the viewer and the cameras added with `scene.add_camera()`. The viewer runs in its own thread and follows the simulation in real time; cameras render frames on demand and work headless (see {doc}`Rendering </user_guide/rendering/index>`).
 
 ## The viewer
 
@@ -30,13 +30,13 @@ scene = gs.Scene(
 
 `camera_pos` and `camera_lookat` are in meters, in the right-handed, Z-up world frame. `camera_fov` is the vertical field of view in degrees. If `res` is `None`, Genesis World opens a 4:3 window sized to half your display height.
 
-The viewer always renders with the rasterizer. To select the backend used by camera sensors (rasterizer, ray tracer, or batch renderer), see {doc}`Rendering backends </user_guide/rendering/index>`.
+The viewer always renders with the rasterizer. To select the backend used by the scene's cameras (rasterizer, ray tracer, or batch renderer), see {doc}`Rendering backends </user_guide/rendering/index>`.
 
 :::{note}
 To cap the viewer frame rate, set `refresh_rate` on `ViewerOptions`. The older `max_FPS` argument is deprecated and now maps to `refresh_rate`.
 :::
 
-`realtime_factor` sets the pace of the simulation itself: the multiple of wall-clock real time that one second of simulated time stands for, `1.0` for real time and `2.0` for twice as fast. When the viewer is shown, the simulation is throttled to it and falls behind gracefully when it cannot keep up; set it to `None` to always run as fast as possible. It also fixes the playback speed of the videos recorded by {doc}`camera sensors </user_guide/rendering/index>`, viewer or not, and `scene.viewer.realtime_factor` changes it while the scene runs.
+`realtime_factor` sets the pace of the simulation itself: how many seconds of simulated time one second of wall-clock time covers, `1.0` for real time and `2.0` for twice as fast. When the viewer is shown, the simulation is throttled to it and falls behind gracefully when it cannot keep up; set it to `None` to always run as fast as possible. It also sets the playback speed of the videos recorded by a {doc}`camera </user_guide/rendering/index>`, viewer or not, with `None` recording at real time since there is no pace to follow. `scene.viewer.realtime_factor` changes it while the scene runs.
 
 Once the scene exists, reach the viewer through the `scene.viewer` shortcut to read or set the camera pose at runtime:
 

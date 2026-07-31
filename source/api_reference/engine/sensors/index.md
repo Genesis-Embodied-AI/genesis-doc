@@ -4,7 +4,7 @@ Sensors read information out of a scene without changing its physics. You attach
 
 ## Sensor types
 
-Create a sensor with `scene.add_sensor()`, passing an options object from `gs.sensors`. The call returns a handle whose `read()` gives the measured value and `read_ground_truth()` the noiseless one, both with the same shape. Camera sensors can also be created through `scene.add_camera()`, documented on the {doc}`camera` page.
+Create a sensor with `scene.add_sensor()`, passing an options object from `gs.sensors`. The call returns a handle whose `read()` gives the measured value and `read_ground_truth()` the noiseless one, both with the same shape. `scene.add_camera()` creates a visualization camera instead, which lives outside the sensor pipeline; the {doc}`camera` page draws the distinction.
 
 Shapes use the batched-optional notation `([n_envs,] ...)`: the leading `n_envs` axis is present when the scene is built with multiple environments and absent otherwise.
 

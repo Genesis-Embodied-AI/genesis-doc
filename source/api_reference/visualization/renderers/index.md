@@ -1,6 +1,6 @@
 # Renderers
 
-A renderer is the backend that camera sensors use to turn a scene into images. Select one per scene by passing an instance to `gs.Scene(renderer=...)`; the choice applies to every camera sensor and does not affect the interactive viewer, which always rasterizes. For the task-oriented walkthrough, see {doc}`/user_guide/rendering/index`.
+A renderer is the backend that the scene's cameras use to turn a scene into images. Select one per scene by passing an instance to `gs.Scene(renderer=...)`; the choice applies to every camera added with `scene.add_camera(...)` and does not affect the interactive viewer, which always rasterizes. For the task-oriented walkthrough, see {doc}`/user_guide/rendering/index`.
 
 | Renderer | Speed | Quality | Use it for |
 |---|---|---|---|

@@ -1,6 +1,6 @@
 # Visualizer
 
-The orchestrator behind `scene.visualizer`, created automatically with every scene. It owns the interactive viewer, the camera sensors, and the renderer backend, and it refreshes them when you call `scene.visualizer.update()`. You rarely construct or call it directly: add cameras with `scene.add_camera(...)`, open the viewer with `show_viewer=True`, and drive both by stepping the scene and calling `update()` each step. For usage, see {doc}`/user_guide/interaction/visualization`.
+The orchestrator behind `scene.visualizer`, created automatically with every scene. It owns the interactive viewer, the cameras, and the renderer backend, and it refreshes them when you call `scene.visualizer.update()`. You rarely construct or call it directly: add cameras with `scene.add_camera(...)`, open the viewer with `show_viewer=True`, and drive both by stepping the scene and calling `update()` each step. For usage, see {doc}`/user_guide/interaction/visualization`.
 
 ## API reference
 
@@ -14,5 +14,5 @@ The orchestrator behind `scene.visualizer`, created automatically with every sce
 ## See also
 
 - {doc}`viewer`: the interactive window
-- {doc}`camera`: camera sensors for off-screen rendering
+- {doc}`camera`: the visualization camera, for off-screen rendering
 - {doc}`renderers/index`: renderer backends

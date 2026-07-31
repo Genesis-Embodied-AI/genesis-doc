@@ -1,12 +1,12 @@
 # Rendering
 
-Camera sensors render a Genesis World scene to images off-screen: color, depth, segmentation, and surface normals, plus video. Unlike the {doc}`viewer </user_guide/interaction/visualization>`, they need no display, so they work headless on a render farm, in a container, or over SSH. This page covers adding a camera, the image types it produces, recording a video, lighting, and the rendering backends, from the fast default rasterizer to photorealistic path tracing.
+A camera renders a Genesis World scene to images off-screen: color, depth, segmentation, and surface normals, plus video. Unlike the {doc}`viewer </user_guide/interaction/visualization>`, it needs no display, so it works headless on a render farm, in a container, or over SSH. This page covers adding a camera, the image types it produces, recording a video, lighting, and the rendering backends, from the fast default rasterizer to photorealistic path tracing.
 
 The complete script is [`examples/tutorials/visualization.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/visualization.py).
 
 ## Adding a camera
 
-A camera is a sensor you add to the scene. It renders independently of the viewer, so it is the tool for headless rendering and for capturing views from angles other than the viewer's:
+Add a camera with `scene.add_camera()`. It renders independently of the viewer, so it is the tool for headless rendering and for capturing views from angles other than the viewer's:
 
 ```python
 cam = scene.add_camera(
@@ -19,6 +19,10 @@ cam = scene.add_camera(
 ```
 
 With `GUI=True`, the camera opens an OpenCV window that displays each rendered frame. This is separate from the viewer window. Leave it `False` when running headless.
+
+:::{note}
+`scene.add_camera()` gives you a **visualization camera**: an object you drive yourself, calling `render()` for pixels and `start_recording()` for video. It is the camera to reach for to look at a scene, and the whole of this page is about it. A robot's onboard camera is instead a {doc}`camera sensor </user_guide/sensing/camera_sensors>`, added with `scene.add_sensor(...)`, read with `read()` like any other sensor, RGB only, and saved to video through the {doc}`recorders </user_guide/sensing/recorders>`.
+:::
 
 ## Rendering images
 
@@ -60,7 +64,7 @@ for i in range(120):
 cam.stop_recording()
 ```
 
-If you omit `save_to_filename`, Genesis World generates a name from the calling script, and `fps` defaults to 60. Two frames are always a whole number of simulation steps apart, so the highest framerate a scene can record is one frame per step, `1 / dt`; a framerate off that grid is rounded to it and logged. One second of video stands for one second of `realtime_factor`-paced time (see {doc}`the viewer </user_guide/interaction/visualization>`), so with the default `realtime_factor=1.0` playback runs at real time whatever the framerate. The result:
+If you omit `save_to_filename`, Genesis World generates a name from the calling script, and `fps` defaults to 60. Two frames are always a whole number of simulation steps apart, so a framerate off that grid is rounded to it and logged, and the highest framerate a scene can record is one frame per step. One second of video stands for one second of `realtime_factor`-paced time (see {doc}`the viewer </user_guide/interaction/visualization>`), so at the default `realtime_factor=1.0` playback runs at real time whatever the framerate and one frame per step encodes at `1 / dt`. The result:
 
 <video preload="auto" controls="True" width="100%">
 <source src="../../_static/videos/cam_record.mp4" type="video/mp4">
@@ -68,13 +72,13 @@ If you omit `save_to_filename`, Genesis World generates a name from the calling 
 
 Call `cam.pause_recording()` to keep a span of the simulation out of the video, a settling phase for instance, then `cam.start_recording()` with no argument to resume the same file; the paused span leaves no gap in the video. The filename and framerate are fixed for the whole of a video, so passing either one when resuming raises. After `stop_recording()`, the camera can record again to a new file at a new framerate.
 
-With `env_separate_rigid=True` in `VisOptions`, a camera in a batched scene records one file per rendered environment, each suffixed with its environment index (`video_0.mp4`, `video_1.mp4`, ...).
+A camera in a batched scene that renders every environment records one file per rendered environment, each suffixed with its environment index (`video_0.mp4`, `video_1.mp4`, ...). That is what the `BatchRenderer` backend does, and what the rasterizer does with `env_separate_rigid=True` in `VisOptions`; otherwise the camera is bound to the single environment `env_idx` and records one file.
 
 For recording sensor and simulation data (not just video) on a schedule, see {doc}`Recording data </user_guide/sensing/recorders>`.
 
 ## Lighting
 
-The rasterizer (the viewer and any rasterizer camera sensor) lights the scene from a list of lights on `VisOptions`. With no configuration it uses a single directional light, so scenes are lit out of the box; set `lights` to control direction, color, and intensity yourself. The light classes live in `gs.options.vis`:
+The rasterizer (the viewer, and any camera or camera sensor that rasterizes) lights the scene from a list of lights on `VisOptions`. With no configuration it uses a single directional light, so scenes are lit out of the box; set `lights` to control direction, color, and intensity yourself. The light classes live in `gs.options.vis`:
 
 ```python
 scene = gs.Scene(
@@ -109,7 +113,7 @@ This controls the rasterizer only. The ray tracer has no light objects: lights t
 
 ## Rendering backends
 
-`gs.Scene(renderer=...)` selects how camera sensors turn the scene into pixels. Genesis World provides:
+`gs.Scene(renderer=...)` selects how the scene's cameras turn the scene into pixels. Genesis World provides:
 
 - `gs.renderers.Rasterizer()`: the default. Fast, and what the viewer always uses.
 - `gs.renderers.RayTracer()`: a path tracer for photorealistic stills (see [below](#photorealistic-rendering-with-luisa-deprecating)).

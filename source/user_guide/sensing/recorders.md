@@ -31,8 +31,10 @@ From then on, the manager drives the recorder for you:
 Because the manager reads the data function itself, you never call it in your loop. You describe the recording once, before build, and step normally.
 
 :::{warning}
-Set up all recording **before** `scene.build()`. `start_recording` asserts the scene is unbuilt and raises otherwise, because recorders allocate their file handles and windows during the build.
+Set up all recording **before** `scene.build()`. `scene.start_recording` and `sensor.start_recording` assert the scene is unbuilt and raise otherwise, because recorders allocate their file handles and windows during the build.
 :::
+
+A visualization camera has its own video API, `camera.start_recording()`, which is called *after* build and bypasses the recorder manager entirely; see {doc}`Recording a video </user_guide/rendering/index>`.
 
 ## Recording sensor data
 
@@ -131,4 +133,4 @@ scene.stop_recording()  # flushes files, closes plot windows
 
 - {doc}`Recording API reference </api_reference/recording/index>`: `RecorderManager`, `Recorder`, and every recorder options class.
 - {doc}`Sensors <index>`: the contact, tactile, surface distance, IMU, and temperature sensors you can record from.
-- {doc}`Camera sensors <camera_sensors>`: RGB, depth, segmentation, and normal outputs, which pair with `VideoFile` and `MPLImagePlot`.
+- {doc}`Camera sensors <camera_sensors>`: RGB frames, which pair with `VideoFile` and `MPLImagePlot`.
