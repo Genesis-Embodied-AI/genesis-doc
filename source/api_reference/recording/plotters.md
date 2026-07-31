@@ -10,6 +10,11 @@ Live line plot backed by PyQtGraph. The fastest option for high-rate time-series
 
 ```{eval-rst}
 .. autoclass:: genesis.options.recorders.PyQtLinePlot
+
+.. autoclass:: genesis.recorders.plotters.PyQtLinePlotter
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## `gs.recorders.MPLLinePlot`
@@ -18,6 +23,11 @@ Live line plot backed by Matplotlib. Use it for time-series data when a Matplotl
 
 ```{eval-rst}
 .. autoclass:: genesis.options.recorders.MPLLinePlot
+
+.. autoclass:: genesis.recorders.plotters.MPLLinePlotter
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## `gs.recorders.MPLImagePlot`
@@ -26,6 +36,11 @@ Displays a 2D array as a live image or heatmap, for example a camera frame or a 
 
 ```{eval-rst}
 .. autoclass:: genesis.options.recorders.MPLImagePlot
+
+.. autoclass:: genesis.recorders.plotters.MPLImagePlotter
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## `gs.recorders.MPLVectorFieldPlot`
@@ -34,6 +49,11 @@ Draws a live vector field (quiver plot) from an array of 2D or 3D vectors.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.recorders.MPLVectorFieldPlot
+
+.. autoclass:: genesis.recorders.plotters.MPLVectorFieldPlotter
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also

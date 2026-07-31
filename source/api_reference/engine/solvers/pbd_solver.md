@@ -8,6 +8,15 @@ The `PBDSolver` implements Position Based Dynamics for simulating cloth, soft bo
 .. autoclass:: genesis.options.solvers.PBDOptions
 ```
 
+## PBDSolver
+
+```{eval-rst}
+.. autoclass:: genesis.engine.solvers.pbd_solver.PBDSolver
+    :members:
+    :undoc-members:
+    :show-inheritance:
+```
+
 ## See also
 
 - {doc}`/api_reference/engine/entity/pbd_entity/index`: PBD entities.

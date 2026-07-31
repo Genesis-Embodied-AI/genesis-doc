@@ -8,6 +8,15 @@ The `SPHSolver` implements Smoothed Particle Hydrodynamics for liquid simulation
 .. autoclass:: genesis.options.solvers.SPHOptions
 ```
 
+## SPHSolver
+
+```{eval-rst}
+.. autoclass:: genesis.engine.solvers.sph_solver.SPHSolver
+    :members:
+    :undoc-members:
+    :show-inheritance:
+```
+
 ## See also
 
 - {doc}`/api_reference/engine/entity/sph_entity`: SPHEntity.

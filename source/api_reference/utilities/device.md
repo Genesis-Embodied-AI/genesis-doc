@@ -38,6 +38,12 @@ gs.init(backend=gs.metal)   # Apple Metal
 gs.init(backend=gs.cpu)     # CPU fallback
 ```
 
+### Backend
+
+```{eval-rst}
+.. autoclass:: genesis.constants.backend()
+```
+
 ## Functions
 
 ```{eval-rst}
@@ -71,5 +77,4 @@ gs.tc_int    # PyTorch int dtype
 
 ## See also
 
-- {doc}`constants`: Backend enums
 - {doc}`tensor_utils`: Tensor operations

@@ -10,6 +10,15 @@ It simulates the `SF.Smoke` material; see {doc}`/api_reference/engine/material/s
 .. autoclass:: genesis.options.solvers.SFOptions
 ```
 
+## SFSolver
+
+```{eval-rst}
+.. autoclass:: genesis.engine.solvers.sf_solver.SFSolver
+    :members:
+    :undoc-members:
+    :show-inheritance:
+```
+
 ## See also
 
 - {doc}`/api_reference/engine/material/sf`: the smoke material simulated by this solver.

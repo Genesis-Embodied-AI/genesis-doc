@@ -6,3 +6,11 @@
     :undoc-members:
     :show-inheritance:
 ```
+
+## Joint types
+
+The value returned by `RigidJoint.type`.
+
+```{eval-rst}
+.. autoclass:: genesis.constants.JOINT_TYPE()
+```

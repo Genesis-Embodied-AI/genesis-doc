@@ -8,6 +8,11 @@ Writes samples to a NumPy `.npz` archive. Best for numeric arrays you load back 
 
 ```{eval-rst}
 .. autoclass:: genesis.options.recorders.NPZFile
+
+.. autoclass:: genesis.recorders.file_writers.NPZFileWriter
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## `gs.recorders.CSVFile`
@@ -16,6 +21,11 @@ Writes samples as rows in a `.csv` file. Best for scalar or low-dimensional data
 
 ```{eval-rst}
 .. autoclass:: genesis.options.recorders.CSVFile
+
+.. autoclass:: genesis.recorders.file_writers.CSVFileWriter
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## `gs.recorders.VideoFile`
@@ -24,6 +34,11 @@ Encodes a stream of image frames to a video file. Pair it with a data function t
 
 ```{eval-rst}
 .. autoclass:: genesis.options.recorders.VideoFile
+
+.. autoclass:: genesis.recorders.file_writers.VideoFileWriter
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also

@@ -8,6 +8,15 @@ The `ToolSolver` handles kinematic tools and end-effectors that drive other phys
 .. autoclass:: genesis.options.solvers.ToolOptions
 ```
 
+## ToolSolver
+
+```{eval-rst}
+.. autoclass:: genesis.engine.solvers.tool_solver.ToolSolver
+    :members:
+    :undoc-members:
+    :show-inheritance:
+```
+
 ## See also
 
 - {doc}`/api_reference/engine/material/tool`: the tool material and its parameters.

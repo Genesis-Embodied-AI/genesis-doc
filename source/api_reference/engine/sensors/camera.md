@@ -6,6 +6,12 @@ Do not confuse it with the visualization camera. The camera sensor is created wi
 
 Each backend is a separate options class and sensor, all returning the same `CameraReturnType(rgb)`. For usage and how to choose a backend, see the {doc}`camera sensing guide </user_guide/sensing/camera_sensors>`.
 
+## Return type
+
+```{eval-rst}
+.. autoclass:: genesis.engine.sensors.camera.CameraReturnType
+```
+
 ## Rasterizer camera
 
 ```{eval-rst}

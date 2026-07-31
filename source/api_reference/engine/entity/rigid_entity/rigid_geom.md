@@ -6,3 +6,11 @@
     :undoc-members:
     :show-inheritance:
 ```
+
+## Geometry types
+
+The value returned by `RigidGeom.type`.
+
+```{eval-rst}
+.. autoclass:: genesis.constants.GEOM_TYPE()
+```

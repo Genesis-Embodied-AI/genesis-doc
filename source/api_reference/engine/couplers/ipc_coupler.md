@@ -8,6 +8,15 @@ The `IPCCoupler` uses Incremental Potential Contact (IPC), a barrier-based, inte
 .. autoclass:: genesis.options.solvers.IPCCouplerOptions
 ```
 
+## IPCCoupler
+
+```{eval-rst}
+.. autoclass:: genesis.engine.couplers.ipc_coupler.coupler.IPCCoupler
+    :members:
+    :undoc-members:
+    :show-inheritance:
+```
+
 ## See also
 
 - {doc}`index`: coupler overview and how to choose one.

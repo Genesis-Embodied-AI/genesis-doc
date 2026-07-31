@@ -4,7 +4,6 @@ Genesis World bundles a set of helper modules under `genesis.utils` for the oper
 
 ## Modules
 
-- **{doc}`constants`:** enums and named constants for compute backends, joint types, and geometry types.
 - **{doc}`device`:** detecting the platform and selecting the compute backend and PyTorch device.
 - **{doc}`tensor_utils`:** converting between Quadrants fields, PyTorch tensors, and NumPy arrays.
 - **{doc}`geom`:** quaternion, rotation, and coordinate-transform helpers in `genesis.utils.geom`.
@@ -39,7 +38,6 @@ After `gs.init()` returns, these globals hold the resolved configuration:
 ```{toctree}
 :titlesonly:
 
-constants
 device
 tensor_utils
 geom
