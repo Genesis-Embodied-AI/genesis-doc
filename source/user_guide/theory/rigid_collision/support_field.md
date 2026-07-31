@@ -2,7 +2,7 @@
 
 Genesis World detects collisions between convex shapes with algorithms that never touch a shape's full geometry directly. Instead, they ask one question repeatedly: *given a direction, which point of the shape lies farthest that way?* The answer is called a **support point**, the function that returns it is a **support function**, and the **support field** is the acceleration structure that answers this question in constant time for arbitrary convex meshes.
 
-This page explains what support functions are, why the collision pipeline is built on them, and how Genesis precomputes a support field so that mesh queries stay cheap. For where these queries sit in the broader pipeline, see {doc}`rigid_collision/index`.
+This page explains what support functions are, why the collision pipeline is built on them, and how Genesis precomputes a support field so that mesh queries stay cheap. For where these queries sit in the broader pipeline, see {doc}`index`.
 
 ## The support function
 
@@ -99,4 +99,4 @@ Only convex meshes use the support field. Primitives use their analytical suppor
 
 ## See also
 
-- {doc}`rigid_collision/index`: where GJK and MPR fit in the rigid collision pipeline, from broad-phase pruning to contact generation.
+- {doc}`index`: where GJK and MPR fit in the rigid collision pipeline, from broad-phase pruning to contact generation.

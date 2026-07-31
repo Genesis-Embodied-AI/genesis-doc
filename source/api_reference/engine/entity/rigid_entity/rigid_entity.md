@@ -10,7 +10,7 @@
 ## Equality constraint types
 
 The value returned by `RigidEquality.type`, for the equality constraints an entity carries. How each one enters the
-constraint solve is described in {doc}`/user_guide/theory/rigid_collision/rigid_constraint_model`.
+constraint solve is described in {doc}`/user_guide/theory/rigid_constraint_model`.
 
 ```{eval-rst}
 .. autoclass:: genesis.constants.EQUALITY_TYPE()

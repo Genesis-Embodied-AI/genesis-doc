@@ -1,6 +1,6 @@
 # Rigid collision: contacts and forces
 
-Every simulation step, Genesis World finds which rigid bodies touch, generates a contact manifold for each touching pair, and hands those contacts to the constraint solver. This page explains how detection works conceptually and how to read the resulting contacts and contact forces back into Python. Force resolution (how contacts turn into accelerations) is covered in {doc}`rigid_constraint_model`.
+Every simulation step, Genesis World finds which rigid bodies touch, generates a contact manifold for each touching pair, and hands those contacts to the constraint solver. This page explains how detection works conceptually and how to read the resulting contacts and contact forces back into Python. Force resolution (how contacts turn into accelerations) is covered in {doc}`/user_guide/theory/rigid_constraint_model`.
 
 The detection code lives under `genesis/engine/solvers/rigid/collider/`, driven by the collider's `detection()` method.
 
@@ -24,7 +24,7 @@ Detection runs in two phases each step, from a cheap approximate cull to an exac
 | Any geometry against height-field terrain | Terrain routine that can emit several contact points per supporting cell. |
 | Non-convex meshes | Signed-distance-field sampling: vertices first (vertex–face), then edges (edge–edge), keeping the deepest penetration. |
 
-MPR and GJK both operate through a *support function* ("which vertex lies farthest along a given direction?") so they run branch-free on the GPU without face-adjacency caches. GJK additionally reports a separation distance when the geometries are apart and is the differentiable path (it is selected automatically when the scene requires gradients). Both accelerate support queries with a precomputed support field; see {doc}`/user_guide/theory/support_field` for how that structure is built and used. To capture flush faces rather than a single point, Genesis perturbs the pose slightly around the first contact normal and gathers the extra contacts that result.
+MPR and GJK both operate through a *support function* ("which vertex lies farthest along a given direction?") so they run branch-free on the GPU without face-adjacency caches. GJK additionally reports a separation distance when the geometries are apart and is the differentiable path (it is selected automatically when the scene requires gradients). Both accelerate support queries with a precomputed support field; see {doc}`/user_guide/theory/rigid_collision/support_field` for how that structure is built and used. To capture flush faces rather than a single point, Genesis perturbs the pose slightly around the first contact normal and gathers the extra contacts that result.
 
 The number of candidate pairs the broad phase may emit is bounded by the `max_collision_pairs` option on {doc}`RigidOptions </api_reference/engine/solvers/rigid_solver>`. Exceeding it at runtime halts the simulation, so raise it for scenes with dense contact.
 
@@ -86,6 +86,6 @@ This is the aggregate the constraint solver accumulated, so it reflects the reso
 
 ## See also
 
-- {doc}`rigid_constraint_model`: how contacts, joint limits, and equality constraints are solved for the resulting motion.
-- {doc}`/user_guide/theory/support_field`: the acceleration structure behind MPR and GJK support queries.
+- {doc}`/user_guide/theory/rigid_constraint_model`: how contacts, joint limits, and equality constraints are solved for the resulting motion.
+- {doc}`/user_guide/theory/rigid_collision/support_field`: the acceleration structure behind MPR and GJK support queries.
 - {doc}`/user_guide/sensing/contact`: contact and tactile sensors for per-step readings.

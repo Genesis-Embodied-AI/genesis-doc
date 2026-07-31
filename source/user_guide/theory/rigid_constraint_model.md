@@ -1,8 +1,8 @@
 # Rigid constraint model
 
-Once collision detection has produced contacts, the rigid solver still has to decide what forces those contacts, along with joint limits and any equality constraints, exert on the bodies. Genesis World does this the way MuJoCo does: it gathers every constraint into one system and solves it once per step for the generalized accelerations that satisfy them all together, using a *soft* formulation that tolerates small, controlled violations in exchange for stability at large timesteps.
+Once {doc}`collision detection <rigid_collision/index>` has produced contacts, the rigid solver still has to decide what forces those contacts, along with joint limits and any equality constraints, exert on the bodies. This is the last of the engine's {doc}`three layers <index>`, and the only one that computes constraint forces. Genesis World does this the way MuJoCo does: it gathers every constraint into one system and solves it once per step for the generalized accelerations that satisfy them all together, using a *soft* formulation that tolerates small, controlled violations in exchange for stability at large timesteps.
 
-This page explains that formulation and the solvers that carry it out. It is conceptual. For where contacts come from, see {doc}`collision_contacts_forces`; for the user-facing API that declares and toggles constraints, see {doc}`/user_guide/robot_control/constraints`. The implementation lives in `genesis/engine/solvers/rigid/constraint/`.
+This page explains that formulation and the solvers that carry it out. It is conceptual. For where contacts come from, see {doc}`rigid_collision/collision_contacts_forces`; for the user-facing API that declares and toggles constraints, see {doc}`/user_guide/robot_control/constraints`. The implementation lives in `genesis/engine/solvers/rigid/constraint/`.
 
 ## The system being solved
 
@@ -134,6 +134,6 @@ These `RigidOptions` fields control the model and the solve. Pass them through {
 
 ## See also
 
-- {doc}`collision_contacts_forces`: how contacts are detected and what each carries into the solve.
+- {doc}`rigid_collision/collision_contacts_forces`: how contacts are detected and what each carries into the solve.
 - {doc}`/user_guide/robot_control/constraints`: declaring equality constraints and toggling welds at runtime.
 - [MuJoCo constraint model](https://mujoco.readthedocs.io/en/latest/computation/index.html#constraint-model): the formulation Genesis World follows, in more mathematical depth.

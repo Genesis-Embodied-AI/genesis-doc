@@ -63,7 +63,7 @@ Mixing two tensors that belong to different scenes raises an error, since gradie
 ## Limitations
 
 - **Memory scales with horizon:** differentiable mode stores intermediate substep state for every step, so long trajectories consume proportionally more GPU memory. Set `substeps_local` in `gs.options.SimOptions` to control how much substep state is retained; in differentiable mode it must be divisible by `substeps`.
-- **Not every operation is differentiable:** some contact and collision paths do not provide gradients. Gradients through those paths may be zero or undefined. The rigid solver uses the GJK collision path when gradients are required (see {doc}`rigid_collision/collision_contacts_forces`), and the elliptic friction cone is unsupported (see {doc}`rigid_collision/rigid_constraint_model`).
+- **Not every operation is differentiable:** some contact and collision paths do not provide gradients. Gradients through those paths may be zero or undefined. The rigid solver uses the GJK collision path when gradients are required (see {doc}`rigid_collision/collision_contacts_forces`), and the elliptic friction cone is unsupported (see {doc}`rigid_constraint_model`).
 - **Coupler support:** differentiable simulation is supported by the default legacy coupler; the SAP coupler does not support it. See {doc}`couplers/index`.
 - **Hibernation is unavailable** when `requires_grad=True`; see {doc}`hibernation`.
 - **Numerical stability over long horizons:** gradients backpropagated through many steps can vanish or explode, as with any long recurrent computation.

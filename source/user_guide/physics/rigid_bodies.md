@@ -57,7 +57,7 @@ scene = gs.Scene(
 
 Reach for the elliptic `friction_cone` when resting objects must stay put instead of slowly creeping. Paired with the default Newton `constraint_solver` it also unlocks the `signorini` contact resolution, which Genesis World then selects by default: friction is bounded by the normal force the contact has developed, so a fast-sliding body decelerates at `friction` times gravity instead of lifting off a flat floor. Set `contact_resolution` explicitly to choose otherwise.
 
-Contact, collision geometry, and constraints, how these bodies actually push on each other, are governed by the rigid solver and documented under {doc}`Theory and modelling </user_guide/theory/rigid_collision/index>`, which covers {doc}`contact resolution </user_guide/theory/rigid_collision/rigid_constraint_model>` in full.
+Contact, collision geometry, and constraints, how these bodies actually push on each other, are governed by the rigid solver and documented under {doc}`Theory and modelling </user_guide/theory/rigid_collision/index>`, which covers {doc}`contact resolution </user_guide/theory/rigid_constraint_model>` in full.
 
 ## See also
 
