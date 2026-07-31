@@ -20,4 +20,4 @@ The `IPCCoupler` uses Incremental Potential Contact (IPC), a barrier-based, inte
 ## See also
 
 - {doc}`index`: coupler overview and how to choose one.
-- {doc}`/user_guide/theory/couplers/index`: the theory behind each coupler.
+- {doc}`/user_guide/theory/coupling/index`: the theory behind each coupler.

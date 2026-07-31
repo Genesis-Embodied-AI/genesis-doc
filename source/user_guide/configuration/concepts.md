@@ -21,7 +21,7 @@ The scene delegates all physics to a **simulator** (see the {doc}`Simulator API 
 - **Solver:** a physics engine for one class of material. Genesis World ships solvers for rigid bodies, the Material Point Method (MPM), the Finite Element Method (FEM), Position-Based Dynamics (PBD), and Smoothed-Particle Hydrodynamics (SPH), among others. Each entity belongs to exactly one solver, chosen by its material.
 - **Coupler:** the bridge between solvers. It transfers forces and resolves interactions across material types, so an MPM fluid can push a rigid body it lands on.
 
-See {doc}`Solvers and coupling </user_guide/theory/solvers_and_coupling>` for how to configure them.
+See {doc}`Solvers and coupling </user_guide/theory/coupling/index>` for how to configure them.
 
 ## Build and step
 
@@ -106,5 +106,5 @@ reads the same values you would recover by slicing the solver's global field wit
 
 - {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`: the minimal build-and-step program.
 - {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>`: running many environments at once.
-- {doc}`Solvers and coupling </user_guide/theory/solvers_and_coupling>`: configuring solvers and the coupler.
+- {doc}`Solvers and coupling </user_guide/theory/coupling/index>`: configuring solvers and the coupler.
 - {doc}`Naming and variables </user_guide/developers/naming_and_variables>`: the map from quantities to solver fields.

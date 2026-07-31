@@ -11,7 +11,7 @@ The `RigidSolver` handles rigid body dynamics, including articulated bodies, rob
 ### Option enums
 
 The values accepted by the `RigidOptions` fields above. The model each one selects is described in
-{doc}`/user_guide/theory/rigid_constraint_model`.
+{doc}`/user_guide/theory/rigid_solver/constraints`.
 
 ```{eval-rst}
 .. autoclass:: genesis.constants.integrator()
