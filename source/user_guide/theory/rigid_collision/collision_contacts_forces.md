@@ -1,4 +1,4 @@
-# Rigid collision: contacts and forces
+# Contacts and forces
 
 Every simulation step, Genesis World finds which rigid bodies touch, generates a contact manifold for each touching pair, and hands those contacts to the constraint solver. This page explains how detection works conceptually and how to read the resulting contacts and contact forces back into Python. Force resolution (how contacts turn into accelerations) is covered in {doc}`/user_guide/theory/rigid_constraint_model`.
 
