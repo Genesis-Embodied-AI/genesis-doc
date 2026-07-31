@@ -2,7 +2,7 @@
 
 This section explains how the engine works underneath the API. Where the rest of the guide is task-oriented, these pages are reference material for the physics and algorithms. Read them when a result surprises you, when you are tuning a hard contact or coupling problem, or when you simply want to understand the machinery.
 
-## One step, three layers
+## What happens in a physics step
 
 A rigid-body engine is three layers, and every `scene.step()` runs them in order. Which layer produced a surprising result is most of the diagnosis, since each fails differently.
 
