@@ -147,4 +147,4 @@ For an interactive version you can teleoperate from the keyboard, see [`examples
 
 - {doc}`Couplers overview <index>`: how to choose between the legacy, SAP, and IPC couplers.
 - {doc}`SAP coupler <sap_coupler>`: the semi-analytic alternative for rigid-FEM contact.
-- {doc}`Non-rigid models </user_guide/theory/nonrigid_models>`: FEM, cloth, and other deformable materials.
+- {doc}`Non-rigid models </user_guide/theory/soft_solvers>`: FEM, cloth, and other deformable materials.

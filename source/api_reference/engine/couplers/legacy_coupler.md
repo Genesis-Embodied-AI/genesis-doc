@@ -8,7 +8,16 @@ The `LegacyCoupler` is the default coupler. It handles every cross-solver pair (
 .. autoclass:: genesis.options.solvers.LegacyCouplerOptions
 ```
 
+## LegacyCoupler
+
+```{eval-rst}
+.. autoclass:: genesis.engine.couplers.legacy_coupler.LegacyCoupler
+    :members:
+    :undoc-members:
+    :show-inheritance:
+```
+
 ## See also
 
 - {doc}`index`: coupler overview and how to choose one.
-- {doc}`/user_guide/theory/couplers/index`: the theory behind each coupler.
+- {doc}`/user_guide/theory/coupling/index`: the theory behind each coupler.

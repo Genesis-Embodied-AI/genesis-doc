@@ -1,11 +1,20 @@
 # PBDSolver
 
-The `PBDSolver` implements Position Based Dynamics for simulating cloth, soft bodies, and particle systems with fast, stable steps. The materials it supports are listed in {doc}`/api_reference/engine/material/pbd/index`. For the algorithm, its constraint groups, and usage, see {doc}`/user_guide/theory/nonrigid_models` and {doc}`/user_guide/physics/beyond_rigid_bodies`.
+The `PBDSolver` implements Position Based Dynamics for simulating cloth, soft bodies, and particle systems with fast, stable steps. The materials it supports are listed in {doc}`/api_reference/engine/material/pbd/index`. For the algorithm, its constraint groups, and usage, see {doc}`/user_guide/theory/soft_solvers` and {doc}`/user_guide/physics/beyond_rigid_bodies`.
 
 ## Options
 
 ```{eval-rst}
 .. autoclass:: genesis.options.solvers.PBDOptions
+```
+
+## PBDSolver
+
+```{eval-rst}
+.. autoclass:: genesis.engine.solvers.pbd_solver.PBDSolver
+    :members:
+    :undoc-members:
+    :show-inheritance:
 ```
 
 ## See also

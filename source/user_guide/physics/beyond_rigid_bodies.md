@@ -139,4 +139,4 @@ Full script, including the jet class and writing the density field to images: [`
 - {doc}`Soft robots <soft_robots>`: actuate MPM and FEM muscles.
 - {doc}`Hybrid entities <hybrid_entity>`: couple a rigid skeleton to a soft skin.
 - {doc}`Particle emitters <emitters>`: stream MPM, SPH, or PBD particles into a scene.
-- {doc}`Solvers and coupling </user_guide/theory/solvers_and_coupling>`: how solvers exchange forces across material boundaries. Runnable pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling), and the IPC contact solver for stiff soft-body contact in [`examples/ipc`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/ipc).
+- {doc}`Solvers and coupling </user_guide/theory/coupling/index>`: how solvers exchange forces across material boundaries. Runnable pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling), and the IPC contact solver for stiff soft-body contact in [`examples/ipc`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/ipc).

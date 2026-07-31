@@ -8,6 +8,15 @@ The `MPMSolver` implements the Material Point Method (MPM) for simulating a wide
 .. autoclass:: genesis.options.solvers.MPMOptions
 ```
 
+## MPMSolver
+
+```{eval-rst}
+.. autoclass:: genesis.engine.solvers.mpm_solver.MPMSolver
+    :members:
+    :undoc-members:
+    :show-inheritance:
+```
+
 ## See also
 
 - {doc}`/api_reference/engine/entity/mpm_entity`: MPMEntity.

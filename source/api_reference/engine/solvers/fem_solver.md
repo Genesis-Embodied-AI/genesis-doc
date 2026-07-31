@@ -8,6 +8,15 @@ The `FEMSolver` implements the Finite Element Method for simulating deformable s
 .. autoclass:: genesis.options.solvers.FEMOptions
 ```
 
+## FEMSolver
+
+```{eval-rst}
+.. autoclass:: genesis.engine.solvers.fem_solver.FEMSolver
+    :members:
+    :undoc-members:
+    :show-inheritance:
+```
+
 ## See also
 
 - {doc}`/api_reference/engine/entity/fem_entity`: FEMEntity.

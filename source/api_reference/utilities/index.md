@@ -4,7 +4,6 @@ Genesis World bundles a set of helper modules under `genesis.utils` for the oper
 
 ## Modules
 
-- **{doc}`constants`:** enums and named constants for compute backends, joint types, and geometry types.
 - **{doc}`device`:** detecting the platform and selecting the compute backend and PyTorch device.
 - **{doc}`tensor_utils`:** converting between Quadrants fields, PyTorch tensors, and NumPy arrays.
 - **{doc}`geom`:** quaternion, rotation, and coordinate-transform helpers in `genesis.utils.geom`.
@@ -20,7 +19,7 @@ Most utilities assume the library has been initialized. `gs.init()` selects the 
 import genesis as gs
 
 gs.init(
-    backend=gs.gpu,  # CUDA on Linux, Metal on macOS
+    backend=gs.gpu,  # first available of CUDA, ROCm, Metal
     precision="32",
     seed=42,
 )
@@ -39,7 +38,6 @@ After `gs.init()` returns, these globals hold the resolved configuration:
 ```{toctree}
 :titlesonly:
 
-constants
 device
 tensor_utils
 geom

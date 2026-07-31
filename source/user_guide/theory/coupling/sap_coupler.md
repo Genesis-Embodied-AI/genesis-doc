@@ -2,7 +2,7 @@
 
 The Semi-Analytic Primal (SAP) coupler resolves contact between rigid bodies and FEM soft bodies with a convex, semi-analytic solver derived from the model Drake uses ([paper](https://arxiv.org/abs/2110.10107)). Reach for it when a rigid robot manipulates a moderately deformable volumetric object (grasping, pressing, lifting) and you need contact forces that stay stable and accurate under sustained load.
 
-SAP handles two solvers: `Rigid` and `FEM`. For cloth and highly deformable bodies, use the {doc}`IPC coupler <ipc_coupler>` instead; for multi-solver scenes (MPM, SPH, PBD) or differentiable simulation, use the default coupler described in {doc}`Solvers and coupling </user_guide/theory/solvers_and_coupling>`.
+SAP handles two solvers: `Rigid` and `FEM`. For cloth and highly deformable bodies, use the {doc}`IPC coupler <ipc_coupler>` instead; for multi-solver scenes (MPM, SPH, PBD) or differentiable simulation, use the default coupler described in {doc}`Solvers and coupling </user_guide/theory/coupling/index>`.
 
 ## Requirements
 
@@ -110,10 +110,10 @@ To hold a target vertex of an FEM body in place (a fixed constraint rather than 
 
 - **Use SAP** for rigid-FEM manipulation of moderately deformable volumetric bodies, where you need stable, accurate contact under sustained load and can afford 64-bit precision.
 - **Use the {doc}`IPC coupler <ipc_coupler>`** for cloth and highly deformable soft bodies.
-- **Use the default coupler** ({doc}`Solvers and coupling </user_guide/theory/solvers_and_coupling>`) for scenes with MPM, SPH, or PBD, for rigid-only simulation, or when you need gradients for differentiable simulation.
+- **Use the default coupler** ({doc}`Solvers and coupling </user_guide/theory/coupling/index>`) for scenes with MPM, SPH, or PBD, for rigid-only simulation, or when you need gradients for differentiable simulation.
 
 ## See also
 
 - {doc}`IPC coupler <ipc_coupler>`: barrier-based contact for cloth and highly deformable bodies.
-- {doc}`Solvers and coupling </user_guide/theory/solvers_and_coupling>`: how solvers and couplers fit together.
+- {doc}`Solvers and coupling </user_guide/theory/coupling/index>`: how solvers and couplers fit together.
 - {doc}`FEM options </api_reference/engine/solvers/fem_solver>` and {doc}`FEM elastic material </api_reference/engine/material/fem/elastic>`: configuring the deformable bodies SAP couples.

@@ -23,11 +23,13 @@ print(backend)  # gs.cuda, gs.metal, gs.cpu, etc.
 ### Automatic selection
 
 ```python
-# GPU auto-selects based on platform
+# Takes the first GPU backend available on the machine
 gs.init(backend=gs.gpu)
-# Linux -> CUDA
-# macOS -> Metal
+# tried in order: gs.cuda -> gs.amdgpu -> gs.metal -> gs.cpu
 ```
+
+With none of the three available, `gs.gpu` falls back to `gs.cpu` and logs a warning. Read `gs.backend` after
+`gs.init()` to see what it settled on.
 
 ### Manual selection
 
@@ -36,6 +38,12 @@ gs.init(backend=gs.gpu)
 gs.init(backend=gs.cuda)    # NVIDIA CUDA
 gs.init(backend=gs.metal)   # Apple Metal
 gs.init(backend=gs.cpu)     # CPU fallback
+```
+
+### Backend
+
+```{eval-rst}
+.. autoclass:: genesis.constants.backend()
 ```
 
 ## Functions
@@ -71,5 +79,4 @@ gs.tc_int    # PyTorch int dtype
 
 ## See also
 
-- {doc}`constants`: Backend enums
 - {doc}`tensor_utils`: Tensor operations
