@@ -19,7 +19,7 @@ Most utilities assume the library has been initialized. `gs.init()` selects the 
 import genesis as gs
 
 gs.init(
-    backend=gs.gpu,  # CUDA on Linux, Metal on macOS
+    backend=gs.gpu,  # first available of CUDA, ROCm, Metal
     precision="32",
     seed=42,
 )
