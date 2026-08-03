@@ -47,6 +47,10 @@ myst_enable_extensions = ["colon_fence", "dollarmath", "amsmath", "dollarmath"]
 # https://github.com/executablebooks/MyST-Parser/issues/519#issuecomment-1037239655
 myst_heading_anchors = 4
 
+# Single backticks in the docstrings resolve as Python cross-references, linking to the documented object when one
+# exists and rendering as inline code otherwise. Markdown pages are unaffected: MyST reads them as code spans.
+default_role = "py:obj"
+
 templates_path = ["_templates"]
 # exclude_patterns = ["user_guide/reference/_autosummary/*"]
 
