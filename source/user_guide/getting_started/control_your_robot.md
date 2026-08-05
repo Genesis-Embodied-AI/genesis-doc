@@ -84,7 +84,7 @@ These methods share the pattern used throughout the control API: a tensor of val
 - `set_*` writes the robot state directly, without consulting the dynamics. The dof lands on the requested value in a single step.
 - `control_*` sends a target to the controller, which produces forces that move the robot toward it over several steps, respecting the dynamics and the force range set above.
 
-Use `set_dofs_position` to reset an episode or place a robot at a starting configuration. We recommend keeping it out of a control loop, because a state written directly carries no momentum:
+Use `set_dofs_position` to reset an episode or place a robot at a starting configuration. On a rigid entity it zeroes the dof velocities as well, so the robot starts from rest; pass `zero_velocity=False` to keep the velocities it had. We recommend keeping it out of a control loop, because the position jump it produces respects no dynamics:
 
 ```python
 for i in range(150):

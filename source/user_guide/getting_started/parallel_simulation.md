@@ -14,7 +14,7 @@ We call one copy of the scene an **environment** (**env**) and count them with `
 
 ## Building parallel environments
 
-Select a GPU backend, since a batch gains nothing on the CPU:
+Initialize on a GPU backend, so the batch has those thousands of cores to fill:
 
 ```python
 gs.init(backend=gs.gpu)

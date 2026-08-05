@@ -81,7 +81,7 @@ and a reason attached to an instruction, never from ornament. Specifically:
   does, so delete it" makes the reader decode an image to find the instruction. Lead with the imperative and
   stop: ✅ "Delete sentences that fail to help the reader."
 - **Vague cost metaphors.** "You pay for that", "it does not come for free", "this is not cheap". Pay what,
-  in what units? Name the cost: ✅ "IPC costs more per step than the other couplers."
+  in what units, and compared to what? Name the cost: ✅ "IPC costs more per step than the legacy coupler."
 - **Stating what the reader already knows.** "Shape primitives need no file at all" tells someone who just
   read the word "primitive" nothing. ✅ "The shape primitives are `Plane`, `Box`, …". The same goes for a
   sentence explaining that a default is the value used when you pass nothing, or that a getter returns the
@@ -229,18 +229,18 @@ After:
 > The IPC coupler resolves contact with Incremental Potential Contact, a barrier-based model built on the
 > [libuipc](https://github.com/spiriMirror/libuipc) library. It advances every coupled body through a single
 > smooth potential whose barrier term grows without bound as two surfaces approach, so contact under IPC
-> stays intersection-free however hard you press two bodies together. IPC costs more per step than the other
-> couplers, which is why we leave it off by default.
+> stays intersection-free however hard you press two bodies together. IPC costs more per step than the legacy
+> coupler, so we keep legacy as the default and let you select IPC per scene.
 >
 > Use it for cloth with self-collision, for FEM solids pressed hard against each other, and for a gripper
-> closing on a deformable object. For coarse rigid contact or mixed continuum scenes (MPM, SPH, PBD), the
-> legacy coupler is cheaper and adequate; see the couplers overview for the full comparison.
+> closing on a deformable object. For mixed continuum scenes (MPM, SPH, PBD) or coarse rigid contact, stay on
+> the legacy coupler; see the couplers overview for the full comparison.
 
-The mechanism is stated once and made to carry its own consequence ("which is why contact under IPC stays…")
+The mechanism is stated once and made to carry its own consequence ("so contact under IPC stays…")
 instead of being circled a second time. Defining IPC by what the other two couplers do is gone, and with it
 the need to hold three models in your head to learn one. "Robustness" gives way to the property it stood in
-for, the cost sits next to the benefit where a reader deciding between couplers needs it, and "we leave it off
-by default" tells them that was our call rather than an accident.
+for, the cost sits next to the benefit where a reader deciding between couplers needs it, and "we keep legacy as
+the default" tells them that was our call rather than an accident.
 
 ## Rewrite rather than patch
 
