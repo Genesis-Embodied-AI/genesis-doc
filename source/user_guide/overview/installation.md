@@ -23,7 +23,7 @@ To run on CUDA, make sure a matching NVIDIA driver is installed on your machine.
 - **Python:** 3.10 to 3.13 (`>=3.10,<3.14`).
 - **Operating system:** Linux, macOS, or Windows. Linux with a CUDA-compatible GPU gives the best performance.
 
-Every combination below supports the full feature set, on CUDA and non-CUDA GPUs alike:
+Genesis World is cross-platform across CPUs and GPUs: NVIDIA through CUDA (`gs.cuda`), AMD through ROCm (`gs.amdgpu`), and Apple Silicon through Metal (`gs.metal`), with a CPU backend (`gs.cpu`) available everywhere. `gs.gpu` resolves to whichever of the three your machine has. The combinations below support the full feature set:
 
 | OS | GPU | GPU simulation | CPU simulation | Interactive viewer | Headless rendering |
 |---|---|:---:|:---:|:---:|:---:|
