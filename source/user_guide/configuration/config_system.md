@@ -1,6 +1,6 @@
 # Options system
 
-Genesis World is configured through **options objects**: small, typed parameter groups under `gs.options.*` that you pass to `gs.Scene(...)` and to `scene.add_entity(...)`. Rather than a scene taking dozens of loose keyword arguments, each concern (the global simulator, one physics solver, the viewer, a renderer) gets its own object with its own defaults. This page explains what those objects are, how they compose into a scene, and how a setting given in two places is resolved.
+Genesis World is configured through **options objects**: small, typed parameter groups under `gs.options.*` that you pass to `gs.Scene(...)` and to `scene.add_entity(...)`. We give each concern its own object with its own defaults, one for the global simulator, one per physics solver, one for the viewer, one per renderer, rather than having a scene accept dozens of loose keyword arguments. This page explains what those objects are, how they compose into a scene, and how we resolve a setting given in two places.
 
 If you have not built a scene yet, read {doc}`/user_guide/getting_started/hello_genesis` first. It uses {py:class}`SimOptions <genesis.options.solvers.SimOptions>` and {py:class}`ViewerOptions <genesis.options.ViewerOptions>` in passing. This page is the conceptual reference behind that usage.
 

@@ -181,7 +181,7 @@ scene = gs.Scene(
 )
 ```
 
-There are no `hibernate()` or `wake()` calls. `use_hibernation` defaults to `False`; `hibernation_thresh_vel` is the speed below which a link may sleep, in m/s, defaulting to `1e-4` under MuJoCo compatibility and `2e-3` otherwise.
+Hibernation is entirely automatic, driven by two options rather than by any call you make. `use_hibernation` defaults to `False`, and `hibernation_thresh_vel` is the speed below which a link may sleep, in m/s, defaulting to `1e-4` under MuJoCo compatibility and `2e-3` otherwise.
 
 :::{note}
 The gain is largest on the CPU backend, where skipping sleeping islands raises the serial step rate directly, and it pairs with `performance_mode=True`. Hibernation is unavailable in differentiable scenes, which fall back to the dense whole-scene solve.

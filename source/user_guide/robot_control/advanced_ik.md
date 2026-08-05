@@ -25,7 +25,7 @@ q = robot.inverse_kinematics_multilink(
 )
 ```
 
-Each target need not be a full 6-DoF pose. `pos_mask` and `rot_mask` are length-3 boolean masks that select which position axes and which rotation axes the solver has to satisfy; both default to `[True, True, True]`. Here `rot_mask=[False, False, True]` asks only that each fingertip's z-axis align with the z-axis of `target_quat`, leaving its heading in the horizontal plane free. Masking out constraints you do not care about gives the solver more freedom and makes it more likely to converge.
+A target can constrain as few axes as you like. `pos_mask` and `rot_mask` are length-3 boolean masks that select which position axes and which rotation axes the solver has to satisfy; both default to `[True, True, True]`. Here `rot_mask=[False, False, True]` asks only that each fingertip's z-axis align with the z-axis of `target_quat`, leaving its heading in the horizontal plane free. Masking out constraints you do not care about gives the solver more freedom and makes it more likely to converge.
 
 Orientations follow the `(w, x, y, z)` quaternion convention, so `target_quat = np.array([0, 1, 0, 0])` points the finger's z-axis straight down.
 
