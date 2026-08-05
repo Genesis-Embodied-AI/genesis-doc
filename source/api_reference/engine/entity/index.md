@@ -2,7 +2,7 @@
 
 An entity is a single simulated object in a Genesis World scene: a robot, a rigid body, a piece of cloth, a volume of fluid, or a deformable solid. It is the unit you add, configure, query, and control.
 
-You create an entity by calling {py:meth}`scene.add_entity <genesis.engine.scene.Scene.add_entity>`, which combines three ingredients:
+Create an entity by calling {py:meth}`scene.add_entity <genesis.engine.scene.Scene.add_entity>`, which combines three ingredients:
 
 - **Morph:** the geometry and pose: a primitive shape, a mesh, or a robot description loaded from URDF, MJCF, or USD. See {doc}`/api_reference/engine/entity/morph/index`.
 - **Material:** the physical model that decides which solver simulates the entity and how it responds to forces. See {doc}`/api_reference/engine/material/index`.
@@ -10,7 +10,7 @@ You create an entity by calling {py:meth}`scene.add_entity <genesis.engine.scene
 
 For a worked example of adding an entity and stepping the scene, see {doc}`/user_guide/getting_started/hello_genesis`.
 
-`add_entity` returns the entity object. Its concrete type depends on the material's solver: a rigid material yields a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`, an MPM material yields an `MPMEntity`, and so on. You interact with an entity through its own methods, whose return tensors follow the batched-optional shape convention; see {doc}`/user_guide/getting_started/hello_genesis`.
+`add_entity` returns the entity object. Its concrete type depends on the material's solver: a rigid material yields a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`, an MPM material yields an `MPMEntity`, and so on. Interact with an entity through its own methods, whose return tensors follow the batched-optional shape convention; see {doc}`/user_guide/getting_started/hello_genesis`.
 
 ## Entity types
 

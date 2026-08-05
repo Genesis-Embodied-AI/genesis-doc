@@ -1,6 +1,6 @@
 # Recording data
 
-A **recorder** samples data from your simulation on a schedule and processes it for you (writing it to a file or drawing it in a live plot) without you threading logging code through your step loop. You describe *what* to record and *how*, then step the scene as usual.
+A **recorder** samples data from your simulation on a schedule and processes it for you (writing it to a file or drawing it in a live plot) without you threading logging code through your step loop. Describe *what* to record and *how*, then step the scene as usual.
 
 Recording runs on a background thread by default, so it adds little overhead to the simulation itself.
 
@@ -28,7 +28,7 @@ From then on, the manager drives the recorder for you:
 2. On each `scene.step()`, the manager calls the data function and hands the result to the recorder at the configured rate.
 3. On `scene.stop_recording()` (or when the scene is destroyed), every recorder flushes and closes cleanly.
 
-Because the manager reads the data function itself, you never call it in your loop. You describe the recording once, before build, and step normally.
+Because the manager reads the data function itself, you never call it in your loop. Describe the recording once, before build, and step normally.
 
 :::{warning}
 Set up all recording **before** `scene.build()`. `scene.start_recording` and `sensor.start_recording` assert the scene is unbuilt and raise otherwise, because recorders allocate their file handles and windows during the build.

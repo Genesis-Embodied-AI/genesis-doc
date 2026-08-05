@@ -21,7 +21,7 @@ Every rigid entity is a {py:class}`RigidEntity <genesis.engine.entities.rigid_en
 - **Joints** (`entity.joints`, `entity.n_joints`): the connections between links.
 - **Degrees of freedom** (`entity.n_dofs`): the independent coordinates the joints move along. A single free body has 6 dofs; a fixed box has none.
 
-You read and write state through the entity: `get_pos()` and `get_quat()` for the base pose, and `get_dofs_position()` for joint positions. Driving those dofs with a controller is covered in {doc}`Control your robot </user_guide/getting_started/control_your_robot>` and, for arms, {doc}`Robot control </user_guide/robot_control/inverse_kinematics_motion_planning>`.
+Read and write state through the entity: `get_pos()` and `get_quat()` for the base pose, and `get_dofs_position()` for joint positions. Driving those dofs with a controller is covered in {doc}`Control your robot </user_guide/getting_started/control_your_robot>` and, for arms, {doc}`Robot control </user_guide/robot_control/inverse_kinematics_motion_planning>`.
 
 ## Fixed and free bases
 

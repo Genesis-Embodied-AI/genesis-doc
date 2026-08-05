@@ -1,6 +1,6 @@
 # Terrain
 
-{py:class}`gs.morphs.Terrain <genesis.options.morphs.Terrain>` adds a static rigid ground defined by a **height field**: a 2D grid of elevations. It is the standard ground for locomotion work: instead of a flat {py:class}`~genesis.options.morphs.Plane`, a robot walks over slopes, stairs, and obstacles. You build a terrain one of two ways: let Genesis World procedurally generate a grid of **sub-terrains**, or supply your own height field.
+{py:class}`gs.morphs.Terrain <genesis.options.morphs.Terrain>` adds a static rigid ground defined by a **height field**: a 2D grid of elevations. It is the standard ground for locomotion work: instead of a flat {py:class}`~genesis.options.morphs.Plane`, a robot walks over slopes, stairs, and obstacles. Build a terrain one of two ways: let Genesis World procedurally generate a grid of **sub-terrains**, or supply your own height field.
 
 The three runnable examples referenced on this page ship with Genesis World:
 

@@ -2,7 +2,7 @@
 
 Tactile sensors turn a link's surface into a grid of sensing points, or **taxels**, and read contact geometry directly from the scene's signed-distance fields (SDFs) or sampled point clouds rather than from solver contact impulses. They give you a dense taxel field at arbitrary locations without adding contacts to the solver, at the cost of being an approximation. Because the layout is link-local, a regular grid imitates a taxel array on a fingertip or a sensor pad.
 
-You describe the layout once with `probe_local_pos`, a set of `(x, y, z)` offsets in the link-local frame (an `(N, 3)` set or an `(M, N, 3)` planar grid), and the probes move rigidly with the link. Genesis World provides a helper for a planar grid, `genesis.utils.geom.generate_grid_points_on_plane(lo, hi, normal, nx, ny)`, which returns an `(ny, nx, 3)` array; `n_probes` is the flattened probe count.
+Describe the layout once with `probe_local_pos`, a set of `(x, y, z)` offsets in the link-local frame (an `(N, 3)` set or an `(M, N, 3)` planar grid), and the probes move rigidly with the link. Genesis World provides a helper for a planar grid, `genesis.utils.geom.generate_grid_points_on_plane(lo, hi, normal, nx, ny)`, which returns an `(ny, nx, 3)` array; `n_probes` is the flattened probe count.
 
 Two families share this interface but estimate contact differently:
 

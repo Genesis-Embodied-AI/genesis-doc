@@ -78,7 +78,7 @@ FEM underpins the {doc}`soft robots tutorial <soft_robots>`, which actuates a vo
 
 Position-Based Dynamics represents an entity as particles linked by constraints and solves for positions directly, which makes it fast and stable for cloth, ropes, and other 1D/2D/3D bodies that keep their topology. {py:class}`gs.materials.PBD.Cloth <genesis.engine.materials.PBD.cloth.Cloth>` loads a 2D mesh as a sheet.
 
-You can pin individual particles after building. `find_closest_particle` locates the particle nearest a world-space point (meters), and `fix_particles` anchors it:
+Pin individual particles after building. `find_closest_particle` locates the particle nearest a world-space point (meters), and `fix_particles` anchors it:
 
 ```python
 scene.build()

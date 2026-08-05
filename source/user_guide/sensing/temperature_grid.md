@@ -36,7 +36,7 @@ The `[n_envs,]` axis is present only when the scene is built with multiple {doc}
 
 ## Material properties
 
-Heat only flows between links that carry thermal properties. You supply these through `properties_dict`, which maps a global rigid-link index to a {py:class}`TemperatureProperties <genesis.options.sensors.options.TemperatureProperties>` entry. Key `-1` is the default applied to any link not listed explicitly; omit it and unlisted links are ignored in contacts entirely.
+Heat only flows between links that carry thermal properties. Supply these through `properties_dict`, which maps a global rigid-link index to a {py:class}`TemperatureProperties <genesis.options.sensors.options.TemperatureProperties>` entry. Key `-1` is the default applied to any link not listed explicitly; omit it and unlisted links are ignored in contacts entirely.
 
 ```python
 properties_dict = {

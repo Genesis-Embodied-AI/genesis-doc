@@ -1,6 +1,6 @@
 # Extending Genesis World
 
-A package built on top of Genesis World often has resources of its own to set up and tear down: GPU buffers, a renderer, a background service. You can tie that lifecycle to Genesis itself. Register a pair of callbacks and Genesis runs your setup on `gs.init()` and your teardown on `gs.destroy()`, so your extension comes up and goes down in lockstep with the engine.
+A package built on top of Genesis World often has resources of its own to set up and tear down: GPU buffers, a renderer, a background service. Tie that lifecycle to Genesis itself. Register a pair of callbacks and Genesis runs your setup on `gs.init()` and your teardown on `gs.destroy()`, so your extension comes up and goes down in lockstep with the engine.
 
 ## Registering a module
 

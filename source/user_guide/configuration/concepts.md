@@ -8,9 +8,9 @@ Every Genesis World program is built from the same handful of objects, and every
 :alt: Diagram of the Genesis World object model, showing a scene that contains entities and a simulator, where the simulator holds physics solvers and a coupler
 ```
 
-A **scene** (see the {doc}`Scene API </api_reference/engine/scene>`) is the top-level container. It owns two things: a simulator that advances the physics, and a visualizer that draws what you see. You add everything to the scene, then build and step it.
+A **scene** (see the {doc}`Scene API </api_reference/engine/scene>`) is the top-level container. It owns two things: a simulator that advances the physics, and a visualizer that draws what you see. Add everything to the scene, then build and step it.
 
-An **entity** is one object in the scene, such as a robot, a rigid body, or a body of fluid. You interact with it through its own methods and attributes rather than a global handle. Each entity is described by three pieces:
+An **entity** is one object in the scene, such as a robot, a rigid body, or a body of fluid. Interact with it through its own methods and attributes rather than a global handle. Each entity is described by three pieces:
 
 - **Morph:** the geometry and initial pose, either a primitive shape or a loaded model (see the {doc}`morph API </api_reference/engine/entity/morph/index>`).
 - **Material:** the physical model. The material chooses which solver simulates the entity. Liquids exist for both MPM and SPH, for example, and they behave differently.

@@ -11,7 +11,7 @@ A hybrid entity pairs two entities that share one scene and one timestep:
 - A **rigid part** (a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`) parsed from the URDF, carrying the joints and **degrees of freedom** (**dofs**).
 - A **soft part** (an {py:class}`MPMEntity <genesis.engine.entities.mpm_entity.MPMEntity>`) whose particles are attached to the rigid links.
 
-Each simulation step, the rigid solver advances the joints, and the coupling maps every soft particle back onto the link it belongs to; the particles' reaction then feeds a force back onto the rigid link. You drive the entity through the rigid dofs; the skin follows. The soft material must be MPM-based; FEM and PBD skins are not yet supported.
+Each simulation step, the rigid solver advances the joints, and the coupling maps every soft particle back onto the link it belongs to; the particles' reaction then feeds a force back onto the rigid link. Drive the entity through the rigid dofs, and the skin follows. The soft material must be MPM-based; FEM and PBD skins are not yet supported.
 
 ## Minimal setup
 
@@ -82,7 +82,7 @@ The skin is generated automatically: for each rigid link with a collision geomet
 
 ## Control
 
-You control a hybrid entity through its rigid dofs, using the same methods as a plain `RigidEntity`. They are forwarded to the rigid part:
+Control a hybrid entity through its rigid dofs, using the same methods as a plain `RigidEntity`. They are forwarded to the rigid part:
 
 ```python
 for i in range(1000):
@@ -95,7 +95,7 @@ for i in range(1000):
 
 ## Accessing the parts
 
-The two underlying entities are exposed as properties if you need to read or render them separately:
+Two properties expose the underlying entities, for reading or rendering them separately:
 
 ```python
 robot.part_rigid   # the RigidEntity skeleton

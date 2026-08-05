@@ -8,7 +8,7 @@ Identifiers answer "which entity is this," and indices answer "which slot in a s
 
 Every entity carries three identifiers, each for a different job:
 
-- **`name`:** a human-readable string. You pass it to `scene.add_entity(..., name=...)`, or Genesis World generates one from the morph type and a UID prefix. Names are how you look an entity up later.
+- **`name`:** a human-readable string. Pass it to `scene.add_entity(..., name=...)`, or Genesis World generates one from the morph type and a UID prefix. Names are how you look an entity up later.
 - **`uid`:** a globally unique ID assigned at creation. It never collides across entities and is stable for the life of the object. Its `short()` form (a 7-character prefix) is what appears in terminal logs.
 - **`idx`:** the entity's integer position in the scene's creation order. This is an *index*, not an identifier you should hand-write. It exists so the engine can address the entity's data.
 

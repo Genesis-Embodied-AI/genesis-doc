@@ -127,7 +127,7 @@ def _update_raw_data(cls, shared_context, shared_metadata, raw_data_T):
 | `SimpleSensor[OptionsT, None, MetadataT]` | Almost always. The standard per-step pipeline: raw, physics imperfections, transform, hardware imperfections, post-process, delay sampling. |
 | `SimpleSensor[OptionsT, None, MetadataT, DataT]` | Same pipeline, but `read()` returns an instance of `DataT`, a `NamedTuple`, instead of a single tensor. The IMU is the canonical example. |
 | `BaseCameraSensor[OptionsT]` | Camera-style sensors that render an image lazily on `read()`. See [Camera-style sensors](#camera-style-sensors). |
-| `Sensor[OptionsT, None, MetadataT]` | Only when neither standard pipeline fits. You then implement `_update_shared_cache` yourself, and set `uses_ring_pipeline = False` if your implementation never touches the timeline rings. |
+| `Sensor[OptionsT, None, MetadataT]` | Only when neither standard pipeline fits. Implement `_update_shared_cache` yourself, and set `uses_ring_pipeline = False` if your implementation never touches the timeline rings. |
 
 Mixins compose onto the base:
 
@@ -273,7 +273,7 @@ Two sensor types that declare the same context class share one instance. The man
 - **Link attachment** with `pos` / `lookat` / `up`, handing you the world-space transform to apply to your renderer each frame.
 - **An RGB output** of shape `([n_envs,] h, w, 3)` and dtype `torch.uint8`, declared from `options.res`, returned as a `CameraReturnType` `NamedTuple`.
 
-It opts out of the ring pipeline (`uses_ring_pipeline = False`) and rejects `delay`, `jitter`, and `history_length` at construction, since those depend on the return-space ring it does not allocate. You implement two hooks:
+It opts out of the ring pipeline (`uses_ring_pipeline = False`) and rejects `delay`, `jitter`, and `history_length` at construction, since those depend on the return-space ring it does not allocate. Implement two hooks:
 
 ```python
 class MyCameraSensor(BaseCameraSensor[MyCameraOptions]):

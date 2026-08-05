@@ -11,7 +11,7 @@ Two runnable examples are the source of truth for the patterns below:
 
 ## Process-per-GPU model
 
-Genesis World does not split a single scene across GPUs. Each process initializes its own Genesis runtime, builds its own scene, and runs on exactly one device. You get multi-GPU execution by starting several such processes and pinning each to a different GPU.
+Genesis World does not split a single scene across GPUs. Each process initializes its own Genesis runtime, builds its own scene, and runs on exactly one device. Run several such processes, pinning each to a different GPU.
 
 Pinning happens through environment variables that must be set **before** `gs.init()` runs, because they select the device that Genesis, its compiler, and the renderer bind to at initialization:
 

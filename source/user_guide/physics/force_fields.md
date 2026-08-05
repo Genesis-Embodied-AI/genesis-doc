@@ -58,7 +58,7 @@ A force field goes through four stages. Getting the order right matters: adding 
 
 2. **Register** it with the scene using `scene.add_force_field(field)`, which returns the same field. This must happen **before** `scene.build()`: the number of registered fields is baked into the compiled solver kernels, so a field added afterward is never evaluated.
 
-3. **Activate** it with `field.activate()`. A field is inactive when created (`field.active` is `False`) and contributes zero acceleration until activated. You can toggle `activate()` and `deactivate()` at any time after building, including mid-simulation, and read `field.active` to check the current state.
+3. **Activate** it with `field.activate()`. A field is inactive when created (`field.active` is `False`) and contributes zero acceleration until activated. Toggle `activate()` and `deactivate()` at any time after building, including mid-simulation, and read `field.active` to check the current state.
 
 4. **Step** the scene. On each substep the active field's acceleration is added to every affected particle.
 
@@ -91,7 +91,7 @@ def swirl(pos, vel, t, i):
 scene.add_force_field(gs.force_fields.Custom(swirl))
 ```
 
-`Turbulence` is built from `gs.force_fields.PerlinNoiseField`, a standalone 3D Perlin noise generator (parameters `wrap_size`, `frequency`, `seed`, `seed_offset`). You rarely construct it directly, and the one case that calls for it is a `Custom` field that needs coherent noise.
+`Turbulence` is built from `gs.force_fields.PerlinNoiseField`, a standalone 3D Perlin noise generator (parameters `wrap_size`, `frequency`, `seed`, `seed_offset`). It covers the usual case, so construct the generator yourself only for a `Custom` field that needs coherent noise.
 
 ## Notes and gotchas
 

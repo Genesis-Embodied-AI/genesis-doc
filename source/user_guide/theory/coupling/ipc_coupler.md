@@ -66,7 +66,7 @@ The example downloads a coarse `grid20x20.obj` cloth mesh rather than a dense on
 
 ## How entities couple
 
-You do not register links with the coupler directly. Instead, each entity's {doc}`Rigid material </api_reference/engine/material/rigid>` declares how it participates through `coup_type`:
+Each entity's {doc}`Rigid material </api_reference/engine/material/rigid>` declares how it participates, through `coup_type`, so the coupler needs no per-link registration:
 
 - **`two_way_soft_constraint`:** Genesis and IPC exchange forces through a soft position-and-orientation constraint. Use it for a floating-base robot or any rigid body whose motion Genesis controls but that must also feel contact.
 - **`external_articulation`:** joint-level coupling for articulated robots: IPC couples at the dof level rather than per link. Use it for a fixed-base arm.

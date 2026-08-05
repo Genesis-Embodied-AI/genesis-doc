@@ -15,7 +15,7 @@ A snapshot captures only the *dynamic* state: the fields that change as the simu
 
 - **`SimState`:** the object returned by `scene.get_state()`. It holds one per-solver state object for each active solver, batched over environments.
 - **Dynamic state:** positions, velocities, and the internal fields each solver integrates. This is what a checkpoint saves and restores.
-- **Static structure:** entities, morphs, geometry, and solver configuration. Not saved. You must reconstruct it before restoring, and it must match.
+- **Static structure:** entities, morphs, geometry, and solver configuration. Not saved. Reconstruct it before restoring, and it must match.
 
 Because structure is not part of the snapshot, a checkpoint is only valid for a scene built the same way. Restoring into a scene with different entities or solver options is undefined.
 

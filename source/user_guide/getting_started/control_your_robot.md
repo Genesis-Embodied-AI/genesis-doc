@@ -36,7 +36,7 @@ With no actuation the arm falls under gravity, so every snippet below issues a c
 
 A **joint** connects two links, and a **dof** (degree of freedom) is one independent coordinate that a joint contributes. The distinction matters here because every control method addresses dofs, never joints. On the Franka arm the two line up: 7 revolute arm joints and 2 prismatic gripper joints, each carrying a single dof, make a 9-dof articulated body. Other joint types carry more, so a free joint contributes 6 dofs and a ball joint 3.
 
-You address dofs by index, so start by mapping the joint names in the MJCF/URDF file to the dof indices the solver assigned them:
+Control methods take dof indices, so start by mapping the joint names in the MJCF/URDF file to the dof indices the solver assigned them:
 
 ```python
 joints_name = (

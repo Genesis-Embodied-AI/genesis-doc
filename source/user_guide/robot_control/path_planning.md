@@ -6,7 +6,7 @@ This page covers `plan_path` on its own. For the full pick-and-place workflow th
 
 ## Mental model
 
-Planning happens in **configuration space**: a point is a full joint configuration (`qpos`), not a Cartesian pose. You give the planner a goal `qpos`, and it searches for a sequence of configurations that connects the start to the goal without any of them putting the robot in collision.
+Planning happens in **configuration space**: a point is a full joint configuration (`qpos`), not a Cartesian pose. Give the planner a goal `qpos`, and it searches for a sequence of configurations that connects the start to the goal without any of them putting the robot in collision.
 
 Two consequences follow from this, and both are common sources of confusion:
 
@@ -49,7 +49,7 @@ for i in range(100):
 ```
 :::
 
-You can preview a planned path in the viewer before executing it:
+Preview a planned path in the viewer before executing it:
 
 ```python
 path_debug = scene.draw_debug_path(path, franka)  # renders the trajectory

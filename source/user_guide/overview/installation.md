@@ -64,7 +64,7 @@ Importing an engine submodule before calling `gs.init()` raises this error:
 genesis.GenesisException: Genesis hasn't been initialized. Did you call `gs.init()`?
 ```
 
-Engine submodules must be imported after initialization so they can configure low-level Quadrants features such as the fast-cache mechanism and dynamic array mode. This is rarely a problem in practice, because engine classes are not meant to be instantiated by hand. If you need to import one for type checking, guard the import:
+Import engine submodules after initialization, so they can configure low-level Quadrants features such as the fast-cache mechanism and dynamic array mode. This is rarely a problem in practice, because engine classes are not meant to be instantiated by hand. If you need to import one for type checking, guard the import:
 
 ```python
 from typing import TYPE_CHECKING
@@ -97,7 +97,7 @@ To ensure GPU rendering is active:
    ldconfig -p | grep EGL
    ```
 
-   You want to see `libEGL_nvidia.so.0`. You may also see `libEGL_mesa.so.0`; some systems handle both, but if rendering is slow, remove Mesa.
+   Look for `libEGL_nvidia.so.0`. `libEGL_mesa.so.0` may appear alongside it, which some systems handle, but remove Mesa if rendering is slow.
 
 3. Optionally remove MESA to prevent fallback, then recheck:
 

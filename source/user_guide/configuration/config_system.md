@@ -1,12 +1,12 @@
 # Options system
 
-You configure Genesis World through **options objects**: small, typed parameter groups under `gs.options.*` that you pass to `gs.Scene(...)` and to `scene.add_entity(...)`. We give each concern its own object with its own defaults, one for the global simulator, one per physics solver, one for the viewer, one per renderer, rather than having a scene accept dozens of loose keyword arguments. This page explains what those objects are, how they compose into a scene, and how we resolve a setting given in two places.
+Configure Genesis World through **options objects**: small, typed parameter groups under `gs.options.*` that you pass to `gs.Scene(...)` and to `scene.add_entity(...)`. We give each concern its own object with its own defaults, one for the global simulator, one per physics solver, one for the viewer, one per renderer, rather than having a scene accept dozens of loose keyword arguments. This page explains what those objects are, how they compose into a scene, and how we resolve a setting given in two places.
 
 If you have not built a scene yet, read {doc}`/user_guide/getting_started/hello_genesis` first. It uses {py:class}`SimOptions <genesis.options.solvers.SimOptions>` and {py:class}`ViewerOptions <genesis.options.ViewerOptions>` in passing. This page is the conceptual reference behind that usage.
 
 ## Composing a scene from options
 
-Every configurable component of a scene is described by one options object. You construct the objects you care about and hand them to the scene; anything you omit uses its defaults.
+Every configurable component of a scene is described by one options object. Construct the objects you care about and hand them to the scene; anything you omit uses its defaults.
 
 ```python
 import genesis as gs
@@ -38,7 +38,7 @@ All `gs.options.*` classes derive from {py:class}`gs.options.Options <genesis.op
 - **Fields are typed and validated on construction.** A value of the wrong type, or out of range, raises immediately with a readable message, not deep inside the first `scene.step()`.
 - **Unknown fields are rejected.** The base sets `extra="forbid"`, so a misspelled argument such as `gravty=(0, 0, -9.81)` raises `Unrecognized attribute 'gravty'` instead of being silently ignored.
 
-You never instantiate `Options` directly; you always use a concrete subclass. Each option class is documented in the {doc}`API Reference </api_reference/index>` alongside the component it configures.
+Never instantiate `Options` directly; always use a concrete subclass. Each option class is documented in the {doc}`API Reference </api_reference/index>` alongside the component it configures.
 
 ## Simulator options override solver options
 

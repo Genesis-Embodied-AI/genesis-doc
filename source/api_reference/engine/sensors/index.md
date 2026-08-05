@@ -1,6 +1,6 @@
 # Sensors
 
-Sensors read information out of a scene without changing its physics. You attach a sensor to a link, step the simulation, and read back a tensor each step. This page catalogs the sensor types and their return shapes; for the attach-and-read model, imperfections, history, and batched reads, see {doc}`the sensors guide </user_guide/sensing/index>`.
+Sensors read information out of a scene without changing its physics. Attach a sensor to a link, step the simulation, and read back a tensor each step. This page catalogs the sensor types and their return shapes; for the attach-and-read model, imperfections, history, and batched reads, see {doc}`the sensors guide </user_guide/sensing/index>`.
 
 ## Sensor types
 

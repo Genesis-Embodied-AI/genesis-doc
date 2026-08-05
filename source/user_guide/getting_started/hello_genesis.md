@@ -68,7 +68,7 @@ Here `dt` is the simulation timestep in seconds, `gravity` points down along `-Z
 
 Objects and robots are {doc}`entities </api_reference/engine/entity/index>`. The API is object-oriented, so `add_entity` hands you the entity itself and you drive it through its own methods and attributes.
 
-The first argument to `add_entity` is a {doc}`morph </api_reference/engine/entity/morph/index>`: a combined description of an entity's geometry *and* initial pose. You can build a morph from a shape primitive or load one from a file:
+The first argument to `add_entity` is a {doc}`morph </api_reference/engine/entity/morph/index>`: a combined description of an entity's geometry *and* initial pose. Build a morph from a shape primitive, or load one from a file:
 
 ```python
 plane = scene.add_entity(gs.morphs.Plane())

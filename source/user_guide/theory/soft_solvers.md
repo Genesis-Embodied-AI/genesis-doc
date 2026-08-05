@@ -1,6 +1,6 @@
 # Soft solvers
 
-Beyond the {doc}`rigid solver <rigid_solver/index>`, Genesis World ships five solvers for continuum and particle materials. You do not instantiate one: assigning a `material` to an entity selects both the solver that advances it and the **constitutive model** it obeys, the rule that turns deformation into stress. A solver is activated at build time only if it holds at least one entity.
+Beyond the {doc}`rigid solver <rigid_solver/index>`, Genesis World ships five solvers for continuum and particle materials. Assigning a `material` to an entity selects both the solver that advances it and the **constitutive model** it obeys, the rule that turns deformation into stress. A solver is activated at build time only if it holds at least one entity.
 
 To pick a solver and run one, see {doc}`/user_guide/physics/beyond_rigid_bodies`. For how forces cross material boundaries, see {doc}`coupling/index`.
 
