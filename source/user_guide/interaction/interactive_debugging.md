@@ -116,7 +116,7 @@ The available primitives:
 
 See {doc}`/api_reference/engine/scene` for the full signatures and defaults.
 
-## The interactive GUI panel
+## Interactive GUI panel
 
 The **ImGui overlay** adds a Dear ImGui panel on top of the viewer, so you can drive the simulation without editing code. It exposes:
 

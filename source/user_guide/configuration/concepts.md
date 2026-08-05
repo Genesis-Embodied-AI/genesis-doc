@@ -2,7 +2,7 @@
 
 Every Genesis World program is built from the same handful of objects, and every one of them runs in two phases: you describe a scene, then you build it and step it. This page explains that object model and computation model, and then the local-versus-global indexing scheme that lets one entity address its own slice of a solver's data. It assumes you have seen the {doc}`minimal example </user_guide/getting_started/hello_genesis>`.
 
-## The object model
+## Object model
 
 ```{figure} ../../_static/images/overview.png
 :alt: Diagram of the Genesis World object model, showing a scene that contains entities and a simulator, where the simulator holds physics solvers and a coupler

@@ -74,7 +74,7 @@ class MyProximitySensor(
 
 The rest of this page explains why each piece exists and which additional hooks the more elaborate sensors override.
 
-## The classes you write
+## Classes you write
 
 Every sensor contributes the same three artifacts, plus two optional ones.
 

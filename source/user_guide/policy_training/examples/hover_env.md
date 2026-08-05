@@ -12,13 +12,13 @@ The three files are the source of truth for the complete code:
 
 The drone is actuated purely through its four propeller speeds. If you have not seen how RPM becomes thrust and attitude, read {doc}`/user_guide/physics/drone_entity` first; this page assumes that mapping.
 
-## The task
+## Task
 
 Each episode places a target point in front of the drone and rewards it for flying to that point and holding position. When the drone gets within `at_target_threshold` (0.1 m) of the target, a fresh target is resampled, so a single episode chains many reach-and-hold maneuvers. An episode lasts up to `episode_length_s` (15 s) and terminates early on a crash.
 
 The task is defined by three things the environment must specify for any RL problem: an observation the policy sees, an action it produces, and a reward that scores the outcome.
 
-## The environment
+## Environment
 
 `HoverEnv` is a plain Python class, not a subclass of a gym base class. It exposes the methods an on-policy RL runner expects: `reset()`, `step(actions)`, and `get_observations()`. All of its state lives in batched tensors of shape `(n_envs, ...)`, so a single instance drives thousands of drones in parallel on the GPU.
 

@@ -56,7 +56,7 @@ Feature highlights:
 The `gs_nyx` / `gs_nyx_plugin` symbols below (`NyxCameraOptions`, `LightFieldAsset`, `EnvironmentMapAsset`, `nps.*`, `npr.*`) ship with the `gs-nyx` package, not the core `genesis` tree. `scene.add_sensor(...)` is the core sensor interface Nyx hooks into.
 :::
 
-## A minimal example
+## Minimal example
 
 The snippet below renders a PBR ball on a plane lit purely by an HDRI environment map, the canonical "hello world" for Nyx, mirroring [`examples/01_hello_nyx.py`](https://github.com/Genesis-Embodied-AI/genesis-nyx/blob/main/examples/01_hello_nyx.py) in the Nyx repo.
 

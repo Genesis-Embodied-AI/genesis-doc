@@ -46,7 +46,7 @@ for i in range(1000):
     scene.step()
 ```
 
-## The lifecycle
+## Lifecycle
 
 A force field goes through four stages. Getting the order right matters: adding after `build()` or forgetting to activate are the two most common mistakes.
 

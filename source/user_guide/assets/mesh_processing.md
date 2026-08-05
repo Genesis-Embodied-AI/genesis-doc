@@ -32,7 +32,7 @@ The `vis_mode` shortcut is how you inspect the result of processing. It renders 
 The processing described below applies when the morph becomes a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`. Deformable entities (FEM, MPM, and other particle-based materials) do not convexify their meshes; see {doc}`Beyond rigid bodies </user_guide/physics/beyond_rigid_bodies>`.
 :::
 
-## The collision pipeline
+## Collision pipeline
 
 When a mesh becomes a rigid entity, Genesis prepares its collision geometry in three stages:
 

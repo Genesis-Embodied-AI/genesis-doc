@@ -9,7 +9,7 @@ Genesis World exposes two levels of this. The state model is the same underneath
 
 All of these operate on a built scene. Build first, then snapshot.
 
-## The state model
+## State model
 
 A snapshot captures only the *dynamic* state: the fields that change as the simulation steps. It does not capture the scene's *structure*: the entities, their morphs, the solver options, or the number of environments. That structure is fixed by how you build the scene, and restoring a snapshot assumes it is already in place.
 

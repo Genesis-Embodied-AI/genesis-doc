@@ -22,7 +22,7 @@ The recipe here separates those two problems.
 
 The teacher is a means to an end. The deployable artifact is the vision student.
 
-## The environment
+## Environment
 
 Both stages share `GraspEnv`. It follows the same gym-style shape as the {doc}`locomotion <locomotion>` and {doc}`drone hover <hover_env>` examples: a `reset()` that returns observations and a `step(actions)` that returns `(observations, rewards, dones, infos)`.
 

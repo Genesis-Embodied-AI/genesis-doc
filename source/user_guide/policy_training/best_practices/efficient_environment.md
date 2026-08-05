@@ -4,7 +4,7 @@ When thousands of environments run in parallel on one GPU, throughput is decided
 
 The reference environment throughout is the quadruped locomotion example, [`examples/locomotion/go2_env.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/locomotion/go2_env.py). It builds `n_envs` copies of a Go2 robot (see {doc}`/user_guide/getting_started/parallel_simulation` for how batched builds work) and its `step` is written to run without a single host-device synchronization.
 
-## The performance model
+## Performance model
 
 Genesis World runs its physics on the GPU. Your environment code runs in Python on the CPU and issues work to the GPU asynchronously: `scene.step()` and every tensor operation queue up and return immediately, before the GPU has finished. Three things break that pipeline, and all three cost throughput that faster physics cannot win back.
 

@@ -90,9 +90,7 @@ gs.sensors.SphericalPattern(
 )
 ```
 
-**First mention of SphericalPattern:**
-
-To model a real unit, set the fov and ray counts from its datasheet. For example, a Velodyne VLP-16 is `fov=(360.0, 30.0), n_points=(1800, 16)`.
+To model a real unit, take the fov and ray counts from its datasheet. A Velodyne VLP-16, for example, is `fov=(360.0, 30.0), n_points=(1800, 16)`.
 
 ### DepthCameraPattern
 
@@ -122,7 +120,7 @@ gs.sensors.GridPattern(
 
 ### Custom pattern
 
-There is no `ray_directions` argument. To cast an arbitrary set of rays, subclass `gs.sensors.RaycastPattern`: return the layout shape from `_get_return_shape()` and fill `_ray_dirs` (unit directions in the sensor frame) in `compute_ray_dirs()`.
+Cast an arbitrary set of rays by subclassing `gs.sensors.RaycastPattern`: return the layout shape from `_get_return_shape()`, and fill `_ray_dirs` with unit directions in the sensor frame from `compute_ray_dirs()`. Rays are always described by a pattern object, so there is no argument that takes a bare list of directions.
 
 ```python
 import torch

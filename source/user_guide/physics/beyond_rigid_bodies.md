@@ -17,7 +17,7 @@ Every entity carries a `material`. In {doc}`Hello, Genesis World </user_guide/ge
 
 MPM and SPH also power {doc}`particle emitters <emitters>`; MPM and FEM power {doc}`volumetric soft robots <soft_robots>`.
 
-## The pattern shared by every non-rigid solver
+## Pattern shared by every non-rigid solver
 
 Whichever solver you use, three things change relative to a rigid-only scene.
 

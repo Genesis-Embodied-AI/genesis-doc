@@ -2,7 +2,7 @@
 
 This page explains what happens between `scene.step()` and the value a sensor's `read()` hands back: how the sensor manager updates every sensor once per step, how sensors of different types share expensive computation, and how buffering makes `read()` a constant-time memory lookup rather than a fresh acquisition. It is the runtime companion to {doc}`custom_sensors`, which covers the hooks you override to add a sensor. For the user-facing side (attach a sensor, step, read a tensor) start with the {doc}`sensor overview </user_guide/sensing/index>`.
 
-## The mental model: read is a lookup, not an acquisition
+## Read is a lookup, not an acquisition
 
 A real robot does not pull a value through an analog wire on each control-loop iteration. Embedded firmware samples the hardware asynchronously at its own rate, processes the signal, and writes a digital snapshot into shared memory. The application's `read()` returns whatever snapshot is currently there. It does not trigger acquisition.
 
@@ -46,7 +46,7 @@ else:
     self._return_cache[sensor_cls] = self._intermediate_cache[intermediate_dtype][:, cls_slice]
 ```
 
-## The per-step pipeline
+## Per-step pipeline
 
 `SensorManager.step` runs three phases in order:
 

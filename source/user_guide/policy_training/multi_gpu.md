@@ -9,7 +9,7 @@ Two runnable examples are the source of truth for the patterns below:
 - [`examples/rigid/multi_gpu.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/multi_gpu.py): one simulation process per GPU, launched with `multiprocessing`.
 - [`examples/rigid/ddp_multi_gpu.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/ddp_multi_gpu.py): data-parallel training over several GPUs with PyTorch DDP and `torchrun`.
 
-## The one-process-per-GPU model
+## Process-per-GPU model
 
 Genesis World does not split a single scene across GPUs. Each process initializes its own Genesis runtime, builds its own scene, and runs on exactly one device. You get multi-GPU execution by starting several such processes and pinning each to a different GPU.
 

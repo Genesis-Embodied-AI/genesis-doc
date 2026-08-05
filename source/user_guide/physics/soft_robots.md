@@ -53,7 +53,7 @@ Everything else (the plane, the scene, `build`, `step`) is the standard flow fro
 The constitutive `model` names differ between solvers. MPM uses `"corotation"` or `"neohooken"`; FEM uses `"linear"` or `"stable_neohookean"`. (`"stable_neohooken"` is a deprecated spelling of the FEM model and will warn.)
 :::
 
-## The scene: timestep and gravity
+## Timestep and gravity
 
 Soft-body dynamics need small timesteps and several substeps for numerical stability. Set the timestep on each solver's options, not on `SimOptions`:
 

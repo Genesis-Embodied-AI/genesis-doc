@@ -4,7 +4,7 @@ This page covers watching a Genesis World scene as it runs: the interactive **vi
 
 Every scene owns a `visualizer` (`scene.visualizer`) that drives both the viewer and the cameras added with `scene.add_camera()`. The viewer runs in its own thread and follows the simulation in real time; cameras render frames on demand and work headless (see {doc}`Rendering </user_guide/rendering/index>`).
 
-## The viewer
+## Viewer
 
 Configure the scene's visuals through two options objects. `viewer_options` controls the interactive window; `vis_options` controls visual properties shared by the viewer *and* every camera (frame gizmos, lighting, reflections). Pass `show_viewer=True` to open the window:
 

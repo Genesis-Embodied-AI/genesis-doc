@@ -49,7 +49,7 @@ for _ in range(1000):
 
 The hover RPM is model-specific; it is the value at which `4 · KF · rpm²` equals the drone's weight. For the shipped Crazyflie 2.X it is approximately 14468 RPM.
 
-## The drone morph
+## Drone morph
 
 The morph is a URDF loaded through {py:class}`gs.morphs.Drone <genesis.options.morphs.Drone>`. The defaults match the Crazyflie model, so `file` and `pos` are usually all you need:
 

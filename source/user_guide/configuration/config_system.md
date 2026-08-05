@@ -4,7 +4,7 @@ Genesis World is configured through **options objects**: small, typed parameter 
 
 If you have not built a scene yet, read {doc}`/user_guide/getting_started/hello_genesis` first. It uses {py:class}`SimOptions <genesis.options.solvers.SimOptions>` and {py:class}`ViewerOptions <genesis.options.ViewerOptions>` in passing. This page is the conceptual reference behind that usage.
 
-## A scene is assembled from options
+## Scenes are assembled from options
 
 Every configurable component of a scene is described by one options object. You construct the objects you care about and hand them to the scene; anything you omit uses its defaults.
 
