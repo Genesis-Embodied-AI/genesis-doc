@@ -1,6 +1,6 @@
 # Forward dynamics
 
-The first layer of a step: place the bodies, build the mass matrix, and solve $M(q)\,\ddot q = \tau$ for the acceleration they would take with no contact acting. {doc}`Detection <collision_detection>` and the {doc}`constraint solve <constraints>` then correct that acceleration.
+The first layer of a step places the bodies, builds the mass matrix, and solves $M(q)\,\ddot q = \tau$ for the acceleration they would take with no contact acting. {doc}`Detection <collision_detection>` and the {doc}`constraint solve <constraints>` then correct that acceleration.
 
 ## Kinematics
 
@@ -32,7 +32,7 @@ A damping force evaluated against the old velocity can overshoot, so every schem
 | `implicitfast` | Velocity-actuator bias joins the effective mass, and standalone free bodies advance by the implicit midpoint rule. | Two factorizations per substep. |
 | `approximate_implicitfast` (default) | The same, carried into the constraint and external-force accelerations. | One factorization per substep; the correction is approximate. |
 
-On an undamped dof under `Euler`, the velocity update is exactly `qvel += dt * qacc`.
+We default to `approximate_implicitfast` because it covers the same terms as `implicitfast` for one factorization instead of two, and the approximation it makes in the constraint and external-force accelerations rarely shows up in a controlled scene. Choose `implicitfast` when it does, and `Euler` when you need the velocity update to be exactly `qvel += dt * qacc`, as an analytical check does.
 
 ## Timestep and substeps
 

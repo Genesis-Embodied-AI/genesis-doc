@@ -2,7 +2,7 @@
 
 Genesis World uses a small, consistent set of naming rules across its API and its source. This page is the reference for three of them: how an entity is identified (`name`, `uid`, `idx`), how indices switch between an entity's own numbering and the solver's global numbering (`*_idx_local` vs `*_idx`), and the `i_*` loop-variable and field-naming conventions you will meet when reading solver code.
 
-Two conventions in one sentence: identifiers answer "which entity is this," and indices answer "which slot in a state array." They are unrelated numbering systems, and mixing them is the most common source of off-by-entity bugs.
+Identifiers answer "which entity is this," and indices answer "which slot in a state array." They are unrelated numbering systems, so passing one where the other belongs reads and runs as valid code while addressing the wrong entity.
 
 ## Identifying an entity: name, uid, and idx
 

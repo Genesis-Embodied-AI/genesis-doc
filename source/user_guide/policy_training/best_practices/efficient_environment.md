@@ -12,7 +12,7 @@ Genesis World runs its physics on the GPU. Your environment code runs in Python 
 - **Allocation:** creating a tensor inside the loop (`torch.zeros(...)`, `torch.tensor(...)`, most fresh reads) goes through the CUDA caching allocator, which synchronizes against pending work when it has to find or free memory.
 - **Python overhead:** a `for` loop over environments issues `n_envs` times the kernel launches for the same result a single batched op produces. The fixed per-launch cost, not the arithmetic, is what you pay.
 
-The rule that follows: operate on whole `([n_envs,] ...)` tensors at once, keep every tensor on the device, and never let a value cross back to the host inside the step loop.
+All three point the same way: operate on whole `([n_envs,] ...)` tensors at once, keep every tensor on the device, and never let a value cross back to the host inside the step loop.
 
 ## Keep tensors on the device
 

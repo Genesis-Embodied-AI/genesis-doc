@@ -99,6 +99,8 @@ The problem is solved iteratively for the generalized accelerations. `constraint
 - **`gs.constraint_solver.Newton`** (the default): forms the Hessian $H = M + J^\top D J$ and takes Newton steps by solving $H\,\Delta a = -g$ with a Cholesky factorization. On the CPU it can exploit the band structure of $H$ for a sparse factorization (`sparse_solve`); on the GPU it uses a dense tiled factorization. It converges in a handful of iterations, each carrying the cost of the factorization.
 - **`gs.constraint_solver.CG`**: preconditioned conjugate gradient in acceleration space, using the mass matrix as the preconditioner and a Polak–Ribière update. It needs only matrix-vector products, never the explicit Hessian, so its memory footprint stays low on scenes with many dofs or constraints.
 
+We default to Newton because a typical robot scene has few enough dofs that the factorization costs less than the extra iterations conjugate gradient would need. Switch to CG when a scene grows large enough that forming and factorizing $H$ dominates the step.
+
 Each iteration proposes a search direction, then a **line search** picks the step length $\alpha$ minimizing the objective along it. The objective restricted to a line is a quadratic, so the exact minimizer is available in closed form, and the search handles inequality rows switching between active and inactive as $\alpha$ varies. Line-search effort is capped by `ls_iterations` and `ls_tolerance`.
 
 The solve stops when both the gradient norm and the per-iteration cost improvement fall below a scaled tolerance,

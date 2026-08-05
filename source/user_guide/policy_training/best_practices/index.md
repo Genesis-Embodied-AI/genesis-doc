@@ -2,7 +2,7 @@
 
 Reinforcement learning in Genesis World runs thousands of environments in parallel on a single GPU. At that scale, two things dominate whether training succeeds: how fast each `env.step()` runs, and whether the policy you train transfers beyond the exact conditions it saw. The pages in this section cover the patterns that address both.
 
-The guiding idea is that the environment code is on the critical path. Every host-device transfer, every buffer re-allocation, and every Python-side branch inside the step loop costs throughput that no amount of GPU compute can win back. Writing environments that keep the step loop on the GPU, and varying the physics across environments so the policy sees a distribution rather than a single world, are the habits that separate a demo from a trainable pipeline.
+Environment code sits on the critical path, so every host-device transfer, every buffer re-allocation, and every Python-side branch inside the step loop costs throughput that no amount of GPU compute wins back. Both pages come down to the same two habits: keep the step loop on the GPU, and vary the physics across environments so the policy sees a distribution rather than a single world.
 
 Start here:
 

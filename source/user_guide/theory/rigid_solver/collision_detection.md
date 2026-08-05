@@ -1,6 +1,6 @@
 # Collision detection
 
-The second layer of a step: find which rigid bodies touch, generate a contact manifold for each touching pair, and hand those contacts to the constraint solver. This page covers how detection works, how to read the resulting contacts back into Python, and the support field the convex algorithms rest on. Turning contacts into accelerations is covered in {doc}`constraints`.
+The second layer of a step finds which rigid bodies touch, generates a contact manifold for each touching pair, and hands those contacts to the constraint solver. This page covers how detection works, how to read the resulting contacts back into Python, and the support field the convex algorithms rest on. Turning contacts into accelerations is covered in {doc}`constraints`.
 
 ## How contacts are detected
 
@@ -22,7 +22,7 @@ Detection runs in two phases each step, from a cheap approximate cull to an exac
 | Any geometry against height-field terrain | Terrain routine that can emit several contact points per supporting cell. |
 | Non-convex meshes | Signed-distance-field sampling: vertices first (vertex–face), then edges (edge–edge), keeping the deepest penetration. |
 
-MPR and GJK both operate through a *support function* ("which vertex lies farthest along a given direction?") so they run branch-free on the GPU without face-adjacency caches. GJK additionally reports a separation distance when the geometries are apart and is the differentiable path (it is selected automatically when the scene requires gradients). Both accelerate support queries with a precomputed support field, described [below](#support-functions). To capture flush faces rather than a single point, Genesis perturbs the pose slightly around the first contact normal and gathers the extra contacts that result.
+MPR and GJK both operate through a *support function* ("which vertex lies farthest along a given direction?") so they run branch-free on the GPU without face-adjacency caches. GJK additionally reports a separation distance when the geometries are apart and is the differentiable path (it is selected automatically when the scene requires gradients). Both accelerate support queries with a precomputed support field, described [below](#support-functions). To capture flush faces rather than a single point, Genesis perturbs the pose slightly around the first contact normal and gathers the extra contacts that result. We default to MPR because it costs less per pair, and we switch to GJK automatically where a scene needs gradients or a separation distance.
 
 The number of candidate pairs the broad phase may emit is bounded by the `max_collision_pairs` option on {doc}`RigidOptions </api_reference/engine/solvers/rigid_solver>`. Exceeding it at runtime halts the simulation, so raise it for scenes with dense contact.
 

@@ -1,6 +1,6 @@
 # Profiling simulation performance
 
-This page covers how to measure where a Genesis World simulation spends its time. There are three questions worth asking, in order of increasing depth:
+This page covers how to measure where a Genesis World simulation spends its time. Ask three questions, in order of increasing depth:
 
 - **Throughput:** how many steps per second does the whole scene run? This is the headline number, reported as FPS.
 - **Launch latency:** is the GPU actually busy, or is the CPU stalling between kernel launches? This is what limits large parallel simulations that are not yet GPU-bound.
