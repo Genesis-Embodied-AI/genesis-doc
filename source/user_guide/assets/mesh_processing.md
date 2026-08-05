@@ -2,7 +2,7 @@
 
 Every mesh you load into Genesis World serves two different jobs, and they want opposite things. The **visual mesh** should look right, so it keeps every triangle the artist authored. The **collision mesh** feeds the physics solver, which is fastest and most stable when geometry is simple, watertight, and convex. A raw mesh from a scanner or an art tool is usually none of those things.
 
-To bridge the gap, Genesis processes the collision geometry of a rigid entity automatically when you load it (watertightening, decimating, and convex-decomposing it) while leaving the visual mesh untouched. This page explains what that pipeline does, the options that control it, and when each one is the right adjustment.
+To bridge the gap, Genesis processes the collision geometry of a rigid entity automatically when you load it (watertightening, decimating, and convex-decomposing it) while leaving the visual mesh untouched. This page explains what that pipeline does, the options that control it, and when to change each one.
 
 The two runnable examples referenced throughout are the source of truth for the code:
 

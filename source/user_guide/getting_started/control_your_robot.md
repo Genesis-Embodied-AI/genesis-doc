@@ -34,7 +34,7 @@ With no actuation the arm falls under gravity, so every snippet below issues a c
 
 ## Joints and degrees of freedom
 
-A **joint** connects two links, and a **dof** (degree of freedom) is one independent coordinate that a joint contributes. The distinction matters here because every control method addresses dofs, never joints. On the Franka arm the two line up neatly: 7 revolute arm joints and 2 prismatic gripper joints, each carrying a single dof, make a 9-dof articulated body. Other joint types carry more, so a free joint contributes 6 dofs and a ball joint 3.
+A **joint** connects two links, and a **dof** (degree of freedom) is one independent coordinate that a joint contributes. The distinction matters here because every control method addresses dofs, never joints. On the Franka arm the two line up: 7 revolute arm joints and 2 prismatic gripper joints, each carrying a single dof, make a 9-dof articulated body. Other joint types carry more, so a free joint contributes 6 dofs and a ball joint 3.
 
 Dofs are addressed by index, so start by mapping the joint names in the MJCF/URDF file to the dof indices the solver assigned them:
 
@@ -124,7 +124,7 @@ franka.control_dofs_velocity(
 )
 ```
 
-`control_dofs_force` applies a torque (or force, for prismatic dofs) directly, bypassing the PD controller. Commanding zero force hands the arm back to gravity and it falls:
+`control_dofs_force` applies a torque (or force, for prismatic dofs) directly, skipping the PD controller. Commanding zero force lets gravity take over and the arm falls:
 
 ```python
 franka.control_dofs_force(

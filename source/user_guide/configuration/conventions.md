@@ -1,6 +1,6 @@
 # Conventions
 
-This page collects the conventions we follow throughout the API: the coordinate system, rotations, physical units, tensor shapes, and data types, plus the rules that decide how an imported asset is oriented. Every one of them is a choice we made once and apply everywhere, so reading this page saves you guessing later.
+This page collects the conventions we follow throughout the API: the coordinate system, rotations, physical units, tensor shapes, and data types, plus the rules that decide how an imported asset is oriented. Every one of them is a choice we made once and apply everywhere.
 
 ## Coordinate system
 
@@ -32,19 +32,19 @@ Gravity defaults to `(0, 0, -9.81)`, i.e. `-Z` with a magnitude of 9.81 m/s². W
 
 ## Axis conversion at import time
 
-Asset formats disagree about which axis points up, and some decline to say. The sections below give the rule we apply to each format on its way into our Z-up space.
+Asset formats disagree about which axis points up, and some do not record it at all. The sections below give the rule we apply to each format on its way into our Z-up space.
 
 ### Why "Y-up" is not enough to go on
 
 A Y-up-to-Z-up conversion is a 3×3 rotation, and several rotations are valid depending on which axis the asset treats as forward. Two meshes can both be labeled Y-up and still import at different orientations, so the up axis alone does not pin down an asset's convention: the forward axis decides the rotation.
 
-We therefore commit to one mapping, `(X, Y, Z) → (X, -Z, Y)`, which is **Y-up, -Z forward**. That is Blender's default configuration when it exports to a Y-up format, and we match it deliberately, since Blender authors a large share of robotics and simulation assets and its exporters apply well-defined conversions per target format. An asset exported from Blender at default settings therefore arrives at the orientation you saw in Blender, and it arrives the same way whether it came as glTF, STL, OBJ, or a mesh referenced from URDF. Wherever these docs say "Y-up", they mean this mapping.
+We therefore commit to one mapping, `(X, Y, Z) → (X, -Z, Y)`, which is **Y-up, -Z forward**. That is Blender's default configuration when it exports to a Y-up format, and we match it deliberately, because Blender is a common authoring tool for robotics and simulation assets and its exporters apply well-defined conversions per target format. An asset exported from Blender at default settings therefore arrives at the orientation you saw in Blender, and it arrives the same way whether it came as glTF, STL, OBJ, or a mesh referenced from URDF. Wherever these docs say "Y-up", they mean this mapping.
 
 ### glTF (.gltf, .glb)
 
 glTF assets are [always Y-up by specification](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#coordinate-system-and-units), so we always convert them, and we do not offer a switch to turn that off. Following the spec is what lets a glTF file behave the same everywhere.
 
-Blender will write a Z-up glTF if you uncheck **+Y-up**, and it cannot read such a file back correctly either. Since our conversion assumes the spec, a Z-up glTF imports rotated. Re-export with the default **+Y-up** option rather than overriding the axis on import.
+Blender will write a Z-up glTF if you uncheck **+Y-up**, though it cannot read that file back correctly afterward. Since our conversion assumes the spec, a Z-up glTF imports rotated. Re-export with the default **+Y-up** option rather than overriding the axis on import.
 
 ![Blender glTF exporter panel with the +Y-up transform option enabled](images/blender_gltf_export.png)
 

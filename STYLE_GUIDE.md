@@ -14,7 +14,7 @@ Every rule below descends from five principles. When a rule doesn't fit a situat
 2. **Accuracy is non-negotiable.** A single wrong argument name or stale output destroys trust in the whole page, so every code block must run and every claim must hold at the current version.
 3. **Show, then tell.** A correct, runnable example answers more questions than three paragraphs, so lead with it.
 4. **One voice.** A reader should not be able to tell that fifty people wrote these pages. Consistency in terminology, structure, and tone is worth more than any individual author's preference.
-5. **Delete before you add.** Every sentence that does not help the reader act hides one that does.
+5. **Cut what does not help, not what is long.** A sentence that fails to help the reader act hides one that does, so delete it. An explanation that earns its lines is not a candidate for cutting: see the [voice guide](VOICE.md) on explaining generously.
 
 ---
 
@@ -91,10 +91,10 @@ A configuration class that is itself the public API with no separate built objec
 
 **One page, one job.** If a page is teaching a concept, don't bury an API dump in it. If it's a reference, don't turn it into a tutorial. Link between them instead.
 
-**Teach concepts; link the code.** A tutorial's job is to explain what a commented example file cannot: *why* each step exists, the mental model behind it, the conventions in play, and what goes wrong without it. Its job is *not* to narrate code line by line — the reader can read code. Concretely:
+**Teach concepts; link the code.** A tutorial's job is to explain what a commented example file cannot: *why* each step exists, the mental model behind it, the conventions in play, and what goes wrong without it. Its job is *not* to narrate code line by line, because the reader can read code. Concretely:
 
 - **The runnable example file is the single source of truth for the complete code.** Link it prominently (for example, `examples/tutorials/hello_genesis.py`). Never paste a long script in full, and never paste it *twice* (a walkthrough followed by the whole script at the bottom is the pattern to kill).
-- **Pull short excerpts into the page — one per teaching point.** An excerpt anchors an explanation; it does not reproduce the file. If an excerpt has nothing to teach, cut it.
+- **Pull short excerpts into the page, one per teaching point.** An excerpt anchors an explanation; it does not reproduce the file. If an excerpt has nothing to teach, cut it.
 - **Comments say _what_; prose says _why_.** Don't write prose that restates the next line of code ("`scene.build()` builds the scene"). Explain the reason, the trade-off, or the gotcha instead.
 - A short, self-contained script (under ~15 lines) may be shown once in full as the minimal working example. Anything longer is excerpted, with the full file linked.
 
@@ -126,7 +126,7 @@ A configuration class that is itself the public API with no separate built objec
 - Arrows follow the context: `→` in prose and in a mapping like `(X, Y, Z) → (X, -Z, Y)`, and ASCII `->` inside code and code comments.
 
 **Capitalization:**
-- Sentence case for in-page content headings: "Reading sensor data", not "Reading Sensor Data". Navigation and section titles are the one exception (Title Case) — see §7.
+- Sentence case for in-page content headings: "Reading sensor data", not "Reading Sensor Data". Navigation and section titles are the one exception (Title Case); see §7.
 - Code identifiers keep their real casing: `Scene`, `add_entity`, `gs.cpu`.
 
 **Oxford comma. American spelling.** ("color", "behavior", "modeling").
@@ -155,12 +155,12 @@ Code is the most-read, most-copied, most-trusted part of any page. Hold it to th
 force = contact_sensor.read()
 ```
 
-**Minimal first, complete later.** The opening example should contain the fewest lines that demonstrate the point — nothing decorative. Introduce configuration and options only once the core idea has landed.
+**Minimal first, complete later.** The opening example should contain the fewest lines that demonstrate the point, with nothing decorative. Introduce configuration and options only once the core idea has landed.
 
 **Prefer excerpts from the real example file over hand-typed snippets.** Code copied from a tested example in `examples/` stays correct; hand-typed code drifts out of sync with the API and rots silently. When you show an excerpt, copy it from the file you link as the source of truth (see §3).
 
 **Follow the same conventions as the codebase itself:**
-- Tag every fenced block with a language: ` ```python `, ` ```bash `. Never leave a block untagged, and never write ` ```Python ` with a capital P — the label is lowercase.
+- Tag every fenced block with a language: ` ```python `, ` ```bash `. Never leave a block untagged, and never write ` ```Python ` with a capital P: the label is lowercase.
 - Format Python as `black` would. **Do not space-align keyword arguments.** Align-by-column drifts out of alignment on the next edit and violates PEP 8.
 
   ✅
@@ -191,7 +191,7 @@ force = contact_sensor.read()
 - ✅ `distances = sensor.read()  # shape ([n_envs,] n_probes)`
 - ❌ `scene.build()  # build the scene`
 
-**Show representative output when it aids understanding**, as a comment or a separate block — but only if it's real. Never invent output.
+**Show representative output when it aids understanding**, as a comment or a separate block, but only if it's real. Never invent output.
 
 **Prefer `gs.gpu` / `gs.cpu` choices that match the tutorial's intent** and explain the choice once, rather than silently switching backends between examples.
 
@@ -201,7 +201,7 @@ force = contact_sensor.read()
 
 Consistency here is what makes the docs read as one voice. These are settled; use them exactly.
 
-**The product is "Genesis World."** Use the full name on first mention in a page and in any heading or introduction. After first mention, "Genesis World" may be shortened to "Genesis" within running prose where there's no ambiguity — but never invent other short forms. Do not write "Genesis World" in every sentence of a paragraph; it reads as keyword stuffing. Rewrite to use "it" or restructure.
+**The product is "Genesis World."** Use the full name on first mention in a page and in any heading or introduction. After first mention, "Genesis World" may be shortened to "Genesis" within running prose where there's no ambiguity, but never invent other short forms. Do not write "Genesis World" in every sentence of a paragraph; it reads as keyword stuffing. Rewrite to use "it" or restructure.
 
 - ✅ "Genesis World uses just-in-time compilation. The first build is therefore slower than subsequent runs, because it compiles GPU kernels on the fly."
 - ❌ "Genesis World uses JIT. Genesis World compiles kernels on the fly, so Genesis World's first build is slow."
@@ -231,17 +231,17 @@ We build with Sphinx + MyST Markdown (`pydata_sphinx_theme`). Use the following,
 - One `#` H1 per page, matching the page's job. **No emoji in headings.** They break scannability, sorting, and search, and read as decoration. (Existing emoji headings should be removed as pages are touched.)
 - **Content headings use sentence case; navigation titles use Title Case.** Every heading inside a page is sentence case. The exception is navigation: the two top-level section landing titles (`User Guide`, `API Reference`) and the sidebar `:caption:` labels in a `{toctree}` (`Getting Started`, `Robot Control`, …) are Title Case, because they read as proper section names rather than page content.
 - **Don't start a page or section title with an article.** Name the subject directly: `Sensor pipeline`, not "The sensor pipeline"; `Support field`, not "The support field". A leading "The"/"A"/"An" adds nothing to a title, sorts and scans worse, and pushes the real word right. (An article mid-title, or in a content heading where it reads naturally, is fine.)
-- **Spell out "and" in headings and toctree captions — never `&`** (see §4).
+- **Spell out "and" in headings and toctree captions, never `&`** (see §4).
 - Don't skip levels (no H2 → H4). `myst_heading_anchors` generates anchors down to H4; keep meaningful headings within that depth.
 
-**Cross-references** — prefer Sphinx roles over bare Markdown links for anything inside the docs, so links survive file moves and are checked at build time:
+**Cross-references:** prefer Sphinx roles over bare Markdown links for anything inside the docs, so links survive file moves and are checked at build time:
 - Another doc page: `` {doc}`/api_reference/engine/scene` `` (leading `/` = path from `source/`).
 - A Python object: `` {py:class}`genesis.engine.scene.Scene` `` / `` {py:meth}`genesis.engine.scene.Scene.build` `` where autodoc targets exist.
 - **Link the first mention of each API symbol per guide page.** When prose names a public class (`gs.materials.MPM.Muscle`, `gs.options.SimOptions`, `gs.morphs.Box`), link it the first time it appears on the page and leave later repeats as plain inline code. Use the full public name as the display text over the real autodoc target: `` {py:class}`gs.materials.MPM.Muscle <genesis.engine.materials.MPM.muscle.Muscle>` `` (the `gs.*` alias is not itself a resolvable target, so the FQN goes in the angle brackets). Do not link inside code blocks, and do not link backend constants or enum values (`gs.gpu`, `gs.tc_float`, `gs.constraint_solver.Newton`) that are documented as prose rather than autodoc classes.
 - Use a plain Markdown link `[text](https://…)` only for **external** URLs.
-- Never hard-code `https://…/genesis-doc/...` links to our own pages or assets — they break across versions and forks.
+- Never hard-code `https://…/genesis-doc/...` links to our own pages or assets, because they break across versions and forks.
 
-**Admonitions** — use `colon_fence` syntax and reserve each type for its meaning:
+**Admonitions:** use `colon_fence` syntax and reserve each type for its meaning:
 ```markdown
 :::{note}
 Supplementary context the reader can skip without breaking anything.
@@ -255,7 +255,7 @@ Something that will cause data loss, crashes, or wrong results if ignored.
 A shortcut or best practice.
 :::
 ```
-Don't overuse them — if half the page is boxed, nothing stands out. One idea per admonition; give it a purpose, not a decoration.
+Don't overuse them: if half the page is boxed, nothing stands out. One idea per admonition; give it a purpose, not a decoration.
 
 **Media (images and video)**
 - Store assets under `source/_static/` and reference them with **relative** paths. Do not link to raw GitHub URLs or personal forks.
@@ -279,7 +279,7 @@ The `[n_envs,]` bracket means "present when the scene is built with multiple env
 
 **Coordinate system.** Right-handed, **Z-up**. Gravity is `-Z`, default magnitude 9.81 m/s². State this rather than assuming it.
 
-**Quaternions.** `(w, x, y, z)` — scalar-first (Hamilton). Say so wherever a quaternion appears in an example.
+**Quaternions.** `(w, x, y, z)`, scalar-first (Hamilton). Say so wherever a quaternion appears in an example.
 
 **Rotations / Euler angles.** Extrinsic x-y-z, in degrees, following SciPy's convention. Annotate in code comments where used.
 
