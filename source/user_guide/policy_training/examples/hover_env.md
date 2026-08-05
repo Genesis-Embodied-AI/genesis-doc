@@ -116,7 +116,7 @@ runner = OnPolicyRunner(env, train_cfg, log_dir, device=gs.device)
 runner.learn(num_learning_iterations=args.max_iterations, init_at_random_ep_len=True)
 ```
 
-`performance_mode=True` bakes the tensor shapes into the compiled kernels for faster stepping, at the cost of a slower first build. It is the right choice for a long training run and the wrong one for interactive iteration.
+`performance_mode=True` bakes the tensor shapes into the compiled kernels for faster stepping, at the cost of a slower first build. We recommend it for a long training run, and leaving it off while you iterate interactively.
 
 The actor and critic are both two-layer MLPs (`[128, 128]`, `tanh`), configured in `get_train_cfg`. Start training with:
 

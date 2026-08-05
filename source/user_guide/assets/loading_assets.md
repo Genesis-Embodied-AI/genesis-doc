@@ -1,6 +1,6 @@
 # Loading assets
 
-Almost everything you put in a scene, a robot, a rigid object, a static mesh, comes from an asset file loaded through a **morph**. A morph combines an entity's geometry with its initial pose, and you pass one as the first argument to `scene.add_entity(...)`. This page covers the supported formats, the pose and scale options common to all of them, and how Genesis World finds asset files.
+A robot, a rigid object, a static piece of scenery: almost everything you put in a scene comes from an asset file loaded through a **morph**. A morph combines an entity's geometry with its initial pose, and you pass one as the first argument to `scene.add_entity(...)`. This page covers the supported formats, the pose and scale options common to all of them, and how we resolve asset paths.
 
 ## Supported formats
 
@@ -11,7 +11,7 @@ Almost everything you put in a scene, a robot, a rigid object, a static mesh, co
 | {py:class}`gs.morphs.Mesh <genesis.options.morphs.Mesh>` | `.obj`, `.stl`, `.dae`, `.glb`, `.gltf` | non-articulated meshes |
 | {py:class}`gs.morphs.USD <genesis.options.morphs.USD>` | `.usd`, `.usda`, `.usdc`, `.usdz` | Universal Scene Description stages |
 
-Shape primitives, {py:class}`gs.morphs.Plane <genesis.options.morphs.Plane>`, {py:class}`Box <genesis.options.morphs.Box>`, {py:class}`Cylinder <genesis.options.morphs.Cylinder>`, {py:class}`Sphere <genesis.options.morphs.Sphere>`, {py:class}`Terrain <genesis.options.morphs.Terrain>`, and {py:class}`Drone <genesis.options.morphs.Drone>`, need no file. See the {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` tutorial for a first load, {doc}`USD import </user_guide/assets/usd_import>` for USD stages, and {doc}`mesh processing </user_guide/assets/mesh_processing>` for preparing meshes.
+The shape primitives are {py:class}`gs.morphs.Plane <genesis.options.morphs.Plane>`, {py:class}`Box <genesis.options.morphs.Box>`, {py:class}`Cylinder <genesis.options.morphs.Cylinder>`, {py:class}`Sphere <genesis.options.morphs.Sphere>`, {py:class}`Terrain <genesis.options.morphs.Terrain>`, and {py:class}`Drone <genesis.options.morphs.Drone>`. See the {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` tutorial for a first load, {doc}`USD import </user_guide/assets/usd_import>` for USD stages, and {doc}`mesh processing </user_guide/assets/mesh_processing>` for preparing meshes.
 
 ```python
 franka = scene.add_entity(

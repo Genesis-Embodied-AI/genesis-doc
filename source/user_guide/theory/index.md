@@ -1,4 +1,4 @@
-# Theory and Modelling
+# Theory and Modeling
 
 This section explains how the engine works underneath the API. Where the rest of the guide is task-oriented, these pages are reference material for the physics and algorithms. Read them when a result surprises you, when you are tuning a hard contact or coupling problem, or to understand the machinery.
 

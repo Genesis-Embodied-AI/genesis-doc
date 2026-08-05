@@ -77,6 +77,10 @@ and a reason attached to an instruction, never from ornament. Specifically:
 - **Inventing a claim to sound helpful.** "Confusing them is the most common way a first control loop goes
   wrong", "a model tuned for another simulator rarely feels right in this one". Neither is something we
   measured. Write the fact you can defend: "gains from another model rarely transfer unchanged."
+- **Stating what the reader already knows.** "Shape primitives need no file at all" tells someone who just
+  read the word "primitive" nothing. ✅ "The shape primitives are `Plane`, `Box`, …". The same goes for a
+  sentence explaining that a default is the value used when you pass nothing, or that a getter returns the
+  thing it is named after. If a reader could infer it from the name or the previous sentence, cut it.
 
 ## Rhythm
 

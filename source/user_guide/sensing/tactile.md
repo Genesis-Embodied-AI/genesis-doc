@@ -105,7 +105,7 @@ Your browser does not support the video tag.
 
 ## Elastomer taxels
 
-`ElastomerTaxel` models a soft tactile skin without simulating deformation. Each probe reports a 3D marker displacement caused by local indentation and shear against the tracked geometry, computed with a HydroShear-style model. It is the right choice when you want the visual "dot displacement" signal of a vision-based tactile sensor.
+`ElastomerTaxel` models a soft tactile skin without simulating deformation. Each probe reports a 3D marker displacement caused by local indentation and shear against the tracked geometry, computed with a HydroShear-style model. Use it when you want the visual "dot displacement" signal of a vision-based tactile sensor.
 
 ```python
 tactile = scene.add_sensor(

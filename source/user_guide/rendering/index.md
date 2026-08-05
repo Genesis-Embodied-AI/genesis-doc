@@ -6,7 +6,7 @@ The complete script is [`examples/tutorials/visualization.py`](https://github.co
 
 ## Adding a camera
 
-Add a camera with `scene.add_camera()`. It renders independently of the viewer, so it is the tool for headless rendering and for capturing views from angles other than the viewer's:
+Add a camera with `scene.add_camera()`. It renders independently of the viewer, so use it for headless rendering and for capturing angles the viewer is not pointed at:
 
 ```python
 cam = scene.add_camera(

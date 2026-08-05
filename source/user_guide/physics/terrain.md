@@ -152,7 +152,7 @@ terrain = scene.add_entity(
 
 ## Caching generated terrains
 
-Generating a terrain (the height field, the collision mesh, and the visual mesh) runs every time the scene is built. Pass `name="my_terrain"` to generate it only once for a given set of options and load it from cache on later builds. This holds even when `randomize=True`, so it is the way to reconstruct a randomized terrain exactly across runs.
+Generating a terrain (the height field, the collision mesh, and the visual mesh) runs every time the scene is built. Pass `name="my_terrain"` to generate it only once for a given set of options and load it from cache on later builds. This holds even when `randomize=True`, so naming a terrain is how you reproduce a randomized one exactly across runs.
 
 ## See also
 

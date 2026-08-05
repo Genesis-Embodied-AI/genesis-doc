@@ -133,10 +133,12 @@ A configuration class that is itself the public API with no separate built objec
 
 **Spell out "and"; don't use the ampersand (`&`).** In headings, section titles, toctree captions, and running prose, write "and". The ampersand reads as shorthand, sorts and searches inconsistently, and clashes with the calm, spelled-out voice. (It is fine inside code, where `&` is an operator.)
 
-- ✅ "Sensors and perception", "Theory and modelling"
-- ❌ "Sensors & perception", "Theory & Modelling"
+- ✅ "Sensors and perception", "Theory and modeling"
+- ❌ "Sensors & perception", "Theory & Modeling"
 
 **Minimize em dashes; default to a colon, comma, or full stop.** Try a colon (to introduce or expand), a comma (for a light pause), or a new sentence first: one of those is almost always cleaner and more scannable. At most one em dash per paragraph, and only for a genuine aside. When a phrase introduces or defines what follows, the punctuation you want is a colon. (An en dash in a number range like "10–80×" is a different character and is fine.)
+
+**Removing an em dash means restructuring the sentence, not swapping in a comma.** A dashed list dropped into commas turns into soup the reader has to parse twice: "Almost everything you put in a scene, a robot, a rigid object, a static mesh, comes from an asset file." Lead with the examples and follow with a colon, or move the list after the claim. ✅ "A robot, a rigid object, a static piece of scenery: almost everything you put in a scene comes from an asset file."
 
 **Definition-style list items lead with a bold term and a colon.** Write `- **Simulation interface:** the user-facing API for …`, with the description as a normal clause after the colon. Do not separate the term from its description with an em dash, and do not use the "bold term, full stop, sentence" form for definition lists.
 
