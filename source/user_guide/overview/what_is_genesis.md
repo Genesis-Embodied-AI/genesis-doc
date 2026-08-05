@@ -13,14 +13,14 @@ Genesis World occupies four layers. Above it sits whatever you build: robotics e
 - **Simulation interface:** the user-facing API for asset parsing (URDF, MJCF, OBJ, GLB, USD, …), entity accessors, controllers, sensors, parallel and heterogeneous environments, and a built-in viewer.
 - **Physics:** a unified multi-physics engine integrating rigid, FEM, MPM, and particle (PBD/SPH) solvers, [uipc](https://github.com/spiriMirror/libuipc), an explicit coupler, and SAP, all sharing one scene and one state.
 - **Render:** three rendering paths behind the cameras. [Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx) is an in-house renderer built for robotics, Luisa is a DSL ray tracer, and Pyrender is a rasterizer.
-- **Compiler:** [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants) lowers Python kernel code to CUDA, AMD ROCm, Apple Metal, x86, and ARM64. It carries the autodiff, GPU-graph, and fast-cache machinery.
+- **Compiler:** [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants) lowers Python kernel code to CUDA, AMD ROCm, Apple Metal, Vulkan, x86, and ARM64. It carries the autodiff, GPU-graph, and fast-cache machinery.
 
 ## Philosophy
 
 Genesis World is shaped by a few convictions about what a simulator for physical AI should be.
 
 - **Transparent and Pythonic:** the engine is open source and written in Python, so you can read it, debug it, and extend it, with no opaque binary between you and the physics.
-- **One scene, one state:** rigid, FEM, MPM, and particle (PBD/SPH) solvers share a single scene and a single state, and where their entities touch, an explicit coupler resolves the interaction. No stitching separate tools together.
+- **One scene, one state:** rigid, FEM, MPM, and particle (PBD/SPH) solvers share a single scene and a single state, and where their entities touch, an explicit coupler resolves the interaction.
 - **Fast at full accuracy:** Genesis World parallelizes simulation across environments on the GPU, measured at 10–80× the throughput of prior GPU-accelerated simulators such as Isaac Gym/Sim/Lab and MuJoCo MJX without trading away accuracy. See the [blog post](https://www.genesis.ai/blog/the-role-of-simulation-in-scalable-robotics-genesis-world-10-and-the-path-forward) for methodology.
 - **Differentiable by design:** autodiff and backpropagation run through the [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants) compiler, with hand-derived gradients for the hardest kernels, so gradients flow all the way through the physics.
 - **Perception built in:** physically accurate, differentiable tactile sensors sit alongside IMU, lidar, depth-camera, contact-force, surface-distance, and temperature-grid sensors, and all three renderers are exposed through the same camera-sensor interface, usable out of the box in parallel and heterogeneous environments.

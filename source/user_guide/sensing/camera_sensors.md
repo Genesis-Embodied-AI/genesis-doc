@@ -2,7 +2,7 @@
 
 A camera sensor renders the scene to an RGB image off-screen and returns it through the sensor pipeline, with no viewer window involved. Add one with `scene.add_sensor(...)`, step the simulation, and call `read()` to get pixels back as a tensor. It is a first-class {doc}`sensor <index>`: it renders lazily on `read()`, joins the batched `scene.read_sensors()` path, and mounts on a moving link like any other sensor.
 
-Genesis World has two other ways to look at a scene, and picking between the three is the first decision this page can help with:
+Genesis World has two other ways to look at a scene:
 
 - The **viewer** (`show_viewer=True`) is the interactive window a human watches. It renders live and hands nothing back to your code. See {doc}`/user_guide/interaction/visualization`.
 - The **visualization camera** (`scene.add_camera().render(...)`) renders color, depth, segmentation, and surface-normal images on demand, and captures video with `start_recording()`. Use it when you want those four channels or a video of the scene. It is covered in {doc}`/user_guide/rendering/index`.

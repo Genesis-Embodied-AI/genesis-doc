@@ -8,13 +8,13 @@ Training a policy takes millions of interaction steps, so you want many environm
 
 ## Why parallelism matters
 
-A GPU has thousands of cores, and stepping a single Franka arm leaves almost all of them idle. Genesis World steps many identical copies of a scene at once instead, so one pass of the physics kernels advances the whole batch. It costs one argument at build time.
+A GPU has thousands of cores, and stepping a single Franka arm leaves almost all of them idle. Genesis World steps many identical copies of a scene at once instead, so one pass of the physics kernels advances the whole batch.
 
 We call one copy of the scene an **environment** (**env**) and count them with `n_envs`, following the learning literature, which calls the parallelism itself **batching**. Describe the plane and the Franka arm exactly as in {doc}`hello_genesis`, then choose the number of copies when you build the scene.
 
 ## Building parallel environments
 
-Initialize on a GPU backend, so the batch has those thousands of cores to fill:
+Initialize on a GPU backend, so the batch has the cores to fill:
 
 ```python
 gs.init(backend=gs.gpu)

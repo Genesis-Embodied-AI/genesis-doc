@@ -120,7 +120,7 @@ gs.sensors.GridPattern(
 
 ### Custom pattern
 
-Cast an arbitrary set of rays by subclassing `gs.sensors.RaycastPattern`: return the layout shape from `_get_return_shape()`, and fill `_ray_dirs` with unit directions in the sensor frame from `compute_ray_dirs()`. Rays are always described by a pattern object, so there is no argument that takes a bare list of directions.
+Cast an arbitrary set of rays by subclassing `gs.sensors.RaycastPattern`: return the layout shape from `_get_return_shape()`, and fill `_ray_dirs` inside `compute_ray_dirs()` with unit directions in the sensor frame. Rays are always described by a pattern object, so there is no argument that takes a bare list of directions.
 
 ```python
 import torch

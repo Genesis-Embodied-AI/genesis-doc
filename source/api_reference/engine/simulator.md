@@ -1,6 +1,6 @@
 # Simulator
 
-The `Simulator` owns the physics solvers and the coupler, and advances them each time you call `scene.step()`. `SimOptions` configures it (timestep, gravity, substeps, differentiable mode), which you pass to the scene as `sim_options`, and the scene builds it automatically.
+The `Simulator` owns the physics solvers and the coupler, and advances them each time you call `scene.step()`. Pass `SimOptions` to the scene as `sim_options` to configure it (timestep, gravity, substeps, differentiable mode), and the scene builds it automatically.
 
 ## Options
 

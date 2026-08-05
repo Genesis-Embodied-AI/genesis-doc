@@ -114,7 +114,7 @@ The zero-copy command writers on a rigid entity are `control_dofs_position`, `co
 
 ## Turn on performance mode for training
 
-Once the environment is finalized, `gs.init(performance_mode=True)` bakes the now-static tensor shapes into the compiled kernels for roughly 30% faster simulation. The cost is that any change to the scene triggers a recompile that can take several minutes. Leave it off for research, debugging, and interactive work; turn it on for long training and production runs, where the scene is fixed and a single recompile speeds up every step that follows. See {doc}`/user_guide/getting_started/hello_genesis` for the other `gs.init` options.
+Once the environment is finalized, `gs.init(performance_mode=True)` bakes the now-static tensor shapes into the compiled kernels for roughly 30% faster simulation. The cost is that any change to the scene triggers a recompile that can take several minutes. Leave it off for research, debugging, and interactive work; turn it on for long training and production runs, where the scene is fixed and one recompile buys the faster step for the rest of the run. See {doc}`/user_guide/getting_started/hello_genesis` for the other `gs.init` options.
 
 ## Verify with the profiler
 

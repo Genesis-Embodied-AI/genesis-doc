@@ -91,7 +91,7 @@ def swirl(pos, vel, t, i):
 scene.add_force_field(gs.force_fields.Custom(swirl))
 ```
 
-`Turbulence` is built from `gs.force_fields.PerlinNoiseField`, a standalone 3D Perlin noise generator (parameters `wrap_size`, `frequency`, `seed`, `seed_offset`). It covers the usual case, so construct the generator yourself only for a `Custom` field that needs coherent noise.
+`Turbulence` is built from `gs.force_fields.PerlinNoiseField`, a standalone 3D Perlin noise generator (parameters `wrap_size`, `frequency`, `seed`, `seed_offset`). `Turbulence` covers the usual case, so construct the generator yourself only for a `Custom` field that needs coherent noise.
 
 ## Notes and gotchas
 

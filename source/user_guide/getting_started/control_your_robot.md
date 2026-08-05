@@ -30,13 +30,13 @@ franka = scene.add_entity(
 scene.build()
 ```
 
-With no actuation the arm falls under gravity, so every snippet below issues a control command after the build to hold or move it.
+Every snippet below issues its control command after the build, to hold or move the arm.
 
 ## Joints and degrees of freedom
 
-A **joint** connects two links, and a **dof** (degree of freedom) is one independent coordinate that a joint contributes. The distinction matters here because every control method addresses dofs, never joints. On the Franka arm the two line up: 7 revolute arm joints and 2 prismatic gripper joints, each carrying a single dof, make a 9-dof articulated body. Other joint types carry more, so a free joint contributes 6 dofs and a ball joint 3.
+A **joint** connects two links, and a **dof** (degree of freedom) is one independent coordinate that a joint contributes. On the Franka arm the two line up: 7 revolute arm joints and 2 prismatic gripper joints, each carrying a single dof, make a 9-dof articulated body. Other joint types carry more, so a free joint contributes 6 dofs and a ball joint 3.
 
-Control methods take dof indices, so start by mapping the joint names in the MJCF/URDF file to the dof indices the solver assigned them:
+The distinction matters because every control method addresses dofs by index, so start by mapping the joint names in the MJCF/URDF file to the dof indices the solver assigned them:
 
 ```python
 joints_name = (
@@ -57,7 +57,7 @@ motors_dof_idx = [franka.get_joint(name).dofs_idx_local[0] for name in joints_na
 
 ## Control gains
 
-The controller has two gains: `kp` (stiffness) scales the force by the distance to the target, and `kv` (damping) scales it by the current velocity, which damps the overshoot. Genesis World parses both from the MJCF or URDF file when the model provides them, but we recommend setting them explicitly, because gains from another model rarely transfer unchanged. `set_dofs_force_range` caps the controller's output.
+The controller has two gains: `kp` (stiffness) scales the force by the distance to the target, and `kv` (damping) opposes it in proportion to the current velocity, which keeps the dof from overshooting the target. Genesis World parses both from the MJCF or URDF file when the model provides them, but we recommend setting them explicitly, because gains from another model rarely transfer unchanged. `set_dofs_force_range` caps the controller's output.
 
 ```python
 franka.set_dofs_kp(
@@ -84,7 +84,7 @@ These methods share the pattern used throughout the control API: a tensor of val
 - `set_*` writes the robot state directly, without consulting the dynamics. The dof lands on the requested value in a single step.
 - `control_*` sends a target to the controller, which produces forces that move the robot toward it over several steps, respecting the dynamics and the force range set above.
 
-Use `set_dofs_position` to reset an episode or place a robot at a starting configuration. On a rigid entity it zeroes the dof velocities as well, so the robot starts from rest; pass `zero_velocity=False` to keep the velocities it had. We recommend keeping it out of a control loop, because the position jump it produces respects no dynamics:
+Use `set_dofs_position` to reset an episode or place a robot at a starting configuration, and keep it out of a control loop. On a rigid entity it zeroes the dof velocities as well, so the robot starts from rest; pass `zero_velocity=False` to keep the velocities it had:
 
 ```python
 for i in range(150):

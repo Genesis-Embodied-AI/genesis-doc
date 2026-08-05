@@ -101,7 +101,7 @@ Skinning a flat 2D cloth mesh with `vis_mode="visual"` can produce degenerate ba
 
 ## SPH: free-surface liquids
 
-Smoothed-Particle Hydrodynamics is a purely Lagrangian (particle-only) solver aimed at liquids. Use SPH when you want fluid governed by physical parameters: rest density `rho` (kg/m³), viscosity `mu`, and surface tension `gamma`. MPM's liquid model is coarser and cheaper.
+Smoothed-Particle Hydrodynamics is a purely Lagrangian (particle-only) solver aimed at liquids. Use SPH when you want fluid governed by physical parameters: rest density `rho` (kg/m³), viscosity `mu`, and surface tension `gamma`. MPM's liquid model is coarser.
 
 Turning a rigid block into water is one line: give it an SPH liquid material. Tune the flow with its parameters:
 

@@ -38,7 +38,7 @@ When a mesh becomes a rigid entity, Genesis prepares its collision geometry in t
 
 - **Watertighten:** close gaps and remove non-manifold artifacts so the mesh bounds a well-defined volume. Controlled by `watertighten` (an integer 0–8, default 5).
 - **Decimate:** reduce the triangle count toward a target so narrow-phase collision stays cheap.
-- **Convexify:** replace the mesh with one or more convex hulls, since the collision solver is fastest and most robust on convex shapes.
+- **Convexify:** replace the mesh with one or more convex hulls, since a convex shape has an exact support function, which is what the collision algorithms query.
 
 Decimation and convexification are on by default for rigid entities and can be disabled independently. The visual mesh is never modified by any of this.
 

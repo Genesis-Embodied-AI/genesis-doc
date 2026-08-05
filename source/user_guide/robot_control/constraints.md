@@ -10,7 +10,7 @@ The complete runnable example is [`examples/rigid/suction_cup.py`](https://githu
 
 A weld constraint pins two links so their relative pose is frozen at the values they have the instant you add it: all six degrees of freedom, translation and rotation. It is the constraint you toggle to model suction or a magnetic gripper: engage it when the end-effector reaches the object, delete it to let go.
 
-The API lives on the rigid solver, not on an entity, because a weld couples links that belong to two different entities. Reach it through `scene.sim.rigid_solver` after the scene is built:
+The API lives on the rigid solver, not on an entity, because a weld couples links that belong to two different entities. Go through `scene.sim.rigid_solver` after the scene is built:
 
 ```python
 rigid = scene.sim.rigid_solver

@@ -106,7 +106,7 @@ and a reason attached to an instruction, never from ornament. Specifically:
   something to hold onto". Software and options do not want, allow, or offer. ✅ "`set_*` writes the robot
   state directly, without consulting the dynamics."
 - **Abstract restatement.** "Parallelism belongs to the scene rather than to the entities in it" says less
-  than the concrete instruction it replaced. ✅ "You choose the number of copies when you build the scene."
+  than the concrete instruction it replaced. ✅ "Choose the number of copies when you build the scene."
 - **Aphoristic contrast.** "Two families of methods read alike and behave nothing alike." ✅ "`set_*` and
   `control_*` look similar and do different things."
 - **Rhetorical framing before the fact.** "Training a policy takes millions of steps, and stepping one robot
