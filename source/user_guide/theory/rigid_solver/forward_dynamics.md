@@ -32,7 +32,7 @@ A damping force evaluated against the old velocity can overshoot, so every schem
 | `implicitfast` | Velocity-actuator bias joins the effective mass, and standalone free bodies advance by the implicit midpoint rule. | Two factorizations per substep. |
 | `approximate_implicitfast` (default) | The same, carried into the constraint and external-force accelerations. | One factorization per substep; the correction is approximate. |
 
-We default to `approximate_implicitfast` because it covers the same terms as `implicitfast` for one factorization instead of two, and the approximation it makes in the constraint and external-force accelerations rarely shows up in a controlled scene. Choose `implicitfast` when it does, and `Euler` when you need the velocity update to be exactly `qvel += dt * qacc`, as an analytical check does.
+We default to `approximate_implicitfast` because it covers the same terms as `implicitfast` for one factorization instead of two. Carrying the first-order correction into the constraint and external-force accelerations is wrong in theory, and holds up well in practice; choose `implicitfast` where it does not. On an undamped dof under `Euler`, the velocity update is exactly `qvel += dt * qacc`, which is what an analytical check wants.
 
 ## Timestep and substeps
 
