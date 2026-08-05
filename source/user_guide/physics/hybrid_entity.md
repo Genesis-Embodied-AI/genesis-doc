@@ -6,7 +6,7 @@ The complete script is [`examples/tutorials/advanced_hybrid_robot.py`](https://g
 
 ## Mental model
 
-A hybrid entity is not a single solver's object. Genesis World builds it from two entities that share the same scene and timestep:
+A hybrid entity pairs two entities that share one scene and one timestep:
 
 - A **rigid part** (a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`) parsed from the URDF, carrying the joints and **degrees of freedom** (**dofs**).
 - A **soft part** (an {py:class}`MPMEntity <genesis.engine.entities.mpm_entity.MPMEntity>`) whose particles are attached to the rigid links.

@@ -1,6 +1,6 @@
 # Viewer interaction and plugins
 
-The Genesis World **viewer** is the interactive window that shows a simulation as it runs. Beyond the built-in camera, recording, and visualization controls, you can extend it two ways: register **keybindings** to bind a key to a callback, and add **viewer plugins** that receive mouse and keyboard events, draw debug geometry each frame, and run logic on every simulation step. Plugins are the right tool for interactive tooling such as picking points on a mesh or dragging bodies with the mouse.
+The Genesis World **viewer** is the interactive window that shows a simulation as it runs. Beyond the built-in camera, recording, and visualization controls, you can extend it two ways: register **keybindings** to bind a key to a callback, and add **viewer plugins** that receive mouse and keyboard events, draw debug geometry each frame, and run logic on every simulation step. Use a plugin for interactive tooling such as picking points on a mesh or dragging bodies with the mouse.
 
 This page assumes a scene built with `show_viewer=True` (see {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`). The runnable examples live under [`examples/viewer_plugin/`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/viewer_plugin).
 
