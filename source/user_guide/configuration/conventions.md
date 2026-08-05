@@ -1,10 +1,10 @@
 # Conventions
 
-This page defines the conventions Genesis World uses throughout its API: the coordinate system, rotations, physical units, tensor shapes, and data types, plus the rules for importing assets. State them the same way everywhere in your own code, and Genesis World will behave predictably.
+This page collects the conventions we follow throughout the API: the coordinate system, rotations, physical units, tensor shapes, and data types, plus the rules that decide how an imported asset is oriented. Every one of them is a choice we made once and apply everywhere, so reading this page saves you guessing later.
 
 ## Coordinate system
 
-Genesis World uses a right-handed, Z-up coordinate system. Relative to the default viewer, whose camera sits on the `+X` side looking back toward the origin:
+We use a right-handed, Z-up coordinate system. Relative to the default viewer, whose camera sits on the `+X` side looking back toward the origin:
 
 - **+X**: points out of the screen, toward the viewer.
 - **+Y**: points to the viewer's right.
@@ -17,7 +17,7 @@ Quaternions follow the `(w, x, y, z)` convention:
 - **w**: scalar (real) component.
 - **x, y, z**: vector (imaginary) components.
 
-This is the scalar-first Hamilton convention. Whenever an API takes a quaternion, provide it in this order.
+We follow the scalar-first Hamilton convention, so provide a quaternion in this order wherever the API takes one.
 
 ```python
 # 90-degree rotation about the +Z axis
@@ -32,39 +32,19 @@ Gravity defaults to `(0, 0, -9.81)`, i.e. `-Z` with a magnitude of 9.81 m/s². W
 
 ## Axis conversion at import time
 
-Different 3D asset formats define, or omit, their coordinate-system conventions. Genesis World applies precise rules to bring every imported mesh into its internal Z-up representation. The following sections describe how each supported format is handled.
+Asset formats disagree about which axis points up, and some decline to say. The sections below give the rule we apply to each format on its way into our Z-up space.
 
-### Alignment with Blender exporters
+### Why "Y-up" is not enough to go on
 
-Genesis World's mesh import behavior is aligned with Blender's default exporter settings. Blender is a common authoring tool for robotics and simulation assets, and its exporters apply well-defined axis conversions depending on the target format (for example, converting from Blender's internal Z-up space to glTF's Y-up convention on export).
+A Y-up-to-Z-up conversion is a 3×3 rotation, and several rotations are valid depending on which axis the asset treats as forward. Two meshes can both be labeled Y-up and still import at different orientations, so the up axis alone does not pin down an asset's convention: the forward axis decides the rotation.
 
-By mirroring Blender's exporter behavior:
-
-- Assets exported from Blender with default settings import into Genesis World with the expected orientation.
-- You can rely on Blender's preview and transforms without format-specific workarounds.
-- Cross-format consistency (glTF, STL, OBJ, and URDF-referenced meshes) is preserved.
-
-### Y-up and Z-up are not a single convention
-
-There is no single, universal transformation between Y-up and Z-up. A Y-up-to-Z-up conversion is a 3×3 rotation, and several valid rotations exist depending on how the remaining axes (typically forward and right) are mapped. Two assets can both be labeled "Y-up" yet differ in orientation because they chose different forward axes.
-
-So labeling an asset "Y-up" or "Z-up" is not enough to define its spatial convention; the forward-axis choice determines the rotation.
-
-#### Genesis World convention
-
-Genesis World adopts one specific Y-up-to-Z-up mapping, aligned with Blender's exporter behavior. Blender's internal coordinate system is Z-up, and its exporters let you choose any combination of up and forward vectors when writing a Y-up format. Genesis World adopts Blender's default Y-up exporter configuration: **Y-up, −Z forward**. Concretely, a Y-up mesh is converted to Z-up by mapping `(X, Y, Z) → (X, -Z, Y)`. This ensures that:
-
-- Assets exported from Blender with default axis settings appear identical in Genesis World.
-- The rotation used is consistent across formats.
-- Axis-conversion behavior is predictable and reproducible.
-
-Every reference to "Y-up" handling in Genesis World means this specific Blender-aligned representation, not an abstract or ambiguous Y-up.
+We therefore commit to one mapping, `(X, Y, Z) → (X, -Z, Y)`, which is **Y-up, -Z forward**. That is Blender's default configuration when it exports to a Y-up format, and we match it deliberately, since Blender authors a large share of robotics and simulation assets and its exporters apply well-defined conversions per target format. An asset exported from Blender at default settings therefore arrives at the orientation you saw in Blender, and it arrives the same way whether it came as glTF, STL, OBJ, or a mesh referenced from URDF. Wherever these docs say "Y-up", they mean this mapping.
 
 ### glTF (.gltf, .glb)
 
-glTF assets are [always Y-up by specification](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#coordinate-system-and-units). On import, Genesis World converts glTF meshes from Y-up to Z-up. This conversion is fixed and cannot be disabled, guaranteeing that imported meshes end up in Genesis World's Z-up space and that the result complies with the glTF specification.
+glTF assets are [always Y-up by specification](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#coordinate-system-and-units), so we always convert them, and we do not offer a switch to turn that off. Following the spec is what lets a glTF file behave the same everywhere.
 
-Blender can also export a glTF as Z-up by unchecking the **+Y-up** option, but it cannot reimport such a file correctly. Because Genesis World's glTF conversion is fixed to Y-up, a Z-up-exported glTF imports with the wrong orientation. Re-export the asset with the default **+Y-up** option rather than relying on axis overrides.
+Blender will write a Z-up glTF if you uncheck **+Y-up**, and it cannot read such a file back correctly either. Since our conversion assumes the spec, a Z-up glTF imports rotated. Re-export with the default **+Y-up** option rather than overriding the axis on import.
 
 ![Blender glTF exporter panel with the +Y-up transform option enabled](images/blender_gltf_export.png)
 
@@ -72,12 +52,12 @@ See [Blender's glTF exporter documentation](https://docs.blender.org/manual/en/2
 
 ### STL (.stl) and Wavefront OBJ (.obj)
 
-STL and OBJ do not define a standard coordinate system, so the up-axis must be specified explicitly at import. Assets in these formats may be either Y-up or Z-up, depending on the originating tool. Genesis World lets you declare how to interpret them:
+Neither format records a coordinate system, and files of both kinds arrive Y-up or Z-up depending on the tool that wrote them, so you declare which one you have:
 
-- **Z-up (default):** the mesh is assumed to already be in Z-up space, and no conversion is applied.
-- **Y-up:** the mesh is assumed to be Y-up, and the `(X, Y, Z) → (X, -Z, Y)` conversion above is applied.
+- **Z-up (default):** we take the mesh to be in Z-up space already and convert nothing.
+- **Y-up:** we apply the `(X, Y, Z) → (X, -Z, Y)` mapping above.
 
-This lets you import STL and OBJ assets from different sources correctly without modifying the original files.
+Declaring it at import means assets from different sources coexist in one scene without you editing the files.
 
 ![Blender Wavefront OBJ exporter panel showing the up-axis and forward-axis settings](images/blender_yup_export.png)
 

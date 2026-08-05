@@ -21,7 +21,7 @@ cam = scene.add_camera(
 With `GUI=True`, the camera opens an OpenCV window that displays each rendered frame. This is separate from the viewer window. Leave it `False` when running headless.
 
 :::{note}
-`scene.add_camera()` gives you a **visualization camera**: an object you drive yourself, calling `render()` for pixels and `start_recording()` for video. It is the camera to reach for to look at a scene, and the whole of this page is about it. A robot's onboard camera is instead a {doc}`camera sensor </user_guide/sensing/camera_sensors>`, added with `scene.add_sensor(...)`, read with `read()` like any other sensor, RGB only, and saved to video through the {doc}`recorders </user_guide/sensing/recorders>`.
+`scene.add_camera()` gives you a **visualization camera**: an object you drive yourself, calling `render()` for pixels and `start_recording()` for video. It is the camera you want for looking at a scene, and the whole of this page is about it. A robot's onboard camera is instead a {doc}`camera sensor </user_guide/sensing/camera_sensors>`, added with `scene.add_sensor(...)`, read with `read()` like any other sensor, RGB only, and saved to video through the {doc}`recorders </user_guide/sensing/recorders>`.
 :::
 
 ## Rendering images

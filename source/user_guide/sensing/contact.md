@@ -1,6 +1,6 @@
 # Contact and force sensors
 
-{py:class}`Contact <genesis.options.sensors.options.Contact>`, {py:class}`ContactForce <genesis.options.sensors.options.ContactForce>`, and {py:class}`JointTorque <genesis.options.sensors.options.JointTorque>` read how a rigid link or joint interacts with the rest of the scene straight from the rigid solver. They are **solver-based**: physically consistent with the simulation, but they only report where the solver actually resolves a contact. Reach for them when you want ground-truth, link-level interaction rather than a spatially resolved tactile field. For a dense field of per-taxel readings across a surface, use the {doc}`tactile sensors <tactile>` instead.
+{py:class}`Contact <genesis.options.sensors.options.Contact>`, {py:class}`ContactForce <genesis.options.sensors.options.ContactForce>`, and {py:class}`JointTorque <genesis.options.sensors.options.JointTorque>` read how a rigid link or joint interacts with the rest of the scene straight from the rigid solver. They are **solver-based**: physically consistent with the simulation, but they only report where the solver actually resolves a contact. Use them when you want ground-truth interaction at the level of a link or a joint. For a dense field of per-taxel readings across a surface, use the {doc}`tactile sensors <tactile>` instead.
 
 For how sensors are sampled, read back, batched with `scene.read_sensors()`, and configured with noise, delay, and `history_length`, see the {doc}`sensors overview <index>`.
 

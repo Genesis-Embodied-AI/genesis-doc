@@ -4,25 +4,23 @@
 :alt: A grid of Franka arms, each one a separate simulated environment running in parallel.
 ```
 
-This tutorial shows how to run many copies of a scene at once on the GPU. Running environments in parallel is what makes Genesis World fast enough for reinforcement learning, where a policy needs millions of interaction steps: instead of stepping one environment at a time, you step thousands together in a single call.
-
-The runnable script for this tutorial is [`examples/tutorials/parallel_simulation.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/parallel_simulation.py). This page explains the concepts behind it; run the script to see it in action.
+Training a policy takes millions of interaction steps, so you want many environments running at once. This tutorial runs many copies of a scene simultaneously on the GPU. The runnable script is [`examples/tutorials/parallel_simulation.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/parallel_simulation.py).
 
 ## Why parallelism matters
 
-A single environment cannot keep a GPU busy. A GPU has thousands of cores, and stepping one Franka arm leaves almost all of them idle. Genesis World closes that gap by simulating many identical environments at once, so the same physics kernels operate on a batch of states in one pass. The learning literature calls this **batching**; we use "environment" (**env**) for one copy of the scene and `n_envs` for the count.
+A GPU has thousands of cores, and stepping a single Franka arm leaves almost all of them idle. Genesis World steps many identical copies of a scene at once instead, so one pass of the physics kernels advances the whole batch. It costs one argument at build time.
 
-The scene is defined exactly as in {doc}`hello_genesis`: a plane and a Franka arm. Parallelism is not a property of the entities; it is turned on when you build the scene.
+We call one copy of the scene an **environment** (**env**) and count them with `n_envs`, following the learning literature, which calls the parallelism itself **batching**. You describe the plane and the Franka arm exactly as in {doc}`hello_genesis`, then choose the number of copies when you build the scene.
 
 ## Building parallel environments
 
-Use `gs.gpu` as the backend so the batch runs on the GPU:
+Select a GPU backend, since a batch gains nothing on the CPU:
 
 ```python
 gs.init(backend=gs.gpu)
 ```
 
-Everything else about scene creation and entity loading is identical to a single-environment scene. The one change is `scene.build()`, which takes the number of environments:
+Scene creation and entity loading are unchanged. The only line that differs is `scene.build()`, which takes the number of environments:
 
 ```python
 # create 20 parallel environments

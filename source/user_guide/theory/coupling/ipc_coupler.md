@@ -1,10 +1,10 @@
 # IPC coupler
 
-The IPC coupler resolves contact with Incremental Potential Contact, a barrier-based model built on the [libuipc](https://github.com/spiriMirror/libuipc) library. Where the legacy coupler applies impulses and the {doc}`SAP coupler <sap_coupler>` solves a semi-analytic contact problem, IPC advances every coupled body through a single smooth potential whose barrier term grows without bound as surfaces approach. The result is contact that stays intersection-free and stable even under large deformation, which is what makes it the right choice for cloth and heavily deforming soft bodies.
+The IPC coupler resolves contact with Incremental Potential Contact, a barrier-based model built on the [libuipc](https://github.com/spiriMirror/libuipc) library. It advances every coupled body through a single smooth potential whose barrier term grows without bound as two surfaces approach, so contact under IPC stays intersection-free however hard you press two bodies together. You pay for that in step time, which is why we leave it off by default.
 
-Reach for IPC when accuracy and robustness matter more than speed: cloth with self-collision, FEM solids pressed hard against each other, or a gripper closing on a deformable object. For mixed continuum scenes (MPM, SPH, PBD) or when you only need coarse rigid contact, stay on the default legacy coupler. See {doc}`the couplers overview <index>` for the full comparison.
+Use it for cloth with self-collision, for FEM solids pressed hard against each other, and for a gripper closing on a deformable object. For coarse rigid contact or mixed continuum scenes (MPM, SPH, PBD), the legacy coupler is cheaper and adequate; see {doc}`the couplers overview <index>` for the full comparison.
 
-Under the hood, FEM bodies are coupled directly from their vertex positions, while rigid bodies enter the IPC world as affine bodies (ABD). Time step, gravity, and differentiable-simulation mode come from {doc}`SimOptions </api_reference/engine/simulator>`, so you set them there, not on the coupler.
+FEM bodies are coupled directly from their vertex positions, and rigid bodies enter the IPC world as affine bodies (ABD). Time step, gravity, and differentiable-simulation mode come from {doc}`SimOptions </api_reference/engine/simulator>` rather than from the coupler.
 
 ## Prerequisites
 

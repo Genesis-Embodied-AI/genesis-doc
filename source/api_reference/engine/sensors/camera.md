@@ -2,7 +2,7 @@
 
 A camera sensor renders an RGB image of the scene each step and returns it through the sensor `read()` interface, so a camera reads like any other sensor: attach it, step, read.
 
-Do not confuse it with the visualization camera. The camera sensor is created with `scene.add_sensor(gs.sensors.*CameraOptions(...))` and its `read()` returns a `CameraReturnType` carrying a single `rgb` field. The visualization camera is created with `scene.add_camera(...)` and its `render()` returns RGB together with depth, segmentation, and surface normals. Reach for the visualization camera when you need those extra channels or the interactive viewer; see {doc}`/api_reference/visualization/camera`.
+You create one with `scene.add_sensor(gs.sensors.*CameraOptions(...))`, and its `read()` returns a `CameraReturnType` carrying a single `rgb` field. Genesis World has a second, similarly named camera: the visualization camera, created with `scene.add_camera(...)`, whose `render()` returns RGB together with depth, segmentation, and surface normals. Use that one when you need those extra channels or the interactive viewer; see {doc}`/api_reference/visualization/camera`.
 
 Each backend is a separate options class and sensor, all returning the same `CameraReturnType(rgb)`. For usage and how to choose a backend, see the {doc}`camera sensing guide </user_guide/sensing/camera_sensors>`.
 

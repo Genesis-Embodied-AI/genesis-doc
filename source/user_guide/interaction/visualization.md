@@ -1,6 +1,6 @@
 # Visualization
 
-This page covers watching a Genesis World scene as it runs: the interactive **viewer** window, and the `gs` command-line tools that open it without writing a script. Reach for these while developing on a machine with a display. To render images off-screen (color, depth, segmentation, video) or produce photorealistic frames, see {doc}`Rendering </user_guide/rendering/index>`.
+This page covers watching a Genesis World scene as it runs: the interactive **viewer** window, and the `gs` command-line tools that open it without writing a script. Both are for developing on a machine with a display. To render images off-screen (color, depth, segmentation, video) or produce photorealistic frames, see {doc}`Rendering </user_guide/rendering/index>`.
 
 Every scene owns a `visualizer` (`scene.visualizer`) that drives both the viewer and the cameras added with `scene.add_camera()`. The viewer runs in its own thread and follows the simulation in real time; cameras render frames on demand and work headless (see {doc}`Rendering </user_guide/rendering/index>`).
 

@@ -69,7 +69,7 @@ franka.set_qpos(qpos, qs_idx_local=...)
 ```
 
 - **Entity methods take local indices.** `dofs_idx_local`, `links_idx_local`, `qs_idx_local`. Passing `None` selects the entity's full range.
-- **Solver methods take global indices.** The `RigidSolver` equivalents accept already-resolved `dofs_idx`, `links_idx`, and so on. Reach for them only when you are working across entities at the solver level.
+- **Solver methods take global indices.** The `RigidSolver` equivalents accept already-resolved `dofs_idx`, `links_idx`, and so on. Use them only when you are working across entities at the solver level.
 - **`envs_idx` has no local form.** Environment (**env**) selection is scene-wide, so batched methods take a single `envs_idx` that indexes environments directly. See {doc}`parallel simulation </user_guide/getting_started/parallel_simulation>` for how the batch dimension works.
 
 :::{note}

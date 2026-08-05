@@ -1,6 +1,6 @@
 # Domain randomization
 
-A policy trained in a single, fixed simulation learns the quirks of that exact simulation. On real hardware, where friction, link masses, and actuator gains differ from your model and drift over time, that policy fails. **Domain randomization** closes the gap: you sample a different set of physical and task parameters for each parallel environment, so the policy sees a distribution of dynamics during training and learns behavior that is robust to any single realization.
+A policy trained in a single, fixed simulation learns the quirks of that exact simulation. On real hardware, where friction, link masses, and actuator gains differ from your model and drift over time, that policy fails. **Domain randomization** closes the gap: you sample a different set of physical and task parameters for each parallel environment, so the policy sees a distribution of dynamics during training and learns behavior that does not depend on any single set of values.
 
 Genesis World is built for this. Because the simulation is already batched across environments, randomizing per-environment parameters is a matter of passing a tensor with a leading `n_envs` dimension. This page covers what you can randomize, the batched APIs that set it, and when to apply each kind of randomization.
 

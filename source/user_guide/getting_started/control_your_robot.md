@@ -1,14 +1,10 @@
 # Control your robot
 
-This tutorial loads a Franka arm and drives it with Genesis World's built-in
-controllers: setting the joint state directly, position and velocity control
-through a PD controller, and direct force (torque) control. The complete script is
-[`examples/tutorials/control_your_robot.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/control_your_robot.py).
+Without actuation, the arm from {doc}`hello_genesis` falls under gravity. Genesis World has a built-in [PD controller](https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller) that takes a target joint position or velocity, and you can also command force directly. This tutorial covers both, plus writing the joint state without going through physics. The complete script is [`examples/tutorials/control_your_robot.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/control_your_robot.py).
 
 ## Scene setup
 
-The scene is the same single-arm setup from {doc}`hello_genesis`: a ground plane
-and a Franka arm loaded from MJCF, simulated at `dt=0.01` s.
+The scene is the same single-arm setup from {doc}`hello_genesis`: a ground plane and a Franka arm loaded from MJCF, simulated at `dt=0.01` s.
 
 ```python
 gs.init(backend=gs.gpu)
@@ -34,20 +30,13 @@ franka = scene.add_entity(
 scene.build()
 ```
 
-Without any actuation, the arm falls under gravity. Everything below applies a
-control command after each `scene.build()` to hold or move it.
+With no actuation the arm falls under gravity, so every snippet below issues a control command after the build to hold or move it.
 
 ## Joints and degrees of freedom
 
-A **joint** and a **dof** (degree of freedom) are related but distinct. A joint
-connects two links; the number of dofs is how many independent coordinates that
-joint adds. The Franka arm has 7 revolute arm joints and 2 prismatic gripper
-joints, each with a single dof, so the arm is a 9-dof articulated body. Other
-joint types carry more: a free joint has 6 dofs, a ball joint has 3. Think of
-each dof as an independently controllable motor.
+A **joint** connects two links, and a **dof** (degree of freedom) is one independent coordinate that a joint contributes. The distinction matters here because every control method addresses dofs, never joints. On the Franka arm the two line up neatly: 7 revolute arm joints and 2 prismatic gripper joints, each carrying a single dof, make a 9-dof articulated body. Other joint types carry more, so a free joint contributes 6 dofs and a ball joint 3.
 
-Control APIs address dofs by index, so you first map the joint names from the
-MJCF/URDF file to their dof indices inside the solver:
+Dofs are addressed by index, so start by mapping the joint names in the MJCF/URDF file to the dof indices the solver assigned them:
 
 ```python
 joints_name = (
@@ -64,17 +53,11 @@ joints_name = (
 motors_dof_idx = [franka.get_joint(name).dofs_idx_local[0] for name in joints_name]
 ```
 
-`dofs_idx_local` is the dof index relative to this entity; each single-dof joint
-exposes a one-element list, hence the `[0]`. Use `joint.dofs_idx` instead when
-you need the dof's global index within the scene.
+`dofs_idx_local` is the dof index relative to this entity, and each single-dof joint exposes a one-element list, hence the `[0]`. Use `joint.dofs_idx` when you need the dof's global index within the scene.
 
 ## Control gains
 
-Position and velocity control run through a PD controller. Its gains — `kp`
-(stiffness) and `kv` (damping) — set how much force the controller applies to
-close the gap between the current state and the target. Gains are usually parsed
-from the MJCF/URDF file, but setting them explicitly makes the behavior
-reproducible. `set_dofs_force_range` caps the controller's output for safety.
+The controller has two gains: `kp` (stiffness) scales the force by the distance to the target, and `kv` (damping) scales it by the current velocity, which damps the overshoot. Genesis World parses both from the MJCF or URDF file when the model provides them, but we recommend setting them explicitly, because gains from another model rarely transfer unchanged. `set_dofs_force_range` caps the controller's output.
 
 ```python
 franka.set_dofs_kp(
@@ -92,21 +75,16 @@ franka.set_dofs_force_range(
 )
 ```
 
-These methods share the pattern used throughout the control API: a tensor of
-values paired with the dof indices they apply to. The values and the indices
-must line up element by element.
+These methods share the pattern used throughout the control API: a tensor of values paired with the dof indices they apply to, lining up element by element.
 
 ## Setting state versus controlling
 
-Genesis World separates two families of methods:
+`set_*` and `control_*` look similar and do different things.
 
-- `set_*` writes the robot state directly. It bypasses physics, teleporting dofs
-  to the requested value in a single step.
-- `control_*` sends a target to the controller. The solver then produces forces
-  that move the robot toward that target over time, obeying dynamics and the
-  force limits set above.
+- `set_*` writes the robot state directly, without consulting the dynamics. The dof lands on the requested value in a single step.
+- `control_*` sends a target to the controller, which produces forces that move the robot toward it over several steps, respecting the dynamics and the force range set above.
 
-Use `set_dofs_position` to reset or initialize a configuration, not to actuate:
+Use `set_dofs_position` to reset an episode or place a robot at a starting configuration. We recommend keeping it out of a control loop, because a state written directly carries no momentum:
 
 ```python
 for i in range(150):
@@ -123,9 +101,7 @@ With the viewer on, the arm snaps to a new configuration every 50 steps.
 
 ## PD and force control
 
-Switching from `set_*` to the matching `control_*` method turns a state
-assignment into an actuated command. A position target is held until you replace
-it. You do not resend it every step.
+Switching from `set_*` to the matching `control_*` method turns a state assignment into an actuated command. The controller holds a position target until you replace it, so a single call is enough.
 
 ```python
 franka.control_dofs_position(
@@ -134,10 +110,7 @@ franka.control_dofs_position(
 )
 ```
 
-Different dofs can run under different control modes at the same time. Passing a
-subset of indices leaves the other dofs on their previous command. Here the
-first dof is driven by a velocity target while the rest stay under position
-control:
+Different dofs can run under different control modes at the same time, because passing a subset of indices leaves the remaining dofs on their previous command. Here the first dof follows a velocity target while the rest stay under position control:
 
 ```python
 # control first dof with velocity, and the rest with position
@@ -151,9 +124,7 @@ franka.control_dofs_velocity(
 )
 ```
 
-`control_dofs_force` applies a torque (or force, for prismatic dofs) directly,
-skipping the PD controller. Commanding zero force lets gravity take over and the
-arm falls:
+`control_dofs_force` applies a torque (or force, for prismatic dofs) directly, bypassing the PD controller. Commanding zero force hands the arm back to gravity and it falls:
 
 ```python
 franka.control_dofs_force(
@@ -173,11 +144,7 @@ print("control force:", franka.get_dofs_control_force(motors_dof_idx))
 print("internal force:", franka.get_dofs_force(motors_dof_idx))
 ```
 
-`get_dofs_control_force` is what the controller commanded: computed from the
-target and gains under position/velocity control, or equal to the input under
-force control. `get_dofs_force` is the total force the dof actually experiences,
-combining the control force with internal effects such as contact and Coriolis
-forces.
+`get_dofs_control_force` is what the controller commanded, computed from the target and gains under position or velocity control, and equal to your input under force control. `get_dofs_force` is the total force the dof actually experiences, combining that control force with internal effects such as contact and Coriolis forces.
 
 Running the full example produces this sequence:
 
@@ -188,14 +155,9 @@ Video: the Franka arm cycling through position, velocity, and force control.
 
 ## Applying external forces
 
-The `control_*` methods act in joint space, through the dofs. Sometimes you instead
-want to push or twist a link directly in Cartesian space: a disturbance to test a
-controller's robustness, a thruster, wind, or a scripted tug on a payload. The rigid
-solver applies such wrenches with `apply_links_external_force` and
-`apply_links_external_torque`.
+The `control_*` methods act in joint space, through the dofs. Sometimes you want to push or twist a link directly in Cartesian space instead: a thruster, wind, a scripted tug on a payload, or a disturbance to see how a controller recovers. The rigid solver applies such wrenches with `apply_links_external_force` and `apply_links_external_torque`.
 
-An external force lasts for a single step and is then cleared, so reapply it on every
-step you want it active:
+An external force lasts for a single step and is then cleared, so reapply it on every step you want it active:
 
 ```python
 rigid = scene.sim.rigid_solver
@@ -210,9 +172,7 @@ for i in range(150):
     scene.step()
 ```
 
-The force and torque tensors follow the batch convention used throughout the API: shape
-`([n_envs,] n_links, 3)`, matching `links_idx`. With a single environment the leading
-`n_envs` dimension is dropped. Forces are in newtons and torques in newton-meters.
+The force and torque tensors follow the batch convention used throughout the API: shape `([n_envs,] n_links, 3)`, matching `links_idx`, with the leading `n_envs` dimension dropped in a single-environment scene. Forces are in newtons and torques in newton-meters.
 
 Both methods take the same optional arguments:
 
@@ -223,18 +183,9 @@ Both methods take the same optional arguments:
 
 ## Pick and place with a suction cup
 
-An industrial suction gripper behaves like an instant rigid grasp. You can
-reproduce that in Genesis World by welding two rigid bodies together for the
-duration of the grasp. The rigid solver exposes `add_weld_constraint` and
-`delete_weld_constraint`, each taking the two link indices to attach or detach.
-The runnable version is
-[`examples/rigid/suction_cup.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/suction_cup.py),
-which moves the end-effector above a cube, welds them, transports the cube, and
-releases it.
+An industrial suction gripper behaves like an instant rigid grasp, which you can reproduce by welding two rigid bodies together for the duration of the grasp. The rigid solver exposes `add_weld_constraint` and `delete_weld_constraint`, each taking the two link indices to attach or detach. The runnable version is [`examples/rigid/suction_cup.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/suction_cup.py), which moves the end-effector above a cube, welds them, transports the cube, and releases it.
 
-Reach a pose above the cube using {doc}`inverse kinematics </user_guide/robot_control/inverse_kinematics_motion_planning>`,
-then activate the "suction" by welding the cube's link to the gripper's `hand`
-link:
+Move to a pose above the cube using {doc}`inverse kinematics </user_guide/robot_control/inverse_kinematics_motion_planning>`, then activate the "suction" by welding the cube's link to the gripper's `hand` link:
 
 ```python
 # ... arm moved above the cube via inverse_kinematics + control_dofs_position ...

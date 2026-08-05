@@ -1,6 +1,6 @@
 # Interactive GUI and debugging
 
-Genesis World gives you three complementary tools for understanding what a scene is doing: rich interactive inspection of any object from a Python shell, debug geometry drawn straight into the viewer, and an in-viewer GUI panel for driving the simulation by hand. Reach for them while prototyping a scene, tracking down a misplaced entity, or checking a frame or contact point without writing a plot.
+Genesis World gives you three complementary tools for understanding what a scene is doing: rich interactive inspection of any object from a Python shell, debug geometry drawn straight into the viewer, and an in-viewer GUI panel for driving the simulation by hand. Use them while prototyping a scene, tracking down a misplaced entity, or checking a frame or contact point without writing a plot.
 
 Two runnable examples back this page:
 

@@ -2,7 +2,7 @@
 
 Genesis World scales along two independent axes. Within a single GPU, a scene runs many copies of the same world at once as batched {doc}`parallel environments </user_guide/getting_started/parallel_simulation>`. Across GPUs, you launch one process per device, each running its own scene pinned to one GPU. This page covers the second axis: how to spread work over several GPUs, and how to combine it with data-parallel training.
 
-Reach for multiple GPUs only after you have saturated one. A single modern GPU runs thousands of environments in parallel, and batching is simpler and faster than crossing a process boundary. Scale out when you need more environments than one GPU's memory holds, or when data-parallel training needs one worker per device.
+We recommend adding a second GPU only once you have saturated the first. A single modern GPU runs thousands of environments in parallel, and batching them is both simpler and faster than crossing a process boundary. Scale out when you need more environments than one GPU's memory holds, or when data-parallel training wants one worker per device.
 
 Two runnable examples are the source of truth for the patterns below:
 

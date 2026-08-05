@@ -2,13 +2,13 @@
 
 The {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` tutorial simulated a rigid robot. But a scene can hold water, sand, cloth, and soft tissue at the same time, because Genesis World unifies several physics **solvers** under one `Scene`. A solver is the set of algorithms that advances one family of materials; the material you assign to an entity decides which solver simulates it.
 
-This page introduces the non-rigid solvers, explains when to reach for each, and links a runnable example per solver. It is an overview: read it to choose a solver, then follow the linked example for the full script.
+This page introduces the non-rigid solvers, says which problems each one suits, and links a runnable example for every one of them. Read it to choose a solver, then follow the linked example for the full script.
 
 ## Choosing a solver
 
 Every entity carries a `material`. In {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` the material defaulted to `gs.materials.Rigid()`, so the rigid solver handled the arm. Assign a material from a different family and its solver runs instead:
 
-| Solver | Representation | Reach for it when you need | Materials (`gs.materials.<S>.*`) |
+| Solver | Representation | Use it when you need | Materials (`gs.materials.<S>.*`) |
 |---|---|---|---|
 | **MPM** (Material Point Method) | Hybrid particles + background grid | The widest range of continuum materials in one solver: elastic, plastic, sand, snow | `Elastic`, `Liquid`, `ElastoPlastic`, `Sand`, `Snow`, `Muscle` |
 | **FEM** (Finite Element Method) | Tetrahedral mesh | Accurate elasticity and volumetric muscles, where mesh fidelity matters | `Elastic`, `Cloth`, `Muscle` |
@@ -51,7 +51,7 @@ obj = scene.add_entity(
 
 ## MPM: deformable and granular materials
 
-The Material Point Method carries mass on particles while resolving forces on a background grid, which lets one solver span elastic solids, plastics, sand, and snow. Reach for MPM when you want several continuum behaviors in the same scene, or a material that flows and then holds its deformed shape.
+The Material Point Method carries mass on particles while resolving forces on a background grid, which lets one solver span elastic solids, plastics, sand, and snow. Use MPM when a scene needs several continuum behaviors at once, or a material that flows and then holds its deformed shape.
 
 Only the `material` differs between an elastic cube, a liquid cube, and an elastoplastic sphere:
 
@@ -101,7 +101,7 @@ Skinning a flat 2D cloth mesh with `vis_mode="visual"` can produce degenerate ba
 
 ## SPH: free-surface liquids
 
-Smoothed-Particle Hydrodynamics is a purely Lagrangian (particle-only) solver aimed at liquids. Reach for SPH when you want fluid governed by physical parameters — rest density `rho` (kg/m³), viscosity `mu`, and surface tension `gamma` — rather than the coarser liquid model MPM provides.
+Smoothed-Particle Hydrodynamics is a purely Lagrangian (particle-only) solver aimed at liquids. Use SPH when you want fluid governed by physical parameters: rest density `rho` (kg/m³), viscosity `mu`, and surface tension `gamma`. MPM's liquid model is coarser and cheaper.
 
 Turning a rigid block into water is one line: give it an SPH liquid material. Tune the flow with its parameters:
 
@@ -128,7 +128,7 @@ The `Liquid` material accepts a `sampler` that controls how particles fill the m
 
 ## SF: gaseous phenomena (smoke)
 
-The Stable Fluid solver is grid-based (Eulerian), not particle-based: it advects a velocity field and one or more scalar density fields on a fixed 3D grid, then makes the velocity divergence-free with a Jacobi pressure projection. Reach for it for smoke and other gases. Set the grid resolution with `SFOptions.res`.
+The Stable Fluid solver works on a fixed 3D grid (Eulerian): it advects a velocity field and one or more scalar density fields, then makes the velocity divergence-free with a Jacobi pressure projection. Use it for smoke and other gases, and set the grid resolution with `SFOptions.res`.
 
 Unlike the other non-rigid solvers, SF has no Lagrangian entity you add and move. Gas enters through velocity **jets** you register on the solver, and the solver stays inactive until at least one jet exists. Each substep advects the velocity and density fields (RK3 backtracing with trilinear interpolation), injects momentum at the jets, then runs `solver_iters` Jacobi pressure iterations to keep the velocity divergence-free. State lives on the fixed grid, so there are no per-entity get/set methods, and SF does not participate in checkpointing. Read the density grid back for rendering.
 

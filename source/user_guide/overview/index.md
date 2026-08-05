@@ -6,7 +6,7 @@ Note that we are still in rapid development. As such, please acknowledge there m
 If you see something, say something! Please do not hesitate to [open an issue](https://github.com/Genesis-Embodied-AI/genesis-world/issues)
 and we will do our best to respond quickly.
 
-This section orients you and gets the platform installed before the {doc}`Getting Started </user_guide/getting_started/index>` tutorials begin.
+This section covers what the platform is and how to install it, before the {doc}`Getting Started </user_guide/getting_started/index>` tutorials begin.
 
 ```{toctree}
 :hidden:

@@ -10,7 +10,7 @@ import genesis as gs
 gs.init(backend=gs.gpu)
 ```
 
-That is all most programs need: it runs on the GPU if one is available and falls back to the CPU otherwise. `gs.init()` takes only keyword arguments; the sections below cover the ones you will actually reach for.
+That is all most programs need: it runs on the GPU if one is available and falls back to the CPU otherwise. `gs.init()` takes only keyword arguments, and the sections below cover the ones that come up in practice.
 
 ## Choosing a backend
 
@@ -51,7 +51,7 @@ print(gs.device)   # the torch.device tensors are placed on
 gs.init(backend=gs.gpu, precision="64")
 ```
 
-Single precision is faster and uses less memory; double precision trades speed for numerical headroom in stiff or ill-conditioned scenes. A few things to keep in mind:
+Single precision is faster and uses less memory, and double precision buys numerical headroom in stiff or ill-conditioned scenes at a cost in speed. Three details come with the choice:
 
 - **Integer indices are always 32-bit**, regardless of `precision`. Only floating-point values switch.
 - **Double precision is not available on Apple Metal.** Requesting `precision="64"` with `backend=gs.metal` raises an error.

@@ -25,8 +25,6 @@ for i in range(1000):
     scene.step()
 ```
 
-The rest of this page explains what each step is for.
-
 ## Initialize
 
 `gs.init()` must run once before you touch any other part of the API. Its most important argument is the compute **backend**:
@@ -68,7 +66,7 @@ Here `dt` is the simulation timestep in seconds, `gravity` points down along `-Z
 
 ## Add entities
 
-Objects and robots are {doc}`entities </api_reference/engine/entity/index>`. Genesis World is object-oriented: you interact with an entity through its own methods and attributes, not through a global handle or id.
+Objects and robots are {doc}`entities </api_reference/engine/entity/index>`. The API is object-oriented, so `add_entity` hands you the entity itself and you drive it through its own methods and attributes.
 
 The first argument to `add_entity` is a {doc}`morph </api_reference/engine/entity/morph/index>`: a combined description of an entity's geometry *and* initial pose. You can build a morph from a shape primitive or load one from a file:
 
