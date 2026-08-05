@@ -10,7 +10,7 @@ Genesis World runs its physics on the GPU. Your environment code runs in Python 
 
 - **Host-device synchronization:** any operation that needs a tensor's value on the CPU (`.item()`, `.cpu()`, `.tolist()`, `bool(t)`, `print(t)`, or `.nonzero()`, which returns a dynamically sized tensor) blocks the CPU until the GPU drains its entire queue. One such call per step, times thousands of steps, dominates the wall clock.
 - **Allocation:** creating a tensor inside the loop (`torch.zeros(...)`, `torch.tensor(...)`, most fresh reads) goes through the CUDA caching allocator, which synchronizes against pending work when it has to find or free memory.
-- **Python overhead:** a `for` loop over environments issues `n_envs` times the kernel launches for the same result a single batched op produces. The fixed per-launch cost, not the arithmetic, is what you pay.
+- **Python overhead:** a `for` loop over environments issues `n_envs` times the kernel launches for the same result a single batched op produces. The fixed per-launch cost dominates, not the arithmetic.
 
 All three point the same way: operate on whole `([n_envs,] ...)` tensors at once, keep every tensor on the device, and never let a value cross back to the host inside the step loop.
 
@@ -114,7 +114,7 @@ The zero-copy command writers on a rigid entity are `control_dofs_position`, `co
 
 ## Turn on performance mode for training
 
-Once the environment is finalized, `gs.init(performance_mode=True)` bakes the now-static tensor shapes into the compiled kernels for roughly 30% faster simulation. The cost is that any change to the scene triggers a recompile that can take several minutes. Leave it off for research, debugging, and interactive work; turn it on for long training and production runs, where the scene is fixed and the one-time recompile pays for itself. See {doc}`/user_guide/getting_started/hello_genesis` for the other `gs.init` options.
+Once the environment is finalized, `gs.init(performance_mode=True)` bakes the now-static tensor shapes into the compiled kernels for roughly 30% faster simulation. The cost is that any change to the scene triggers a recompile that can take several minutes. Leave it off for research, debugging, and interactive work; turn it on for long training and production runs, where the scene is fixed and a single recompile speeds up every step that follows. See {doc}`/user_guide/getting_started/hello_genesis` for the other `gs.init` options.
 
 ## Verify with the profiler
 

@@ -28,10 +28,10 @@ recommendations, and the things we support. What it never does is escort the rea
 together", "now we will look at the viewer", "if you are patient enough, let's continue". The reader is
 reading, not accompanying you.
 
-Keep the verbs active, because the passive voice is where warmth goes to die. "Parallelism is turned on when
-the scene is built" has no one in it; "you turn parallelism on at build time" has both an actor and an action.
-When you catch yourself writing "is handled", "is performed", or "can be configured", find the actor and put
-them in front.
+Keep the verbs active. "Parallelism is turned on when the scene is built" has nobody in it, while "you turn
+parallelism on at build time" has both an actor and an action. When you catch yourself writing "is handled",
+"is performed", or "can be configured", find the actor and put them in front. This holds for headings too:
+prefer "Composing a scene from options" over "A scene is assembled from options".
 
 ## Explain, then instruct
 
@@ -46,8 +46,8 @@ Say what goes wrong without the step, when something does. Say what the value me
 not the solver's. When a default exists, say why it is the default. A reader who understands why `build()` is
 required will remember it forever; a reader who was told to call it will forget by the next page.
 
-Generosity has a limit, and it is repetition rather than length. Explaining the same fact twice on one page is
-the thing to cut, not the explanation itself.
+Cut repetition rather than length. Explaining the same fact twice on one page is what to remove; the
+explanation itself stays.
 
 ## Ornament is not warmth
 
@@ -77,6 +77,11 @@ and a reason attached to an instruction, never from ornament. Specifically:
 - **Inventing a claim to sound helpful.** "Confusing them is the most common way a first control loop goes
   wrong", "a model tuned for another simulator rarely feels right in this one". Neither is something we
   measured. Write the fact you can defend: "gains from another model rarely transfer unchanged."
+- **Wrapping an instruction in a metaphor.** "A sentence that fails to help the reader act hides one that
+  does, so delete it" makes the reader decode an image to find the instruction. Lead with the imperative and
+  stop: ✅ "Delete sentences that fail to help the reader."
+- **Vague cost metaphors.** "You pay for that", "it does not come for free", "this is not cheap". Pay what,
+  in what units? Name the cost: ✅ "IPC costs more per step than the other couplers."
 - **Stating what the reader already knows.** "Shape primitives need no file at all" tells someone who just
   read the word "primitive" nothing. ✅ "The shape primitives are `Plane`, `Box`, …". The same goes for a
   sentence explaining that a default is the value used when you pass nothing, or that a getter returns the
@@ -93,9 +98,9 @@ leaving the reader to infer it. Fragments belong in a list, a table, or a code c
 prose.
 
 - ✅ "The first build is slow because Genesis World compiles GPU kernels on the fly. Later runs load them
-  from cache, so only the first one pays."
+  from cache and start immediately."
 - ❌ "The first build is slow. Kernels compile on the fly. Later runs reuse the cache. Only the first one
-  pays."
+  is slow."
 
 Bold-lead bullets are a real format, and a page made entirely of them is a slide deck. Use them where the lead
 phrase is the index the reader scans for, as in the lists on this page, and write paragraphs everywhere else.
@@ -125,9 +130,9 @@ The habit, then the replacement.
 - **Uniform hedging.** "You might want to consider possibly using X" is three hedges around one
   recommendation. Be decisive where we have a recommendation, and say so plainly where we do not: "Use the
   Newton solver", or "either value works, so pick by which failure you would rather debug".
-- **Emphatic capitals and bold slogans.** A sentence that needs shouting needs a better fact in it, and bold
-  is for the term being defined rather than for emphasis on a clause. An exclamation mark is fine where you
-  mean it; what does not work is one standing in for the evidence.
+- **Emphatic capitals and bold slogans.** Replace the emphasis with a better fact, and reserve bold for the
+  term being defined rather than for a whole clause. An exclamation mark is fine where you mean it; what does
+  not work is one standing in for the evidence.
 - **Narrating history.** "This option was previously called `n_worlds`", "we have now added USD support". A
   page describes what is true at the current version, and version history lives in the changelog.
 - **Em dashes.** Default to a colon, a comma, or a full stop, and keep at most one per paragraph for a
@@ -224,8 +229,8 @@ After:
 > The IPC coupler resolves contact with Incremental Potential Contact, a barrier-based model built on the
 > [libuipc](https://github.com/spiriMirror/libuipc) library. It advances every coupled body through a single
 > smooth potential whose barrier term grows without bound as two surfaces approach, so contact under IPC
-> stays intersection-free however hard you press two bodies together. You pay for that in step time, which
-> is why we leave it off by default.
+> stays intersection-free however hard you press two bodies together. IPC costs more per step than the other
+> couplers, which is why we leave it off by default.
 >
 > Use it for cloth with self-collision, for FEM solids pressed hard against each other, and for a gripper
 > closing on a deformable object. For coarse rigid contact or mixed continuum scenes (MPM, SPH, PBD), the
@@ -254,7 +259,7 @@ Before merging prose:
 
 - [ ] Every sentence has a subject that acts: you, Genesis World, or we. No orphaned passives.
 - [ ] "We" appears where the page states one of our conventions, defaults, or recommendations.
-- [ ] Each non-obvious instruction carries its reason, and no fact is explained twice.
+- [ ] Each non-obvious instruction carries its reason, and no fact appears twice.
 - [ ] No paragraph is a stack of five-word sentences; clauses connect with "because", "so", "while".
 - [ ] Every bulleted section earned its bullets, and the page is not three lists in a row.
 - [ ] No banned word or phrase from the list above, and every adjective is a verifiable property.

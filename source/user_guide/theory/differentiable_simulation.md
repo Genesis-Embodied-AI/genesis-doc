@@ -37,7 +37,7 @@ print(force.grad)
 
 ## How autodiff works
 
-- **Enable it once, on the scene:** set `requires_grad=True` in `gs.options.SimOptions`. Genesis World then records the intermediate substep state each step needs for the backward pass. That storage is why we default the flag to `False` rather than always paying for it; see [Limitations](#limitations) for how it scales.
+- **Enable it once, on the scene:** set `requires_grad=True` in `gs.options.SimOptions`. Genesis World then records the intermediate substep state each step needs for the backward pass. That state occupies GPU memory in proportion to the number of steps you run, so we default the flag to `False`; see [Limitations](#limitations).
 - **State getters return differentiable tensors:** methods such as `get_pos()`, `get_vel()`, and `get_qpos()` return a {py:class}`gs.Tensor <genesis.grad.tensor.Tensor>` (a subclass of `torch.Tensor` that also carries a reference to the scene it came from). See the {doc}`Tensor reference </api_reference/differentiation/tensor>`.
 - **`backward()` flows through the physics:** calling `backward()` on any tensor derived from scene state runs the standard PyTorch backward pass, then continues the gradient backward through time across the recorded steps, down to the inputs you marked with `requires_grad=True`.
 - **Inputs are ordinary leaf tensors:** control forces, initial positions, and target values are plain PyTorch tensors created with `requires_grad=True`. Any operation that mixes them with scene-derived tensors yields a scene-tracked tensor, which keeps the graph connected.

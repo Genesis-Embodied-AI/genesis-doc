@@ -10,7 +10,7 @@ The first is built in and always available. The other two use the PyTorch profil
 
 ## Benchmark against a disposable cache
 
-Before you measure anything, get the compilation cache out of the way. Genesis World compiles GPU kernels just-in-time and caches the results to a persistent local folder, so repeated runs of the same scene start quickly. Quadrants, the compiler, keeps its own cache in the same way. This is what you want for day-to-day work, but it distorts profiling and benchmarking: the first run pays the compilation cost and later runs read from the warm cache.
+Before you measure anything, get the compilation cache out of the way. Genesis World compiles GPU kernels just-in-time and caches the results to a persistent local folder, so repeated runs of the same scene start quickly. Quadrants, the compiler, keeps its own cache in the same way. This is what you want for day-to-day work, but it distorts profiling and benchmarking: the first run compiles the kernels, and later runs read them from the warm cache.
 
 Do not wipe the persistent cache to get around this. Its effect outlives your experiment, and every future simulation is slow until the cache rebuilds. Instead, redirect both caches to a throwaway directory for the duration of a single run, by setting a few environment variables:
 
@@ -87,7 +87,7 @@ scene.build(n_envs=30000, env_spacing=(1.0, 1.0))
 
 Three choices make this a throughput benchmark rather than an interactive session:
 
-- **`performance_mode=True`** bakes static tensor shapes into the compiled kernels for faster stepping, at the cost of recompiling whenever the scene changes. It is worth it for a fixed benchmark or a training run, not for iterative development.
+- **`performance_mode=True`** bakes static tensor shapes into the compiled kernels for faster stepping, at the cost of recompiling whenever the scene changes. Use it for a fixed benchmark or a training run, and leave it off while you iterate.
 - **`show_viewer=False`** runs headless. Rendering a window caps throughput at display rates and defeats the purpose.
 - **A large `n_envs`** keeps the GPU saturated. Throughput scales with the batch until you run out of VRAM.
 

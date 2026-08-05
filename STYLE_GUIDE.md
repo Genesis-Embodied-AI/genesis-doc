@@ -1,6 +1,6 @@
 # Documentation Style Guide
 
-This guide defines how we write documentation for Genesis World: what belongs on a page, how it is structured, and how it is marked up. Its companion, the [voice guide](VOICE.md), covers how the sentences themselves read. Both are prescriptive, describing the standard we are moving *toward* rather than how every existing page reads today, so bring any page you touch closer to them.
+This guide defines how we write documentation for Genesis World: what belongs on a page, how to structure it, and how to mark it up. Its companion, the [voice guide](VOICE.md), covers how the sentences themselves read. Both are prescriptive, describing the standard we are moving *toward* rather than how every existing page reads today, so bring any page you touch closer to them.
 
 Our model is the class of technical documentation that developers actively enjoy using: Stripe, Django, and the Python standard library. What those share is a set of habits rather than a house style. They respect the reader's time, they are accurate to a fault, and they read as one voice across many authors.
 
@@ -11,10 +11,10 @@ Our model is the class of technical documentation that developers actively enjoy
 Every rule below descends from five principles. When a rule doesn't fit a situation, reason from these instead.
 
 1. **The reader is trying to get something done.** Documentation is a tool. Optimize for the reader who is stuck, skimming, and slightly frustrated, rather than for the one with time to read top to bottom.
-2. **Accuracy is non-negotiable.** A single wrong argument name or stale output destroys trust in the whole page, so every code block must run and every claim must hold at the current version.
-3. **Show, then tell.** A correct, runnable example answers more questions than three paragraphs, so lead with it.
+2. **Run every code block and check every claim against the current version.** A single wrong argument name or stale output destroys trust in the whole page.
+3. **Lead with a correct, runnable example.** It answers more questions than three paragraphs of description.
 4. **One voice.** A reader should not be able to tell that fifty people wrote these pages. Consistency in terminology, structure, and tone is worth more than any individual author's preference.
-5. **Cut what does not help, not what is long.** A sentence that fails to help the reader act hides one that does, so delete it. An explanation that earns its lines is not a candidate for cutting: see the [voice guide](VOICE.md) on explaining generously.
+5. **Delete sentences that fail to help the reader.** Keep the explanations that earn their lines: see the [voice guide](VOICE.md) on explaining generously.
 
 ---
 
@@ -29,7 +29,7 @@ Sentence-level voice lives in the [voice guide](VOICE.md): who the subject of a 
 - ❌ "…or simply use `'dumb'` if you are a black-and-white person." (a joke that leaves the option undocumented)
 - ❌ "You can stop here if you want, but if you are patient enough, let's walk through it step by step together." (narrator escorting the reader)
 - ❌ "…up to 10~80x (yes, this is a bit sci-fi) faster…" (an aside standing in for the methodology)
-- ✅ "Simulation is parallelized across environments on the GPU, measured at 10–80× the throughput of prior GPU-accelerated simulators without trading away accuracy. See the [blog post](…) for methodology."
+- ✅ "Genesis World parallelizes simulation across environments on the GPU, measured at 10–80× the throughput of prior GPU-accelerated simulators without trading away accuracy. See the [blog post](…) for methodology."
 
 **Keep marketing out of the docs.** Superlatives ("world's fastest", "unprecedented", "effortless") belong on the landing page and in the README, not in reference or tutorial material. State capabilities as facts the reader can verify, and let benchmarks live behind a link.
 
@@ -234,7 +234,7 @@ We build with Sphinx + MyST Markdown (`pydata_sphinx_theme`). Use the following,
 - **Spell out "and" in headings and toctree captions, never `&`** (see §4).
 - Don't skip levels (no H2 → H4). `myst_heading_anchors` generates anchors down to H4; keep meaningful headings within that depth.
 
-**Cross-references:** prefer Sphinx roles over bare Markdown links for anything inside the docs, so links survive file moves and are checked at build time:
+**Cross-references:** prefer Sphinx roles over bare Markdown links for anything inside the docs, so links survive file moves and Sphinx checks them at build time:
 - Another doc page: `` {doc}`/api_reference/engine/scene` `` (leading `/` = path from `source/`).
 - A Python object: `` {py:class}`genesis.engine.scene.Scene` `` / `` {py:meth}`genesis.engine.scene.Scene.build` `` where autodoc targets exist.
 - **Link the first mention of each API symbol per guide page.** When prose names a public class (`gs.materials.MPM.Muscle`, `gs.options.SimOptions`, `gs.morphs.Box`), link it the first time it appears on the page and leave later repeats as plain inline code. Use the full public name as the display text over the real autodoc target: `` {py:class}`gs.materials.MPM.Muscle <genesis.engine.materials.MPM.muscle.Muscle>` `` (the `gs.*` alias is not itself a resolvable target, so the FQN goes in the angle brackets). Do not link inside code blocks, and do not link backend constants or enum values (`gs.gpu`, `gs.tc_float`, `gs.constraint_solver.Newton`) that are documented as prose rather than autodoc classes.

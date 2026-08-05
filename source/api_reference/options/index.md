@@ -1,6 +1,6 @@
 # Options
 
-Almost every component in Genesis World is configured through an **Options** class you pass in, and built into a working object when the scene builds (`RigidOptions` -> `RigidSolver`, `IMU` -> `IMUSensor`, and so on). Since the options and the object are two halves of one component, in this API Reference we document each **Options** with the object it configures.
+You configure almost every component in Genesis World through an **Options** class, and the scene builds it into a working object (`RigidOptions` -> `RigidSolver`, `IMU` -> `IMUSensor`, and so on). Since the options and the object are two halves of one component, we document each **Options** with the object it configures.
 
 
 ```{eval-rst}

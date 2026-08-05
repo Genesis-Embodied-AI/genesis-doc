@@ -24,7 +24,7 @@ Source for the Genesis World documentation site, built with [Sphinx](https://www
 
 Before contributing, read both guides and bring any page you touch in line with them:
 
-- [Style guide](STYLE_GUIDE.md): what belongs on a page, how it is structured, and how it is marked up.
+- [Style guide](STYLE_GUIDE.md): what belongs on a page, how to structure it, and how to mark it up.
 - [Voice guide](VOICE.md): how the sentences read, the patterns we avoid, and the register these pages use.
 
 ## Questions, requests, and bugs

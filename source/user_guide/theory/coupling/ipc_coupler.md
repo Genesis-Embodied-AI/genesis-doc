@@ -1,6 +1,6 @@
 # IPC coupler
 
-The IPC coupler resolves contact with Incremental Potential Contact, a barrier-based model built on the [libuipc](https://github.com/spiriMirror/libuipc) library. It advances every coupled body through a single smooth potential whose barrier term grows without bound as two surfaces approach, so contact under IPC stays intersection-free however hard you press two bodies together. You pay for that in step time, which is why we leave it off by default.
+The IPC coupler resolves contact with Incremental Potential Contact, a barrier-based model built on the [libuipc](https://github.com/spiriMirror/libuipc) library. It advances every coupled body through a single smooth potential whose barrier term grows without bound as two surfaces approach, so contact under IPC stays intersection-free however hard you press two bodies together. IPC costs more per step than the other couplers, which is why we leave it off by default.
 
 Use it for cloth with self-collision, for FEM solids pressed hard against each other, and for a gripper closing on a deformable object. For coarse rigid contact or mixed continuum scenes (MPM, SPH, PBD), the legacy coupler is cheaper and adequate; see {doc}`the couplers overview <index>` for the full comparison.
 

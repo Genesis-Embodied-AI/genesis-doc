@@ -136,7 +136,7 @@ Three things distinguish Nyx from the other backends:
 
 ## Rendering a Gaussian splat
 
-Beyond standard meshes, Nyx can render captured **3D Gaussian splats** in the same path-traced frame as simulated geometry. A splat is declared as a `LightFieldAsset` on the Nyx camera, not as a Genesis World entity: every Nyx sensor's `light_fields` are collected at `scene.build()` and rendered each step.
+Beyond standard meshes, Nyx can render captured **3D Gaussian splats** in the same path-traced frame as simulated geometry. A splat is declared as a `LightFieldAsset` on the Nyx camera, not as a Genesis World entity: Genesis World collects every Nyx sensor's `light_fields` at `scene.build()` and renders them each step.
 
 ```{figure} ../../_static/images/nyx_gaussian_splat.png
 :alt: A captured plant Gaussian splat sitting on a Genesis World plane, rendered by Nyx
