@@ -1,8 +1,8 @@
 # Documentation Style Guide
 
-This guide defines how we write documentation for Genesis World. It is prescriptive: it describes the standard we are moving *toward*, not necessarily how every existing page reads today. When you touch a page, bring it closer to this standard.
+This guide defines how we write documentation for Genesis World: what belongs on a page, how it is structured, and how it is marked up. Its companion, the [voice guide](VOICE.md), covers how the sentences themselves read. Both are prescriptive, describing the standard we are moving *toward* rather than how every existing page reads today, so bring any page you touch closer to them.
 
-Our north star is the class of technical documentation that developers actively enjoy using — Stripe, Django, and the Python standard library. What those share is not a house style but a set of habits: they respect the reader's time, they are accurate to a fault, and they read as one voice rather than a collection of authors.
+Our model is the class of technical documentation that developers actively enjoy using: Stripe, Django, and the Python standard library. What those share is a set of habits rather than a house style. They respect the reader's time, they are accurate to a fault, and they read as one voice across many authors.
 
 ---
 
@@ -10,39 +10,33 @@ Our north star is the class of technical documentation that developers actively 
 
 Every rule below descends from five principles. When a rule doesn't fit a situation, reason from these instead.
 
-1. **The reader is trying to get something done.** Documentation is a tool, not prose to be admired. Optimize for the reader who is stuck, skimming, and slightly frustrated — not the reader with time to read top to bottom.
-2. **Accuracy is non-negotiable.** A single wrong argument name or stale output destroys trust in the whole page. Every code block must run. Every claim must be true at the current version.
-3. **Show, then tell.** A correct, runnable example answers more questions than three paragraphs. Lead with it.
+1. **The reader is trying to get something done.** Documentation is a tool. Optimize for the reader who is stuck, skimming, and slightly frustrated, rather than for the one with time to read top to bottom.
+2. **Accuracy is non-negotiable.** A single wrong argument name or stale output destroys trust in the whole page, so every code block must run and every claim must hold at the current version.
+3. **Show, then tell.** A correct, runnable example answers more questions than three paragraphs, so lead with it.
 4. **One voice.** A reader should not be able to tell that fifty people wrote these pages. Consistency in terminology, structure, and tone is worth more than any individual author's preference.
-5. **Less, but better.** The best edit is usually a deletion. Every sentence that doesn't help the reader act is a sentence that hides the one that does.
+5. **Delete before you add.** Every sentence that does not help the reader act hides one that does.
 
 ---
 
 ## 2. Voice and tone
 
-**Write in a calm, direct, professional voice.** Confident and warm, never chatty, never salesy.
+Sentence-level voice lives in the [voice guide](VOICE.md): who the subject of a sentence is, how much explanation a step gets, rhythm, the patterns we avoid, and the register. Read it before writing prose. This section covers only what is specific to documentation.
 
-**Use second person ("you") for the reader and first person plural ("we") sparingly** — reserve "we" for the project's deliberate design decisions ("we follow the w-x-y-z quaternion convention"), not as a narrator walking the reader by the hand ("let's go through it together").
+**An audible author, not a specification.** These pages are written by people who made choices, and the reader should be able to hear that. Say "we" for our conventions and defaults, keep the verbs active, and give a step its reason rather than only its name. Terseness is the failure mode to watch for: prose with every connective word squeezed out of it reads as choppy and hard to follow, and shortening it further makes it worse.
 
-- ✅ "Call `scene.build()` before stepping the simulation."
-- ✅ "Genesis World uses a right-handed, Z-up coordinate system."
-- ❌ "Now, let's dive in a bit and play around together!"
-- ❌ "If you are patient enough, let's walk through it step by step."
+**Warmth and sloppiness are different things.** Enthusiasm about a real capability is welcome, and so is telling the reader plainly that something is easy when it is. What we cut is looser writing that costs the reader time:
 
-**No jokes, winks, or filler.** Personality comes from clarity, not from asides. Delete anything you'd cut from a spoken answer to a colleague who's in a hurry.
-
-- ❌ "…or simply use `'dumb'` if you are a black-and-white person."
-- ❌ "…up to 10~80x (yes, this is a bit sci-fi) faster…"
-- ❌ "With just two lines of code you can now pick and place arbitrary objects! Feel free to integrate this into your pipeline."
+- ❌ "…or simply use `'dumb'` if you are a black-and-white person." (a joke that leaves the option undocumented)
+- ❌ "You can stop here if you want, but if you are patient enough, let's walk through it step by step together." (narrator escorting the reader)
+- ❌ "…up to 10~80x (yes, this is a bit sci-fi) faster…" (an aside standing in for the methodology)
+- ✅ "Simulation is parallelized across environments on the GPU, measured at 10–80× the throughput of prior GPU-accelerated simulators without trading away accuracy. See the [blog post](…) for methodology."
 
 **Keep marketing out of the docs.** Superlatives ("world's fastest", "unprecedented", "effortless") belong on the landing page and in the README, not in reference or tutorial material. State capabilities as facts the reader can verify, and let benchmarks live behind a link.
 
 - ✅ "Parallel simulation runs across environments on a single GPU. See [benchmarks](…) for measured throughput."
 - ❌ "Genesis World is the world's fastest physics engine, with unprecedented speed."
 
-**Address the reader's mental state, not just the mechanics.** Say what a step is *for* and what will go wrong without it. The reader who knows *why* `build()` is required will remember it; the reader who was only told to call it will forget.
-
-**Be decisive.** Prefer "Use X." over "You might want to consider possibly using X." Hedging wastes words and erodes authority. When there is a recommended path, name it and move the alternatives to a note.
+**Be decisive about the recommended path.** Where we have a recommendation, name it and move the alternatives to a note: "Use X" beats "you might want to consider using X". Where there is genuinely no recommendation, say so and give the reader the criterion to decide by.
 
 ---
 
@@ -111,7 +105,7 @@ A configuration class that is itself the public API with no separate built objec
 - **One home per fact.** Every parameter's type, default, and meaning lives once, in the source docstring the reference autodocs. Neither the guide nor a reference page's hand-written prose restates the full parameter or return list; they link to it with `{py:class}` or `{doc}`. Naming the few parameters a task needs, in a teaching example, is fine; reproducing the reference table is not. A compact table that helps a reader *choose between* sensors is navigation, not a restatement, and is welcome.
 - **Fix facts at the docstring.** Then the reference updates itself, and the guide keeps no version-fragile specifics that rot silently. If you find either side reproducing the reference, delete it and link.
 
-**Keep paragraphs short.** Three or four sentences maximum. Break dense material into lists, tables, or steps. A wall of text is where information goes to hide.
+**Keep paragraphs to three or four sentences.** A paragraph makes one point; when it starts making a second, start a new one. Material that is really a set of parallel items belongs in a list, a table, or numbered steps instead, though see the [voice guide](VOICE.md) on not turning a whole page into bullets.
 
 ---
 
@@ -119,7 +113,7 @@ A configuration class that is itself the public API with no separate built objec
 
 **Active voice, present tense.** "Genesis World compiles the kernels on the first build," not "the kernels will be compiled." Describe what the software *does*, as a fact about the present.
 
-**Short sentences.** One idea each. If a sentence has two "and"s or a parenthetical inside a parenthetical, split it.
+**One idea per sentence, and no nesting.** A parenthetical inside a parenthetical, or a third subordinate clause, is a sentence that wants to be two. Splitting is not the same as chopping: join the halves with the word that names their relationship ("because", "so", "while") rather than leaving two stubs side by side. See the [voice guide](VOICE.md) on rhythm.
 
 **Define a term once, then reuse it exactly.** Don't alternate between "degree of freedom", "dof", and "motor" for the same thing. Introduce the term, bold it on first use, then use it consistently. (See §6 for the terms we've standardized.)
 
@@ -129,6 +123,7 @@ A configuration class that is itself the public API with no separate built objec
 - Always state units. "9.81 m/s²", "0.01 s", "0.5 m". A bare number is a bug report waiting to happen.
 - Use the actual symbol or identifier in code font: `dt`, `max_range`, `n_envs`.
 - Write "10–80×" with an en dash and a real multiplication sign, not "10~80x". (Better: avoid the range and cite a benchmark.)
+- Arrows follow the context: `→` in prose and in a mapping like `(X, Y, Z) → (X, -Z, Y)`, and ASCII `->` inside code and code comments.
 
 **Capitalization:**
 - Sentence case for in-page content headings: "Reading sensor data", not "Reading Sensor Data". Navigation and section titles are the one exception (Title Case) — see §7.
@@ -141,7 +136,7 @@ A configuration class that is itself the public API with no separate built objec
 - ✅ "Sensors and perception", "Theory and modelling"
 - ❌ "Sensors & perception", "Theory & Modelling"
 
-**Minimize em dashes; default to a colon, comma, or full stop.** The em dash (—) is the exception, not the reflex. Before using one, try a colon (to introduce or expand), a comma (for a light pause), or a new sentence — one of those is almost always cleaner and more scannable. At most one em dash per paragraph, and only for a genuine aside; a sentence whose clauses are strung together with them should be rewritten. When a phrase introduces or defines what follows, use a colon, not a dash. (An en dash in a number range like "10–80×" is not an em dash and is fine.)
+**Minimize em dashes; default to a colon, comma, or full stop.** Try a colon (to introduce or expand), a comma (for a light pause), or a new sentence first: one of those is almost always cleaner and more scannable. At most one em dash per paragraph, and only for a genuine aside. When a phrase introduces or defines what follows, the punctuation you want is a colon. (An en dash in a number range like "10–80×" is a different character and is fine.)
 
 **Definition-style list items lead with a bold term and a colon.** Write `- **Simulation interface:** the user-facing API for …`, with the description as a normal clause after the colon. Do not separate the term from its description with an em dash, and do not use the "bold term, full stop, sentence" form for definition lists.
 
@@ -188,7 +183,7 @@ force = contact_sensor.read()
   ```
 - Use double quotes for strings, matching the codebase.
 
-**Comments earn their place.** A comment should explain *why*, or annotate a non-obvious value (units, conventions, shapes). Don't narrate what the code plainly says.
+**Comment only what the code cannot say.** A comment explains *why*, or annotates a non-obvious value: units, conventions, tensor shapes. Never narrate what the line plainly says.
 
 - ✅ `euler=(0, 0, 90),  # extrinsic x-y-z, degrees`
 - ✅ `distances = sensor.read()  # shape ([n_envs,] n_probes)`
@@ -292,7 +287,7 @@ The `[n_envs,]` bracket means "present when the scene is built with multiple env
 
 ## 9. Pre-merge checklist
 
-Before opening a docs PR, confirm:
+Before opening a docs PR, confirm the following, then run the [voice guide](VOICE.md) checklist over the prose:
 
 - [ ] Every code block runs against the current release, and I've run it.
 - [ ] Every fenced block is tagged with a lowercase language (`python`, `bash`, …).
@@ -301,9 +296,9 @@ Before opening a docs PR, confirm:
 - [ ] No parameter, type, default, or return fact is re-typed from the API Reference (the source docstring); the guide and reference-page prose link to it instead.
 - [ ] In-page headings are sentence case with no emoji; section/navigation titles (top-level section pages, toctree captions) are Title Case.
 - [ ] No page or section title begins with an article ("The", "A", "An").
-- [ ] Terminology matches §6; the product is "Genesis World" (not keyword-stuffed).
-- [ ] No jokes, no marketing superlatives, no "let's".
-- [ ] Headings, titles, and captions spell out "and" — no ampersands (`&`).
+- [ ] Terminology matches §6, and the product is "Genesis World" without keyword stuffing.
+- [ ] No marketing superlatives; every capability claim is one the reader can verify.
+- [ ] Headings, titles, and captions spell out "and", with no ampersands (`&`).
 - [ ] Internal links use `{doc}` / `{py:*}` roles; no hard-coded genesis-doc URLs.
 - [ ] Tensor shapes, coordinate frame, quaternion order, and units are stated where relevant.
 - [ ] Alt text on every image; assets live under `_static/` and are referenced relatively.
