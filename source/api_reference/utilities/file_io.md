@@ -1,6 +1,6 @@
 # File I/O utilities
 
-Genesis World provides utilities for file operations, path handling, and loading robot/scene descriptions.
+Genesis World has helpers for file operations, path handling, and loading robot and scene descriptions.
 
 ## Cache and source directories
 
@@ -16,7 +16,7 @@ Genesis World caches compiled kernels and processed assets. These helpers, expos
 
 ## Loading models and meshes
 
-Robot descriptions and meshes are loaded by passing a file-based morph (`gs.morphs.URDF`, `gs.morphs.MJCF`, `gs.morphs.Mesh`, `gs.morphs.USD`) to `scene.add_entity(...)`. Supported mesh formats:
+Load a robot description or a mesh by passing a file-based morph (`gs.morphs.URDF`, `gs.morphs.MJCF`, `gs.morphs.Mesh`, `gs.morphs.USD`) to `scene.add_entity(...)`. Supported mesh formats:
 
 | Format | Extension | Notes |
 |--------|-----------|-------|
@@ -38,6 +38,6 @@ Genesis World resolves a morph's `file` in order:
 
 ## See also
 
-- {doc}`/user_guide/assets/loading_assets`: loading robot descriptions and meshes
-- {doc}`/api_reference/engine/entity/morph/file_morph/index`: File-based morphs
-- {doc}`/api_reference/engine/entity/index`: Entity loading
+- {doc}`/user_guide/assets/loading_assets`: loading robot descriptions and meshes.
+- {doc}`/api_reference/engine/entity/morph/file_morph/index`: file-based morphs.
+- {doc}`/api_reference/engine/entity/index`: entity loading.

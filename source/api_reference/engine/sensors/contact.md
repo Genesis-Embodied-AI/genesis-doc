@@ -1,10 +1,10 @@
 # Contact sensors
 
-Sensors that report contact on a rigid link, for manipulation, grasping, and physical-interaction tasks. For usage and how to scope a reading with `filter_link_idx`, see the {doc}`contact sensing guide </user_guide/sensing/contact>`.
+These sensors report contact on a rigid link, for manipulation, grasping, and physical-interaction tasks. For usage and how to scope a reading with `filter_link_idx`, see the {doc}`contact sensing guide </user_guide/sensing/contact>`.
 
 ## `gs.sensors.ContactForce`
 
-The total contact force on the associated link, in its local frame.
+Reports the total contact force on the associated link, in its local frame.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.options.ContactForce
@@ -19,7 +19,7 @@ The total contact force on the associated link, in its local frame.
 
 ## `gs.sensors.Contact`
 
-A boolean: whether the associated link is in contact.
+Reports whether the associated link is in contact.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.options.Contact

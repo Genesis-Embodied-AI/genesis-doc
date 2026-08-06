@@ -1,6 +1,6 @@
 # IPCCoupler
 
-The `IPCCoupler` uses Incremental Potential Contact (IPC), a barrier-based, intersection-free contact model built on [libuipc](https://github.com/spiriMirror/libuipc). It unifies rigid bodies (handled as affine-body-dynamics objects) and FEM bodies in one contact framework. Use it for cloth and large-deformation soft bodies, where contact has to stay intersection-free and a slower step is acceptable. Select it by passing `gs.options.IPCCouplerOptions` to the scene.
+The `IPCCoupler` uses Incremental Potential Contact (IPC), a barrier-based, intersection-free contact model built on [libuipc](https://github.com/spiriMirror/libuipc). It treats rigid bodies as affine-body-dynamics objects, putting them in one contact framework with FEM bodies. Use it for cloth and large-deformation soft bodies, where contact has to stay intersection-free and a slower step is acceptable. Select it by passing `gs.options.IPCCouplerOptions` to the scene.
 
 ## Options
 

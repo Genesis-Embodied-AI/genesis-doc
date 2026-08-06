@@ -8,7 +8,7 @@ The state is `qpos` and `qvel`, not per-link poses. Forward kinematics walks eac
 
 ## Mass matrix
 
-$M$ is assembled from composite-rigid-body inertias, folded leaf-to-root so that each link carries the spatial inertia of its subtree, then factorized once per substep. The later stages that map forces to accelerations reuse that factorization, including each constraint-solver iteration.
+The solver assembles $M$ from composite-rigid-body inertias, folding them leaf-to-root so that each link carries the spatial inertia of its subtree, then factorizes it once per substep. The later stages that map forces to accelerations reuse that factorization, including each constraint-solver iteration.
 
 ## Forces before contact
 
@@ -16,7 +16,7 @@ $\tau$ collects the forces independent of contact: actuation, according to the c
 
 ## Integration
 
-Velocity first, then position from the new velocity, which makes the ordering semi-implicit rather than explicit:
+The solver integrates velocity first, then position from the new velocity, which makes the ordering semi-implicit rather than explicit:
 
 $$
 \dot q_{k+1} = \dot q_k + \ddot q_k\,\Delta t

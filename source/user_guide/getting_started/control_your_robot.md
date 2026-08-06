@@ -1,6 +1,6 @@
 # Control your robot
 
-Without actuation, the arm from {doc}`hello_genesis` falls under gravity. Genesis World has a built-in [PD controller](https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller) that takes a target joint position or velocity, and you can also command force directly. This tutorial covers both, plus writing the joint state without going through physics. The complete script is [`examples/tutorials/control_your_robot.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/control_your_robot.py).
+Without actuation, the arm from {doc}`hello_genesis` falls under gravity. Genesis World has a built-in [PD controller](https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller) that takes a target joint position or velocity, plus a force path that bypasses it. This tutorial covers both, plus writing the joint state without going through physics. The complete script is [`examples/tutorials/control_your_robot.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/control_your_robot.py).
 
 ## Scene setup
 
@@ -183,7 +183,7 @@ Both methods take the same optional arguments:
 
 ## Pick and place with a suction cup
 
-An industrial suction gripper behaves like an instant rigid grasp, which you can reproduce by welding two rigid bodies together for the duration of the grasp. The rigid solver exposes `add_weld_constraint` and `delete_weld_constraint`, each taking the two link indices to attach or detach. The runnable version is [`examples/rigid/suction_cup.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/suction_cup.py), which moves the end-effector above a cube, welds them, transports the cube, and releases it.
+An industrial suction gripper behaves like an instant rigid grasp, so reproduce it by welding two links together for the duration of the grasp. The rigid solver exposes `add_weld_constraint` and `delete_weld_constraint`, each taking the two link indices to attach or detach. The runnable version is [`examples/rigid/suction_cup.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/suction_cup.py), which moves the end-effector above a cube, welds them, transports the cube, and releases it.
 
 Move to a pose above the cube using {doc}`inverse kinematics </user_guide/robot_control/inverse_kinematics_motion_planning>`, then activate the "suction" by welding the cube's link to the gripper's `hand` link:
 
@@ -195,17 +195,14 @@ link_franka = franka.get_link("hand").idx
 rigid.add_weld_constraint(link_cube, link_franka)
 ```
 
-While the weld is active the cube tracks the gripper, so transporting it is just
-more IK targets. Releasing is a single call:
+While the weld is active the cube tracks the gripper, so transporting it takes nothing but more IK targets. Releasing is a single call:
 
 ```python
 rigid.delete_weld_constraint(link_cube, link_franka)
 ```
 
 :::{note}
-The weld is an ideal rigid attachment: it enforces no compliance or grasp-force
-limit. For a physically grounded grasp, control the gripper fingers against the
-object instead.
+The weld is an ideal rigid attachment: it fixes the relative pose of the two links and models neither compliance nor a grasp-force limit. For a physically grounded grasp, control the gripper fingers against the object instead.
 :::
 
 ## See also

@@ -20,7 +20,7 @@ Every rule below descends from five principles. When a rule doesn't fit a situat
 
 ## 2. Voice and tone
 
-Write the way a senior engineer explains something to a capable colleague who is in a hurry. That person wants the reason along with the instruction, and they will forgive you a longer sentence if it saves them a question. Being short comes from knowing what you want to say, never from cutting sentences in half.
+Write the way a senior engineer with a sense of humor explains something to a capable colleague. That person wants the reason along with the instruction, and they will forgive you a longer sentence if it saves them a question. Being short comes from knowing what you want to say, never from cutting sentences in half.
 
 The failure mode these pages fall into is compression. A page that has had every connective word squeezed out of it reads as choppy and authorless, and the reader ends up reassembling the logic the writer threw away. Readers tell us so. Length is not the enemy: a paragraph that explains why a step exists earns its lines, and a page of clipped declaratives does not become clearer by being shorter.
 
@@ -62,6 +62,10 @@ Where a sentence states a fact rather than giving an instruction, an imperative 
 the fact a real actor instead of the reader. ✅ "Genesis World constructs the solvers for you." ❌ "You rarely
 construct a solver directly."
 
+Cut a relative clause whose only content is that the value came from the reader: "rotated by any `euler_offset`
+you supply", "the `n_envs` you passed", "the mesh file you gave it". Naming the option already says where its
+value comes from, and the clause pushes the fact to the end of the sentence. ✅ "rotated by `euler_offset`."
+
 "We" is how the reader hears that a person chose this, so use it for our conventions, our defaults, our
 recommendations, and the things we support. What it never does is escort the reader: "let's walk through it
 together", "now we will look at the viewer", "if you are patient enough, let's continue". The reader is
@@ -75,7 +79,7 @@ from options".
 
 ### Explain, then instruct
 
-Every non-obvious step gets its reason in the same breath as the instruction, and the reason goes first when
+Every non-obvious step gets its reason in the same sentence as the instruction, and the reason goes first when
 it is what makes the instruction make sense.
 
 - ✅ "Genesis World compiles GPU kernels just-in-time, so `scene.build()` is an explicit step: it allocates
@@ -153,7 +157,7 @@ The habit, then the replacement.
 - **Preamble.** A page that opens with a tour of itself, or a section that restates its own heading. Open on
   the fact the reader came for.
 - **Fragments as statements.** "Fully differentiable." becomes "Gradients flow through the physics."
-- **Restating the reason.** Give it once, in the same breath as the claim: "Prefer `expand` over `repeat`,
+- **Restating the reason.** Give it once, in the same sentence as the claim: "Prefer `expand` over `repeat`,
   because it returns a view."
 - **Oblique verdicts.** "Comments earn their place", "X belongs here", "X is the right tool". Use the
   imperative: "Comment only what the code cannot say."
@@ -356,7 +360,7 @@ A configuration class that is itself the public API with no separate built objec
 **User Guide vs API Reference: one home per fact.** The two top-level sections have different jobs, and no fact should live in both.
 
 - **The API Reference is information-oriented and generated from the source docstrings** (`{eval-rst}` + `.. autoclass::`); its structure mirrors the code. A reference page carries a one-line "what and when," the autodoc directives, and a link to the How-to in the User Guide. It hosts no usage examples; those live in the guide, never duplicated here. The docstring *is* the reference.
-- **The User Guide is task- and understanding-oriented:** the mental model, when to reach for a feature, how APIs combine, sensible values for a use case, and the gotchas, anchored by curated runnable examples.
+- **The User Guide is task- and understanding-oriented:** the mental model, when to use a feature, how APIs combine, sensible values for a use case, and the gotchas, anchored by curated runnable examples.
 - **One home per fact.** Every parameter's type, default, and meaning lives once, in the source docstring the reference autodocs. Neither the guide nor a reference page's hand-written prose restates the full parameter or return list; they link to it with `{py:class}` or `{doc}`. Naming the few parameters a task needs, in a teaching example, is fine; reproducing the reference table is not. A compact table that helps a reader *choose between* sensors is navigation, not a restatement, and is welcome.
 - **Fix facts at the docstring.** Then the reference updates itself, and the guide keeps no version-fragile specifics that rot silently. If you find either side reproducing the reference, delete it and link.
 

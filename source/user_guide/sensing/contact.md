@@ -12,7 +12,7 @@ For how sensors are sampled, read back, batched with `scene.read_sensors()`, and
 | `ContactForce` | net contact force on the link | `([n_envs,] 3)` | link-local, N |
 | `JointTorque` | actuator effort per dof | `([n_envs,] n_dofs)` | N·m (revolute) / N (prismatic) |
 
-The `[n_envs,]` axis is present only when the scene is built with multiple environments. When a sensor is created with `history_length > 0`, an extra axis is inserted after the batch axis (see the {doc}`overview <index>`).
+The `[n_envs,]` axis is present only when the scene is built with multiple environments. A sensor created with `history_length > 0` gains an extra axis after the batch axis (see the {doc}`overview <index>`).
 
 ## Contact and contact force
 
@@ -40,7 +40,7 @@ for link_name in foot_link_names:
     )
 ```
 
-A sensor is bound to one link by `entity_idx` and the entity-local `link_idx_local`. After building and stepping, read it:
+`entity_idx` and the entity-local `link_idx_local` bind a sensor to one link. After building and stepping, read it:
 
 ```python
 force = sensor.read()  # shape ([n_envs,] 3), N, in the link-local frame
@@ -62,7 +62,7 @@ The reading models the effort at the gearbox interface:
 actuator_force = tau_control - armature * qacc + tau_frictionloss + tau_damping
 ```
 
-Because `qacc` is the constraint-solved acceleration, gravity, Coriolis, and contact loads are all captured implicitly. In free space the reading is roughly the gravity-plus-Coriolis load; when the arm presses into an obstacle it also carries the contact reaction.
+Because `qacc` is the constraint-solved acceleration, the reading captures gravity, Coriolis, and contact loads implicitly. In free space the reading is roughly the gravity-plus-Coriolis load; when the arm presses into an obstacle it also carries the contact reaction.
 
 The full script is [`examples/sensors/joint_torque_franka.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/joint_torque_franka.py), which holds a Franka arm against a fixed wall box and plots control torque against sensed torque:
 

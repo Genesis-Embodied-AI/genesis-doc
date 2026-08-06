@@ -25,6 +25,6 @@ Two options objects configure the viewer: `ViewerOptions` sets its initial camer
 
 ## See also
 
-- {doc}`visualizer`: the orchestrator that owns the viewer, cameras, and renderer
-- {doc}`lights`: lighting the scene through `VisOptions`
-- {doc}`/user_guide/interaction/visualization`: the interactive viewer and `gs` tools
+- {doc}`visualizer`: the orchestrator that owns the viewer, cameras, and renderer.
+- {doc}`lights`: lighting the scene through `VisOptions`.
+- {doc}`/user_guide/interaction/visualization`: the interactive viewer and `gs` tools.

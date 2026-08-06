@@ -1,8 +1,8 @@
 # Mesh processing
 
-Every mesh you load into Genesis World serves two different jobs, and they want opposite things. The **visual mesh** should look right, so it keeps every triangle the artist authored. The **collision mesh** feeds the physics solver, which is fastest and most stable when geometry is simple, watertight, and convex. A raw mesh from a scanner or an art tool is usually none of those things.
+Every mesh you load into Genesis World has two jobs with conflicting requirements. The **visual mesh** should look right, so it keeps every triangle the artist authored. The **collision mesh** feeds the physics solver, which is fastest and most stable when geometry is simple, watertight, and convex. A raw mesh from a scanner or an art tool is usually none of those things.
 
-To bridge the gap, Genesis processes the collision geometry of a rigid entity automatically when you load it (watertightening, decimating, and convex-decomposing it) while leaving the visual mesh untouched. This page explains what that pipeline does, the options that control it, and when to change each one.
+Genesis processes the collision geometry of a rigid entity automatically when you load it (watertightening, decimating, and convex-decomposing it) while leaving the visual mesh untouched. This page explains what that pipeline does, the options that control it, and when to change each one.
 
 The two runnable examples referenced throughout are the source of truth for the code:
 
@@ -40,7 +40,7 @@ When a mesh becomes a rigid entity, Genesis prepares its collision geometry in t
 - **Decimate:** reduce the triangle count toward a target so narrow-phase collision stays cheap.
 - **Convexify:** replace the mesh with one or more convex hulls, since a convex shape has an exact support function, which is what the collision algorithms query.
 
-Decimation and convexification are on by default for rigid entities and can be disabled independently. The visual mesh is never modified by any of this.
+Decimation and convexification are on by default for rigid entities; turn either off on its own with `decimate=False` or `convexify=False`.
 
 ## Decimation
 
@@ -124,7 +124,7 @@ For the material side of deformable simulation, see {doc}`Soft robots </user_gui
 
 ## Caching
 
-Mesh processing is expensive, so Genesis caches each result on disk keyed by a SHA-256 hash of the input geometry and the options that produced it. Change a relevant option and the key changes, so the stale entry is bypassed and the mesh is reprocessed. Subsequent loads with identical inputs read straight from cache.
+Mesh processing is expensive, so Genesis caches each result on disk keyed by a SHA-256 hash of the input geometry and the options that produced it. Change a relevant option and the key changes, so Genesis bypasses the stale entry and reprocesses the mesh. Subsequent loads with identical inputs read straight from cache.
 
 | Result | Extension | Produced by |
 |---|---|---|

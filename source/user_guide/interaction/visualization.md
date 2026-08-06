@@ -2,7 +2,7 @@
 
 This page covers watching a Genesis World scene as it runs: the interactive **viewer** window, and the `gs` command-line tools that open it without writing a script. Both are for developing on a machine with a display. To render images off-screen (color, depth, segmentation, video) or produce photorealistic frames, see {doc}`Rendering </user_guide/rendering/index>`.
 
-Every scene owns a `visualizer` (`scene.visualizer`) that drives both the viewer and the cameras added with `scene.add_camera()`. The viewer runs in its own thread and follows the simulation in real time; cameras render frames on demand and work headless (see {doc}`Rendering </user_guide/rendering/index>`).
+Every scene owns a `visualizer` (`scene.visualizer`) that drives both the viewer and the cameras added with `scene.add_camera()`. The viewer runs in its own thread and follows the simulation in real time; cameras render frames on demand and work headless.
 
 ## Viewer
 
@@ -33,10 +33,10 @@ scene = gs.Scene(
 The viewer always renders with the rasterizer. To select the backend used by the scene's cameras (rasterizer, ray tracer, or batch renderer), see {doc}`Rendering backends </user_guide/rendering/index>`.
 
 :::{note}
-To cap the viewer frame rate, set `refresh_rate` on `ViewerOptions`. The older `max_FPS` argument is deprecated and now maps to `refresh_rate`.
+To cap the viewer frame rate, set `refresh_rate` on `ViewerOptions`. The older `max_FPS` argument is deprecated and maps to `refresh_rate`.
 :::
 
-`realtime_factor` sets the pace of the simulation itself: how many seconds of simulated time one second of wall-clock time covers, `1.0` for real time and `2.0` for twice as fast. When the viewer is shown, the simulation is throttled to it and falls behind gracefully when it cannot keep up; set it to `None` to always run as fast as possible. It also sets the playback speed of the videos recorded by a {doc}`camera </user_guide/rendering/index>`, viewer or not, with `None` recording at real time since there is no pace to follow. `scene.viewer.realtime_factor` changes it while the scene runs.
+`realtime_factor` sets the pace of the simulation itself: how many seconds of simulated time one second of wall-clock time covers, `1.0` for real time and `2.0` for twice as fast. When the viewer is shown, Genesis World throttles the simulation to it, falling behind gracefully when it cannot keep up; set it to `None` to always run as fast as possible. It also sets the playback speed of the videos recorded by a {doc}`camera </user_guide/rendering/index>`, viewer or not, with `None` recording at real time since there is no pace to follow. `scene.viewer.realtime_factor` changes it while the scene runs.
 
 Once the scene exists, reach the viewer through the `scene.viewer` shortcut to read or set the camera pose at runtime:
 
@@ -49,7 +49,7 @@ scene.viewer.set_camera_pose(pos=(3.5, 0.0, 2.5), lookat=(0, 0, 0.5))
 
 Installing Genesis World adds a `gs` command with a few subcommands, so you can open the viewer without writing a script. Run `gs` with no arguments to list them.
 
-**`gs launch [asset]`** opens an asset in the interactive viewer. It accepts a Mesh, URDF, MJCF, or USD file; for a USD stage, every rigid entity in the stage is loaded. The viewer's overlay exposes per-joint sliders and play, pause, step, and reset controls, and it starts paused so you can inspect and pose the asset first. With no file, it opens an empty scene to which you can add entities live. Useful flags: `-c` visualize collision geometry, `-r` slowly rotate the asset, `-s SCALE` scale it, and `-l` show link frames.
+**`gs launch [asset]`** opens an asset in the interactive viewer. It accepts a Mesh, URDF, MJCF, or USD file, and for a USD stage it loads every rigid entity in the stage. The viewer's overlay exposes per-joint sliders and play, pause, step, and reset controls, and it starts paused so you can inspect and pose the asset first. With no file, it opens an empty scene to which you can add entities live. Useful flags: `-c` visualize collision geometry, `-r` slowly rotate the asset, `-s SCALE` scale it, and `-l` show link frames.
 
 ```bash
 gs launch xml/franka_emika_panda/panda.xml
@@ -71,7 +71,7 @@ gs animate 'frames/*.png' --fps 60
 `gs view` still works as a deprecated alias of `gs launch` and prints a deprecation warning. Use `gs launch` instead.
 :::
 
-## Next steps
+## See also
 
 - {doc}`Rendering </user_guide/rendering/index>`: cameras, image types, video, lighting, and rendering backends.
 - {doc}`Interactive GUI and debugging </user_guide/interaction/interactive_debugging>`: inspecting objects, drawing debug geometry, and the in-viewer control panel.

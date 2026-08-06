@@ -39,7 +39,7 @@ Genesis World simulates on three GPU backends, NVIDIA (`gs.cuda`), AMD (`gs.amdg
 
 ### Surface reconstruction
 
-To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, Genesis World reconstructs a mesh from the internal particle representation. [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) is supported out of the box. `ParticleMesher`, an in-house OpenVDB-based tool, is faster but produces lower-quality surfaces; enable it by adding its library to your path:
+To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, Genesis World reconstructs a mesh from the internal particle representation. It uses [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) out of the box. `ParticleMesher`, our OpenVDB-based tool, reconstructs faster and produces lower-quality surfaces; enable it by adding its library to your path:
 
 ```bash
 echo "export LD_LIBRARY_PATH=${PWD}/ext/ParticleMesher/ParticleMesherPy:$LD_LIBRARY_PATH" >> ~/.bashrc
@@ -64,7 +64,7 @@ Importing an engine submodule before calling `gs.init()` raises this error:
 genesis.GenesisException: Genesis hasn't been initialized. Did you call `gs.init()`?
 ```
 
-Import engine submodules after initialization, so they can configure low-level Quadrants features such as the fast-cache mechanism and dynamic array mode. This is rarely a problem in practice, because engine classes are not meant to be instantiated by hand. If you need to import one for type checking, guard the import:
+Import engine submodules after initialization, so they can configure low-level Quadrants features such as the fast-cache mechanism and dynamic array mode. This is rarely a problem in practice, because Genesis World constructs the engine classes for you. If you need to import one for type checking, guard the import:
 
 ```python
 from typing import TYPE_CHECKING

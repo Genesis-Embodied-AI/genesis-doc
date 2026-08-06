@@ -1,6 +1,6 @@
 # Multi-GPU simulation and training
 
-Genesis World scales along two independent axes. Within a single GPU, a scene runs many copies of the same world at once as batched {doc}`parallel environments </user_guide/getting_started/parallel_simulation>`. Across GPUs, you launch one process per device, each running its own scene pinned to one GPU. This page covers the second axis: how to spread work over several GPUs, and how to combine it with data-parallel training.
+Genesis World scales along two independent axes. Within a single GPU, a scene runs many copies of the same world at once as batched {doc}`parallel environments </user_guide/getting_started/parallel_simulation>`. Across GPUs, one process per device runs its own scene pinned to a single GPU. This page covers the second axis: how to spread work over several GPUs, and how to combine it with data-parallel training.
 
 We recommend adding a second GPU only once you have saturated the first. A single modern GPU runs thousands of environments in parallel, and batching them is both simpler and faster than crossing a process boundary. Scale out when you need more environments than one GPU's memory holds, or when data-parallel training needs one worker per device.
 
@@ -13,13 +13,13 @@ Two runnable examples are the source of truth for the patterns below:
 
 Genesis World does not split a single scene across GPUs. Each process initializes its own Genesis runtime, builds its own scene, and runs on exactly one device. Run several such processes, pinning each to a different GPU.
 
-Pinning happens through environment variables that must be set **before** `gs.init()` runs, because they select the device that Genesis, its compiler, and the renderer bind to at initialization:
+Pin each process with these environment variables, set **before** `gs.init()` runs, because they select the device that Genesis, its compiler, and the renderer bind to at initialization:
 
 - **`CUDA_VISIBLE_DEVICES`:** restricts which physical GPUs the CUDA runtime and PyTorch can see. Set it to a single index so the process sees exactly one device, which it then addresses as `cuda:0`.
 - **`QD_VISIBLE_DEVICE`:** selects the GPU for Quadrants, the compiler that generates and runs Genesis World kernels.
 - **`EGL_DEVICE_ID`:** selects the GPU used for offscreen (EGL) rendering, and only matters when the process renders images on the GPU.
 
-Set `CUDA_VISIBLE_DEVICES` and `QD_VISIBLE_DEVICE` together to the same index so simulation and any PyTorch tensors land on one device. Because each process sees only that one GPU, it always refers to it as index `0` internally.
+Set `CUDA_VISIBLE_DEVICES` and `QD_VISIBLE_DEVICE` together to the same index so simulation and any PyTorch tensors land on one device.
 
 ## Running one process per GPU
 

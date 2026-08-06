@@ -1,6 +1,6 @@
 # Advanced and parallel IK
 
-The inverse kinematics (IK) solver introduced in {doc}`inverse_kinematics_motion_planning` extends in two directions that matter for real manipulation and for training at scale: solving for several end-effector links at once, and solving every environment of a parallel scene in a single call. This page covers both.
+The inverse kinematics (IK) solver introduced in {doc}`inverse_kinematics_motion_planning` extends in two directions that matter for real manipulation and for training at scale: solving for several end-effector links at once, and solving every environment of a parallel scene in a single call.
 
 The runnable sources for this page are
 [`advanced_IK_multilink.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/advanced_IK_multilink.py)
@@ -38,7 +38,7 @@ robot.set_dofs_position(q)
 scene.visualizer.update()
 ```
 
-The target frames in the video are drawn with `scene.draw_debug_frame()` and moved each iteration with `scene.update_debug_objects()`. These markers live at the visualizer level and take no part in the simulation. See {doc}`/user_guide/interaction/interactive_debugging` for the debug-drawing API.
+The example draws the target frames in the video with `scene.draw_debug_frame()` and moves them each iteration with `scene.update_debug_objects()`. These markers live at the visualizer level and take no part in the simulation. See {doc}`/user_guide/interaction/interactive_debugging` for the debug-drawing API.
 
 ```{video} ../../_static/videos/ik_multilink.mp4
 :width: 100%

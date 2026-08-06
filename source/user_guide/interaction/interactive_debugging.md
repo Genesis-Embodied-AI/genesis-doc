@@ -1,6 +1,6 @@
 # Interactive GUI and debugging
 
-Genesis World gives you three complementary tools for understanding what a scene is doing: rich interactive inspection of any object from a Python shell, debug geometry drawn straight into the viewer, and an in-viewer GUI panel for driving the simulation by hand. Use them while prototyping a scene, tracking down a misplaced entity, or checking a frame or contact point without writing a plot.
+Genesis World has three tools for understanding what a scene is doing: interactive inspection of any object from a Python shell, debug geometry drawn straight into the viewer, and an in-viewer GUI panel for driving the simulation by hand. Use them while prototyping a scene, tracking down a misplaced entity, or checking a frame or contact point without writing a plot.
 
 Two runnable examples back this page:
 
@@ -148,7 +148,7 @@ scene = gs.Scene(
 )
 ```
 
-With `enable_gui=True`, the viewer's help-text overlay and default keyboard controls are turned off automatically, because ImGui captures input that would otherwise conflict with the default keybindings.
+With `enable_gui=True`, the viewer drops its help-text overlay and its default keyboard controls, because ImGui captures input that would otherwise conflict with those keybindings.
 
 To add your own controls, grab the auto-attached plugin and register a panel. The callback receives the live ImGui module, so you can call any of its widgets:
 
@@ -174,6 +174,6 @@ The full example is [`imgui_joint_control.py`](https://github.com/Genesis-Embodi
 
 ## See also
 
-- {doc}`/user_guide/interaction/viewer_plugin` for keybindings and writing your own viewer plugins.
-- {doc}`/user_guide/rendering/index` for cameras, rendering, and recording.
-- {doc}`/user_guide/getting_started/hello_genesis` for the core simulation loop.
+- {doc}`/user_guide/interaction/viewer_plugin`: keybindings and writing your own viewer plugins.
+- {doc}`/user_guide/rendering/index`: cameras, rendering, and recording.
+- {doc}`/user_guide/getting_started/hello_genesis`: the core simulation loop.

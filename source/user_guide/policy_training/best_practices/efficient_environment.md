@@ -2,7 +2,7 @@
 
 When thousands of environments run in parallel on one GPU, throughput is decided less by what `env.step()` computes than by what it forces the GPU to stop and wait for. A step that runs a batched physics kernel over `n_envs` states is fast; the same step becomes slow the moment it copies a value back to the CPU, allocates a fresh tensor, or loops in Python over environments. This page explains that performance model and the patterns that keep the step loop on the device.
 
-The reference environment throughout is the quadruped locomotion example, [`examples/locomotion/go2_env.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/locomotion/go2_env.py). It builds `n_envs` copies of a Go2 robot (see {doc}`/user_guide/getting_started/parallel_simulation` for how batched builds work) and its `step` is written to run without a single host-device synchronization.
+The reference environment throughout is the quadruped locomotion example, [`examples/locomotion/go2_env.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/locomotion/go2_env.py). It builds `n_envs` copies of a Go2 robot (see {doc}`/user_guide/getting_started/parallel_simulation` for how batched builds work) and its `step` runs without a single host-device synchronization.
 
 ## Performance model
 

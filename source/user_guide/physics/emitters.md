@@ -2,7 +2,7 @@
 
 An emitter is a nozzle that streams particles into a particle solver as the simulation runs. Where {doc}`Beyond rigid bodies <beyond_rigid_bodies>` fills a fixed volume of particles once at build time, an emitter injects new particles every step: a faucet, a hose, or a jet of sand that keeps flowing for as long as you call it.
 
-An emitter does not simulate anything itself. It owns a particle entity, pre-allocated with `max_particles` slots, and feeds positions and velocities into that entity's solver. The material you give the emitter decides which solver runs the particles: `gs.materials.SPH.*` for smoothed-particle hydrodynamics, `gs.materials.MPM.*` for the material point method, and `gs.materials.PBD.*` for position-based dynamics.
+An emitter owns a particle entity, pre-allocated with `max_particles` slots, and feeds positions and velocities into that entity's solver. The emitter's material decides which solver runs the particles: `gs.materials.SPH.*` for smoothed-particle hydrodynamics, `gs.materials.MPM.*` for the material point method, and `gs.materials.PBD.*` for position-based dynamics.
 
 The complete script is [`examples/coupling/water_wheel.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/coupling/water_wheel.py):
 
@@ -51,7 +51,7 @@ emitter = scene.add_emitter(
 ```
 
 - `material` selects the solver and the physical behavior. Pass any MPM or SPH material, for example {py:class}`gs.materials.SPH.Liquid <genesis.engine.materials.SPH.liquid.Liquid>`, {py:class}`gs.materials.MPM.Liquid <genesis.engine.materials.MPM.liquid.Liquid>`, or {py:class}`gs.materials.MPM.Sand <genesis.engine.materials.MPM.sand.Sand>`, or one of {py:class}`gs.materials.PBD.Particle <genesis.engine.materials.PBD.particle.Particle>` and {py:class}`gs.materials.PBD.Liquid <genesis.engine.materials.PBD.liquid.Liquid>`. Any other material raises at `add_emitter` time.
-- `max_particles` caps how many particles the emitter holds. Once emission reaches the cap, the oldest particles are recycled, so a long-running stream stays bounded in memory. Default is `20000`.
+- `max_particles` caps how many particles the emitter holds. Once emission reaches the cap, the emitter recycles the oldest particles, so a long-running stream stays bounded in memory. Default is `20000`.
 - `surface` controls appearance only. If omitted, the emitter uses `gs.surfaces.Default(color=(0.6, 0.8, 1.0, 1.0))`. `vis_mode="visual"` is not supported for emitters; use the default `"particle"`, or `"recon"` to render a reconstructed fluid surface.
 
 ## Emit each step

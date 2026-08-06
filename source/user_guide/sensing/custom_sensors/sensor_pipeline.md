@@ -15,7 +15,7 @@ Genesis World models this exactly. The manager computes each sensor's value **on
 
 The `SensorManager` (`genesis/engine/sensors/sensor_manager.py`) owns all sensor storage and drives the per-step update. Sensors themselves hold no per-step buffers; they contribute a slice of the manager's storage and a set of compute hooks.
 
-Storage is organized so that every sensor of one class updates in a single batched pass. Sensors are grouped by class, and within a class each instance occupies a contiguous slice of that class's cache:
+The manager organizes storage so that every sensor of one class updates in a single batched pass: it groups sensors by class, and within a class each instance occupies a contiguous slice of that class's cache:
 
 ```python
 # SensorManager.build: sort each class by entity so instances on the same
@@ -33,7 +33,7 @@ Conceptually the manager keeps four kinds of storage:
 - **Per-dtype timeline rings:** paired ground-truth and measured circular buffers holding pre-noise, post-transform values, so stateful filters can read previous steps without keeping their own state.
 - **Per-class return-space rings:** paired circular buffers holding the finished snapshot at each past step. Delay sampling and history reads both source from here.
 
-Rings and extra buffers cost memory, so the manager allocates them only when a sensor needs them. When a sensor applies no delay, no history, and no return-space cast, its return cache is a zero-copy alias of the intermediate cache and no rings are allocated at all:
+Rings and extra buffers cost memory, so the manager allocates them only when a sensor needs them. When a sensor applies no delay, no history, and no return-space cast, its return cache is a zero-copy alias of the intermediate cache and the manager allocates no rings at all:
 
 ```python
 # SensorManager.build
@@ -65,7 +65,7 @@ for sensor_cls, sensors in self._sensors_by_type.items():
 
 **Rotate the rings first.** The timeline rings must advance before compute, because the compute hook writes into slot 0 and stateful filters read the previous slots. Return-space rings rotate later, inside the per-class loop, so that during the cast step slot 0 still holds the previous step's finished output (a meaningful "last value") rather than stale data.
 
-**Refresh shared contexts once.** Each shared resource is rebuilt at most once per step, before any sensor reads it, so several sensor types consuming the same context pay for it once. See the next section.
+**Refresh shared contexts once.** The manager rebuilds each shared resource at most once per step, before any sensor reads it, so several sensor types consuming the same context pay for it once. See the next section.
 
 **Update each class, then finish it.** For each class the manager calls `_update_shared_cache` once, producing the ground-truth signal and the measured working buffer. It then casts both branches to return space via `_post_process`, writes the finished snapshots into the return-space ring, and delay-samples the measured ring into the return cache:
 
@@ -85,7 +85,7 @@ sensor_cls._apply_delay(metadata, measured_return_ring, self._return_cache[senso
 
 Casting happens eagerly, once per branch per step, rather than lazily at read time. Eager casting gives the manager a real per-class buffer that every reader shares, keeps the cast count independent of how many consumers read the sensor, and lets stateful casts (a bandwidth filter, for instance) run exactly once per step.
 
-The hooks named above (`_update_shared_cache`, `_post_process`, `_apply_delay`) belong to the sensor class, not the manager. `SimpleSensor` implements `_update_shared_cache` as a fixed sequence of finer hooks (raw signal, physics imperfections, transform, hardware imperfections) that concrete sensors override as needed. The order in which those fire and the buffers they touch are documented in {doc}`custom_sensors`.
+The hooks named above (`_update_shared_cache`, `_post_process`, `_apply_delay`) belong to the sensor class, not the manager. `SimpleSensor` implements `_update_shared_cache` as a fixed sequence of finer hooks (raw signal, physics imperfections, transform, hardware imperfections) that concrete sensors override as needed. {doc}`custom_sensors` documents the order in which those fire and the buffers they touch.
 
 ## Shared context: sharing computation across sensor types
 
@@ -128,7 +128,7 @@ def read_ground_truth(self, envs_idx=None) -> DataT:
 - **`read()`:** the measured value, with the sensor's imperfections applied and readout delay sampled in. This is what a controller trained for sim-to-real transfer should consume.
 - **`read_ground_truth()`:** the noiseless, delay-free value from the same step, with identical shape. Use it for reward computation, logging, and debugging.
 
-Both are pure views into per-class caches the manager already populated during `step()`; neither recomputes. The ground-truth branch keeps the raw simulated phenomenon and never sees readout delay, which is why its cache is filled straight from the current ring slot while the measured cache is delay-sampled.
+Both are pure views into per-class caches the manager already populated during `step()`; neither recomputes. The ground-truth branch keeps the raw simulated phenomenon and never sees readout delay, which is why the manager fills its cache straight from the current ring slot and delay-samples the measured one.
 
 ## History and buffering
 
@@ -155,7 +155,7 @@ ring = self._measured_return_timeline_ring[sensor_cls]  # or the GT ring
 return ring.at(hist_idx).transpose(0, 1)
 ```
 
-Delay and history share this ring. Delay reads a single stale slot; history reads a contiguous window of recent slots. The ring is sized to cover whichever demand is deeper.
+Delay and history share this ring. Delay reads a single stale slot; history reads a contiguous window of recent slots. The manager sizes the ring to cover whichever demand is deeper.
 
 ## Reading a whole class at once
 

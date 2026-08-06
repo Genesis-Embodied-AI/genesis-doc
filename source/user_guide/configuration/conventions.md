@@ -46,9 +46,9 @@ An asset exported from Blender at default settings therefore arrives at the orie
 
 glTF assets are [always Y-up by specification](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#coordinate-system-and-units), so we always convert them, with no switch to turn that off: a glTF file that follows the spec then behaves the same everywhere.
 
-Blender will write a Z-up glTF if you uncheck **+Y-up**, though it cannot read that file back correctly afterward. Since our conversion assumes the spec, a Z-up glTF imports rotated. Re-export with the default **+Y-up** option rather than overriding the axis on import.
+Blender writes a Z-up glTF if you uncheck **+Y-up**, though it cannot read that file back correctly afterward. Since our conversion assumes the spec, a Z-up glTF imports rotated. Re-export with the default **+Y-up** option rather than overriding the axis on import.
 
-![Blender glTF exporter panel with the +Y-up transform option enabled](images/blender_gltf_export.png)
+![Blender glTF exporter panel with the +Y-up transform option enabled](../../_static/images/blender_gltf_export.png)
 
 See [Blender's glTF exporter documentation](https://docs.blender.org/manual/en/2.83/addons/import_export/scene_gltf2.html#transform) for the transform settings.
 
@@ -61,7 +61,7 @@ Neither format records a coordinate system, and files of both kinds arrive Y-up 
 
 Declaring it at import means assets from different sources coexist in one scene without you editing the files.
 
-![Blender Wavefront OBJ exporter panel showing the up-axis and forward-axis settings](images/blender_yup_export.png)
+![Blender Wavefront OBJ exporter panel showing the up-axis and forward-axis settings](../../_static/images/blender_yup_export.png)
 
 See [Blender's Wavefront OBJ exporter](https://docs.blender.org/manual/en/4.0/files/import_export/obj.html#object-properties) and [Blender's STL exporter](https://docs.blender.org/manual/fr/3.6/addons/import_export/mesh_stl.html#transform) documentation.
 
@@ -78,7 +78,7 @@ obj = scene.add_entity(
 )
 ```
 
-After import, each mesh records whether a conversion was applied in its `imported_as_zup` metadata flag:
+After import, the `imported_as_zup` metadata flag on each mesh records whether a conversion ran:
 
 ```python
 obj.vgeoms[0].mesh.metadata["imported_as_zup"]  # False if a Y-up -> Z-up conversion ran
@@ -111,13 +111,13 @@ points     # shape ([n_envs,] n_probes, 3)
 
 The `[n_envs,]` bracket means: **present when the scene is built with multiple environments, absent otherwise.** A scene built with `scene.build(n_envs=4096)` returns tensors with a leading `4096` dimension; a scene built without `n_envs` drops that dimension entirely rather than using a size-1 axis.
 
-Methods that read or write per-environment state take an `envs_idx` argument to address a subset of environments. Passing `envs_idx=None` (the default) applies to all of them; passing a tensor of indices selects just those rows along the batch dimension.
+Methods that read or write per-environment state take an `envs_idx` argument to address a subset of environments. Passing `envs_idx=None` (the default) applies to all of them; passing a tensor of indices selects only those rows along the batch dimension.
 
 ## Data types and precision
 
 Tensors returned by the API are **PyTorch tensors** placed on the active device (`gs.device`). Their dtype follows the precision chosen at initialization:
 
-- **Floating-point values** are `float32` by default, or `float64` when the library is initialized with `precision="64"`.
-- **Integer indices** (entity, link, and DOF indices, `envs_idx`, and the like) are always `int32`, independent of the float precision.
+- **Floating-point values** are `float32` by default, or `float64` when you initialize with `precision="64"`.
+- **Integer indices** (entity, link, and dof indices, `envs_idx`, and the like) are always `int32`, independent of the float precision.
 
 `gs.init()` sets PyTorch's global default dtype and device to match, so tensors you allocate yourself line up with what the API returns. See {doc}`initialization` for how to choose the backend and precision.

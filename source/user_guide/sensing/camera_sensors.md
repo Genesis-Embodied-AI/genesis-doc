@@ -5,7 +5,7 @@ A camera sensor renders the scene to an RGB image off-screen and returns it thro
 Genesis World has two other ways to look at a scene:
 
 - The **viewer** (`show_viewer=True`) is the interactive window a human watches. It renders live and hands nothing back to your code. See {doc}`/user_guide/interaction/visualization`.
-- The **visualization camera** (`scene.add_camera().render(...)`) renders color, depth, segmentation, and surface-normal images on demand, and captures video with `start_recording()`. Use it when you want those four channels or a video of the scene. It is covered in {doc}`/user_guide/rendering/index`.
+- The **visualization camera** (`scene.add_camera().render(...)`) renders color, depth, segmentation, and surface-normal images on demand, and captures video with `start_recording()`. Use it when you want those four channels or a video of the scene. See {doc}`/user_guide/rendering/index`.
 
 The complete script is [`examples/sensors/camera_as_sensor.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/camera_as_sensor.py).
 
@@ -76,7 +76,7 @@ Three backends render RGB. They share the common options below and differ in spe
 | {py:class}`RaytracerCameraOptions <genesis.options.sensors.camera.RaytracerCameraOptions>` | LuisaRender | single environment | photo-realistic offline renders |
 | {py:class}`BatchRendererCameraOptions <genesis.options.sensors.camera.BatchRendererCameraOptions>` | Madrona (GPU) | parallel | high-throughput RL training (CUDA only) |
 
-Select a backend by choosing the matching options class; no separate scene `renderer` argument is required for the rasterizer. For photo-realistic path tracing, prefer the Nyx renderer described in {doc}`/user_guide/rendering/nyx_renderer`.
+Select a backend by choosing the matching options class. The rasterizer and the batch renderer set themselves up from it, while a raytracer camera also needs its renderer on the scene, `gs.Scene(renderer=gs.renderers.RayTracer(...))`, and raises at build time without it. For photo-realistic path tracing, prefer the Nyx renderer described in {doc}`/user_guide/rendering/nyx_renderer`.
 
 Common parameters (all backends):
 
@@ -140,7 +140,7 @@ All `BatchRendererCameraOptions` cameras in a scene must share the same resoluti
 ## Notes and gotchas
 
 :::{note}
-**Camera sensors return RGB only.** `read()` gives you the color image and nothing else. For depth, segmentation masks, or surface normals, use the visualization camera's `render()` method (see {doc}`/user_guide/rendering/index`) or, for depth specifically, the {doc}`depth-camera raycaster sensor <raycaster>`.
+`read()` returns the color image alone. For depth, segmentation masks, or surface normals, use the visualization camera's `render()` method (see {doc}`/user_guide/rendering/index`) or, for depth specifically, the {doc}`depth-camera raycaster sensor <raycaster>`.
 :::
 
 :::{warning}

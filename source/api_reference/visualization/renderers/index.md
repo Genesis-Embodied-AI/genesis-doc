@@ -25,5 +25,5 @@ batch_renderer
 
 ## See also
 
-- {doc}`/user_guide/rendering/index`: adding cameras, image types, video, and backends
-- {doc}`/api_reference/visualization/lights`: lighting a rendered scene
+- {doc}`/user_guide/rendering/index`: adding cameras, image types, video, and backends.
+- {doc}`/api_reference/visualization/lights`: lighting a rendered scene.

@@ -1,6 +1,6 @@
 # Sensors
 
-Sensors read information out of a scene without changing its physics. Attach a sensor to a link, step the simulation, and read back a tensor each step. This page catalogs the sensor types and their return shapes; for the attach-and-read model, imperfections, history, and batched reads, see {doc}`the sensors guide </user_guide/sensing/index>`.
+Sensors read information out of a scene without changing its physics. Attach a sensor to a link, step the simulation, and read back a tensor each step. For the attach-and-read model, imperfections, history, and batched reads, see {doc}`the sensors guide </user_guide/sensing/index>`.
 
 ## Sensor types
 
@@ -26,7 +26,7 @@ Shapes use the batched-optional notation `([n_envs,] ...)`: the leading `n_envs`
 
 Notes on the return types:
 
-- **Camera sensors:** `read()` returns `CameraReturnType`, which carries a single `rgb` field. Depth, segmentation, and surface normals come from `scene.add_camera(...).render(...)`, not from the camera-sensor `read()`.
+- **Camera sensors:** `read()` returns `CameraReturnType`, which carries a single `rgb` field.
 - **`SurfaceDistanceProbe`:** `read()` returns the probe-to-surface distances; the corresponding nearest points are available as `sensor.nearest_points`, shape `([n_envs,] n_probes, 3)`.
 - **`Raycaster` patterns:** `pattern_shape` follows the ray pattern: for example `(n_horizontal, n_vertical)` for a spherical pattern and `(height, width)` for `DepthCamera`.
 

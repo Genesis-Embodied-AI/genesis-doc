@@ -27,9 +27,9 @@ scene = gs.Scene(
 
 The options split into three roles, plus a set of per-entity options passed to `add_entity` rather than to the scene:
 
-- **Global.** `SimOptions` sets the properties of the simulation as a whole; coupler options set how solvers interact.
-- **Per solver.** One options object per physics solver (rigid, MPM, SPH, FEM, SF, PBD), each configuring that solver alone.
-- **Visualization.** The viewer, solver-independent visualization, and the renderer.
+- **Global:** `SimOptions` sets the properties of the simulation as a whole, and the coupler options set how solvers interact.
+- **Per solver:** one options object per physics solver (rigid, MPM, SPH, FEM, SF, PBD), each configuring that solver alone.
+- **Visualization:** the viewer, the solver-independent visualization, and the renderer.
 
 ## Every options object shares one base
 
@@ -40,11 +40,11 @@ All `gs.options.*` classes derive from {py:class}`gs.options.Options <genesis.op
 
 Never instantiate `Options` directly; always use a concrete subclass. Each option class is documented in the {doc}`API Reference </api_reference/index>` alongside the component it configures.
 
-## Simulator options override solver options
+## Solver options override simulator options
 
-`SimOptions` holds settings that are global by default: most importantly the timestep `dt` (seconds) and `gravity` (N/kg, pointing down `-Z`). Each solver also exposes those same settings on its own options object, where they default to `None`.
+`SimOptions` holds settings that are global by default: most importantly the timestep `dt` (seconds) and `gravity` (m/s², pointing down `-Z`). Each solver also exposes those same settings on its own options object, where they default to `None`.
 
-The rule is: **a value set on a solver's options overrides the global `SimOptions` value, for that solver only.** A solver whose field is left at `None` inherits the global value. This lets most scenes set `dt` once while allowing a single solver to run at a different rate.
+A value set on a solver's options overrides the global `SimOptions` value, for that solver only, and a solver whose field is left at `None` inherits the global value. This lets most scenes set `dt` once while allowing a single solver to run at a different rate.
 
 ```python
 scene = gs.Scene(
@@ -58,7 +58,7 @@ The same inheritance applies to `gravity`. Settings that are meaningful only to 
 
 ## Scene-level option groups
 
-Each of these is an optional argument to `gs.Scene(...)`. Pass an instance to configure that component; omit it to accept the defaults.
+Each of these is an optional argument to `gs.Scene(...)`.
 
 | Options class | `Scene` argument | Configures |
 |---|---|---|
@@ -80,7 +80,7 @@ Each of these is an optional argument to `gs.Scene(...)`. Pass an instance to co
 The solver and coupler options are documented beside their solver and coupler in the {doc}`physics engine reference </api_reference/engine/index>`, the global `SimOptions` under {doc}`Scene </api_reference/engine/index>`, and the viewer, visualization, and renderer options in the {doc}`visualization reference </api_reference/visualization/index>`.
 
 :::{note}
-Not every solver runs in every scene. A solver is only active once you add an entity whose material targets it: adding a rigid entity activates the rigid solver, and so on. Options for an inactive solver are simply unused.
+A solver is active only once you add an entity whose material targets it: adding a rigid entity activates the rigid solver, and so on. An inactive solver ignores its options.
 :::
 
 ## Per-entity options

@@ -43,7 +43,7 @@ Because the two callables identify the registration, pass named functions (or ho
 
 ## Writing a custom recorder
 
-The built-in file writers and plotters cover most needs, but you can capture data any way you like by subclassing `genesis.recorders.Recorder` and passing your options to `scene.start_recording`. The scene drives a recorder through five methods, so you implement them and never call them yourself:
+The built-in file writers and plotters cover most needs; to capture data any other way, subclass `genesis.recorders.Recorder` and pass your options to `scene.start_recording`. The scene drives a recorder through five methods, so you implement them and never call them yourself:
 
 1. **`__init__`** configures the recorder from its options.
 2. **`build()`** initializes resources (called during `scene.build()`).

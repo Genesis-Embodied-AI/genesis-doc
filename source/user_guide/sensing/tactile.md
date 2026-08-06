@@ -2,18 +2,18 @@
 
 Tactile sensors turn a link's surface into a grid of sensing points, or **taxels**, and read contact geometry directly from the scene's signed-distance fields (SDFs) or sampled point clouds rather than from solver contact impulses. They give you a dense taxel field at arbitrary locations without adding contacts to the solver, at the cost of being an approximation. Because the layout is link-local, a regular grid imitates a taxel array on a fingertip or a sensor pad.
 
-Describe the layout once with `probe_local_pos`, a set of `(x, y, z)` offsets in the link-local frame (an `(N, 3)` set or an `(M, N, 3)` planar grid), and the probes move rigidly with the link. Genesis World provides a helper for a planar grid, `genesis.utils.geom.generate_grid_points_on_plane(lo, hi, normal, nx, ny)`, which returns an `(ny, nx, 3)` array; `n_probes` is the flattened probe count.
+Describe the layout once with `probe_local_pos`, a set of `(x, y, z)` offsets in the link-local frame (an `(N, 3)` set or an `(M, N, 3)` planar grid), and the probes move rigidly with the link. For a planar grid, `genesis.utils.geom.generate_grid_points_on_plane(lo, hi, normal, nx, ny)` returns an `(ny, nx, 3)` array; `n_probes` is the flattened probe count.
 
 Two families share this interface but estimate contact differently:
 
 - **SDF-query probes** ({py:class}`ContactProbe <genesis.options.sensors.tactile.ContactProbe>`, {py:class}`ContactDepthProbe <genesis.options.sensors.tactile.ContactDepthProbe>`, and {py:class}`KinematicTaxel <genesis.options.sensors.tactile.KinematicTaxel>`) query the signed distance from each probe to nearby collision geometry directly. They need no list of target links, though an optional `filter_link_idx` (global link indices) can exclude chosen counterpart links from the query.
 - **Point-cloud probes** ({py:class}`ElastomerTaxel <genesis.options.sensors.tactile.ElastomerTaxel>` and {py:class}`ProximityTaxel <genesis.options.sensors.tactile.ProximityTaxel>`) sample a point cloud from the meshes named in `track_link_idx` (global link indices) and measure against those points. `n_sample_points` sets the sample budget.
 
-Readings are geometric estimates, not solver impulses, and are uncalibrated. Treat them as relative signals unless you tune the coefficients to your setup. The taxels also expose hardware-style [imperfections](#sensor-imperfections), so a policy can be trained against the noise a real sensor produces. For how sensors are sampled, read back, and batched, see the {doc}`sensors overview <index>`.
+Readings are geometric estimates, not solver impulses, and are uncalibrated. Treat them as relative signals unless you tune the coefficients to your setup. The taxels also expose hardware-style [imperfections](#sensor-imperfections), so you can train a policy against the noise a real sensor produces. For how sensors are sampled, read back, and batched, see the {doc}`sensors overview <index>`.
 
 :::{note}
 These tactile sensors were introduced in [Tactile Genesis: Exploring Tactile Sensors at Scale for Learning Dexterous Tasks](https://neuroagents-lab.github.io/tactile-genesis/).
-The implementation in Genesis World has since been refined, so its behavior may differ from what the original paper reports.
+Genesis World's implementation may differ in behavior from what that paper reports.
 Still, if you use them in your research, **please cite**:
 
 ```bibtex
@@ -77,7 +77,7 @@ s = penetration ** normal_exponent
 F = normal_stiffness * s * n  +  normal_damping * s * v_n  -  shear_scalar * v_t
 ```
 
-where `n` is the contact surface normal at the probe: the SDF gradient in `"sdf"` mode, or the nearest-triangle face normal in `"raycast"` mode (see `contact_depth_query` above). `v_n` / `v_t` are the normal and tangential relative velocities. Unlike the point-cloud taxels below, `KinematicTaxel` derives `n` from the queried geometry itself rather than from a user-supplied `probe_local_normal`. Use `normal_exponent=1.5` for Hertzian (spherical) contact; the default `1.0` is a linear spring.
+where `n` is the contact surface normal at the probe: the SDF gradient in `"sdf"` mode, or the nearest-triangle face normal in `"raycast"` mode (see `contact_depth_query` above). `v_n` / `v_t` are the normal and tangential relative velocities. `KinematicTaxel` derives `n` from the queried geometry itself, while the point-cloud taxels below take `probe_local_normal` as the surface normal. Use `normal_exponent=1.5` for Hertzian (spherical) contact; the default `1.0` is a linear spring.
 
 ```python
 taxel = scene.add_sensor(
@@ -124,7 +124,7 @@ tactile = scene.add_sensor(
 displacement = tactile.read()  # shape ([n_envs,] n_probes, 3), m, link-local
 ```
 
-`dilate_scale` and `shear_scale` scale the indentation and shear response; `lambda_d` and `lambda_s` control how far each effect spreads across neighboring markers. The out-of-plane (normal) bulge scales as `depth ** normal_exponent` (default `2.0`, the HydroShear quadratic response); tangential dilation and shear stay linear in depth regardless of `normal_exponent`. When `probe_local_pos` is a regular planar grid with a single shared normal, the dilation term is computed with an FFT to keep large arrays fast. The shear anchor is gated by the same `contact_threshold` / `release_threshold` Schmitt trigger (a tracked point begins anchoring shear at `contact_threshold` penetration and releases once it separates back to `release_threshold`).
+`dilate_scale` and `shear_scale` scale the indentation and shear response; `lambda_d` and `lambda_s` control how far each effect spreads across neighboring markers. The out-of-plane (normal) bulge scales as `depth ** normal_exponent` (default `2.0`, the HydroShear quadratic response); tangential dilation and shear stay linear in depth regardless of `normal_exponent`. When `probe_local_pos` is a regular planar grid with a single shared normal, Genesis World computes the dilation term with an FFT to keep large arrays fast. The shear anchor is gated by the same `contact_threshold` / `release_threshold` Schmitt trigger (a tracked point begins anchoring shear at `contact_threshold` penetration and releases once it separates back to `release_threshold`).
 
 <video preload="auto" controls="True" width="100%" aria-label="A live vector-field plot of ElastomerTaxel marker displacements across a taxel pad as an object presses and slides, the dots deflecting under local indentation and shear">
 <source src="../../_static/videos/elastomer_taxel.mp4" type="video/mp4">
@@ -193,8 +193,6 @@ taxel = scene.add_sensor(
     )
 )
 ```
-
-Pass `--noise` to `tactile_sandbox.py` to enable these imperfections in the interactive demo.
 
 <video preload="auto" controls="True" width="100%" aria-label="A live vector-field plot of KinematicTaxel forces with imperfections enabled, the field lagging and blurring across neighboring taxels from hysteresis and spatial crosstalk as an object presses in">
 <source src="../../_static/videos/imperfect_kinematic_taxel.mp4" type="video/mp4">

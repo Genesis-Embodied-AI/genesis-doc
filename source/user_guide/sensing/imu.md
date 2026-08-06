@@ -6,7 +6,7 @@ The complete script is [`examples/sensors/imu_franka.py`](https://github.com/Gen
 
 ## Minimal example
 
-An IMU is attached to one link of a rigid entity. Identify the link by its owning entity and the link's local index, then read the sensor after the scene is built:
+An IMU attaches to one link of a rigid entity. Identify the link by its owning entity and the link's local index, then read the sensor after the scene is built:
 
 ```python
 end_effector = franka.get_link("hand")
@@ -30,7 +30,7 @@ for _ in range(1000):
 
 ## Frame and conventions
 
-All three fields are expressed in the **sensor's body frame**, the frame of the attached link rotated by any `euler_offset` you supply, so they rotate as the link rotates.
+The **sensor's body frame** is the attached link's frame rotated by `euler_offset`, so all three fields rotate as the link rotates.
 
 The accelerometer reports **specific force**: coordinate acceleration minus gravity. A sensor at rest therefore reads roughly `(0, 0, 9.81)` m/s² (the reaction to gravity along its local up axis), not zero. This matches real hardware, which cannot distinguish free fall from weightlessness.
 

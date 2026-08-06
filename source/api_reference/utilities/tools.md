@@ -1,6 +1,6 @@
 # Timing and media tools
 
-The `genesis.utils.tools` module provides small helpers for timing loops and saving media, exposed under `gs.utils.tools`.
+The `genesis.utils.tools` module holds small helpers for timing loops and saving media, exposed under `gs.utils.tools`.
 
 ## Timing
 

@@ -48,21 +48,21 @@ self.scene.build(n_envs=num_envs)
 
 ### Control
 
-The robot is driven by a PD controller in joint-position space. The 12 leg joints are located by name, and their gains are set once after the build:
+A PD controller in joint-position space drives the robot. The environment locates the 12 leg joints by name and sets their gains once after the build:
 
 ```python
 self.robot.set_dofs_kp([self.env_cfg["kp"]] * self.num_actions, self.motors_dof_idx)  # kp = 20.0
 self.robot.set_dofs_kv([self.env_cfg["kd"]] * self.num_actions, self.motors_dof_idx)  # kd = 0.5
 ```
 
-The policy does not output torques or absolute joint angles. It outputs a residual around the robot's default standing pose, which `step` scales and adds to that pose to form a position target:
+The policy outputs a residual around the robot's default standing pose rather than torques or absolute joint angles, and `step` scales that residual and adds it to the pose to form a position target:
 
 ```python
 target_dof_pos = exec_actions * self.env_cfg["action_scale"] + self.default_dof_pos  # action_scale = 0.25, rad
 self.robot.control_dofs_position(target_dof_pos[:, self.actions_dof_idx], slice(6, 18))
 ```
 
-Actuating around a default pose keeps early exploration close to a stable stance, which is what lets the policy find a gait in a few hundred iterations. The environment also feeds the *previous* step's action to the controller (`simulate_action_latency`) to reproduce the one-step (~20 ms) actuation delay a real Go2 shows, narrowing the sim-to-real gap.
+Actuating around a default pose keeps early exploration close to a stable stance, so the policy finds a gait within a few hundred iterations. The environment also feeds the *previous* step's action to the controller (`simulate_action_latency`) to reproduce the one-step (~20 ms) actuation delay a real Go2 shows, narrowing the sim-to-real gap.
 
 ### Observations
 
@@ -89,7 +89,7 @@ def get_observations(self):
     return TensorDict({"policy": self.obs_buf}, batch_size=[self.num_envs])
 ```
 
-The **command** is the task: a per-environment target of forward velocity, lateral velocity, and yaw rate. Commands are resampled at random within configured ranges every `resampling_time_s` and on reset, so a single policy learns to follow a distribution of velocity commands rather than one fixed gait.
+The **command** is the task: a per-environment target of forward velocity, lateral velocity, and yaw rate. The environment resamples the command at random within configured ranges every `resampling_time_s` and on reset, so a single policy learns to follow a distribution of velocity commands rather than one fixed gait.
 
 ### Rewards
 
@@ -117,11 +117,11 @@ Each raw term is multiplied by its scale and by `dt`, so the weights read as per
 
 ### Resets
 
-`step` marks an environment for reset when its episode reaches `episode_length_s`, when the base roll or pitch exceeds 10 degrees (the robot has fallen), or when the physics solver flags a numerical error. Flagged environments are reset in place to the initial pose without interrupting the others, and a fresh command is drawn for each.
+`step` marks an environment for reset when its episode reaches `episode_length_s`, when the base roll or pitch exceeds 10 degrees (the robot has fallen), or when the physics solver flags a numerical error. It resets those environments in place to the initial pose without interrupting the others, and draws a fresh command for each.
 
 ## Training
 
-With the environment defined, `go2_train.py` hands it to rsl-rl's `OnPolicyRunner`, which trains a PPO policy. The actor and critic are both three-layer MLPs (`[512, 256, 128]`, ELU); the full hyperparameter set is in `get_train_cfg`. Genesis World is initialized on the GPU with `performance_mode=True`, which bakes static tensor shapes into the compiled kernels for faster stepping at the cost of recompiling when the scene changes, a worthwhile trade for a long training run:
+With the environment defined, `go2_train.py` hands it to rsl-rl's `OnPolicyRunner`, which trains a PPO policy. The actor and critic are both three-layer MLPs (`[512, 256, 128]`, ELU); the full hyperparameter set is in `get_train_cfg`. The script initializes Genesis World on the GPU with `performance_mode=True`, which bakes static tensor shapes into the compiled kernels for faster stepping at the cost of recompiling when the scene changes, a worthwhile trade for a long training run:
 
 ```python
 gs.init(backend=gs.gpu, precision="32", logging_level="warning", seed=args.seed, performance_mode=True)
@@ -147,7 +147,7 @@ tensorboard --logdir logs
 
 ## Evaluation
 
-`go2_eval.py` reloads the saved configs, rebuilds the environment with a single visualized instance, restores a checkpoint, and steps the policy in a loop:
+`go2_eval.py` reloads the saved configs, rebuilds `Go2Env` with a single environment and the viewer open, restores a checkpoint, and steps the policy in a loop:
 
 ```python
 runner.load(os.path.join(log_dir, f"model_{args.ckpt}.pt"))
@@ -178,7 +178,7 @@ The trained policy is a standard joint-position controller and can be deployed t
 
 ## Variations
 
-`go2_backflip.py` reuses the same `Go2Env` machinery for a dynamic backflip. It subclasses the environment to add a phase-based observation and loads a pre-trained TorchScript policy, showing how far the base environment stretches beyond flat walking:
+`go2_backflip.py` reuses the same `Go2Env` machinery for a dynamic backflip. It subclasses the environment to add a phase-based observation and loads a pre-trained TorchScript policy:
 
 ```bash
 python examples/locomotion/go2_backflip.py -e single
@@ -186,5 +186,6 @@ python examples/locomotion/go2_backflip.py -e single
 
 ## See also
 
-- {doc}`Best practices <../best_practices/index>` for keeping the step loop on the GPU and randomizing physics across environments.
-- {doc}`hover_env` for the same pipeline applied to a quadcopter, and {doc}`manipulation` for a two-stage manipulation policy.
+- {doc}`Best practices <../best_practices/index>`: keeping the step loop on the GPU and randomizing physics across environments.
+- {doc}`hover_env`: the same pipeline applied to a quadcopter.
+- {doc}`manipulation`: a two-stage pipeline that combines reinforcement learning with imitation learning.

@@ -24,7 +24,7 @@ The `backend` argument selects the device the physics runs on. Pass one of the b
 | `gs.amdgpu` | An AMD ROCm GPU. |
 | `gs.metal` | An Apple Silicon GPU. |
 
-`gs.gpu` (and the default of `backend=None`) is resolved in order: **CUDA → AMD → Metal → CPU**. Genesis World picks the first one that initializes on your machine, so `gs.gpu` is portable across hardware. If no GPU is usable it falls back to the CPU and logs a warning rather than failing.
+Genesis World resolves `gs.gpu` (and the default `backend=None`) in order, **CUDA → AMD → Metal → CPU**, taking the first one that initializes on your machine, so `gs.gpu` is portable across hardware. With no GPU usable it falls back to the CPU and logs a warning rather than failing.
 
 ```python
 gs.init(backend=gs.gpu)   # portable: use a GPU if present, else CPU
@@ -45,7 +45,7 @@ print(gs.device)   # the torch.device tensors are placed on
 
 ## Precision
 
-`precision` chooses the floating-point width used throughout the simulation. It is `"32"` (single precision) by default and can be raised to `"64"` (double precision):
+`precision` chooses the floating-point width used throughout the simulation. It is `"32"` (single precision) by default, and `"64"` selects double precision:
 
 ```python
 gs.init(backend=gs.gpu, precision="64")
@@ -57,7 +57,7 @@ Single precision is faster and uses less memory, and double precision buys numer
 - **Double precision is not available on Apple Metal.** Requesting `precision="64"` with `backend=gs.metal` raises an error.
 - `gs.init()` sets PyTorch's global default dtype and device to match, so tensors you create afterward land on the right device with the right dtype without extra arguments.
 
-What dtype the tensors returned by the API carry is described in {doc}`conventions`.
+{doc}`conventions` covers the dtypes the API returns.
 
 ## Reproducibility
 
@@ -73,17 +73,17 @@ Seeding alone does not guarantee bit-for-bit determinism on a GPU, where some ke
 gs.init(backend=gs.cpu, seed=0, debug=True)
 ```
 
-`debug=True` turns on PyTorch's deterministic algorithms, disables cuDNN autotuning, and raises the log level to `DEBUG`. It is meant for reproducing bugs and validating results, not for production: it **dramatically reduces runtime speed**, and it is only partially supported on GPU backends (deterministic execution is most reliable on `gs.cpu`).
+`debug=True` turns on PyTorch's deterministic algorithms, disables cuDNN autotuning, and raises the log level to `DEBUG`. Use it to reproduce a bug or validate a result rather than for a production run, because deterministic kernels are considerably slower, and keep to `gs.cpu` where determinism has to hold: GPU backends support it only partially.
 
 ## Logging
 
-The logger is created during `gs.init()` and exposed as `gs.logger`. Control its verbosity with `logging_level`; when unset it defaults to `"info"` (or `"debug"` when `debug=True`).
+`gs.init()` creates the logger and exposes it as `gs.logger`. Control its verbosity with `logging_level`; when unset it defaults to `"info"` (or `"debug"` when `debug=True`).
 
 ```python
 gs.init(backend=gs.gpu, logging_level="warning")  # quiet: warnings and errors only
 ```
 
-Set `logger_verbose_time=True` to prefix each log line with a full timestamp instead of just the elapsed time. The `theme` argument (`"dark"`, `"light"`, or `"dumb"`) controls the terminal color scheme; use `"dumb"` to disable colors in environments that mangle ANSI codes.
+Set `logger_verbose_time=True` to prefix each log line with a full timestamp instead of the elapsed time alone. The `theme` argument (`"dark"`, `"light"`, or `"dumb"`) controls the terminal color scheme; use `"dumb"` to disable colors in environments that mangle ANSI codes.
 
 ## Performance mode
 

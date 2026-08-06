@@ -2,11 +2,11 @@
 
 This page is for advanced users adding a new sensor type. It is the author's counterpart to the {doc}`sensor pipeline <sensor_pipeline>`, which describes how sensors execute at runtime; here the focus is the interface you implement, the shape and dtype contracts each override must honor, and how the framework pairs your sensor with its options automatically. If you only want to *use* the built-in sensors, start with {doc}`/user_guide/sensing/index` instead.
 
-The base classes live in `genesis/engine/sensors/base_sensor.py`. In almost every case you derive from `SimpleSensor` and override only the hooks you need. Deriving directly from `Sensor` is reserved for sensors that bypass the standard pipeline entirely, and the built-in cameras do exactly that through `BaseCameraSensor`.
+The base classes live in `genesis/engine/sensors/base_sensor.py`. In almost every case, derive from `SimpleSensor` and override only the hooks you need. Derive directly from `Sensor` only for a sensor that bypasses the standard pipeline entirely, as the built-in cameras do through `BaseCameraSensor`.
 
 ## Minimal working example
 
-A complete sensor is three classes: a user-facing options dataclass, a per-class metadata container, and the sensor itself. The following proximity sensor reports the distance from an attached link to the world origin, clamped to a maximum range. It is enough to be usable through `scene.add_sensor(...)`, and every imperfection feature (noise, bias, random walk, delay, jitter, history) is inherited from `SimpleSensor` and applied uniformly.
+A complete sensor is three classes: a user-facing options dataclass, a per-class metadata container, and the sensor itself. The following proximity sensor reports the distance from an attached link to the world origin, clamped to a maximum range. It is enough to be usable through `scene.add_sensor(...)`, and it inherits every imperfection feature (noise, bias, random walk, delay, jitter, history) from `SimpleSensor`, which applies them uniformly.
 
 ```python
 # my_plugin/options.py
@@ -88,7 +88,7 @@ The generic signature is `Sensor[OptionsT, ContextT, MetadataT, DataT]`: options
 
 ## Registration is automatic
 
-Sensors are never registered by hand. When a `Sensor` subclass names its options class as the first type parameter, `Sensor.__init_subclass__` records the pairing in `SensorManager.SENSOR_TYPES_MAP` the moment the class body runs. The user then only ever constructs the options instance and hands it to `scene.add_sensor(...)`, which resolves the sensor class, instantiates it, and returns the sensor.
+When a `Sensor` subclass names its options class as the first type parameter, `Sensor.__init_subclass__` records the pairing in `SensorManager.SENSOR_TYPES_MAP` the moment the class body runs. The user then only ever constructs the options instance and hands it to `scene.add_sensor(...)`, which resolves the sensor class, instantiates it, and returns the sensor.
 
 That leaves two supported placements:
 
@@ -118,7 +118,7 @@ def _update_raw_data(cls, shared_context, shared_metadata, raw_data_T):
     raw_data_T.copy_(pos.reshape(pos.shape[0], -1).T)                      # (3*N, B)
 ```
 
-`shared_context` is the cross-type resource, or `None`; most sensors ignore it. Hooks are called once per class per step, never per instance and never per environment, so vectorize accordingly.
+`shared_context` is the cross-type resource, or `None`; most sensors ignore it. The manager calls hooks once per class per step, never per instance and never per environment, so vectorize accordingly.
 
 ## Choosing a base class
 
@@ -138,7 +138,7 @@ Mixins compose onto the base:
 
 The metadata class holds anything that is per-sensor-class rather than per-instance and is read by your hooks: solver and entity references, per-sensor index tensors concatenated at build time (`links_idx`, `thresholds`, `max_range`), per-sensor offsets, filter coefficients, and precomputed flags that gate slow paths.
 
-`SimpleSensorMetadata` already provides the imperfection state (`noise`, `bias`, `random_walk`, `resolution`, `jitter_ts`) and the matching `has_any_*` flags. Subclass it and declare your fields with `make_tensor_field((shape,))` so they are auto-allocated:
+`SimpleSensorMetadata` already holds the imperfection state (`noise`, `bias`, `random_walk`, `resolution`, `jitter_ts`) and the matching `has_any_*` flags. Subclass it and declare your fields with `make_tensor_field((shape,))` so they are auto-allocated:
 
 ```python
 @dataclass
@@ -302,7 +302,7 @@ To pick the right hooks, mirror the closest built-in sensor. Every one implement
 | `TemperatureGridSensor` | yes | yes (RC filter reading `timeline.at(1)`) | identity |
 | Any `*CameraSensor` | — | — | identity; derives from `BaseCameraSensor` |
 
-`_apply_hardware_imperfections` is inherited unchanged by every `SimpleSensor`; override it only for a non-standard imperfection model.
+Every `SimpleSensor` inherits `_apply_hardware_imperfections` unchanged; override it only for a non-standard imperfection model.
 
 ## Things to double-check
 

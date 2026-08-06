@@ -1,8 +1,8 @@
 # Beyond rigid bodies
 
-The {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` tutorial simulated a rigid robot. But a scene can hold water, sand, cloth, and soft tissue at the same time, because Genesis World unifies several physics **solvers** under one `Scene`. A solver is the set of algorithms that advances one family of materials; the material you assign to an entity decides which solver simulates it.
+A scene can hold water, sand, cloth, and soft tissue at the same time, because Genesis World unifies several physics **solvers** under one `Scene`. A solver is the set of algorithms that advances one family of materials; the material you assign to an entity decides which solver simulates it.
 
-This page introduces the non-rigid solvers, says which problems each one suits, and links a runnable example for every one of them. Read it to choose a solver, then follow the linked example for the full script.
+Choose a solver from the table below, then follow its linked example for the full script.
 
 ## Choosing a solver
 
@@ -21,7 +21,7 @@ MPM and SPH also power {doc}`particle emitters <emitters>`; MPM and FEM power {d
 
 Whichever solver you use, three things change relative to a rigid-only scene.
 
-**1. Enable substepping.** Non-rigid solvers are numerically stiff, so each `scene.step()` is subdivided into several substeps. Set a small `dt` (in seconds) and a substep count on `SimOptions`; the internal substep is `dt / substeps`. Rigid-only scenes leave `substeps` at its default of `1`.
+**1. Enable substepping.** Non-rigid solvers are numerically stiff, so Genesis World subdivides each `scene.step()` into several substeps. Set a small `dt` (in seconds) and a substep count on `SimOptions`; the internal substep is `dt / substeps`. Rigid-only scenes leave `substeps` at its default of `1`.
 
 ```python
 sim_options=gs.options.SimOptions(
@@ -30,7 +30,7 @@ sim_options=gs.options.SimOptions(
 )
 ```
 
-**2. Configure the solver on the scene.** Each solver reads its own options object: `MPMOptions`, `SPHOptions`, `FEMOptions`, `PBDOptions`. Particle-grid solvers (MPM, SPH) require a simulation domain; entities that leave `lower_bound`/`upper_bound` (in meters, Z-up) are clamped to it.
+**2. Configure the solver on the scene.** Each solver reads its own options object: `MPMOptions`, `SPHOptions`, `FEMOptions`, `PBDOptions`. Particle-grid solvers (MPM, SPH) require a simulation domain, and the solver clamps entities that leave `lower_bound`/`upper_bound` (in meters, Z-up) to it.
 
 ```python
 mpm_options=gs.options.MPMOptions(
@@ -130,11 +130,11 @@ The `Liquid` material accepts a `sampler` that controls how particles fill the m
 
 The Stable Fluid solver works on a fixed 3D grid (Eulerian): it advects a velocity field and one or more scalar density fields, then makes the velocity divergence-free with a Jacobi pressure projection. Use it for smoke and other gases, and set the grid resolution with `SFOptions.res`.
 
-Unlike the other non-rigid solvers, SF has no Lagrangian entity you add and move. Gas enters through velocity **jets** you register on the solver, and the solver stays inactive until at least one jet exists. Each substep advects the velocity and density fields (RK3 backtracing with trilinear interpolation), injects momentum at the jets, then runs `solver_iters` Jacobi pressure iterations to keep the velocity divergence-free. State lives on the fixed grid, so there are no per-entity get/set methods, and SF does not participate in checkpointing. Read the density grid back for rendering.
+SF has no Lagrangian entity you add and move: gas enters through velocity **jets** you register on the solver, and the solver stays inactive until at least one jet exists. Each substep advects the velocity and density fields (RK3 backtracing with trilinear interpolation), injects momentum at the jets, then runs `solver_iters` Jacobi pressure iterations to keep the velocity divergence-free. State lives on the fixed grid, so there are no per-entity get/set methods, and SF does not participate in checkpointing. Read the density grid back for rendering.
 
 Full script, including the jet class and writing the density field to images: [`examples/fluid/smoke.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/fluid/smoke.py).
 
-## Next steps
+## See also
 
 - {doc}`Soft robots <soft_robots>`: actuate MPM and FEM muscles.
 - {doc}`Hybrid entities <hybrid_entity>`: couple a rigid skeleton to a soft skin.

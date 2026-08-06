@@ -20,7 +20,7 @@ The recipe here separates those two problems.
 - **Stage 1, the teacher:** reinforcement learning on privileged state, the exact end-effector and object poses read straight from the simulator. With perfect observations, a small MLP learns the task quickly across thousands of parallel environments.
 - **Stage 2, the student:** a convolutional network that takes stereo RGB images and imitates the teacher through behavior cloning. It never queries the RL reward; it just reproduces the teacher's actions from pixels.
 
-The teacher is a means to an end. The deployable artifact is the vision student.
+The deployable artifact is the vision student.
 
 ## Environment
 
@@ -48,7 +48,7 @@ obs_components = [
 ]
 ```
 
-Quaternions are scalar-first `(w, x, y, z)`, following the Genesis World convention. This state is only available in simulation, which is exactly why it stays confined to the teacher.
+Quaternions are scalar-first `(w, x, y, z)`, following the Genesis World convention. This state is only available in simulation, so it stays confined to the teacher.
 
 ### Vision observations
 
@@ -85,7 +85,7 @@ The gripper stays open throughout the learned rollout. The policy's job is to al
 
 ### Reward
 
-A single reward term drives learning: keypoint alignment. Reference keypoints are attached to both the gripper and the object, and the reward shrinks as the two sets of keypoints coincide:
+A single reward term drives learning: keypoint alignment. The environment attaches reference keypoints to both the gripper and the object, and the reward grows as the two sets of keypoints coincide:
 
 ```python
 reward_scales = {
@@ -100,7 +100,7 @@ def _reward_keypoints(self) -> torch.Tensor:
     return torch.exp(-dist)  # 1.0 when perfectly aligned, decaying to 0
 ```
 
-Aligning keypoints constrains position and orientation at once, so no separate dense shaping terms are needed. This is the only reward.
+Aligning keypoints constrains position and orientation at once, so no separate dense shaping terms are needed.
 
 ## Stage 1: train the teacher with RL
 
@@ -197,6 +197,6 @@ The evaluation script reuses the configuration pickled during training (`logs/<e
 
 ## See also
 
-- {doc}`Training locomotion policies with RL <locomotion>` and {doc}`training drone hovering policies with RL <hover_env>` for single-stage PPO examples with the same environment shape.
-- {doc}`Camera sensors </user_guide/sensing/camera_sensors>` for the rendering API behind the stereo observations.
-- {doc}`Control your robot </user_guide/getting_started/control_your_robot>` for the inverse-kinematics and position-control primitives the environment uses.
+- {doc}`Training locomotion policies with RL <locomotion>` and {doc}`training drone hovering policies with RL <hover_env>`: single-stage PPO examples with the same environment shape.
+- {doc}`Camera sensors </user_guide/sensing/camera_sensors>`: the rendering API behind the stereo observations.
+- {doc}`Control your robot </user_guide/getting_started/control_your_robot>`: the inverse-kinematics and position-control primitives the environment uses.

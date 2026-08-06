@@ -7,7 +7,7 @@ Despite the name, a force field is an **acceleration field**: it contributes an 
 Force fields act only on **particle-based entities** stepped by the PBD and SPH solvers (fluids, cloth, and other particle materials). They do not affect rigid bodies, MPM, or FEM entities. To apply a world force to a rigid body, use its entity API instead.
 
 :::{note}
-No runnable example ships for this feature yet, so the snippet below is illustrative. Every symbol and argument in it is taken from the live API (`gs.force_fields`) and the {doc}`Force field API </api_reference/engine/force_field>`, but the script has not been added to `examples/`.
+No runnable example ships for this feature yet, so the snippet below is illustrative, though every symbol and argument in it comes from the live API (`gs.force_fields`) and the {doc}`Force field API </api_reference/engine/force_field>`.
 :::
 
 ## Minimal example
@@ -48,7 +48,7 @@ for i in range(1000):
 
 ## Lifecycle
 
-A force field goes through four stages. Getting the order right matters: adding after `build()` or forgetting to activate are the two most common mistakes.
+A force field goes through four stages, and the order matters.
 
 1. **Instantiate** a field from `gs.force_fields.*`, passing its parameters:
 
@@ -60,7 +60,7 @@ A force field goes through four stages. Getting the order right matters: adding 
 
 3. **Activate** it with `field.activate()`. A field is inactive when created (`field.active` is `False`) and contributes zero acceleration until activated. Toggle `activate()` and `deactivate()` at any time after building, including mid-simulation, and read `field.active` to check the current state.
 
-4. **Step** the scene. On each substep the active field's acceleration is added to every affected particle.
+4. **Step** the scene. On each substep the solver adds the active field's acceleration to every affected particle.
 
 ## Available field types
 
@@ -95,17 +95,13 @@ scene.add_force_field(gs.force_fields.Custom(swirl))
 
 ## Notes and gotchas
 
-:::{warning}
-**Register before building.** `scene.add_force_field(...)` must be called before `scene.build()`. The active-field count is compiled into the solver kernels, so a field added after building is silently ignored.
-:::
-
 - **It is acceleration, not force.** The value is in m/s² and is independent of particle mass, so heavy and light particles gain the same velocity per step. Multiply by mass yourself if you are reasoning about forces.
-- **Only PBD and SPH particles are affected.** Rigid bodies, MPM, and FEM entities ignore force fields entirely. Add a particle-based entity (an SPH liquid, a PBD cloth or fluid) for the field to have anything to act on.
-- **Fields stack.** Every active field is summed, so you can combine, for example, a `Constant` gravity offset with a `Drag` term and a `Turbulence` gust.
+- **Only PBD and SPH particles are affected.** Add a particle-based entity (an SPH liquid, a PBD cloth or fluid) for the field to have anything to act on.
+- **Fields stack.** The solver sums every active field, so a `Constant` gravity offset, a `Drag` term, and a `Turbulence` gust combine into one acceleration.
 - **Activation is free to toggle.** Because activation flips a runtime flag rather than the compiled kernel, switching a field on or off mid-simulation costs nothing and needs no rebuild.
 
 ## See also
 
-- {doc}`emitters` for spawning streams of particles that a force field can then push around.
-- {doc}`beyond_rigid_bodies` for an overview of the particle-based solvers force fields act on.
-- {doc}`Force field API </api_reference/engine/force_field>` for the full parameter reference.
+- {doc}`emitters`: spawning streams of particles that a force field can then push around.
+- {doc}`beyond_rigid_bodies`: an overview of the particle-based solvers force fields act on.
+- {doc}`Force field API </api_reference/engine/force_field>`: the full parameter reference.

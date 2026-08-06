@@ -33,10 +33,10 @@ for i in range(1000):
 gs.init(backend=gs.cpu)
 ```
 
-- **Backend.** `gs.cpu` runs anywhere. For GPU-accelerated {doc}`parallel simulation <parallel_simulation>`, use `gs.cuda`, `gs.amdgpu`, or `gs.metal`. `gs.gpu` picks the right one for your machine (CUDA where available, Metal on Apple Silicon).
-- **Precision.** Genesis World uses 32-bit floats by default. Pass `precision="64"` when you need double precision.
-- **Logging.** On init, Genesis World logs system and version information. Set `logging_level="warning"` to quiet it, and `theme="light"` for light-background terminals.
-- **Performance mode.** With `performance_mode=True`, Genesis World bakes static tensor shapes into its compiled kernels for roughly 30% faster simulation, at the cost of recompiling whenever the scene changes (several minutes per change). Leave it off for research, debugging, and interactive work; turn it on for policy training and production runs.
+- **Backend:** `gs.cpu` runs anywhere. For GPU-accelerated {doc}`parallel simulation <parallel_simulation>`, use `gs.cuda`, `gs.amdgpu`, or `gs.metal`. `gs.gpu` picks the right one for your machine (CUDA where available, Metal on Apple Silicon).
+- **Precision:** Genesis World uses 32-bit floats by default. Pass `precision="64"` when you need double precision.
+- **Logging:** on init, Genesis World logs system and version information. Set `logging_level="warning"` to quiet it, and `theme="light"` for light-background terminals.
+- **Performance mode:** with `performance_mode=True`, Genesis World bakes static tensor shapes into its compiled kernels for roughly 30% faster simulation, at the cost of recompiling whenever the scene changes (several minutes per change). Leave it off for research, debugging, and interactive work; turn it on for policy training and production runs.
 
 For the full set of `gs.init()` arguments (backend selection and fallback, precision, seeding and determinism, logging, and environment variables), see {doc}`Initialization and backends </user_guide/configuration/initialization>`.
 
@@ -97,10 +97,10 @@ franka = scene.add_entity(
 )
 ```
 
-File paths may be absolute or relative. Relative paths are resolved against your working directory *and* against the bundled asset directory (`genesis/assets`), so `xml/franka_emika_panda/panda.xml` loads the Franka model that ships with Genesis World.
+File paths may be absolute or relative. Genesis World resolves a relative path against your working directory *and* against the bundled asset directory (`genesis/assets`), so `xml/franka_emika_panda/panda.xml` loads the Franka model that ships with Genesis World.
 
 :::{note}
-An MJCF file specifies the joint connecting the robot's base to the world; a URDF does not. A URDF base is therefore free (a 6-DoF joint to the world) unless you pass `fixed=True`. The same applies to `gs.morphs.Mesh`.
+An MJCF file specifies the joint connecting the robot's base to the world; a URDF does not. A URDF base is therefore free (a 6-dof joint to the world) unless you pass `fixed=True`. The same applies to `gs.morphs.Mesh`.
 :::
 
 ## Build and step
@@ -117,6 +117,8 @@ for i in range(1000):
 **Kernel compilation and caching.** The first build with a new scene configuration (different robots, a different number of objects, anything that changes the internal data layout) compiles kernels on the fly, which is slow. Genesis World caches compiled kernels: as long as the first run exits normally or via `Ctrl-C` (**not** `Ctrl-\`), later runs with the same configuration load from cache and start quickly.
 :::
 
-## Next steps
+## See also
 
-Continue with {doc}`Control your robot <control_your_robot>` to actuate the Franka you just loaded, then {doc}`Visualization </user_guide/interaction/visualization>` to work with the viewer and {doc}`Rendering </user_guide/rendering/index>` to capture images.
+- {doc}`Control your robot <control_your_robot>`: actuate the Franka you just loaded.
+- {doc}`Visualization </user_guide/interaction/visualization>`: watch a scene in the interactive viewer.
+- {doc}`Rendering </user_guide/rendering/index>`: capture images and video from a camera.

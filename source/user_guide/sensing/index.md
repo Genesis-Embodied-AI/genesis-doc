@@ -58,7 +58,7 @@ contact_batch = data[gs.sensors.types.Contact]
 
 ## Sensor types
 
-Each family has its own page. Pick by what you need to measure; the `read()` return types and shapes are cataloged in {doc}`the sensor reference </api_reference/engine/sensors/index>`.
+Each family has its own page. Pick by what you need to measure; {doc}`the sensor reference </api_reference/engine/sensors/index>` catalogs every `read()` return type and shape.
 
 | Page | Options classes (`gs.sensors.*`) | Measures |
 |---|---|---|

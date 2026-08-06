@@ -1,6 +1,6 @@
 # ToolSolver
 
-The `ToolSolver` handles kinematic tools and end-effectors that drive other physics objects through one-way coupling into the soft solvers (MPM, FEM, PBD, SPH). A `ToolEntity` has no internal dynamics and is built from a single mesh. It is a temporary workaround for differentiable rigid-soft interaction and will be removed once the `RigidSolver` supports differentiability directly.
+The `ToolSolver` handles kinematic tools and end-effectors that drive other entities through one-way coupling into the soft solvers (MPM, FEM, PBD, SPH). A `ToolEntity` carries no internal dynamics and comes from a single mesh. It is a temporary workaround for differentiable rigid-soft interaction and will be removed once the `RigidSolver` supports differentiability directly.
 
 ## Options
 

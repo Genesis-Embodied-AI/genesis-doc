@@ -27,7 +27,7 @@ g = M\,(a - a^{\text{unc}}) + J^\top D\,(Ja - a_{\text{ref}}),
 H = M + J^\top D\,J.
 $$
 
-Equality constraints act in both directions and are always present. Contacts and joint limits are *inequalities*: a contact may only push, and a joint limit resists only once the joint reaches it. Such a row is active only while it is violated, and friction rows are capped by the friction cone. Which inequality rows are active is decided during the solve, by the line search below.
+Equality constraints act in both directions and are always present. Contacts and joint limits are *inequalities*: a contact may only push, and a joint limit resists only once the joint reaches it. Such a row is active only while it is violated, and friction rows are capped by the friction cone. The line search below decides which inequality rows are active as the solve proceeds.
 
 ## Constraint types
 
@@ -52,7 +52,7 @@ A non-negative multiplier on any edge produces a force whose tangential part is 
 **Contact resolution.** `contact_resolution` sets how a contact's normal force and friction force are resolved against each other.
 
 - **`gs.contact_resolution.convex`:** MuJoCo's formulation. The contact is a single convex cost in which the friction limit $|\mathbf f_t| \le \mu f_n$ bounds the normal and tangential parts jointly, so tangential demand can be met by raising $f_n$.
-- **`gs.contact_resolution.signorini`:** friction is bounded by the normal force the contact has developed, so that force follows the contact's normal state rather than tangential demand. Contacts are resolved by successive approximation, which costs extra solver iterations.
+- **`gs.contact_resolution.signorini`:** friction is bounded by the normal force the contact has developed, so that force follows the contact's normal state rather than tangential demand. The solver resolves contacts by successive approximation, which costs extra iterations.
 
 `signorini` requires the elliptic cone, whose rows separate into a normal row and a friction disc, and the Newton solver, which reaches the fixed point of the successive approximation. Left unset, `contact_resolution` resolves to `signorini` under those two and to `convex` otherwise; `enable_mujoco_compatibility` keeps `convex`. Requesting `signorini` where it is unavailable raises at build time.
 
@@ -68,7 +68,7 @@ $$
 \phi = q_{\max} - q < 0,
 $$
 
-a single one-dof inequality is spawned with Jacobian $J = \pm 1$ and a reference acceleration that pushes the joint back inside its range. `enable_joint_limit` turns this on and off globally.
+the solver spawns a single one-dof inequality with Jacobian $J = \pm 1$ and a reference acceleration that pushes the joint back inside its range. `enable_joint_limit` turns this on and off globally.
 
 A related row models dry friction in a joint: dofs with a nonzero friction-loss coefficient get a constraint that resists motion up to a bounded force, independent of any limit.
 
@@ -80,7 +80,7 @@ Equality constraints are holonomic, tying bodies together for as long as they ex
 - **Weld:** holds two frames at a fixed relative pose, removing all 6 dofs. This is the constraint the {doc}`suction-gripper example </user_guide/robot_control/constraints>` toggles at runtime.
 - **Joint:** couples two scalar joints so one follows the other through a quartic polynomial, removing 1 dof, as a geared mechanism does.
 
-Each writes its rows into $J$ so that the constrained relative velocity is driven to zero. `disable_constraint=True` turns off all constraints, contacts included.
+Each writes its rows into $J$ so that the solve drives the constrained relative velocity to zero. `disable_constraint=True` turns off all constraints, contacts included.
 
 ## Reference acceleration and softness
 
@@ -94,14 +94,14 @@ The gains $b$ and $k$ come from a time constant and a damping ratio: $\phi$ deca
 
 ## Solving the system
 
-The problem is solved iteratively for the generalized accelerations. `constraint_solver` sets the algorithm; both variants minimize the same objective and share the same line search.
+The solver works out the generalized accelerations iteratively. `constraint_solver` sets the algorithm; both variants minimize the same objective and share the same line search.
 
 - **`gs.constraint_solver.Newton`** (the default): forms the Hessian $H = M + J^\top D J$ and takes Newton steps by solving $H\,\Delta a = -g$ with a Cholesky factorization. On the CPU it can exploit the band structure of $H$ for a sparse factorization (`sparse_solve`); on the GPU it uses a dense tiled factorization. It converges in a handful of iterations, each carrying the cost of the factorization.
 - **`gs.constraint_solver.CG`**: preconditioned conjugate gradient in acceleration space, using the mass matrix as the preconditioner and a Polak–Ribière update. It needs only matrix-vector products, never the explicit Hessian, so its memory footprint stays low on scenes with many dofs or constraints.
 
 We default to Newton because a typical robot scene has few enough dofs that the factorization costs less than the extra iterations conjugate gradient would need. Switch to CG when a scene grows large enough that forming and factorizing $H$ dominates the step.
 
-Each iteration proposes a search direction, then a **line search** picks the step length $\alpha$ minimizing the objective along it. The objective restricted to a line is a quadratic, so the exact minimizer is available in closed form, and the search handles inequality rows switching between active and inactive as $\alpha$ varies. Line-search effort is capped by `ls_iterations` and `ls_tolerance`.
+Each iteration proposes a search direction, then a **line search** picks the step length $\alpha$ minimizing the objective along it. The objective restricted to a line is a quadratic, so the exact minimizer is available in closed form, and the search handles inequality rows switching between active and inactive as $\alpha$ varies. `ls_iterations` and `ls_tolerance` cap the line-search effort.
 
 The solve stops when both the gradient norm and the per-iteration cost improvement fall below a scaled tolerance,
 

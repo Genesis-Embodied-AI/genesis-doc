@@ -32,12 +32,12 @@ scene = gs.Scene(
         lower_bound=(0.0, 0.0, -0.2),  # MPM grid must enclose the soft skin
         upper_bound=(1.0, 1.0, 1.0),
         gravity=(0, 0, 0),  # mimic gravity compensation on the skin
-        enable_CPIC=True,
+        enable_CPIC=True,  # keeps skin particles from slipping through the thin skeleton links
     ),
 )
 ```
 
-The MPM solver simulates the skin on a background grid; `lower_bound` and `upper_bound` (meters) define that grid, and anything that leaves it is lost. Keep the entity comfortably inside.
+The MPM solver simulates the skin on a background grid, and `lower_bound` and `upper_bound` (meters) define that grid's extent. Keep the entity comfortably inside.
 
 ## Add the hybrid entity
 
@@ -67,7 +67,7 @@ robot = scene.add_entity(
 )
 ```
 
-The skin is generated automatically: for each rigid link with a collision geometry, Genesis World inflates that geometry outward by `thickness` (meters) and fills it with MPM particles bound to the link. Gravity on the skin is cancelled by setting the MPM solver's `gravity` to zero above, and on the skeleton by `gravity_compensation=1.0`, so the arm holds its pose instead of sagging.
+Genesis World generates the skin: for each rigid link with a collision geometry, it inflates that geometry outward by `thickness` (meters) and fills it with MPM particles bound to the link. Setting the MPM solver's `gravity` to zero above cancels gravity on the skin, and `gravity_compensation=1.0` cancels it on the skeleton, so the arm holds its pose instead of sagging.
 
 ### Hybrid material parameters
 
@@ -82,7 +82,7 @@ The skin is generated automatically: for each rigid link with a collision geomet
 
 ## Control
 
-Control a hybrid entity through its rigid dofs, using the same methods as a plain `RigidEntity`. They are forwarded to the rigid part:
+Control a hybrid entity through its rigid dofs, using the same methods as a plain `RigidEntity`:
 
 ```python
 for i in range(1000):
@@ -112,7 +112,7 @@ The rigid and soft solvers must share the same `dt`. Genesis World asserts this 
 :::
 
 :::{warning}
-The MPM grid defined by `lower_bound` / `upper_bound` is finite. Particles that move outside it are dropped, which shows up as skin tearing away from the skeleton. Size the bounds to contain the entity's full range of motion.
+The MPM grid defined by `lower_bound` / `upper_bound` is finite, and the solver clamps a skin particle that reaches the edge, which shows up as the skin catching on an invisible wall while the skeleton moves on. Size the bounds to contain the entity's full range of motion.
 :::
 
 :::{tip}

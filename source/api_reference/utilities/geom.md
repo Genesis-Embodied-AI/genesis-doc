@@ -1,6 +1,6 @@
 # Geometry utilities
 
-The `genesis.utils.geom` module provides geometry helpers for rotations, quaternions, and rigid transforms, also exposed at the top level as `gs.<name>`. They accept NumPy arrays or PyTorch tensors and operate on single values or batches.
+The `genesis.utils.geom` module holds geometry helpers for rotations, quaternions, and rigid transforms, also exposed at the top level as `gs.<name>`. They accept NumPy arrays or PyTorch tensors and operate on single values or batches.
 
 They follow the project conventions: quaternions are `(w, x, y, z)` scalar-first (Hamilton), Euler angles are degrees in extrinsic x-y-z order, and the world frame is right-handed and Z-up. See {doc}`/user_guide/configuration/conventions`.
 

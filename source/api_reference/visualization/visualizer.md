@@ -13,6 +13,6 @@ The orchestrator behind `scene.visualizer`, created automatically with every sce
 
 ## See also
 
-- {doc}`viewer`: the interactive window
-- {doc}`camera`: the visualization camera, for off-screen rendering
-- {doc}`renderers/index`: renderer backends
+- {doc}`viewer`: the interactive window.
+- {doc}`camera`: the visualization camera, for off-screen rendering.
+- {doc}`renderers/index`: renderer backends.
