@@ -1,14 +1,14 @@
 # SAP coupler
 
-The Semi-Analytic Primal (SAP) coupler resolves contact between rigid bodies and FEM soft bodies with a convex, semi-analytic solver derived from the model Drake uses ([paper](https://arxiv.org/abs/2110.10107)). Reach for it when a rigid robot manipulates a moderately deformable volumetric object (grasping, pressing, lifting) and you need contact forces that stay stable and accurate under sustained load.
+The Semi-Analytic Primal (SAP) coupler resolves contact between rigid bodies and FEM soft bodies with a convex, semi-analytic solver derived from the model Drake uses ([paper](https://arxiv.org/abs/2110.10107)). Use it when a rigid robot manipulates a moderately deformable volumetric object (grasping, pressing, lifting) and you need contact forces that stay stable and accurate under sustained load.
 
 SAP handles two solvers: `Rigid` and `FEM`. For cloth and highly deformable bodies, use the {doc}`IPC coupler <ipc_coupler>` instead; for multi-solver scenes (MPM, SPH, PBD) or differentiable simulation, use the default coupler described in {doc}`Solvers and coupling </user_guide/theory/coupling/index>`.
 
 ## Requirements
 
-SAP coupling imposes three hard requirements. Each is checked at build time and raises if unmet:
+SAP coupling imposes three hard requirements. Genesis World checks each at build time and raises if one is unmet:
 
-- **64-bit precision:** initialize with `precision="64"`. The solver is ill-conditioned in 32-bit and refuses to run.
+- **64-bit precision:** initialize with `precision="64"`, because the solver is ill-conditioned in 32-bit.
 - **Implicit FEM solver:** any FEM entity must be simulated with {py:class}`FEMOptions <genesis.options.solvers.FEMOptions>`(use_implicit_solver=True).
 - **Rigid or FEM only:** SAP couples the rigid and FEM solvers. Other solvers (MPM, SPH, PBD) are not supported.
 
@@ -16,7 +16,7 @@ SAP does not support differentiable simulation. Calls into the gradient path rai
 
 ## Minimal example
 
-The complete script is [`examples/sap_coupling/fem_sphere_and_cube.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/fem_sphere_and_cube.py), which drops an FEM cube onto an FEM sphere. The setup that turns on SAP coupling is these three choices:
+The complete script is [`examples/sap_coupling/fem_sphere_and_cube.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/fem_sphere_and_cube.py), which drops an FEM cube onto an FEM sphere. Three choices turn SAP coupling on:
 
 ```python
 import genesis as gs

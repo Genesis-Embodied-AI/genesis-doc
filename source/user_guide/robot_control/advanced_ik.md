@@ -1,6 +1,6 @@
 # Advanced and parallel IK
 
-The inverse kinematics (IK) solver introduced in {doc}`inverse_kinematics_motion_planning` extends in two directions that matter for real manipulation and for training at scale: solving for several end-effector links at once, and solving every environment of a parallel scene in a single call. This page covers both.
+The inverse kinematics (IK) solver introduced in {doc}`inverse_kinematics_motion_planning` extends in two directions that matter for real manipulation and for training at scale: solving for several end-effector links at once, and solving every environment of a parallel scene in a single call.
 
 The runnable sources for this page are
 [`advanced_IK_multilink.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/advanced_IK_multilink.py)
@@ -25,7 +25,7 @@ q = robot.inverse_kinematics_multilink(
 )
 ```
 
-Each target need not be a full 6-DoF pose. `pos_mask` and `rot_mask` are length-3 boolean masks that select which position axes and which rotation axes the solver has to satisfy; both default to `[True, True, True]`. Here `rot_mask=[False, False, True]` asks only that each fingertip's z-axis align with the z-axis of `target_quat`, leaving its heading in the horizontal plane free. Masking out constraints you do not care about gives the solver more freedom and makes it more likely to converge.
+A target can constrain as few axes as you like. `pos_mask` and `rot_mask` are length-3 boolean masks that select which position axes and which rotation axes the solver has to satisfy; both default to `[True, True, True]`. Here `rot_mask=[False, False, True]` asks only that each fingertip's z-axis align with the z-axis of `target_quat`, leaving its heading in the horizontal plane free. Masking out constraints you do not care about gives the solver more freedom and makes it more likely to converge.
 
 Orientations follow the `(w, x, y, z)` quaternion convention, so `target_quat = np.array([0, 1, 0, 0])` points the finger's z-axis straight down.
 
@@ -38,7 +38,7 @@ robot.set_dofs_position(q)
 scene.visualizer.update()
 ```
 
-The target frames in the video are drawn with `scene.draw_debug_frame()` and moved each iteration with `scene.update_debug_objects()`. These markers live at the visualizer level and take no part in the simulation. See {doc}`/user_guide/interaction/interactive_debugging` for the debug-drawing API.
+The example draws the target frames in the video with `scene.draw_debug_frame()` and moves them each iteration with `scene.update_debug_objects()`. These markers live at the visualizer level and take no part in the simulation. See {doc}`/user_guide/interaction/interactive_debugging` for the debug-drawing API.
 
 ```{video} ../../_static/videos/ik_multilink.mp4
 :width: 100%

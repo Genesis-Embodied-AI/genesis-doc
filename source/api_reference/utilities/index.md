@@ -1,6 +1,6 @@
 # Utilities and helpers
 
-Genesis World bundles a set of helper modules under `genesis.utils` for the operations that surround a simulation: selecting a compute backend, converting between array formats, applying geometric transforms, and loading assets from disk. This page is the entry point to those modules; each linked page documents one of them in detail.
+Genesis World bundles a set of helper modules under `genesis.utils` for the operations that surround a simulation: selecting a compute backend, converting between array formats, applying geometric transforms, and loading assets from disk. Each linked page documents one of them in detail.
 
 ## Modules
 
@@ -11,9 +11,9 @@ Genesis World bundles a set of helper modules under `genesis.utils` for the oper
 - **{doc}`file_io`:** cache and source directory paths, plus loading URDF and MJCF descriptions.
 - **{doc}`tools`:** timing loops and saving media in `genesis.utils.tools`.
 
-## Initialization and globals
+## Initialization
 
-Most utilities assume the library has been initialized. `gs.init()` selects the backend, sets the random seed and float precision, and populates the module-level globals below.
+Every utility here assumes an initialized library. `gs.init()` selects the backend, sets the random seed and the float precision, and publishes the resolved configuration as module-level globals:
 
 ```python
 import genesis as gs
@@ -25,13 +25,7 @@ gs.init(
 )
 ```
 
-After `gs.init()` returns, these globals hold the resolved configuration:
-
-| Global | Type | Description |
-|---|---|---|
-| `gs.device` | `torch.device` | The active PyTorch device (for example, `cuda:0`, `mps:0`, or `cpu`). |
-| `gs.backend` | backend enum | The backend that was actually selected, after resolving `gs.gpu`. |
-| `gs.EPS` | `float` | Numerical epsilon for the active float precision. |
+{doc}`device` covers the backend resolution, the globals it sets (`gs.device`, `gs.backend`, `gs.EPS`), and the precision-dependent dtype aliases.
 
 ## Components
 

@@ -9,7 +9,7 @@
 
 ## Geometry types
 
-The value returned by `RigidGeom.type`.
+`RigidGeom.type` returns one of these values.
 
 ```{eval-rst}
 .. autoclass:: genesis.constants.GEOM_TYPE()

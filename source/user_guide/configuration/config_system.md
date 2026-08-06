@@ -1,12 +1,12 @@
 # Options system
 
-Genesis World is configured through **options objects**: small, typed parameter groups under `gs.options.*` that you pass to `gs.Scene(...)` and to `scene.add_entity(...)`. Rather than a scene taking dozens of loose keyword arguments, each concern (the global simulator, one physics solver, the viewer, a renderer) gets its own object with its own defaults. This page explains what those objects are, how they compose into a scene, and how a setting given in two places is resolved.
+Configure Genesis World through **options objects**: small, typed parameter groups under `gs.options.*` that you pass to `gs.Scene(...)` and to `scene.add_entity(...)`. Rather than have a scene accept dozens of loose keyword arguments, we give each concern its own object with its own defaults: one for the global simulator, one per physics solver, one for the viewer, and one per renderer. This page explains what those objects are, how they compose into a scene, and how we resolve a setting given in two places.
 
 If you have not built a scene yet, read {doc}`/user_guide/getting_started/hello_genesis` first. It uses {py:class}`SimOptions <genesis.options.solvers.SimOptions>` and {py:class}`ViewerOptions <genesis.options.ViewerOptions>` in passing. This page is the conceptual reference behind that usage.
 
-## A scene is assembled from options
+## Composing a scene from options
 
-Every configurable component of a scene is described by one options object. You construct the objects you care about and hand them to the scene; anything you omit uses its defaults.
+Every configurable component of a scene is described by one options object. Construct the objects you care about and hand them to the scene; anything you omit uses its defaults.
 
 ```python
 import genesis as gs
@@ -27,9 +27,9 @@ scene = gs.Scene(
 
 The options split into three roles, plus a set of per-entity options passed to `add_entity` rather than to the scene:
 
-- **Global.** `SimOptions` sets the properties of the simulation as a whole; coupler options set how solvers interact.
-- **Per solver.** One options object per physics solver (rigid, MPM, SPH, FEM, SF, PBD), each configuring that solver alone.
-- **Visualization.** The viewer, solver-independent visualization, and the renderer.
+- **Global:** `SimOptions` sets the properties of the simulation as a whole, and the coupler options set how solvers interact.
+- **Per solver:** one options object per physics solver (rigid, MPM, SPH, FEM, SF, PBD), each configuring that solver alone.
+- **Visualization:** the viewer, the solver-independent visualization, and the renderer.
 
 ## Every options object shares one base
 
@@ -38,13 +38,13 @@ All `gs.options.*` classes derive from {py:class}`gs.options.Options <genesis.op
 - **Fields are typed and validated on construction.** A value of the wrong type, or out of range, raises immediately with a readable message, not deep inside the first `scene.step()`.
 - **Unknown fields are rejected.** The base sets `extra="forbid"`, so a misspelled argument such as `gravty=(0, 0, -9.81)` raises `Unrecognized attribute 'gravty'` instead of being silently ignored.
 
-You never instantiate `Options` directly; you always use a concrete subclass. Each option class is documented in the {doc}`API Reference </api_reference/index>` alongside the component it configures.
+Never instantiate `Options` directly; always use a concrete subclass. Each option class is documented in the {doc}`API Reference </api_reference/index>` alongside the component it configures.
 
-## Simulator options override solver options
+## Solver options override simulator options
 
-`SimOptions` holds settings that are global by default: most importantly the timestep `dt` (seconds) and `gravity` (N/kg, pointing down `-Z`). Each solver also exposes those same settings on its own options object, where they default to `None`.
+`SimOptions` holds settings that are global by default: most importantly the timestep `dt` (seconds) and `gravity` (m/s², pointing down `-Z`). Each solver also exposes those same settings on its own options object, where they default to `None`.
 
-The rule is: **a value set on a solver's options overrides the global `SimOptions` value, for that solver only.** A solver whose field is left at `None` inherits the global value. This lets most scenes set `dt` once while allowing a single solver to run at a different rate.
+A value set on a solver's options overrides the global `SimOptions` value, for that solver only, and a solver whose field is left at `None` inherits the global value. This lets most scenes set `dt` once while allowing a single solver to run at a different rate.
 
 ```python
 scene = gs.Scene(
@@ -58,7 +58,7 @@ The same inheritance applies to `gravity`. Settings that are meaningful only to 
 
 ## Scene-level option groups
 
-Each of these is an optional argument to `gs.Scene(...)`. Pass an instance to configure that component; omit it to accept the defaults.
+Each of these is an optional argument to `gs.Scene(...)`.
 
 | Options class | `Scene` argument | Configures |
 |---|---|---|
@@ -80,7 +80,7 @@ Each of these is an optional argument to `gs.Scene(...)`. Pass an instance to co
 The solver and coupler options are documented beside their solver and coupler in the {doc}`physics engine reference </api_reference/engine/index>`, the global `SimOptions` under {doc}`Scene </api_reference/engine/index>`, and the viewer, visualization, and renderer options in the {doc}`visualization reference </api_reference/visualization/index>`.
 
 :::{note}
-Not every solver runs in every scene. A solver is only active once you add an entity whose material targets it: adding a rigid entity activates the rigid solver, and so on. Options for an inactive solver are simply unused.
+A solver is active only once you add an entity whose material targets it: adding a rigid entity activates the rigid solver, and so on. An inactive solver ignores its options.
 :::
 
 ## Per-entity options

@@ -9,7 +9,7 @@
 
 ## Joint types
 
-The value returned by `RigidJoint.type`.
+`RigidJoint.type` returns one of these values.
 
 ```{eval-rst}
 .. autoclass:: genesis.constants.JOINT_TYPE()

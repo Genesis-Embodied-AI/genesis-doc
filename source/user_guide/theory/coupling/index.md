@@ -12,9 +12,9 @@ scene = gs.Scene(
 
 ## How coupling works
 
-Solvers advance independently within a timestep, and the coupler reconciles them in between. Each substep runs four phases in order:
+Each substep runs four phases in order:
 
-- **Preprocess:** the coupler prepares cross-solver data, for example surfacing operations needed by the CPIC variant of MPM.
+- **Preprocess:** the coupler prepares the cross-solver data a solver needs before it integrates, such as the per-particle rigid-surface normals that the compatible particle-in-cell (CPIC) variant of MPM uses to tell which side of a thin geometry each particle is on.
 - **Advance (pre-coupling):** every active solver integrates its own material forward by one substep, ignoring the others.
 - **Couple:** the coupler detects contact between entities in different solvers and exchanges momentum so they no longer interpenetrate.
 - **Postprocess (post-coupling):** each solver finalizes the substep with the coupled state.
@@ -27,7 +27,7 @@ The default coupler resolves contact with an **impulse-based** response. For eac
 
 ## Choosing a coupler
 
-All three derive from {py:class}`BaseCouplerOptions <genesis.options.solvers.BaseCouplerOptions>`, and the scene uses the legacy coupler when given nothing.
+We ship three couplers, all configured through options classes deriving from {py:class}`BaseCouplerOptions <genesis.options.solvers.BaseCouplerOptions>`, and we default to the legacy coupler because it covers every solver pair.
 
 | Coupler | Contact model | Best for | Requirements |
 |---|---|---|---|
@@ -35,7 +35,7 @@ All three derive from {py:class}`BaseCouplerOptions <genesis.options.solvers.Bas
 | **{doc}`SAP <sap_coupler>`** | Semi-analytic primal, from [Drake](https://drake.mit.edu/) | Rigid-FEM contact under moderate deformation, such as grasping a deformable | 64-bit precision; implicit FEM solver |
 | **{doc}`IPC <ipc_coupler>`** | Barrier-based (Incremental Potential Contact) | Cloth and large-deformation soft bodies; intersection-free contact | `libuipc` library |
 
-The legacy coupler is the broadest. SAP raises rigid-FEM contact accuracy where the impulse model is too coarse, and IPC keeps contact intersection-free under large deformation, representing rigid bodies as affine bodies (ABD). The two specialized couplers have their own pages for setup and parameters.
+SAP raises rigid-FEM contact accuracy where the impulse model is too coarse, and IPC keeps contact intersection-free under large deformation, representing rigid bodies through affine body dynamics (ABD). Both specialized couplers have their own pages for setup and parameters.
 
 ## Enabling and disabling interactions
 
@@ -49,7 +49,7 @@ scene = gs.Scene(
 )
 ```
 
-The available pair flags on `LegacyCouplerOptions` are `rigid_mpm`, `rigid_sph`, `rigid_pbd`, `rigid_fem`, `mpm_sph`, `mpm_pbd`, `fem_mpm`, and `fem_sph`. A pair with no flag is not coupled by the legacy coupler. Disable a pair you do not need to save the cost of its contact kernels.
+The available pair flags on `LegacyCouplerOptions` are `rigid_mpm`, `rigid_sph`, `rigid_pbd`, `rigid_fem`, `mpm_sph`, `mpm_pbd`, `fem_mpm`, and `fem_sph`; the legacy coupler couples exactly these pairs. Turning off a pair you do not need saves the cost of running its contact kernels every substep.
 
 ## See also
 

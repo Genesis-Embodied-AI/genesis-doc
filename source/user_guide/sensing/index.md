@@ -2,7 +2,7 @@
 
 A sensor extracts information from a scene without modifying its physics. It models the robot-control view of an onboard device: attach it to a link, step the simulation, and read back a tensor. Genesis World ships sensors for contact and force, inertial measurement, ranging, rendering, surface distance, and temperature.
 
-## The attach-and-read model
+## Attach-and-read model
 
 Create a sensor with `scene.add_sensor()`, passing an options object from `gs.sensors`. The call returns a sensor handle you keep and read each step. Most sensors attach to a rigid link through `entity_idx` and `link_idx_local`; a few are static or bound to a whole entity.
 
@@ -42,7 +42,7 @@ Set `history_length=N` on the options to keep the last `N` snapshots, stacked al
 
 ## Parallel and heterogeneous environments
 
-Sensors run across parallel environments. A returned tensor carries a leading batch axis, written `([n_envs,] ...)`: the `[n_envs,]` bracket is present when the scene is built with multiple environments and absent otherwise. The example above reads shape `(16, 4, 1)`: 16 environments, 4 history steps, 1 contact bin.
+Sensors run across parallel environments. A returned tensor carries a leading batch axis, which we write `([n_envs,] ...)`: the `[n_envs,]` bracket is present when the scene is built with multiple environments and absent otherwise. The example above reads shape `(16, 4, 1)`: 16 environments, 4 history steps, 1 contact bin.
 
 For high-throughput training or logging, read every sensor of a class at once with `scene.read_sensors()` (or `entity.read_sensors()` to scope it to one entity). Each returns a `dict` keyed by a sensor-type tag, `gs.sensors.types.<Name>`, mapping to one batched tensor per class. The last axis is a flat concatenation of every sensor of that class; for sensors that return a `NamedTuple`, the fields are packed in field order (an {doc}`imu` contributes `lin_acc + ang_vel + mag = 9` scalars). The history axis is present whenever any sensor in the class was created with `history_length > 0`.
 
@@ -58,7 +58,7 @@ contact_batch = data[gs.sensors.types.Contact]
 
 ## Sensor types
 
-Each family has its own page. Pick by what you need to measure; the `read()` return types and shapes are cataloged in {doc}`the sensor reference </api_reference/engine/sensors/index>`.
+Each family has its own page. Pick by what you need to measure; {doc}`the sensor reference </api_reference/engine/sensors/index>` catalogs every `read()` return type and shape.
 
 | Page | Options classes (`gs.sensors.*`) | Measures |
 |---|---|---|

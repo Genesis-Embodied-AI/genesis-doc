@@ -55,7 +55,7 @@ for _ in range(1000):
 
 ## `add_stage` vs. `add_entity`
 
-A USD file is a *stage* that can contain any number of physics entities. Genesis World offers two entry points:
+A USD file is a *stage* that can contain any number of physics entities, so Genesis World has two entry points for loading one:
 
 - **`scene.add_stage(morph=gs.morphs.USD(...))`** discovers and loads **every** rigid entity in the file and returns them as a list. Use it for complete scenes and for any file whose contents you don't want to enumerate by hand.
 - **`scene.add_entity(gs.morphs.USD(...))`** loads a **single** entity and returns it directly. It targets the prim named by `prim_path`; when `prim_path` is left as `None`, it falls back to the stage's default prim, and raises if the file declares none.
@@ -88,7 +88,7 @@ USD stages carry their own `upAxis` and `metersPerUnit` metadata, and Genesis Wo
 
 ## Mesh processing
 
-Collision meshes are derived from the asset's geometry. Three options control that derivation; `examples/usd/kitchen.py` sets all three to honor the asset as authored:
+Genesis World derives collision meshes from the asset's geometry. Three options control that derivation; `examples/usd/kitchen.py` sets all three to honor the asset as authored:
 
 ```python
 scene.add_stage(
@@ -125,7 +125,7 @@ gs.morphs.USD(
 )
 ```
 
-The defaults already cover Isaac Sim and common community conventions; override a candidate list only when your exporter uses a name none of them match. The parsed values populate the corresponding `dof` fields:
+Our defaults already cover Isaac Sim and common community conventions, so override a candidate list only when your exporter uses a name none of them match. The parsed values populate the corresponding `dof` fields:
 
 | Morph option | `dof` field it fills | Meaning |
 |---|---|---|
@@ -152,9 +152,9 @@ gs.morphs.USD(
 
 The rules, in order of application:
 
-1. **Inheritance.** The parser traverses the prim hierarchy top-down. Once a prim matches a pattern, every descendant inherits that classification.
-2. **Classification.** A prim matching only the visual pattern is visual-only; one matching only the collision pattern is collision-only; one matching both, or neither, is used for both. The neither case is the default for mesh-only assets that carry no naming convention.
-3. **Visibility and purpose.** Only visible prims are parsed. Prims with `purpose = "guide"` are excluded from visuals but may still serve as collision geometry.
+1. **Inheritance:** the parser traverses the prim hierarchy top-down, and once a prim matches a pattern, every descendant inherits that classification.
+2. **Classification:** a prim matching only the visual pattern is visual-only; one matching only the collision pattern is collision-only; one matching both, or neither, is used for both. The neither case is the default for mesh-only assets that carry no naming convention.
+3. **Visibility and purpose:** the parser reads visible prims only, and treats a prim with `purpose = "guide"` as collision geometry alone, leaving it out of the visuals.
 
 The patterns above are the defaults, so most Isaac Sim assets need no configuration here.
 
@@ -168,7 +168,7 @@ pip install --extra-index-url https://pypi.nvidia.com/ omniverse-kit
 export OMNI_KIT_ACCEPT_EULA=yes
 ```
 
-`OMNI_KIT_ACCEPT_EULA=yes` accepts the Omniverse EULA non-interactively; set it once. Without Omniverse Kit, Genesis World parses only `UsdPreviewSurface` and falls back to each prim's `displayColor` where no material is present.
+`OMNI_KIT_ACCEPT_EULA=yes` accepts the Omniverse EULA non-interactively; set it once. Without Omniverse Kit, Genesis World falls back to each prim's `displayColor` where no material is present.
 
 :::{note}
 If you see a `Baking process failed: ...` warning, the usual causes are an unaccepted EULA (set `OMNI_KIT_ACCEPT_EULA=yes`), a first-launch dependency install that timed out (rerun the program once it finishes), or stale extensions across multiple Python environments (remove the shared extension folder, e.g. `~/.local/share/ov/data/ext` on Linux, and retry).

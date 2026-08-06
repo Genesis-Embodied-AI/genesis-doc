@@ -6,12 +6,12 @@
 
 Genesis World began as an academic project in December 2024, under the name **Genesis**, and is now developed with support from [Genesis AI](https://www.genesis.ai/). For the design rationale, see the [blog post](https://www.genesis.ai/blog/the-role-of-simulation-in-scalable-robotics-genesis-world-10-and-the-path-forward).
 
-## The stack
+## Stack
 
 Genesis World occupies four layers. Above it sits whatever you build: robotics environments, ML pipelines, or agentic simulation. Below it sits whatever compute backend you have.
 
 - **Simulation interface:** the user-facing API for asset parsing (URDF, MJCF, OBJ, GLB, USD, …), entity accessors, controllers, sensors, parallel and heterogeneous environments, and a built-in viewer.
-- **Physics:** a unified multi-physics engine integrating rigid, FEM, MPM, and particle (PBD/SPH) solvers, [uipc](https://github.com/spiriMirror/libuipc), an explicit coupler, and SAP, all sharing one scene and one state.
+- **Physics:** a unified multi-physics engine integrating rigid, FEM, MPM, and particle (PBD/SPH) solvers, with explicit, SAP, and [libuipc](https://github.com/spiriMirror/libuipc)-based couplers resolving contact between them, all sharing one scene and one state.
 - **Render:** three rendering paths behind the cameras. [Nyx](https://github.com/Genesis-Embodied-AI/genesis-nyx) is an in-house renderer built for robotics, Luisa is a DSL ray tracer, and Pyrender is a rasterizer.
 - **Compiler:** [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants) lowers Python kernel code to CUDA, AMD ROCm, Apple Metal, Vulkan, x86, and ARM64. It carries the autodiff, GPU-graph, and fast-cache machinery.
 
@@ -20,14 +20,14 @@ Genesis World occupies four layers. Above it sits whatever you build: robotics e
 Genesis World is shaped by a few convictions about what a simulator for physical AI should be.
 
 - **Transparent and Pythonic:** the engine is open source and written in Python, so you can read it, debug it, and extend it, with no opaque binary between you and the physics.
-- **Unified, not bolted together:** rigid, FEM, MPM, and particle (PBD/SPH) solvers share one scene and one state with explicit coupling, rather than living in separate tools you have to stitch together.
-- **Fast without cutting corners:** simulation is parallelized across environments on the GPU, up to 10–80× faster than prior GPU-accelerated simulators such as Isaac Gym/Sim/Lab and MuJoCo MJX, without trading away accuracy. See the [blog post](https://www.genesis.ai/blog/the-role-of-simulation-in-scalable-robotics-genesis-world-10-and-the-path-forward) for methodology.
-- **Differentiable by design:** autodiff and backpropagation run through the [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants) compiler, with hand-derived gradients for the hardest kernels, so gradients flow through the physics.
+- **One scene, one state:** rigid, FEM, MPM, and particle (PBD/SPH) solvers share a single scene and a single state, and where their entities touch, an explicit coupler resolves the interaction.
+- **Fast at full accuracy:** Genesis World parallelizes simulation across environments on the GPU, measured at 10–80× the throughput of prior GPU-accelerated simulators such as Isaac Gym/Sim/Lab and MuJoCo MJX without trading away accuracy. See the [blog post](https://www.genesis.ai/blog/the-role-of-simulation-in-scalable-robotics-genesis-world-10-and-the-path-forward) for methodology.
+- **Differentiable by design:** autodiff and backpropagation run through the [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants) compiler, with hand-derived gradients for the hardest kernels, so gradients flow all the way through the physics.
 - **Perception built in:** physically accurate, differentiable tactile sensors sit alongside IMU, lidar, depth-camera, contact-force, surface-distance, and temperature-grid sensors, and all three renderers are exposed through the same camera-sensor interface, usable out of the box in parallel and heterogeneous environments.
 - **Easy to start, easy to scale:** a single `pip install`, a small API, and the same code path from one environment on a laptop to thousands on a datacenter GPU.
 
 ## Mission
 
-Simulation trains policies, generates data, and turns computation into capability. Yet researchers have long been held back by simulators that are hard to learn or closed off: intricate data-centric abstractions, heavy APIs, and physics they cannot inspect or adapt to what they observe in the real world.
+Simulation trains policies, generates data, and turns computation into capability. Yet researchers have long been held back by simulators that are hard to learn or closed off: intricate data-centric abstractions, heavy APIs, and physics they can neither inspect nor adapt to what they observe in the real world.
 
 Genesis World exists to change that. Our aim is a transparent, welcoming platform where researchers from physics simulation and robotics build a fast, physically and visually realistic virtual world together, and where the computer-graphics community's advances in simulation and rendering reach robotics instead of staying out of reach. It is early, and a small team will not get everything right on a first release, so contributions of every kind are welcome. Open an issue or a pull request on [GitHub](https://github.com/Genesis-Embodied-AI/genesis-world); we would love to hear from you.

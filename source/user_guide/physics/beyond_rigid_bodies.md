@@ -1,14 +1,14 @@
 # Beyond rigid bodies
 
-The {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` tutorial simulated a rigid robot. But a scene can hold water, sand, cloth, and soft tissue at the same time, because Genesis World unifies several physics **solvers** under one `Scene`. A solver is the set of algorithms that advances one family of materials; the material you assign to an entity decides which solver simulates it.
+A scene can hold water, sand, cloth, and soft tissue at the same time, because Genesis World unifies several physics **solvers** under one `Scene`. A solver is the set of algorithms that advances one family of materials; the material you assign to an entity decides which solver simulates it.
 
-This page introduces the non-rigid solvers, explains when to reach for each, and links a runnable example per solver. It is an overview: read it to choose a solver, then follow the linked example for the full script.
+Choose a solver from the table below, then follow its linked example for the full script.
 
 ## Choosing a solver
 
 Every entity carries a `material`. In {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` the material defaulted to `gs.materials.Rigid()`, so the rigid solver handled the arm. Assign a material from a different family and its solver runs instead:
 
-| Solver | Representation | Reach for it when you need | Materials (`gs.materials.<S>.*`) |
+| Solver | Representation | Use it when you need | Materials (`gs.materials.<S>.*`) |
 |---|---|---|---|
 | **MPM** (Material Point Method) | Hybrid particles + background grid | The widest range of continuum materials in one solver: elastic, plastic, sand, snow | `Elastic`, `Liquid`, `ElastoPlastic`, `Sand`, `Snow`, `Muscle` |
 | **FEM** (Finite Element Method) | Tetrahedral mesh | Accurate elasticity and volumetric muscles, where mesh fidelity matters | `Elastic`, `Cloth`, `Muscle` |
@@ -17,11 +17,11 @@ Every entity carries a `material`. In {doc}`Hello, Genesis World </user_guide/ge
 
 MPM and SPH also power {doc}`particle emitters <emitters>`; MPM and FEM power {doc}`volumetric soft robots <soft_robots>`.
 
-## The pattern shared by every non-rigid solver
+## Pattern shared by every non-rigid solver
 
 Whichever solver you use, three things change relative to a rigid-only scene.
 
-**1. Enable substepping.** Non-rigid solvers are numerically stiff, so each `scene.step()` is subdivided into several substeps. Set a small `dt` (in seconds) and a substep count on `SimOptions`; the internal substep is `dt / substeps`. Rigid-only scenes leave `substeps` at its default of `1`.
+**1. Enable substepping.** Non-rigid solvers are numerically stiff, so Genesis World subdivides each `scene.step()` into several substeps. Set a small `dt` (in seconds) and a substep count on `SimOptions`; the internal substep is `dt / substeps`. Rigid-only scenes leave `substeps` at its default of `1`.
 
 ```python
 sim_options=gs.options.SimOptions(
@@ -30,7 +30,7 @@ sim_options=gs.options.SimOptions(
 )
 ```
 
-**2. Configure the solver on the scene.** Each solver reads its own options object: `MPMOptions`, `SPHOptions`, `FEMOptions`, `PBDOptions`. Particle-grid solvers (MPM, SPH) require a simulation domain; entities that leave `lower_bound`/`upper_bound` (in meters, Z-up) are clamped to it.
+**2. Configure the solver on the scene.** Each solver reads its own options object: `MPMOptions`, `SPHOptions`, `FEMOptions`, `PBDOptions`. Particle-grid solvers (MPM, SPH) require a simulation domain, and the solver clamps entities that leave `lower_bound`/`upper_bound` (in meters, Z-up) to it.
 
 ```python
 mpm_options=gs.options.MPMOptions(
@@ -51,7 +51,7 @@ obj = scene.add_entity(
 
 ## MPM: deformable and granular materials
 
-The Material Point Method carries mass on particles while resolving forces on a background grid, which lets one solver span elastic solids, plastics, sand, and snow. Reach for MPM when you want several continuum behaviors in the same scene, or a material that flows and then holds its deformed shape.
+The Material Point Method carries mass on particles while resolving forces on a background grid, which lets one solver span elastic solids, plastics, sand, and snow. Use MPM when a scene needs several continuum behaviors at once, or a material that flows and then holds its deformed shape.
 
 Only the `material` differs between an elastic cube, a liquid cube, and an elastoplastic sphere:
 
@@ -78,7 +78,7 @@ FEM underpins the {doc}`soft robots tutorial <soft_robots>`, which actuates a vo
 
 Position-Based Dynamics represents an entity as particles linked by constraints and solves for positions directly, which makes it fast and stable for cloth, ropes, and other 1D/2D/3D bodies that keep their topology. {py:class}`gs.materials.PBD.Cloth <genesis.engine.materials.PBD.cloth.Cloth>` loads a 2D mesh as a sheet.
 
-You can pin individual particles after building. `find_closest_particle` locates the particle nearest a world-space point (meters), and `fix_particles` anchors it:
+Pin individual particles after building. `find_closest_particle` locates the particle nearest a world-space point (meters), and `fix_particles` anchors it:
 
 ```python
 scene.build()
@@ -101,7 +101,7 @@ Skinning a flat 2D cloth mesh with `vis_mode="visual"` can produce degenerate ba
 
 ## SPH: free-surface liquids
 
-Smoothed-Particle Hydrodynamics is a purely Lagrangian (particle-only) solver aimed at liquids. Reach for SPH when you want fluid governed by physical parameters — rest density `rho` (kg/m³), viscosity `mu`, and surface tension `gamma` — rather than the coarser liquid model MPM provides.
+Smoothed-Particle Hydrodynamics is a purely Lagrangian (particle-only) solver aimed at liquids. Use SPH when you want fluid governed by physical parameters: rest density `rho` (kg/m³), viscosity `mu`, and surface tension `gamma`. MPM's liquid model is coarser.
 
 Turning a rigid block into water is one line: give it an SPH liquid material. Tune the flow with its parameters:
 
@@ -128,13 +128,13 @@ The `Liquid` material accepts a `sampler` that controls how particles fill the m
 
 ## SF: gaseous phenomena (smoke)
 
-The Stable Fluid solver is grid-based (Eulerian), not particle-based: it advects a velocity field and one or more scalar density fields on a fixed 3D grid, then makes the velocity divergence-free with a Jacobi pressure projection. Reach for it for smoke and other gases. Set the grid resolution with `SFOptions.res`.
+The Stable Fluid solver works on a fixed 3D grid (Eulerian): it advects a velocity field and one or more scalar density fields, then makes the velocity divergence-free with a Jacobi pressure projection. Use it for smoke and other gases, and set the grid resolution with `SFOptions.res`.
 
-Unlike the other non-rigid solvers, SF has no Lagrangian entity you add and move. Gas enters through velocity **jets** you register on the solver, and the solver stays inactive until at least one jet exists. Each substep advects the velocity and density fields (RK3 backtracing with trilinear interpolation), injects momentum at the jets, then runs `solver_iters` Jacobi pressure iterations to keep the velocity divergence-free. State lives on the fixed grid, so there are no per-entity get/set methods, and SF does not participate in checkpointing. Read the density grid back for rendering.
+SF has no Lagrangian entity you add and move: gas enters through velocity **jets** you register on the solver, and the solver stays inactive until at least one jet exists. Each substep advects the velocity and density fields (RK3 backtracing with trilinear interpolation), injects momentum at the jets, then runs `solver_iters` Jacobi pressure iterations to keep the velocity divergence-free. State lives on the fixed grid, so there are no per-entity get/set methods, and SF does not participate in checkpointing. Read the density grid back for rendering.
 
 Full script, including the jet class and writing the density field to images: [`examples/fluid/smoke.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/fluid/smoke.py).
 
-## Next steps
+## See also
 
 - {doc}`Soft robots <soft_robots>`: actuate MPM and FEM muscles.
 - {doc}`Hybrid entities <hybrid_entity>`: couple a rigid skeleton to a soft skin.

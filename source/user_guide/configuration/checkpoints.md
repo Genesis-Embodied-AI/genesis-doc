@@ -9,13 +9,13 @@ Genesis World exposes two levels of this. The state model is the same underneath
 
 All of these operate on a built scene. Build first, then snapshot.
 
-## The state model
+## State model
 
 A snapshot captures only the *dynamic* state: the fields that change as the simulation steps. It does not capture the scene's *structure*: the entities, their morphs, the solver options, or the number of environments. That structure is fixed by how you build the scene, and restoring a snapshot assumes it is already in place.
 
 - **`SimState`:** the object returned by `scene.get_state()`. It holds one per-solver state object for each active solver, batched over environments.
 - **Dynamic state:** positions, velocities, and the internal fields each solver integrates. This is what a checkpoint saves and restores.
-- **Static structure:** entities, morphs, geometry, and solver configuration. Not saved. You must reconstruct it before restoring, and it must match.
+- **Static structure:** entities, morphs, geometry, and solver configuration. Rebuild it exactly before restoring into it.
 
 Because structure is not part of the snapshot, a checkpoint is only valid for a scene built the same way. Restoring into a scene with different entities or solver options is undefined.
 
@@ -41,7 +41,7 @@ scene.reset(state=state)  # rewind to the snapshot; the sim continues from step 
 Passing `state` to `reset()` also registers it as the scene's initial state. A subsequent bare `scene.reset()` returns to *this* snapshot, not to the state the scene had at build time. Keep a separate reference to your build-time state if you need both.
 :::
 
-The per-solver state objects are plain attribute holders. For the rigid solver, for example, the state carries `qpos`, `dofs_vel`, `links_pos`, and `links_quat`; reading one field looks like this:
+The per-solver state objects are plain attribute holders, one attribute per state field. Reading the rigid solver's `qpos` looks like this:
 
 ```python
 state = scene.get_state()
@@ -69,10 +69,7 @@ for step in range(episode_length):
         scene.reset(state=init_state, envs_idx=done_envs)
 ```
 
-- **`envs_idx`:** the environments to reset, as any array-like of indices. `None` (the default) resets all of them.
-- **Partial reset:** with `envs_idx`, only the selected environments take the new state; the others advance uninterrupted.
-
-`envs_idx` applies only to a scene built with environments. On a non-parallelized scene it raises.
+`envs_idx` takes any array-like of indices, and `None` (the default) resets every environment. It applies only to a scene built with environments, so on a non-parallelized scene it raises.
 
 ## Saving to disk
 
@@ -126,7 +123,7 @@ On disk, a checkpoint is a pickled dictionary. The `arrays` entry is a flat map 
 ## Reproducibility notes
 
 - **Configuration must match.** A checkpoint restores fields by name into an already-built scene. The entities, solver options, and environment count must match the scene that produced it. There is no compatibility check: a mismatch fails or silently corrupts state.
-- **Precision limits exactness.** Genesis World uses 32-bit floats by default (see {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`). A save/load round trip is therefore accurate to roughly single-precision, not bit-exact. Build with `precision="64"` if you need tighter reproducibility.
+- **Precision limits exactness.** Genesis World uses 32-bit floats by default (see {doc}`initialization`). A save/load round trip is therefore accurate to roughly single-precision, not bit-exact. Initialize with `precision="64"` if you need tighter reproducibility.
 - **Serialize before pickling a `SimState`.** A `SimState` returned by `get_state()` holds live references back into the scene and its autograd graph. Call `state.serializable()` first to detach the tensors and drop those references, then pickle it yourself. `save_checkpoint` handles this for you.
 
 ```python
@@ -142,5 +139,3 @@ with open("state.pkl", "wb") as f:
 
 - {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>`: how state is batched over environments.
 - {doc}`Scene API </api_reference/engine/scene>`: the full signatures of `get_state`, `reset`, `save_checkpoint`, and `load_checkpoint`.
-</content>
-</invoke>

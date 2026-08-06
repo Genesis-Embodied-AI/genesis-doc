@@ -21,5 +21,5 @@ With `n_envs > 1`, camera outputs gain a leading batch dimension, for example `r
 
 ## See also
 
-- {doc}`rasterizer`: the standard single-scene rasterizer
-- {doc}`/user_guide/policy_training/examples/index`: rendering observations for RL
+- {doc}`rasterizer`: the standard single-scene rasterizer.
+- {doc}`/user_guide/policy_training/examples/index`: rendering observations for RL.

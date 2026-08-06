@@ -12,13 +12,13 @@ The three files are the source of truth for the complete code:
 
 The drone is actuated purely through its four propeller speeds. If you have not seen how RPM becomes thrust and attitude, read {doc}`/user_guide/physics/drone_entity` first; this page assumes that mapping.
 
-## The task
+## Task
 
 Each episode places a target point in front of the drone and rewards it for flying to that point and holding position. When the drone gets within `at_target_threshold` (0.1 m) of the target, a fresh target is resampled, so a single episode chains many reach-and-hold maneuvers. An episode lasts up to `episode_length_s` (15 s) and terminates early on a crash.
 
-The task is defined by three things the environment must specify for any RL problem: an observation the policy sees, an action it produces, and a reward that scores the outcome.
+The environment must specify the three things any RL problem needs: an observation the policy sees, an action it produces, and a reward that scores the outcome.
 
-## The environment
+## Environment
 
 `HoverEnv` is a plain Python class, not a subclass of a gym base class. It exposes the methods an on-policy RL runner expects: `reset()`, `step(actions)`, and `get_observations()`. All of its state lives in batched tensors of shape `(n_envs, ...)`, so a single instance drives thousands of drones in parallel on the GPU.
 
@@ -43,7 +43,7 @@ self.drone = self.scene.add_entity(gs.morphs.Drone(file="urdf/drones/cf2x.urdf")
 self.scene.build(n_envs=num_envs)
 ```
 
-`build(n_envs=num_envs)` is what allocates the batched simulation. During training this is 8192 environments; during evaluation it is 1.
+`build(n_envs=num_envs)` allocates the batched simulation. During training this is 8192 environments; during evaluation it is 1.
 
 ### Actions
 
@@ -79,7 +79,7 @@ Linear and angular velocities are expressed in the drone's body frame (rotated b
 
 ### Rewards
 
-Five terms are summed each step, each scaled by `dt` and a weight from `reward_cfg`. The weights (positive rewards, negative penalties) live in `hover_train.py`:
+The environment sums five terms each step, each scaled by `dt` and a weight from `reward_cfg`. The weights (positive rewards, negative penalties) live in `hover_train.py`:
 
 - **target:** rewards closing the distance to the target. It is potential-based: the reduction in squared distance from the previous step, so progress toward the target scores positively regardless of absolute distance.
 - **smooth:** penalizes large step-to-step changes in action, which suppresses jitter and narrows the sim-to-real gap.
@@ -116,7 +116,7 @@ runner = OnPolicyRunner(env, train_cfg, log_dir, device=gs.device)
 runner.learn(num_learning_iterations=args.max_iterations, init_at_random_ep_len=True)
 ```
 
-`performance_mode=True` bakes the tensor shapes into the compiled kernels for faster stepping, at the cost of a slower first build. It is the right choice for a long training run and the wrong one for interactive iteration.
+`performance_mode=True` bakes the tensor shapes into the compiled kernels for faster stepping, at the cost of a slower first build. We recommend it for a long training run, and leaving it off while you iterate interactively.
 
 The actor and critic are both two-layer MLPs (`[128, 128]`, `tanh`), configured in `get_train_cfg`. Start training with:
 
@@ -165,5 +165,5 @@ If evaluation is slow or unstable, drop `--record` to disable rendering.
 
 ## See also
 
-- {doc}`/user_guide/physics/drone_entity` for how propeller RPM produces thrust, attitude, and yaw.
-- {doc}`locomotion` and {doc}`manipulation` for the same environment/train/eval structure applied to other tasks.
+- {doc}`/user_guide/physics/drone_entity`: how propeller RPM produces thrust, attitude, and yaw.
+- {doc}`locomotion` and {doc}`manipulation`: the same environment/train/eval structure applied to other tasks.

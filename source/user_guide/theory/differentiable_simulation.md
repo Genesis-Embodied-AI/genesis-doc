@@ -37,7 +37,7 @@ print(force.grad)
 
 ## How autodiff works
 
-- **Enable it once, on the scene:** set `requires_grad=True` in `gs.options.SimOptions`. Genesis World then records the intermediate substep state each step needs for the backward pass. The flag defaults to `False`, so simulations are non-differentiable unless you opt in.
+- **Enable it once, on the scene:** set `requires_grad=True` in `gs.options.SimOptions`. Genesis World then records the intermediate substep state each step needs for the backward pass. That state occupies GPU memory in proportion to the number of steps you run, so we default the flag to `False`; see [Limitations](#limitations).
 - **State getters return differentiable tensors:** methods such as `get_pos()`, `get_vel()`, and `get_qpos()` return a {py:class}`gs.Tensor <genesis.grad.tensor.Tensor>` (a subclass of `torch.Tensor` that also carries a reference to the scene it came from). See the {doc}`Tensor reference </api_reference/differentiation/tensor>`.
 - **`backward()` flows through the physics:** calling `backward()` on any tensor derived from scene state runs the standard PyTorch backward pass, then continues the gradient backward through time across the recorded steps, down to the inputs you marked with `requires_grad=True`.
 - **Inputs are ordinary leaf tensors:** control forces, initial positions, and target values are plain PyTorch tensors created with `requires_grad=True`. Any operation that mixes them with scene-derived tensors yields a scene-tracked tensor, which keeps the graph connected.
@@ -63,9 +63,9 @@ Mixing two tensors that belong to different scenes raises an error, since gradie
 ## Limitations
 
 - **Memory scales with horizon:** differentiable mode stores intermediate substep state for every step, so long trajectories consume proportionally more GPU memory. Set `substeps_local` in `gs.options.SimOptions` to control how much substep state is retained; in differentiable mode it must be divisible by `substeps`.
-- **Not every operation is differentiable:** some contact and collision paths do not provide gradients. Gradients through those paths may be zero or undefined. The rigid solver uses the GJK collision path when gradients are required (see {doc}`rigid_solver/collision_detection`), and the elliptic friction cone is unsupported (see {doc}`rigid_solver/constraints`).
-- **Coupler support:** differentiable simulation is supported by the default legacy coupler; the SAP coupler does not support it. See {doc}`coupling/index`.
-- **Hibernation is unavailable** when `requires_grad=True`; see {doc}`rigid_solver/collision_detection`.
+- **Some contact and collision paths have no gradients:** gradients through them may be zero or undefined. The rigid solver uses the GJK collision path when gradients are required (see {doc}`rigid_solver/collision_detection`), and the elliptic friction cone is unsupported (see {doc}`rigid_solver/constraints`).
+- **Coupler support:** the default legacy coupler carries gradients; the SAP coupler does not. See {doc}`coupling/index`.
+- **Hibernation:** unavailable when `requires_grad=True`; see {doc}`rigid_solver/collision_detection`.
 - **Numerical stability over long horizons:** gradients backpropagated through many steps can vanish or explode, as with any long recurrent computation.
 
 ## See also

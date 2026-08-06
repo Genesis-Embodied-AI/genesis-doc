@@ -1,6 +1,6 @@
 # Collision detection
 
-The second layer of a step: find which rigid bodies touch, generate a contact manifold for each touching pair, and hand those contacts to the constraint solver. This page covers how detection works, how to read the resulting contacts back into Python, and the support field the convex algorithms rest on. Turning contacts into accelerations is covered in {doc}`constraints`.
+The second layer of a step finds which rigid bodies touch, generates a contact manifold for each touching pair, and hands those contacts to the constraint solver. This page covers how detection works, how to read the resulting contacts back into Python, and the support field the convex algorithms rest on. For turning those contacts into accelerations, see {doc}`constraints`.
 
 ## How contacts are detected
 
@@ -13,7 +13,7 @@ Detection runs in two phases each step, from a cheap approximate cull to an exac
 - **Static pairs:** two geometries both fixed relative to the world.
 - **Hibernation:** contacts between sleeping bodies, unless one side is awake.
 
-**Narrow phase.** Each surviving pair is resolved to an exact contact manifold: a contact normal, a penetration depth, and one or more contact points. The algorithm depends on the geometry pair:
+**Narrow phase.** The solver resolves each surviving pair to an exact contact manifold: a contact normal, a penetration depth, and one or more contact points. The algorithm depends on the geometry pair:
 
 | Geometry pair | Path |
 |---|---|
@@ -22,9 +22,9 @@ Detection runs in two phases each step, from a cheap approximate cull to an exac
 | Any geometry against height-field terrain | Terrain routine that can emit several contact points per supporting cell. |
 | Non-convex meshes | Signed-distance-field sampling: vertices first (vertex–face), then edges (edge–edge), keeping the deepest penetration. |
 
-MPR and GJK both operate through a *support function* ("which vertex lies farthest along a given direction?") so they run branch-free on the GPU without face-adjacency caches. GJK additionally reports a separation distance when the geometries are apart and is the differentiable path (it is selected automatically when the scene requires gradients). Both accelerate support queries with a precomputed support field, described [below](#support-functions). To capture flush faces rather than a single point, Genesis perturbs the pose slightly around the first contact normal and gathers the extra contacts that result.
+MPR and GJK both operate through a *support function* ("which vertex lies farthest along a given direction?") so they run branch-free on the GPU without face-adjacency caches. GJK additionally reports a separation distance when the geometries are apart and is the differentiable path. It is the more stable of the two and much the slower, so we default to MPR and turn GJK on automatically when the scene requires gradients. Both accelerate support queries with a precomputed support field, described [below](#support-functions). To capture flush faces rather than a single point, Genesis perturbs the pose slightly around the first contact normal and gathers the extra contacts that result.
 
-The number of candidate pairs the broad phase may emit is bounded by the `max_collision_pairs` option on {doc}`RigidOptions </api_reference/engine/solvers/rigid_solver>`. Exceeding it at runtime halts the simulation, so raise it for scenes with dense contact.
+The `max_collision_pairs` option on {doc}`RigidOptions </api_reference/engine/solvers/rigid_solver>` bounds how many candidate pairs the broad phase may emit. Exceeding it at runtime halts the simulation, so raise it for scenes with dense contact.
 
 ## Reading contacts
 
@@ -103,7 +103,7 @@ $$
 s_{A \ominus B}(d) = s_A(d) - s_B(-d)
 $$
 
-Because neither algorithm inspects faces or edges, a shape only needs to answer support queries to participate in collision detection. The support function, not the mesh, is the interface a shape must provide.
+Because neither algorithm inspects faces or edges, a shape only needs to answer support queries to participate in collision detection.
 
 Each support query is dispatched by geometry type:
 
@@ -125,7 +125,7 @@ Only convex meshes use the field. It precomputes the answer for a dense set of d
 
 ### Precomputation
 
-The unit sphere of directions is sampled on a regular latitude–longitude grid of `support_res × support_res` cells. The default resolution is `support_res = 180`, giving $180 \times 180 = 32{,}400$ sample directions. Cell $(i, j)$ maps to angles
+Genesis samples the unit sphere of directions on a regular latitude–longitude grid of `support_res × support_res` cells. The default resolution is `support_res = 180`, giving $180 \times 180 = 32{,}400$ sample directions. Cell $(i, j)$ maps to angles
 
 $$
 \theta = \frac{i}{\text{res}}\,2\pi - \pi \in [-\pi, \pi), \qquad
@@ -134,7 +134,7 @@ $$
 
 and to the direction $d = (\sin\phi\cos\theta,\; \sin\phi\sin\theta,\; \cos\phi)$, with angles in radians.
 
-For each geometry, Genesis projects all of its vertices onto every sample direction and records the winning vertex: its position in the mesh's local frame and its index. The results for all geometries are packed into flat arrays, so a single query needs no host round-trip.
+For each geometry, Genesis projects all of its vertices onto every sample direction and records the winning vertex: its position in the mesh's local frame and its index. It packs the results for all geometries into flat arrays, so a single query needs no host round-trip.
 
 ### Query
 
@@ -144,7 +144,7 @@ The four-cell neighborhood also lets the field report how many distinct vertices
 
 ### Data layout
 
-The field is stored as a struct of flat arrays in a Quadrants-resident structure so collision kernels read it without pointer chasing. Per-geometry blocks are concatenated and indexed through a prefix-sum offset.
+The field lives in a Quadrants-resident struct of flat arrays, so collision kernels read it without pointer chasing. A prefix-sum offset indexes into the concatenated per-geometry blocks.
 
 | Field | Shape | Description |
 |---|---|---|
@@ -158,7 +158,7 @@ At the default resolution, each convex mesh contributes $32{,}400$ cells. At sin
 
 - **Constant-time lookups:** a query is a fixed four-cell search rather than a scan over vertices, which also means fewer diverging branches on the GPU.
 - **Uniform representation:** every convex mesh reduces to the same struct-of-arrays layout, with no per-shape bounding volume or hierarchy to build or traverse.
-- **Approximate, not exact:** the grid has a fixed angular resolution, so a query direction snaps to the nearest sampled cells. A feature narrower than one angular cell may return a neighboring vertex rather than the true extreme point.
+- **Approximate answers:** the grid has a fixed angular resolution, so a query direction snaps to the nearest sampled cells. A feature narrower than one angular cell may return a neighboring vertex rather than the true extreme point.
 - **Fixed preprocessing cost:** the field is built for every geometry at scene build time and stored at full resolution, so both build time and memory grow with the number of geometries in the scene.
 
 :::{note}
@@ -169,9 +169,9 @@ When MuJoCo compatibility is enabled, a mesh query falls back to an exhaustive v
 
 The solver partitions links into **contact islands**: connected components of a coupling graph whose edges are kinematic (every link to its parent), contacts, and equality constraints. An articulated body stays one island; an entity holding several free bodies splits into one island per body. Each island is an exactly decoupled block of the constraint solve, so `use_contact_island` (default `True`) lets the solver factor and solve them separately. It has no effect on a scene that is already one coupled tree, or on a differentiable scene, which uses the dense whole-scene solve regardless.
 
-**Hibernation** extends that partition in time. Each step, every awake link's maximum degree-of-freedom (dof) speed is compared against `hibernation_thresh_vel`. Each dof velocity is weighted by its `dof_length`, which is 1 for a translational dof and the swept radius for a rotational one, so a single linear tolerance covers both and the rotational jitter of a small body no longer keeps it awake. A link that stays under the tolerance for 10 consecutive steps is ready to sleep, and an island hibernates once all of its links are ready, at which point their dof velocities are zeroed. Two things wake an island again: a new contact against one of its bodies, resolved before the solve so the body responds the same step, and a coupling force arriving from another solver.
+**Hibernation** extends that partition in time. Each step, the solver compares every awake link's maximum degree-of-freedom (dof) speed against `hibernation_thresh_vel`. It weights each dof velocity by its `dof_length`, which is 1 for a translational dof and the swept radius for a rotational one, so a single linear tolerance covers both and the rotational jitter of a small body does not keep it awake. A link that stays under the tolerance for 10 consecutive steps is ready to sleep, and an island hibernates once all of its links are ready, at which point the solver zeroes their dof velocities. Two things wake an island again: a new contact against one of its bodies, resolved before the solve so the body responds the same step, and a coupling force arriving from another solver.
 
-A sleeping island is skipped by the solve and by the broad phase. In a scene with many settled bodies, per-step cost then follows the number of *awake* bodies rather than the total.
+The solve and the broad phase both skip a sleeping island. In a scene with many settled bodies, per-step cost then follows the number of *awake* bodies rather than the total.
 
 ```python
 scene = gs.Scene(
@@ -181,10 +181,10 @@ scene = gs.Scene(
 )
 ```
 
-There are no `hibernate()` or `wake()` calls. `use_hibernation` defaults to `False`; `hibernation_thresh_vel` is the speed below which a link may sleep, in m/s, defaulting to `1e-4` under MuJoCo compatibility and `2e-3` otherwise.
+Hibernation is entirely automatic, driven by two options rather than by any call you make. `use_hibernation` defaults to `False`, and `hibernation_thresh_vel` is the speed below which a link may sleep, in m/s, defaulting to `1e-4` under MuJoCo compatibility and `2e-3` otherwise.
 
 :::{note}
-The gain is largest on the CPU backend, where skipping sleeping islands raises the serial step rate directly, and it pairs with `performance_mode=True`. Hibernation is unavailable in differentiable scenes, which fall back to the dense whole-scene solve.
+The gain is largest on the CPU backend, where skipping sleeping islands raises the serial step rate directly. Hibernation is unavailable in differentiable scenes, which fall back to the dense whole-scene solve.
 :::
 
 Read which links are asleep from the solver state:

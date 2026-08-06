@@ -36,7 +36,7 @@ The `[n_envs,]` axis is present only when the scene is built with multiple {doc}
 
 ## Material properties
 
-Heat only flows between links that carry thermal properties. You supply these through `properties_dict`, which maps a global rigid-link index to a {py:class}`TemperatureProperties <genesis.options.sensors.options.TemperatureProperties>` entry. Key `-1` is the default applied to any link not listed explicitly; omit it and unlisted links are ignored in contacts entirely.
+Heat only flows between links that carry thermal properties. Supply these through `properties_dict`, which maps a global rigid-link index to a {py:class}`TemperatureProperties <genesis.options.sensors.options.TemperatureProperties>` entry. Key `-1` is the default applied to any link not listed explicitly; omit it and contacts with unlisted links transfer no heat at all.
 
 ```python
 properties_dict = {
@@ -74,15 +74,15 @@ Each field has a fixed unit:
 | `specific_heat` | Specific heat capacity | J/(kg·K) |
 | `emissivity` | Radiative emissivity, `0`–`1` | — |
 
-`properties_dict`, `ambient_temperature`, and `convection_coefficient` are shared across every temperature sensor in the scene: the dictionaries are merged, and the last ambient and convection values set win.
+`properties_dict`, `ambient_temperature`, and `convection_coefficient` are shared across every temperature sensor in the scene: Genesis World merges the dictionaries, and the last ambient and convection values set win.
 
 ## Behavior and guarantees
 
-- **Frame and layout.** The grid is defined in the link's local frame and spans its bounding box, so it moves and rotates with the link. Cell `(0, 0, 0)` is the corner of the bounding box; `grid_size=(10, 10, 1)` is a single-layer 10×10 sheet, useful for a flat surface like the platform above.
-- **Units.** All temperatures are in degrees Celsius, on input (`base_temperature`, `ambient_temperature`) and on output (`read()`). `ambient_temperature` defaults to 21 °C.
-- **Convection.** `convection_coefficient` is the surface cooling coefficient *h* in W/(m²·K) and defaults to 1.0. Set it to 0.0 to disable convective cooling, as the example does.
-- **Unlisted links.** With `simulate_all_link_temperatures=False` (the default), links other than the sensor's own are treated as adiabatic: they exchange no heat and stay at their `base_temperature`. Set it to `True` to evolve the temperature of every link that has thermal properties; the per-link values are then available on the `link_temperatures` attribute.
-- **Heat generation.** Pass `heat_generation` (a per-cell array matching `grid_size`, in W/m²) to inject heat into specific cells, for example to model a heating element embedded in the link.
+- **Frame and layout:** the grid sits in the link's local frame and spans its bounding box, so it moves and rotates with the link. Cell `(0, 0, 0)` is the corner of the bounding box; `grid_size=(10, 10, 1)` is a single-layer 10×10 sheet, useful for a flat surface like the platform above.
+- **Units:** all temperatures are in degrees Celsius, on input (`base_temperature`, `ambient_temperature`) and on output (`read()`). `ambient_temperature` defaults to 21 °C.
+- **Convection:** `convection_coefficient` is the surface cooling coefficient *h* in W/(m²·K) and defaults to 1.0. Set it to 0.0 to disable convective cooling, as the example does.
+- **Unlisted links:** with `simulate_all_link_temperatures=False` (the default), every link other than the sensor's own stays adiabatic at its `base_temperature`, exchanging no heat. Set it to `True` to evolve the temperature of every link that has thermal properties; the per-link values are then available on the `link_temperatures` attribute.
+- **Heat generation:** pass `heat_generation` (a per-cell array matching `grid_size`, in W/m²) to inject heat into specific cells, for example to model a heating element embedded in the link.
 
 :::{tip}
 `draw_debug=True` colors each cell in the viewer from blue (cool) to red (hot), mapped across `debug_temperature_range` in °C. It is a visualization aid only and does not affect the values `read()` returns.

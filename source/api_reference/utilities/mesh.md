@@ -1,6 +1,6 @@
 # Mesh utilities
 
-The `genesis.utils.mesh` module provides helpers for loading meshes, generating primitive geometry, tetrahedralizing solids, and converting colors. They operate on `trimesh` meshes and NumPy arrays.
+The `genesis.utils.mesh` module holds helpers for loading meshes, generating primitive geometry, tetrahedralizing solids, and converting colors. They operate on `trimesh` meshes and NumPy arrays.
 
 ## Loading and decomposition
 

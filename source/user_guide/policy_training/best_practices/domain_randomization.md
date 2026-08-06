@@ -1,6 +1,6 @@
 # Domain randomization
 
-A policy trained in a single, fixed simulation learns the quirks of that exact simulation. On real hardware, where friction, link masses, and actuator gains differ from your model and drift over time, that policy fails. **Domain randomization** closes the gap: you sample a different set of physical and task parameters for each parallel environment, so the policy sees a distribution of dynamics during training and learns behavior that is robust to any single realization.
+A policy trained in a single, fixed simulation learns the quirks of that exact simulation. On real hardware, where friction, link masses, and actuator gains differ from your model and drift over time, that policy fails. **Domain randomization** closes the gap: you sample a different set of physical and task parameters for each parallel environment, so the policy sees a distribution of dynamics during training and learns behavior that does not depend on any single set of values.
 
 Genesis World is built for this. Because the simulation is already batched across environments, randomizing per-environment parameters is a matter of passing a tensor with a leading `n_envs` dimension. This page covers what you can randomize, the batched APIs that set it, and when to apply each kind of randomization.
 
@@ -38,7 +38,7 @@ robot.set_COM_shift(
 The three methods differ in what they modify:
 
 - **`set_friction_ratio`:** multiplies each geom's base friction coefficient by the supplied factor, shape `(n_envs, n_links)`. It scales rather than replaces, so a ratio of `1.0` leaves the model's friction unchanged. To set an absolute coefficient for the whole entity instead, use `set_friction(friction)`, which takes a single float and requires it in the range `[1e-2, 5.0]` for stability.
-- **`set_mass_shift`:** adds a mass offset in kg to each link, shape `(n_envs, n_links)`. It is an additive shift on top of the model's mass, not a replacement.
+- **`set_mass_shift`:** adds a mass offset in kg to each link, shape `(n_envs, n_links)`.
 - **`set_COM_shift`:** adds a center-of-mass offset in meters to each link, shape `(n_envs, n_links, 3)`, in the link's local frame.
 
 These three write to per-environment state buffers, so they work whether or not the scene batches its static model info. Pass `envs_idx` to any of them to restrict the update to a subset of environments.
@@ -68,7 +68,7 @@ scene = gs.Scene(
 )
 ```
 
-Without `batch_dofs_info=True`, a gain tensor with an `n_envs` dimension has nowhere to go. The state-based setters above (`set_friction_ratio`, `set_mass_shift`, `set_COM_shift`) do not need these flags.
+Without `batch_dofs_info=True`, a gain tensor with an `n_envs` dimension has nowhere to go.
 :::
 
 ## Randomizing commands and states per episode
@@ -114,6 +114,6 @@ All six accept an optional `envs_idx` to update a subset of environments. The ga
 
 ## See also
 
-- {doc}`/user_guide/getting_started/parallel_simulation` for how batched environments work and why per-env tensors are cheap.
-- {doc}`/user_guide/policy_training/examples/locomotion` for an end-to-end policy that uses these techniques.
-- {doc}`/user_guide/policy_training/best_practices/efficient_environment` for keeping the randomized environment fast.
+- {doc}`/user_guide/getting_started/parallel_simulation`: how batched environments work and why per-env tensors are cheap.
+- {doc}`/user_guide/policy_training/examples/locomotion`: an end-to-end policy that uses these techniques.
+- {doc}`/user_guide/policy_training/best_practices/efficient_environment`: keeping the randomized environment fast.

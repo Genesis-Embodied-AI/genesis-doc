@@ -1,6 +1,6 @@
 # Soft solvers
 
-Beyond the {doc}`rigid solver <rigid_solver/index>`, Genesis World ships five solvers for continuum and particle materials. You do not instantiate one: assigning a `material` to an entity selects both the solver that advances it and the **constitutive model** it obeys, the rule that turns deformation into stress. A solver is activated at build time only if it holds at least one entity.
+Beyond the {doc}`rigid solver <rigid_solver/index>`, Genesis World ships five solvers for continuum and particle materials. Assigning a `material` to an entity selects both the solver that advances it and the **constitutive model** it obeys, the rule that turns deformation into stress. The simulator activates a solver at build time only if it holds at least one entity.
 
 To pick a solver and run one, see {doc}`/user_guide/physics/beyond_rigid_bodies`. For how forces cross material boundaries, see {doc}`coupling/index`.
 
@@ -14,7 +14,7 @@ To pick a solver and run one, see {doc}`/user_guide/physics/beyond_rigid_bodies`
 | **SPH** (Smoothed-Particle Hydrodynamics) | Free-surface liquids | Particles |
 | **SF** (Stable Fluids) | Smoke and gas | Fixed Eulerian grid |
 
-A **kinematic** solver for scripted motion and a **tool** solver for driven manipulators round out the set. Both participate in coupling, and neither is selected through a material.
+A **kinematic** solver for scripted motion and a **tool** solver for driven manipulators round out the set, and a material selects them as it does the five above: `gs.materials.Kinematic` and `gs.materials.Tool`. The tool solver drives the soft solvers through one-way coupling, while a kinematic entity is rendered only and takes no part in physics.
 
 ## Deformation and stress
 
@@ -58,7 +58,7 @@ soft = scene.add_entity(
 
 A plastic material keeps part of its deformation after unloading. Genesis splits $\mathbf F$ into an elastic part that stores energy and a plastic part that does not: each step computes a trial elastic state, then a **return mapping** projects it onto a yield surface and moves the excess into the plastic part.
 
-{py:class}`gs.materials.MPM.ElastoPlastic <genesis.engine.materials.MPM.elasto_plastic.ElastoPlastic>` offers two yield criteria through `use_von_mises`:
+{py:class}`gs.materials.MPM.ElastoPlastic <genesis.engine.materials.MPM.elasto_plastic.ElastoPlastic>` selects between two yield criteria through `use_von_mises`:
 
 - **von Mises** (default): yielding follows the deviatoric part of the Hencky strain $\boldsymbol\varepsilon = \ln\boldsymbol\Sigma$. The material flows once $\lVert \operatorname{dev}\boldsymbol\varepsilon\rVert$ exceeds $\tau_Y / (2\mu)$, with `von_mises_yield_stress` setting $\tau_Y$, so the body dents and holds the dent.
 - **Singular-value clamping** (`use_von_mises=False`): the principal stretches are clamped into $[\,1-\texttt{yield\_lower},\ 1+\texttt{yield\_higher}\,]$, capping elastic stretch and compression before the rest becomes permanent.

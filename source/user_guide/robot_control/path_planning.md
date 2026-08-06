@@ -6,12 +6,12 @@ This page covers `plan_path` on its own. For the full pick-and-place workflow th
 
 ## Mental model
 
-Planning happens in **configuration space**: a point is a full joint configuration (`qpos`), not a Cartesian pose. You give the planner a goal `qpos`, and it searches for a sequence of configurations that connects the start to the goal without any of them putting the robot in collision.
+Planning happens in **configuration space**: a point is a full joint configuration (`qpos`), not a Cartesian pose. Give the planner a goal `qpos`, and it searches for a sequence of configurations that connects the start to the goal without any of them putting the robot in collision.
 
-Two consequences follow from this, and both are common sources of confusion:
+Two consequences follow:
 
-- **You usually need inverse kinematics first.** A task is normally stated as an end-effector pose in the world, but the planner wants a joint configuration. {doc}`inverse_kinematics_motion_planning` converts one to the other; feed its `qpos` output in as `qpos_goal`.
-- **Planning does not move the robot.** `plan_path` returns waypoints; it does not step the simulation. The robot only moves when you send those waypoints to a controller and call `scene.step()`.
+- **Inverse kinematics usually comes first.** A task normally arrives as an end-effector pose in the world, while the planner takes a joint configuration. {doc}`inverse_kinematics_motion_planning` converts one to the other; feed its `qpos` output in as `qpos_goal`.
+- **Planning does not move the robot.** `plan_path` returns waypoints, and the robot moves only when you send those waypoints to a controller and call `scene.step()`.
 
 The planners are sampling-based (RRT and RRTConnect). They are probabilistically complete (given enough time they find a path if one exists), but they are randomized, so two runs on the same problem can return different paths, and a hard problem can fail within the retry budget.
 
@@ -38,7 +38,7 @@ for waypoint in path:
     scene.step()
 ```
 
-`num_waypoints` sets how finely the found path is resampled, one waypoint per simulation step, so `num_waypoints * dt` is the wall-clock duration of the motion. Waypoints are full `qpos` vectors of shape `(num_waypoints, n_qs)` for a single environment.
+`num_waypoints` sets how finely `plan_path` resamples the found path, one waypoint per simulation step, so `num_waypoints * dt` is the simulated duration of the motion. Waypoints are full `qpos` vectors of shape `(num_waypoints, n_qs)` for a single environment.
 
 :::{tip}
 Let the controller settle after the last waypoint. Position control is a PD controller, so the arm trails its commanded target by a small error; stepping a little longer lets it converge before the next phase begins.
@@ -49,7 +49,7 @@ for i in range(100):
 ```
 :::
 
-You can preview a planned path in the viewer before executing it:
+Preview a planned path in the viewer before executing it:
 
 ```python
 path_debug = scene.draw_debug_path(path, franka)  # renders the trajectory
@@ -81,12 +81,12 @@ The remaining arguments control the search and the output:
 | `ignore_collision` | `False` | Skip all collision checks. |
 
 :::{warning}
-`resolution` sets how far apart two configurations may be before the segment between them is treated as collision-checked. If it is larger than the thinnest obstacle in configuration space, the planner can step over a collision and return a path that clips through geometry. Reduce it when paths look valid but pass through obstacles.
+`resolution` sets how far apart two configurations may be before the planner treats the segment between them as collision-checked. If it is larger than the thinnest obstacle in configuration space, the planner can step over a collision and return a path that clips through geometry. Reduce it when paths look valid but pass through obstacles.
 :::
 
 ## Planning while carrying an object
 
-When the robot has grasped an object, that object becomes part of the swept volume and must be checked for collision too. Attach it for the duration of the plan by naming the gripper link and passing the entity:
+When the robot has grasped an object, that object becomes part of the swept volume, so the planner has to check it for collision too. Attach it for the duration of the plan by naming the gripper link and passing the entity:
 
 ```python
 path = franka.plan_path(
@@ -96,7 +96,7 @@ path = franka.plan_path(
 )
 ```
 
-The attachment is used only while planning; it does not create a physical constraint. Only a single non-articulated entity is supported. To weld links together in the simulation itself, see {doc}`constraints`.
+The planner accounts for the attachment while it searches, and creates no physical constraint, so the object stays attached only as long as the gripper holds it. One attachment covers a single non-articulated entity. To weld links together in the simulation itself, see {doc}`constraints`.
 
 ## Checking whether planning succeeded
 
@@ -112,7 +112,7 @@ When the mask is not requested, a failed plan still returns a path-shaped tensor
 
 ## Planning across parallel environments
 
-In a {doc}`batched scene </user_guide/getting_started/parallel_simulation>`, `plan_path` plans for every environment at once. The returned tensor gains a leading environment dimension:
+In a {doc}`batched scene </user_guide/getting_started/parallel_simulation>`, `plan_path` plans for every environment at once. The returned tensor gains an environment dimension between the waypoint and joint dimensions:
 
 ```python
 scene.build(n_envs=16)
@@ -133,13 +133,13 @@ path, valid = franka.plan_path(
 
 ## Notes and gotchas
 
-- **Free and spherical joints are unsupported.** The planner rejects entities with a free or spherical joint. A mobile base modeled as a free joint therefore cannot be planned for directly.
+- **Free and spherical joints are unsupported.** The planner rejects an entity with a free or spherical joint, so a mobile base modeled as a free joint cannot be planned for directly.
 - **Planning is randomized.** For reliability on hard problems, give the planner room with `timeout` and `max_retry` rather than expecting the first attempt to succeed.
-- **`ignore_collision=True` disables the point of planning.** It produces a straight-line interpolation in joint space and is only useful for a quick trajectory when you already know the space is clear.
+- **`ignore_collision=True` skips every collision check.** It produces a straight-line interpolation in joint space, useful only for a quick trajectory when you already know the space is clear.
 
 ## See also
 
-- {doc}`inverse_kinematics_motion_planning`: full pick-and-place: IK, planning, and gripper control together
-- {doc}`advanced_ik`: multi-target IK, null-space control, and solver tuning
-- {doc}`/user_guide/getting_started/control_your_robot`: position, velocity, and force control in depth
-- {doc}`constraints`: weld and connect constraints for locking links at runtime
+- {doc}`inverse_kinematics_motion_planning`: IK, planning, and gripper control in one pick-and-place task.
+- {doc}`advanced_ik`: multi-target IK, null-space control, and solver tuning.
+- {doc}`/user_guide/getting_started/control_your_robot`: position, velocity, and force control in depth.
+- {doc}`constraints`: weld and connect constraints for locking links at runtime.

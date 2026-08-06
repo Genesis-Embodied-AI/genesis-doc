@@ -2,8 +2,8 @@
 
 Lights illuminate a rendered scene. How you add them depends on the backend:
 
-- **Rasterizer (and the viewer):** lights come from the `lights` list on `gs.options.VisOptions`, using the light classes in `gs.options.vis`. With no configuration the scene gets a single directional light, so it is lit out of the box. Ambient fill is set separately through `VisOptions.ambient_light`.
-- **RayTracer:** there are no light objects. Lights are entities with an `Emission` {doc}`surface </api_reference/engine/entity/surface/emission>`, plus optional `SphereLight` area lights (below).
+- **Rasterizer (and the viewer):** lights come from the `lights` list on `gs.options.VisOptions`, using the light classes in `gs.options.vis`. With no configuration the scene gets a single directional light, so it is lit out of the box. Set ambient fill separately through `VisOptions.ambient_light`.
+- **RayTracer:** a light is an entity carrying an `Emission` {doc}`surface </api_reference/engine/entity/surface/emission>`, plus the optional `SphereLight` area lights below.
 - **BatchRenderer:** lights are added at runtime with `scene.add_light(...)`; see {doc}`renderers/batch_renderer`.
 
 For usage and worked examples, see {doc}`/user_guide/rendering/index`.
@@ -30,7 +30,7 @@ A light that emits from a point in space, falling off with distance.
 
 ### `gs.options.vis.AmbientLight`
 
-A uniform fill light with no direction, applied everywhere so shadows are not pure black. Ambient fill can also be set directly through `VisOptions.ambient_light`.
+A uniform fill light with no direction, applied everywhere so shadowed areas still receive light.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.vis.AmbientLight
@@ -38,7 +38,7 @@ A uniform fill light with no direction, applied everywhere so shadows are not pu
 
 ## SphereLight
 
-A spherical area light for the `RayTracer` renderer. Add one or more to a scene to illuminate it, controlling position, color, intensity, and radius. Color values are not restricted to `[0, 1]`, so they can express HDR intensities.
+A spherical area light for the `RayTracer` renderer. Pass one or more in `gs.renderers.RayTracer(lights=[...])` to illuminate a scene, controlling position, color, intensity, and radius.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.renderers.SphereLight
@@ -46,6 +46,6 @@ A spherical area light for the `RayTracer` renderer. Add one or more to a scene 
 
 ## See also
 
-- {doc}`viewer`: `VisOptions`, which holds the rasterizer light list
-- {doc}`renderers/raytracer`: photorealistic rendering
-- {doc}`/api_reference/engine/entity/surface/emission`: emissive surfaces
+- {doc}`viewer`: `VisOptions`, which holds the rasterizer light list.
+- {doc}`renderers/raytracer`: photorealistic rendering.
+- {doc}`/api_reference/engine/entity/surface/emission`: emissive surfaces.

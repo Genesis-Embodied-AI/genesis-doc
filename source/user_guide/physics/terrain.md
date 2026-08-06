@@ -1,6 +1,6 @@
 # Terrain
 
-{py:class}`gs.morphs.Terrain <genesis.options.morphs.Terrain>` adds a static rigid ground defined by a **height field**: a 2D grid of elevations. It is the standard ground for locomotion work: instead of a flat {py:class}`~genesis.options.morphs.Plane`, a robot walks over slopes, stairs, and obstacles. You build a terrain one of two ways: let Genesis World procedurally generate a grid of **sub-terrains**, or supply your own height field.
+{py:class}`gs.morphs.Terrain <genesis.options.morphs.Terrain>` adds a static rigid ground defined by a **height field**: a 2D grid of elevations. It is the standard ground for locomotion work: instead of a flat {py:class}`~genesis.options.morphs.Plane`, a robot walks over slopes, stairs, and obstacles. Build a terrain one of two ways: let Genesis World procedurally generate a grid of **sub-terrains**, or supply your own height field.
 
 The three runnable examples referenced on this page ship with Genesis World:
 
@@ -32,7 +32,7 @@ for _ in range(1000):
     scene.step()
 ```
 
-A single string for `subterrain_types` is applied to every tile. The next sections cover how the height field is laid out and how to mix tile types, supply your own data, or derive one from a mesh.
+A single string for `subterrain_types` fills every tile with the same generator.
 
 ## How a terrain is represented
 
@@ -44,12 +44,12 @@ A terrain is a static rigid entity backed by a height field: a 2D array `height_
 So grid cell `(i, j)` sits at world position `(i * horizontal_scale, j * horizontal_scale, height_field[i, j] * vertical_scale)`, offset by the morph's `pos`. Genesis World turns this grid into two representations at build time: a height map and SDF for collision queries, and a watertight triangle mesh for rendering.
 
 :::{note}
-The terrain's collision SDF resolution is computed automatically and ignores any resolution set on `gs.materials.Rigid()`.
+Genesis World computes the terrain's collision SDF resolution automatically, ignoring any resolution set on `gs.materials.Rigid()`.
 :::
 
 ## Procedural sub-terrains
 
-For locomotion, you rarely author a height field by hand. Instead, tile the ground with **sub-terrains** (the approach popularized by Isaac Gym), where each tile is filled by a named generator. Three parameters control the grid:
+Locomotion work rarely calls for authoring a height field by hand. Tile the ground with **sub-terrains** instead (the approach popularized by Isaac Gym), where a named generator fills each tile. Three parameters control the grid:
 
 - `n_subterrains=(nx, ny)`: number of tiles in x and y. Default `(3, 3)`.
 - `subterrain_size=(sx, sy)`: size of each tile in meters. Default `(12.0, 12.0)`.
@@ -85,11 +85,11 @@ The available generators:
 | `stepping_stones_terrain` | Isolated stones with gaps between them. |
 | `fractal_terrain` | Fractal noise heightscape. |
 
-Set `randomize=True` to give the generators that involve randomness fresh parameters on each build; left `False` (the default), they use a fixed seed so the terrain is reproducible. Per-generator settings can be overridden through `subterrain_parameters`.
+Set `randomize=True` to give the generators that involve randomness fresh parameters on each build; left `False` (the default), they use a fixed seed so the terrain is reproducible. Override per-generator settings through `subterrain_parameters`.
 
 ## Custom height field
 
-Pass a `height_field` array to build the terrain from your own data, for example a digital elevation model, or a NumPy array you generate. When `height_field` is set, the sub-terrain parameters above are ignored.
+Pass a `height_field` array to build the terrain from your own data, for example a digital elevation model, or a NumPy array you generate. A `height_field` overrides the sub-terrain parameters above, which Genesis World then ignores.
 
 ```python
 import numpy as np
@@ -148,11 +148,11 @@ terrain = scene.add_entity(
 )
 ```
 
-`spacing` is the grid step in the mesh's own units, and `oversample` casts extra rays per cell so peaks inside a cell are not missed (memory grows as `oversample²`). Pass `up_axis="y"` for meshes authored Y-up, such as glTF; the function rotates them to Z-up before sampling. Cells with no ray hit come back as `NaN`.
+`spacing` is the grid step in the mesh's own units, and `oversample` casts extra rays per cell so a peak inside a cell still registers (memory grows as `oversample²`). Pass `up_axis="y"` for meshes authored Y-up, such as glTF; the function rotates them to Z-up before sampling. Cells with no ray hit come back as `NaN`.
 
 ## Caching generated terrains
 
-Generating a terrain (the height field, the collision mesh, and the visual mesh) runs every time the scene is built. Pass `name="my_terrain"` to generate it only once for a given set of options and load it from cache on later builds. This holds even when `randomize=True`, so it is the way to reconstruct a randomized terrain exactly across runs.
+Generating a terrain (the height field, the collision mesh, and the visual mesh) runs every time the scene is built. Pass `name="my_terrain"` to generate it only once for a given set of options and load it from cache on later builds. This holds even when `randomize=True`, so naming a terrain is how you reproduce a randomized one exactly across runs.
 
 ## See also
 

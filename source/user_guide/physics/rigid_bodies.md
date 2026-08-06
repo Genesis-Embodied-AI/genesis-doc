@@ -1,6 +1,6 @@
 # Rigid bodies
 
-A rigid body is the default kind of entity in Genesis World: a solid that does not deform, simulated by the rigid solver. It is what you get from {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`, and it covers most of robotics, robot arms, grippers, mobile bases, and the props they interact with. This page is the overview of that entity type; the rest of this section covers the non-rigid families that build on the same `Scene`.
+A rigid body is the default kind of entity in Genesis World: a solid that does not deform, simulated by the rigid solver. It is what you get from {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`, and it covers most of robotics: robot arms, grippers, mobile bases, and the props they interact with. The rest of this section covers the non-rigid families that build on the same `Scene`.
 
 ## Adding a rigid body
 
@@ -15,13 +15,13 @@ Both are rigid entities. The box is a single body; the Franka is **articulated**
 
 ## Single bodies and articulated bodies
 
-Every rigid entity is a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`, and you interact with it through its own methods rather than a global handle. An articulated entity exposes its structure:
+Every rigid entity is a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`. An articulated entity exposes its structure:
 
 - **Links** (`entity.links`, `entity.n_links`): the individual rigid bodies in the tree.
 - **Joints** (`entity.joints`, `entity.n_joints`): the connections between links.
 - **Degrees of freedom** (`entity.n_dofs`): the independent coordinates the joints move along. A single free body has 6 dofs; a fixed box has none.
 
-You read and write state through the entity: `get_pos()` and `get_quat()` for the base pose, and `get_dofs_position()` for joint positions. Driving those dofs with a controller is covered in {doc}`Control your robot </user_guide/getting_started/control_your_robot>` and, for arms, {doc}`Robot control </user_guide/robot_control/inverse_kinematics_motion_planning>`.
+Read and write state through the entity: `get_pos()` and `get_quat()` for the base pose, and `get_dofs_position()` for joint positions. {doc}`Control your robot </user_guide/getting_started/control_your_robot>` covers driving those dofs with a controller, and {doc}`Robot control </user_guide/robot_control/inverse_kinematics_motion_planning>` does the same for arms.
 
 ## Fixed and free bases
 
@@ -43,7 +43,7 @@ box = scene.add_entity(
 )
 ```
 
-Torsional and rolling friction stay inert until enabled on the solver, since they add constraint rows to every contact:
+Torsional and rolling friction take effect only once you enable them on the solver, since they add constraint rows to every contact:
 
 ```python
 scene = gs.Scene(
@@ -55,9 +55,9 @@ scene = gs.Scene(
 )
 ```
 
-Reach for the elliptic `friction_cone` when resting objects must stay put instead of slowly creeping. Paired with the default Newton `constraint_solver` it also unlocks the `signorini` contact resolution, which Genesis World then selects by default: friction is bounded by the normal force the contact has developed, so a fast-sliding body decelerates at `friction` times gravity instead of lifting off a flat floor. Set `contact_resolution` explicitly to choose otherwise.
+Choose the elliptic `friction_cone` when resting objects have to stay put rather than creeping slowly. Paired with the default Newton `constraint_solver` it also unlocks the `signorini` contact resolution, which we then select by default: friction is bounded by the normal force the contact has developed, so a fast-sliding body decelerates at `friction` times gravity instead of lifting off a flat floor. Set `contact_resolution` explicitly to override that choice.
 
-Contact, collision geometry, and constraints, how these bodies actually push on each other, are governed by the rigid solver and documented under {doc}`Theory and modelling </user_guide/theory/rigid_solver/index>`, which covers {doc}`contact resolution </user_guide/theory/rigid_solver/constraints>` in full.
+The rigid solver governs how these bodies actually push on each other: contact, collision geometry, and constraints. {doc}`Theory and modeling </user_guide/theory/rigid_solver/index>` documents that model, and covers {doc}`contact resolution </user_guide/theory/rigid_solver/constraints>` in full.
 
 ## See also
 
