@@ -75,6 +75,32 @@ gs.init(backend=gs.cpu, seed=0, debug=True)
 
 `debug=True` turns on PyTorch's deterministic algorithms, disables cuDNN autotuning, and raises the log level to `DEBUG`. It is meant for reproducing bugs and validating results, not for production: it **dramatically reduces runtime speed**, and it is only partially supported on GPU backends (deterministic execution is most reliable on `gs.cpu`).
 
+## Deterministic mode
+
+`use_deterministic_algorithms=True` guarantees that a scene replays a rollout identically: reset it, drive it with the same inputs, and every step reproduces the previous run bit-for-bit on a given machine.
+
+```python
+gs.init(backend=gs.gpu, use_deterministic_algorithms=True)
+```
+
+The mode is opt-in because the guarantee is paid for in throughput. Wherever it pays off, Genesis keeps several implementations of the same computation side by side, each written for a different workload, and picks between them by timing them as the simulation runs, so the one in use stays the fastest for the state the scene is currently in. They compute the same thing by construction, but agree only to within floating-point noise, and a simulation amplifies such a difference until the two runs have visibly parted ways. Which implementation ran at which step is therefore part of the trajectory, and nothing about that is reproducible: the timings follow how busy the machine is, and the measurements accumulate across resets, so a rollout also depends on everything the process ran before it. They accumulate on purpose - environments in a training loop reset constantly, often one at a time, and starting the measurements over at every reset would leave them forever measuring instead of exploiting what they measured. Deterministic mode settles every such choice up front instead, on the implementation that suits most scenes, and never revisits it.
+
+What it costs therefore depends on the scene and on how far its state travels: nothing at all while the settled choice is the one that would have been picked anyway, and up to the gap between the implementations whenever another would have taken over. Measure your own scene before committing to the mode in a throughput-sensitive setting.
+
+The choice can also be made by hand, by pinning one implementation through the Quadrants `QD_PERFDISPATCH_FORCE` environment variable, which removes the measurement just as the mode does and is therefore reproducible on its own. Use it when the implementation deterministic mode settles on is the wrong one for your scene. For the constraint solve, which is where the choice matters most today, the two candidates are:
+
+```bash
+# One thread per environment, each solved as a whole; favored when the environment count alone keeps the GPU busy.
+QD_PERFDISPATCH_FORCE=func_solve_body:func_solve_body_monolith python my_script.py
+
+# Parallelism inside each environment; favored when too few environments run to keep the GPU busy on their own.
+QD_PERFDISPATCH_FORCE=func_solve_body:func_solve_decomposed python my_script.py
+```
+
+Note that this is a workaround naming internal implementations: it is no part of the public API, and may change or disappear in any release.
+
+Leave the mode off for policy training, where throughput dominates; turn it on to compare two runs or to track down a divergence.
+
 ## Logging
 
 The logger is created during `gs.init()` and exposed as `gs.logger`. Control its verbosity with `logging_level`; when unset it defaults to `"info"` (or `"debug"` when `debug=True`).
