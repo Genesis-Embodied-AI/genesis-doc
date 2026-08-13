@@ -132,7 +132,7 @@ To ensure GPU rendering is active:
 
 ### Black rendering window in Docker on Windows 11 (WSL2)
 
-On machines with an NVIDIA GPU, install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html). If rendering still fails inside a Docker container based on the Genesis image, add the WSL libraries to the container's library search path:
+On machines with an NVIDIA GPU, install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html). If rendering still fails inside a Docker container, add the WSL libraries to the container's library search path:
 
 ```bash
 docker run --gpus all --rm -it \
@@ -140,7 +140,7 @@ docker run --gpus all --rm -it \
     -e LD_LIBRARY_PATH=/usr/lib/wsl/lib \
     -v /tmp/.X11-unix/:/tmp/.X11-unix \
     -v $PWD:/workspace \
-    genesis
+    <...>
 ```
 
 ### OpenGL error in an Ubuntu VM on Windows 11 (WSL2)
