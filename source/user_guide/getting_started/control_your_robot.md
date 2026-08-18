@@ -190,36 +190,39 @@ Video: the Franka arm cycling through position, velocity, and force control.
 
 The `control_*` methods act in joint space, through the dofs. Sometimes you instead
 want to push or twist a link directly in Cartesian space: a disturbance to test a
-controller's robustness, a thruster, wind, or a scripted tug on a payload. The rigid
-solver applies such wrenches with `apply_links_external_force` and
-`apply_links_external_torque`.
+controller's robustness, a thruster, wind, or a scripted tug on a payload. A link
+takes a **wrench**, a linear force and a torque together, through
+`apply_external_wrench`.
 
-An external force lasts for a single step and is then cleared, so reapply it on every
-step you want it active:
+A wrench lasts for a single step and is then cleared, so reapply it on every step you
+want it active:
 
 ```python
-rigid = scene.sim.rigid_solver
-hand = franka.get_link("hand").idx
+hand = franka.get_link("hand")
 
 for i in range(150):
-    # push the hand straight up with 50 N in the world frame
-    rigid.apply_links_external_force(
-        force=np.array([[0.0, 0.0, 50.0]]),  # N, shape ([n_envs,] n_links, 3)
-        links_idx=[hand],
-    )
+    # push the hand straight up in the world frame, 50 N
+    hand.apply_external_wrench(force=(0.0, 0.0, 50.0))
     scene.step()
 ```
 
-The force and torque tensors follow the batch convention used throughout the API: shape
-`([n_envs,] n_links, 3)`, matching `links_idx`. With a single environment the leading
-`n_envs` dimension is dropped. Forces are in newtons and torques in newton-meters.
+Both components are optional, and `apply_external_force` and `apply_external_torque`
+are shortcuts for the one-sided cases. Forces are in newtons and torques in
+newton-meters. To drive many links in one call, `RigidEntity.apply_links_external_wrench`
+and `RigidSolver.apply_links_external_wrench` take the same arguments plus a
+`links_idx`, with force and torque of shape `([n_envs,] n_links, 3)`.
 
-Both methods take the same optional arguments:
+Three arguments decide where the wrench acts and in which coordinates it is read:
 
-- **`links_idx`:** which links to act on. `None` targets every link.
-- **`envs_idx`:** which environments to act on in a batched scene. `None` targets all of them.
-- **`ref`:** the reference frame the wrench is applied at: `"link_origin"` (default), `"link_com"` (the link's center of mass), or `"root_com"` (the center of mass of the whole kinematic tree).
+- **`ref`:** the reference frame, either `"link_origin"` (default) or `"link_com"`, the link's center of mass. It selects the frame the input coordinates are expressed in, and the point the force acts at when you give no `pos`.
 - **`local`:** by default the wrench is expressed in world coordinates. Set `local=True` to express it in the reference frame's own coordinates instead, so the force rotates with the link.
+- **`pos`:** the point the linear force acts at, which sets the moment arm of the torque it induces. With `local=True` it is an offset from the reference frame's origin, so the point follows the link as it moves. Otherwise it is a world position. A torque acts the same wherever it is applied, so `pos` requires a force.
+
+Applying a force away from the center of mass is what makes a body swing rather than
+translate. The viewer's {doc}`mouse interaction plugin </user_guide/interaction/viewer_plugin>`
+works this way: it pulls at the point you grabbed, and the moment about the center of
+mass turns the body to follow the cursor.
+
 
 ## Pick and place with a suction cup
 
