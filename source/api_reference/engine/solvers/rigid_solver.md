@@ -21,6 +21,14 @@ The values accepted by the `RigidOptions` fields above. The model each one selec
 .. autoclass:: genesis.constants.broadphase_traversal()
 ```
 
+## Reference frames
+
+The frame a per-link getter expresses its result in, and the frame an external wrench is read in.
+
+```{eval-rst}
+.. autoclass:: genesis.constants.link_ref_frame()
+```
+
 ## RigidSolver
 
 ```{eval-rst}
