@@ -214,7 +214,7 @@ and `RigidSolver.apply_links_external_wrench` take the same arguments plus a
 
 Three arguments decide where the wrench acts and in which coordinates it is read:
 
-- **`ref`:** the reference frame, either `"link_origin"` (default) or `"link_com"`, the link's center of mass. It selects the frame the input coordinates are expressed in, and the point the force acts at when you give no `pos`.
+- **`ref`:** the reference frame, either `gs.link_ref_frame.link_origin` (default) or `gs.link_ref_frame.link_COM`, the link's center of mass. It selects the frame the input coordinates are expressed in, and the point the force acts at when you give no `pos`.
 - **`local`:** by default the wrench is expressed in world coordinates. Set `local=True` to express it in the reference frame's own coordinates instead, so the force rotates with the link.
 - **`pos`:** the point the linear force acts at, which sets the moment arm of the torque it induces. With `local=True` it is an offset from the reference frame's origin, so the point follows the link as it moves. Otherwise it is a world position. A torque acts the same wherever it is applied, so `pos` requires a force.
 
