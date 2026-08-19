@@ -132,8 +132,8 @@ class MyPlugin(ViewerPlugin):
 ```python
 scene.viewer.add_plugin(
     gs.vis.viewer_plugins.MouseInteractionPlugin(
-        use_force=True,       # spring force; False sets position directly
-        spring_const=1000.0,  # N/m, only used when use_force=True
+        use_force=True,      # spring force; False sets position directly
+        spring_slack=0.02,   # distance in m the body hangs below the cursor; only used when use_force=True
         color=(0.1, 0.6, 0.8, 0.6),
     )
 )
