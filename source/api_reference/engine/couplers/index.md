@@ -14,7 +14,7 @@ ipc_coupler
 
 ## Base options
 
-The fields every coupler variant inherits.
+Every coupler options class inherits these fields from `BaseCouplerOptions`.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.solvers.BaseCouplerOptions
@@ -22,5 +22,5 @@ The fields every coupler variant inherits.
 
 ## See also
 
-- {doc}`/user_guide/theory/coupling/index`: choosing and configuring a coupler
-- {doc}`/api_reference/engine/solvers/index`: the physics solvers being coupled
+- {doc}`/user_guide/theory/coupling/index`: choosing and configuring a coupler.
+- {doc}`/api_reference/engine/solvers/index`: the physics solvers being coupled.

@@ -14,10 +14,10 @@ This backend is deprecated in favor of {doc}`Nyx </user_guide/rendering/nyx_rend
 .. autoclass:: genesis.options.renderers.RayTracer
 ```
 
-The underlying `genesis.vis.raytracer.Raytracer` implementation is importable only when the optional ray-tracing extra is installed, so it is not auto-documented here.
+The underlying `genesis.vis.raytracer.Raytracer` implementation is importable only when the optional ray-tracing extra is installed, so this page documents the options class alone.
 
 ## See also
 
-- {doc}`rasterizer`: the fast default renderer
-- {doc}`/user_guide/rendering/nyx_renderer`: the recommended photorealistic path
-- {doc}`/api_reference/engine/entity/surface/index`: surface materials for ray tracing
+- {doc}`rasterizer`: the fast default renderer.
+- {doc}`/user_guide/rendering/nyx_renderer`: the recommended photorealistic path.
+- {doc}`/api_reference/engine/entity/surface/index`: surface materials for ray tracing.

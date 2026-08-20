@@ -1,8 +1,8 @@
 # Recording and playback
 
-Genesis World records simulation data through a recorder framework: you register a recorder with the scene, describe *what* to sample, then step the scene as usual. The recorder samples on a schedule and either writes the data to a file or draws it in a live plot, so you never thread logging code through your step loop.
+Genesis World records simulation data through a recorder framework: register a recorder with the scene, describe *what* to sample, then step the scene as usual. The recorder samples on its own schedule and either writes the data to a file or draws it in a live plot, so you never thread logging code through your step loop.
 
-This page is the API overview for the `genesis.recorders` module. For a task-oriented walkthrough, see {doc}`/user_guide/sensing/recorders`.
+For the recording workflow and worked examples, see {doc}`/user_guide/sensing/recorders`.
 
 ## Components
 
@@ -11,7 +11,7 @@ This page is the API overview for the `genesis.recorders` module. For a task-ori
 - **File writers:** `NPZFile`, `CSVFile`, and `VideoFile` persist data to disk. See {doc}`file_writers`.
 - **Plotters:** `PyQtLinePlot`, `MPLLinePlot`, `MPLImagePlot`, and `MPLVectorFieldPlot` visualize data live and can save the animation. See {doc}`plotters`.
 
-All recorder options classes are exported from `gs.recorders`. For the recording workflow and worked examples, see {doc}`/user_guide/sensing/recorders`.
+Every recorder options class is exported from `gs.recorders`.
 
 ## Components reference
 

@@ -4,8 +4,6 @@
 
 ## `gs.sensors.Raycaster`
 
-Also available as `gs.sensors.Lidar`.
-
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.options.Raycaster
 ```
