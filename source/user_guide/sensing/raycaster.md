@@ -90,8 +90,6 @@ gs.sensors.SphericalPattern(
 )
 ```
 
-**First mention of SphericalPattern:**
-
 To model a real unit, set the fov and ray counts from its datasheet. For example, a Velodyne VLP-16 is `fov=(360.0, 30.0), n_points=(1800, 16)`.
 
 ### DepthCameraPattern
