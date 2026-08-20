@@ -2,7 +2,7 @@
 
 A sensor extracts information from a scene without modifying its physics. It models the robot-control view of an onboard device: attach it to a link, step the simulation, and read back a tensor. Genesis World ships sensors for contact and force, inertial measurement, ranging, rendering, surface distance, and temperature.
 
-## The attach-and-read model
+## Attach-and-read model
 
 Create a sensor with `scene.add_sensor()`, passing an options object from `gs.sensors`. The call returns a sensor handle you keep and read each step. Most sensors attach to a rigid link through `entity_idx` and `link_idx_local`; a few are static or bound to a whole entity.
 
@@ -58,7 +58,7 @@ contact_batch = data[gs.sensors.types.Contact]
 
 ## Sensor types
 
-Each family has its own page. Pick by what you need to measure; the `read()` return types and shapes are cataloged in {doc}`the sensor reference </api_reference/engine/sensors/index>`.
+Each family has its own page. Pick by what you need to measure; {doc}`the sensor reference </api_reference/engine/sensors/index>` catalogs every `read()` return type and shape.
 
 | Page | Options classes (`gs.sensors.*`) | Measures |
 |---|---|---|

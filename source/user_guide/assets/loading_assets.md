@@ -1,6 +1,6 @@
 # Loading assets
 
-Almost everything you put in a scene, a robot, a rigid object, a static mesh, comes from an asset file loaded through a **morph**. A morph combines an entity's geometry with its initial pose, and you pass one as the first argument to `scene.add_entity(...)`. This page covers the supported formats, the pose and scale options common to all of them, and how Genesis World finds asset files.
+A robot, a rigid object, a static mesh: almost everything you put in a scene comes from an asset file loaded through a **morph**. A morph combines an entity's geometry with its initial pose, and you pass one as the first argument to `scene.add_entity(...)`. This page covers the supported formats, the pose and scale options common to all of them, and how Genesis World finds asset files.
 
 ## Supported formats
 
@@ -45,7 +45,7 @@ See {doc}`/user_guide/configuration/conventions` for the coordinate frame, rotat
 
 ## Articulated bases: fixed or free
 
-An MJCF file specifies the joint connecting a robot's base to the world, so its base is fixed or floating as authored. A URDF does not: its base is free (a 6-DoF joint to the world) unless you fix it. The same applies to `gs.morphs.Mesh`.
+An MJCF file specifies the joint connecting a robot's base to the world, so its base is fixed or floating as authored. A URDF does not: its base is free (a 6-dof joint to the world) unless you fix it. The same applies to `gs.morphs.Mesh`.
 
 ```python
 # Bolt the robot's base to the world.

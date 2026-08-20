@@ -23,7 +23,7 @@ To run on CUDA, make sure a matching NVIDIA driver is installed on your machine.
 - **Python:** 3.10 to 3.13 (`>=3.10,<3.14`).
 - **Operating system:** Linux, macOS, or Windows. Linux with a CUDA-compatible GPU gives the best performance.
 
-Genesis World simulates on the CPU (`gs.cpu`) and on NVIDIA (`gs.cuda`), AMD (`gs.amdgpu`), and Apple Silicon (`gs.metal`) GPUs, with `gs.gpu` resolving to whichever of the three your machine has. An Intel GPU drives the viewer and offscreen rendering but has no simulation backend, so run the physics on `gs.cpu` there. The following combinations are supported:
+Genesis World is cross-platform across CPUs and GPUs: NVIDIA through CUDA (`gs.cuda`), AMD through ROCm (`gs.amdgpu`), and Apple Silicon through Metal (`gs.metal`), with a CPU backend (`gs.cpu`) available everywhere. `gs.gpu` resolves to whichever of the three your machine has. An Intel GPU drives the viewer and offscreen rendering but has no simulation backend, so run the physics on `gs.cpu` there. The following combinations are supported:
 
 | OS | GPU | GPU simulation | CPU simulation | Interactive viewer | Headless rendering |
 |---|---|:---:|:---:|:---:|:---:|
@@ -39,7 +39,7 @@ Genesis World simulates on the CPU (`gs.cpu`) and on NVIDIA (`gs.cuda`), AMD (`g
 
 ### Surface reconstruction
 
-To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, Genesis World reconstructs a mesh from the internal particle representation. [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) is supported out of the box. `ParticleMesher`, an in-house OpenVDB-based tool, is faster but produces lower-quality surfaces; enable it by adding its library to your path:
+To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, Genesis World reconstructs a mesh from the internal particle representation. It uses [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) out of the box. `ParticleMesher`, our OpenVDB-based tool, reconstructs faster but produces lower-quality surfaces; enable it by adding its library to your path:
 
 ```bash
 echo "export LD_LIBRARY_PATH=${PWD}/ext/ParticleMesher/ParticleMesherPy:$LD_LIBRARY_PATH" >> ~/.bashrc
@@ -64,7 +64,7 @@ Importing an engine submodule before calling `gs.init()` raises this error:
 genesis.GenesisException: Genesis hasn't been initialized. Did you call `gs.init()`?
 ```
 
-Engine submodules must be imported after initialization so they can configure low-level Quadrants features such as the fast-cache mechanism and dynamic array mode. This is rarely a problem in practice, because engine classes are not meant to be instantiated by hand. If you need to import one for type checking, guard the import:
+Engine submodules must be imported after initialization so they can configure low-level Quadrants features such as the fast-cache mechanism and dynamic array mode. This is rarely a problem in practice, because Genesis World constructs the engine classes for you. If you need to import one for type checking, guard the import:
 
 ```python
 from typing import TYPE_CHECKING
@@ -97,7 +97,7 @@ To ensure GPU rendering is active:
    ldconfig -p | grep EGL
    ```
 
-   You want to see `libEGL_nvidia.so.0`. You may also see `libEGL_mesa.so.0`; some systems handle both, but if rendering is slow, remove Mesa.
+   You want to see `libEGL_nvidia.so.0`. You may also see `libEGL_mesa.so.0`; some systems handle both, but remove Mesa if rendering is slow.
 
 3. Optionally remove MESA to prevent fallback, then recheck:
 

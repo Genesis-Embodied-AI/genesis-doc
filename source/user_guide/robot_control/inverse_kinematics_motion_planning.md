@@ -1,6 +1,6 @@
 # Inverse kinematics and motion planning
 
-This tutorial builds a complete pick-and-place task with a Franka arm: solve **inverse kinematics** (IK) for a target end-effector pose, plan a collision-free path to that configuration, then close the gripper and lift a cube. Along the way it covers the pose conventions IK expects and why the two control modes (position and force) are used at different stages.
+This tutorial builds a complete pick-and-place task with a Franka arm: solve **inverse kinematics** (IK) for a target end-effector pose, plan a collision-free path to that configuration, then close the gripper and lift a cube. It also covers the pose conventions IK expects, and why the approach runs under position control while the grasp runs under force control.
 
 The complete script is [`examples/tutorials/IK_motion_planning_grasp.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/IK_motion_planning_grasp.py).
 
@@ -90,7 +90,7 @@ for i in range(100):
     scene.step()
 ```
 
-Executing the path steps the simulation once per waypoint. The extra 100 steps at the end matter: position control is a PD controller, so the arm trails its commanded target by a small error. Stepping a little longer lets it converge onto the last waypoint before the next phase begins.
+Executing the path steps the simulation once per waypoint. The extra 100 steps at the end matter: the PD controller leaves the arm trailing its commanded target by a small error, and stepping a little longer lets it converge onto the last waypoint before the next phase begins.
 
 :::{tip}
 `scene.draw_debug_path(path, franka)` visualizes the planned trajectory in the viewer, and `scene.clear_debug_object(...)` removes it afterward. The example uses both to render the path while the arm follows it.
@@ -111,7 +111,7 @@ for i in range(100):
     scene.step()
 ```
 
-To grasp, switch the fingers from position control to **force control**. Position control would command a target opening; force control instead applies a steady squeezing force, which holds the cube robustly regardless of its exact width:
+To grasp, switch the fingers from position control to **force control**. Position control would command a target opening, so it depends on the cube's exact width and on the fingers reaching it precisely; force control applies a steady squeezing force instead, and the fingers close until the cube stops them:
 
 ```python
 franka.control_dofs_position(qpos[:-2], motors_dof)
@@ -137,7 +137,7 @@ The fingers stay under force control from the grasp step, so the cube rises with
 
 ## See also
 
-- {doc}`advanced_ik`: multi-target IK, null-space control, and solver tuning
-- {doc}`constraints`: weld and connect constraints for locking links together at runtime
-- {doc}`path_planning`: collision-free motion planning with RRT
-- {doc}`/user_guide/getting_started/control_your_robot`: position, velocity, and force control in depth
+- {doc}`advanced_ik`: multi-target IK, null-space control, and solver tuning.
+- {doc}`constraints`: weld and connect constraints for locking links together at runtime.
+- {doc}`path_planning`: collision-free motion planning with RRT.
+- {doc}`/user_guide/getting_started/control_your_robot`: position, velocity, and force control in depth.

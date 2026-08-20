@@ -4,25 +4,23 @@
 :alt: A grid of Franka arms, each one a separate simulated environment running in parallel.
 ```
 
-This tutorial shows how to run many copies of a scene at once on the GPU. Running environments in parallel is what makes Genesis World fast enough for reinforcement learning, where a policy needs millions of interaction steps: instead of stepping one environment at a time, you step thousands together in a single call.
-
-The runnable script for this tutorial is [`examples/tutorials/parallel_simulation.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/parallel_simulation.py). This page explains the concepts behind it; run the script to see it in action.
+Training a policy takes millions of interaction steps, so you want many environments running at once. This tutorial shows how to run many copies of one scene on the GPU, stepping them all with a single call. The runnable script is [`examples/tutorials/parallel_simulation.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/parallel_simulation.py).
 
 ## Why parallelism matters
 
-A single environment cannot keep a GPU busy. A GPU has thousands of cores, and stepping one Franka arm leaves almost all of them idle. Genesis World closes that gap by simulating many identical environments at once, so the same physics kernels operate on a batch of states in one pass. The learning literature calls this **batching**; we use "environment" (**env**) for one copy of the scene and `n_envs` for the count.
+A single environment cannot keep a GPU busy. A GPU has thousands of cores, and stepping one Franka arm leaves almost all of them idle. Genesis World steps many identical copies of a scene at once instead, so one pass of the physics kernels advances the whole batch.
 
-The scene is defined exactly as in {doc}`hello_genesis`: a plane and a Franka arm. Parallelism is not a property of the entities; it is turned on when you build the scene.
+The learning literature calls this **batching**; we call one copy of the scene an **environment** (**env**) and count them with `n_envs`. Parallelism is not a property of the entities: describe the plane and the Franka arm exactly as in {doc}`hello_genesis`, then choose the number of copies when you build the scene.
 
 ## Building parallel environments
 
-Use `gs.gpu` as the backend so the batch runs on the GPU:
+Initialize on a GPU backend, so the batch has cores to run on:
 
 ```python
 gs.init(backend=gs.gpu)
 ```
 
-Everything else about scene creation and entity loading is identical to a single-environment scene. The one change is `scene.build()`, which takes the number of environments:
+Scene creation and entity loading are unchanged. The only line that differs is `scene.build()`, which takes the number of environments:
 
 ```python
 # create 20 parallel environments
@@ -30,8 +28,8 @@ B = 20
 scene.build(n_envs=B, env_spacing=(1.0, 1.0))
 ```
 
-- `n_envs` is the batch size. With `n_envs=0` (the default) the scene has no batch dimension; with `n_envs > 0`, a batch dimension of that size is prepended to every state you set or read.
-- `env_spacing` is a `(x, y)` offset in meters used to lay the environments out on a grid in the viewer. It affects visualization only. The environments start from identical states, and the spacing does not change any entity's simulated position.
+- `n_envs` is the batch size. With `n_envs=0` (the default) the scene has no batch dimension; with `n_envs > 0`, every state you set or read carries a leading batch dimension of that size.
+- `env_spacing` is a `(x, y)` offset in meters that lays the environments out on a grid in the viewer. It affects visualization only: the environments start from identical states, and the spacing does not change any entity's simulated position.
 
 The environments are independent: each has its own copy of every entity's state, and stepping the scene advances all of them together with one `scene.step()` call.
 
@@ -73,7 +71,7 @@ The same `envs_idx` argument is available on the state-reading methods (for exam
 Genesis World supports tens of thousands of environments on a single GPU. Turn off the viewer for headless throughput and raise `n_envs`; memory use grows with the batch, so reduce it if your GPU runs out of VRAM. To measure throughput on your own hardware, use the scripts in [`examples/speed_benchmark`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/speed_benchmark) and see {doc}`/user_guide/developers/profiling`.
 
 :::{tip}
-Genesis World prints the real-time simulation speed (FPS) to the terminal by default. Disable it by setting `profiling_options=gs.options.ProfilingOptions(show_FPS=False)` when creating the scene.
+Genesis World prints the real-time simulation speed (FPS) to the terminal by default. Pass `profiling_options=gs.options.ProfilingOptions(show_FPS=False)` to `gs.Scene` to quiet it.
 :::
 
 ## See also

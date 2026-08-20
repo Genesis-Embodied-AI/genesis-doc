@@ -1,6 +1,6 @@
 # Forward dynamics
 
-The first layer of a step: place the bodies, build the mass matrix, and solve $M(q)\,\ddot q = \tau$ for the acceleration they would take with no contact acting. {doc}`Detection <collision_detection>` and the {doc}`constraint solve <constraints>` then correct that acceleration.
+The first layer of a step places the bodies, builds the mass matrix, and solves $M(q)\,\ddot q = \tau$ for the acceleration they would take with no contact acting. {doc}`Detection <collision_detection>` and the {doc}`constraint solve <constraints>` then correct that acceleration.
 
 ## Kinematics
 
@@ -8,7 +8,7 @@ The state is `qpos` and `qvel`, not per-link poses. Forward kinematics walks eac
 
 ## Mass matrix
 
-$M$ is assembled from composite-rigid-body inertias, folded leaf-to-root so that each link carries the spatial inertia of its subtree, then factorized once per substep. The later stages that map forces to accelerations reuse that factorization, including each constraint-solver iteration.
+The solver assembles $M$ from composite-rigid-body inertias, folding them leaf-to-root so that each link carries the spatial inertia of its subtree, then factorizes it once per substep. The later stages that map forces to accelerations reuse that factorization, including each constraint-solver iteration.
 
 ## Forces before contact
 
@@ -16,7 +16,7 @@ $\tau$ collects the forces independent of contact: actuation, according to the c
 
 ## Integration
 
-Velocity first, then position from the new velocity, which makes the ordering semi-implicit rather than explicit:
+The solver integrates velocity first, then position from the new velocity, which makes the ordering semi-implicit rather than explicit:
 
 $$
 \dot q_{k+1} = \dot q_k + \ddot q_k\,\Delta t
@@ -32,7 +32,7 @@ A damping force evaluated against the old velocity can overshoot, so every schem
 | `implicitfast` | Velocity-actuator bias joins the effective mass, and standalone free bodies advance by the implicit midpoint rule. | Two factorizations per substep. |
 | `approximate_implicitfast` (default) | The same, carried into the constraint and external-force accelerations. | One factorization per substep; the correction is approximate. |
 
-On an undamped dof under `Euler`, the velocity update is exactly `qvel += dt * qacc`.
+We default to `approximate_implicitfast` because it avoids computing the inverse mass matrix twice. The approximation is not exact, so choose `implicitfast` when a scene is stiff enough that the difference shows in the trajectory. On an undamped dof under `Euler`, the velocity update is exactly `qvel += dt * qacc`.
 
 ## Timestep and substeps
 

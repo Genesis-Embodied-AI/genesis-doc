@@ -48,13 +48,13 @@ A probe is a point fixed in a link's local frame. `probe_local_pos` is a sequenc
 distances = sensor.read()  # shape ([n_envs,] n_probes), meters
 ```
 
-The matching nearest points are a separate attribute rather than part of `read()`:
+The `nearest_points` attribute holds the matching point on each tracked surface:
 
 ```python
 points = sensor.nearest_points  # shape ([n_envs,] n_probes, 3), world frame
 ```
 
-Both leading dimensions follow the batched-optional convention: the `[n_envs,]` axis is present only when the scene is built with multiple environments. `nearest_points` is written on each step, so read it after at least one `scene.step()`; before the first step it holds zeros.
+The `[n_envs,]` axis on both is present only when the scene is built with multiple environments. Genesis World writes `nearest_points` on each step, so read it after at least one `scene.step()`; before the first step it holds zeros.
 
 <video preload="auto" controls="True" width="100%" aria-label="Shadow Hand with surface-distance probes on its palm and fingertips; lines connect each probe to the nearest point on a tracked duck mesh and box as the hand moves">
 <source src="../../_static/videos/proximity.mp4" type="video/mp4">

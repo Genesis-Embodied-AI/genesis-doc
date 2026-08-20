@@ -1,6 +1,6 @@
 # Surfaces and textures
 
-A **surface** describes how an entity *looks* when rendered: its color, glossiness, transparency, and texture maps. It is separate from the entity's shape and its physics. When you add an entity you pass up to three independent descriptions:
+A **surface** describes how an entity *looks* when rendered: its color, glossiness, transparency, and texture maps. Every entity takes up to three independent descriptions:
 
 - a {doc}`morph </api_reference/engine/entity/morph/index>`: geometry and initial pose,
 - a {doc}`material </api_reference/engine/material/index>`: physical behavior (mass, stiffness, friction),
@@ -16,8 +16,6 @@ scene.add_entity(
     surface=gs.surfaces.Smooth(color=(0.6, 0.8, 1.0)),
 )
 ```
-
-The rest of this page explains the surface types, how colors and textures are set, and how to light a ray-traced scene.
 
 ## Choosing a surface
 
@@ -44,7 +42,7 @@ scene.add_entity(morph=gold_sphere, surface=gs.surfaces.Metal(metal_type="gold")
 
 ## Setting color and PBR properties
 
-Each PBR channel is really a *texture* (see below), but when a channel is a single constant you set it with a shortcut argument instead of building a texture object. The common shortcuts are `color`, `roughness`, `opacity`, `emissive`, `metallic`, and `ior`:
+Each PBR channel is really a *texture* (see below), but a channel that holds a single constant takes a shortcut argument instead of a texture object. The common shortcuts are `color`, `roughness`, `opacity`, `emissive`, `metallic`, and `ior`:
 
 ```python
 surface = gs.surfaces.Default(
@@ -56,10 +54,10 @@ surface = gs.surfaces.Default(
 
 Two constraints follow from how the shortcuts map onto channels:
 
-- A shortcut and its texture cannot both be set. Passing `color=...` together with `diffuse_texture=...` raises an error. The texture already carries the color.
+- A shortcut and its texture cannot both be set: passing `color=...` together with `diffuse_texture=...` raises an error, because the texture already carries the color.
 - A shortcut only applies to channels the surface actually has. `metallic` is meaningful on `Default`/`BSDF`; `Metal`, `Glass`, and the plastics ignore it because their reflectance is fixed by their type.
 
-A fourth color component is treated as opacity, so `color=(r, g, b, a)` is the concise way to make a surface semi-transparent:
+Genesis World treats a fourth color component as opacity, so `color=(r, g, b, a)` is the concise way to make a surface semi-transparent:
 
 ```python
 # 50% transparent glossy plastic
@@ -85,14 +83,14 @@ surface = gs.surfaces.Rough(
 ```
 
 :::{warning}
-Set `encoding="linear"` for any map that stores data rather than a color: roughness, metallic, normal, and opacity maps. The default `encoding="srgb"` applies gamma correction that is correct for color images but corrupts data maps. `.hdr` and `.exr` files are forced to `linear` automatically.
+Set `encoding="linear"` for any map that stores data rather than a color: roughness, metallic, normal, and opacity maps. The default `encoding="srgb"` applies gamma correction that is correct for color images but corrupts data maps. Genesis World forces `.hdr` and `.exr` files to `linear`.
 :::
 
-An image path is resolved against your working directory first, then against the bundled asset directory (`genesis/assets`), so `"textures/checker.png"` loads the checker image that ships with Genesis World. A loaded asset (a `.glb` or textured `.obj`, for example) brings its own surface; pass a `surface` to `add_entity` only when you want to override it.
+Genesis World resolves an image path against your working directory first, then against the bundled asset directory (`genesis/assets`), so `"textures/checker.png"` loads the checker image that ships with the library. A loaded asset (a `.glb` or textured `.obj`, for example) brings its own surface; pass a `surface` to `add_entity` only when you want to override it.
 
 ## Lighting a ray-traced scene
 
-In the {doc}`Nyx <nyx_renderer>` ray tracer, lights are not a special object: they are ordinary entities with an `Emission` surface. An environment map is the same idea applied to the background: an emissive image wrapped around the scene provides ambient illumination.
+In the {doc}`Nyx <nyx_renderer>` ray tracer, lights are not a special object: they are ordinary entities with an `Emission` surface. An environment map is the same idea applied to the background: an emissive image wrapped around the scene lights everything in it.
 
 This excerpt from `examples/rendering/demo.py` sets an HDRI-style environment map and one area light:
 
@@ -117,7 +115,7 @@ Surfaces render on both the interactive viewer's rasterizer and the ray tracer, 
 
 ## Visualizing something other than the visual mesh
 
-`vis_mode` selects *which* geometry of an entity is drawn, independent of the surface's material. It is most useful for particle-based entities, whose "shape" is a point cloud rather than a mesh:
+`vis_mode` selects *which* geometry of an entity the renderer draws, independent of the surface's material. It matters most for particle-based entities, whose "shape" is a point cloud rather than a mesh:
 
 ```python
 # draw a fluid entity as its raw particles
@@ -131,7 +129,7 @@ The accepted values are `"visual"`, `"collision"`, `"particle"`, `"sdf"`, and `"
 
 ## Foam and spray
 
-A fast-moving particle fluid entrains air: whitewater on a breaking wave, spray thrown off a splash, bubbles carried below the surface. Genesis World can add these as secondary foam particles at render time. This is purely a visual effect for particle-based fluids in the {doc}`Nyx <nyx_renderer>` ray tracer. It does not change the physics, and the rasterizer ignores it.
+A fast-moving particle fluid entrains air: whitewater on a breaking wave, spray thrown off a splash, bubbles carried below the surface. Genesis World renders these as secondary foam particles around a particle-based fluid in the ray tracer. The foam is a rendering effect, so it leaves the physics untouched and the rasterizer ignores it.
 
 Enable it on the fluid's surface with `generate_foam=True`, and tune the look with a `foam_options` object:
 
@@ -162,8 +160,8 @@ scene.add_entity(
 - **`bubble_decay`:** dissipation rate of submerged bubbles. Defaults to `5.0`.
 - **`color`:** RGBA tint of the foam particles. Defaults to `(0.7, 0.7, 0.7, 0.7)`.
 
-## Next steps
+## See also
 
 - {doc}`Rendering <index>`: cameras and choosing a renderer.
-- {doc}`Nyx renderer <nyx_renderer>`: the ray tracer and its options in depth.
+- {doc}`Nyx renderer <nyx_renderer>`: photorealistic path tracing in depth.
 - {doc}`USD import </user_guide/assets/usd_import>`: loading assets that carry their own surfaces.

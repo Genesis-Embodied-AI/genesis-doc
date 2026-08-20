@@ -1,17 +1,17 @@
 # Drone entity
 
-A {py:class}`DroneEntity <genesis.engine.entities.drone_entity.DroneEntity>` is a quadrotor whose actuation is its four propeller speeds. Unlike a robot arm, you do not command joint torques or positions; you set each propeller's angular velocity in **RPM** (revolutions per minute), and Genesis World converts those speeds into the aerodynamic forces that lift and steer the drone.
+A {py:class}`DroneEntity <genesis.engine.entities.drone_entity.DroneEntity>` is a quadrotor whose actuation is its four propeller speeds. Unlike a robot arm, it takes no joint torques or positions: set each propeller's angular velocity in **RPM** (revolutions per minute), and Genesis World converts those speeds into the aerodynamic forces that lift and steer the drone.
 
-This page explains that RPM-to-motion mapping and how to drive it. It uses the Crazyflie 2.X model that ships with Genesis World. For the class API, see the {doc}`DroneEntity reference </api_reference/engine/entity/drone_entity>`.
+The examples below use the Crazyflie 2.X model that ships with Genesis World. For the class API, see the {doc}`DroneEntity reference </api_reference/engine/entity/drone_entity>`.
 
 ## How propeller RPM becomes motion
 
-Each simulation step, Genesis World reads the RPM you set for every propeller and applies two things to that propeller's link:
+Each simulation step, Genesis World reads every propeller's commanded RPM and applies two things to that propeller's link:
 
 - **Thrust**, a force along the propeller's local +Z axis: `F = KF · rpm²`.
 - **Reaction torque**, a yaw moment about the same axis: `τ = KM · rpm² · spin`, where `spin` is `+1` for a counter-clockwise propeller and `-1` for a clockwise one.
 
-`KF` (thrust coefficient) and `KM` (moment coefficient) are read from the drone's URDF, so they are fixed properties of the model. Thrust grows with the *square* of RPM, so control is nonlinear: doubling RPM roughly quadruples lift.
+`KF` (thrust coefficient) and `KM` (moment coefficient) come from the drone's URDF, so they are fixed properties of the model. Thrust grows with the *square* of RPM, so control is nonlinear: doubling RPM roughly quadruples lift.
 
 Two consequences follow, and they are the whole basis of quadrotor control:
 
@@ -47,9 +47,9 @@ for _ in range(1000):
     scene.step()
 ```
 
-The hover RPM is model-specific; it is the value at which `4 · KF · rpm²` equals the drone's weight. For the shipped Crazyflie 2.X it is approximately 14468 RPM.
+The hover RPM is model-specific: it is the value at which `4 · KF · rpm²` equals the drone's weight, approximately 14468 RPM for the shipped Crazyflie 2.X.
 
-## The drone morph
+## Drone morph
 
 The morph is a URDF loaded through {py:class}`gs.morphs.Drone <genesis.options.morphs.Drone>`. The defaults match the Crazyflie model, so `file` and `pos` are usually all you need:
 
@@ -66,7 +66,7 @@ drone = scene.add_entity(
 )
 ```
 
-`propellers_link_name` fixes the *order* in which propellers are indexed: the RPM array you pass to `set_propellers_rpm` maps to these links positionally. `propellers_spin` gives each propeller's rotation direction, which sets the sign of its yaw reaction torque. The `RACE` model inverts all four spins internally.
+`propellers_link_name` fixes the *order* in which propellers are indexed: `set_propellers_rpm` maps its RPM array to these links positionally. `propellers_spin` gives each propeller's rotation direction, which sets the sign of its yaw reaction torque. The `RACE` model inverts all four spins internally.
 
 The bundled models are:
 
@@ -85,7 +85,7 @@ propellers_rpm  # shape ([n_envs,] n_propellers), non-negative
 ```
 
 :::{warning}
-Call `set_propellers_rpm` **exactly once per step**, before `scene.step()`. A second call in the same step raises an error, because the propeller revolution count used for the spin animation is accumulated per step.
+Call `set_propellers_rpm` **exactly once per step**, before `scene.step()`. A second call in the same step raises an error, because each call accumulates the propeller revolution count that drives the spin animation.
 :::
 
 To move rather than hover, offset individual propellers from the hover RPM. The interactive example [`examples/drone/interactive_drone.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/drone/interactive_drone.py) maps a direction to a per-propeller offset around a common thrust:
@@ -101,7 +101,7 @@ The direction vectors show the pattern directly: moving forward uses `(1, 1, -1,
 
 ## Closed-loop control
 
-Open-loop RPM schedules drift. To fly to a target position, close the loop on the drone's state. The state getters are inherited from `RigidEntity`:
+Open-loop RPM schedules drift. To fly to a target position, close the loop on the drone's state, which `DroneEntity` exposes through the getters it inherits from `RigidEntity`:
 
 ```python
 pos = drone.get_pos()  # shape ([n_envs,] 3), meters
@@ -118,7 +118,7 @@ M3 = self.__base_rpm + (thrust + roll + pitch - yaw + x_vel - y_vel)
 M4 = self.__base_rpm + (thrust + roll - pitch + yaw - x_vel - y_vel)
 ```
 
-Each correction adds or subtracts across the four motors according to its sign pattern, which is exactly the differential-RPM idea made concrete. Run the full point-to-point flight with [`examples/drone/fly_route.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/drone/fly_route.py), which drives this controller and clamps each RPM to a safe range before applying it.
+Each correction adds or subtracts across the four motors according to its sign pattern. Run the full point-to-point flight with [`examples/drone/fly_route.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/drone/fly_route.py), which drives this controller and clamps each RPM to a safe range before applying it.
 
 ## Multiple environments
 

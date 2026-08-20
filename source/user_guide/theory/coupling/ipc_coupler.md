@@ -1,10 +1,10 @@
 # IPC coupler
 
-The IPC coupler resolves contact with Incremental Potential Contact, a barrier-based model built on the [libuipc](https://github.com/spiriMirror/libuipc) library. Where the legacy coupler applies impulses and the {doc}`SAP coupler <sap_coupler>` solves a semi-analytic contact problem, IPC advances every coupled body through a single smooth potential whose barrier term grows without bound as surfaces approach. The result is contact that stays intersection-free and stable even under large deformation, which is what makes it the right choice for cloth and heavily deforming soft bodies.
+The IPC coupler resolves contact with Incremental Potential Contact, a barrier-based model built on the [libuipc](https://github.com/spiriMirror/libuipc) library. It advances every coupled body through a single smooth potential whose barrier term grows without bound as two surfaces approach, so contact under IPC stays intersection-free even under large deformation. IPC costs more per step than the legacy coupler, so we keep legacy as the default and let you select IPC per scene.
 
-Reach for IPC when accuracy and robustness matter more than speed: cloth with self-collision, FEM solids pressed hard against each other, or a gripper closing on a deformable object. For mixed continuum scenes (MPM, SPH, PBD) or when you only need coarse rigid contact, stay on the default legacy coupler. See {doc}`the couplers overview <index>` for the full comparison.
+Use it for cloth with self-collision, for FEM solids pressed hard against each other, and for a gripper closing on a deformable object. For mixed continuum scenes (MPM, SPH, PBD) or coarse rigid contact, stay on the legacy coupler; see {doc}`the couplers overview <index>` for the full comparison.
 
-Under the hood, FEM bodies are coupled directly from their vertex positions, while rigid bodies enter the IPC world as affine bodies (ABD). Time step, gravity, and differentiable-simulation mode come from {doc}`SimOptions </api_reference/engine/simulator>`, so you set them there, not on the coupler.
+An FEM body couples directly through its vertex positions, and a rigid body enters the IPC world as an affine body (ABD). Time step, gravity, and differentiable-simulation mode come from {doc}`SimOptions </api_reference/engine/simulator>` rather than from the coupler.
 
 ## Prerequisites
 
@@ -66,7 +66,7 @@ The example downloads a coarse `grid20x20.obj` cloth mesh rather than a dense on
 
 ## How entities couple
 
-You do not register links with the coupler directly. Instead, each entity's {doc}`Rigid material </api_reference/engine/material/rigid>` declares how it participates through `coup_type`:
+Each entity's {doc}`Rigid material </api_reference/engine/material/rigid>` declares how it participates, through `coup_type`, so the coupler needs no per-link registration:
 
 - **`two_way_soft_constraint`:** Genesis and IPC exchange forces through a soft position-and-orientation constraint. Use it for a floating-base robot or any rigid body whose motion Genesis controls but that must also feel contact.
 - **`external_articulation`:** joint-level coupling for articulated robots: IPC couples at the dof level rather than per link. Use it for a fixed-base arm.

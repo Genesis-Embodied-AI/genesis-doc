@@ -1,12 +1,12 @@
 # Viewer interaction and plugins
 
-The Genesis World **viewer** is the interactive window that shows a simulation as it runs. Beyond the built-in camera, recording, and visualization controls, you can extend it two ways: register **keybindings** to bind a key to a callback, and add **viewer plugins** that receive mouse and keyboard events, draw debug geometry each frame, and run logic on every simulation step. Plugins are the right tool for interactive tooling such as picking points on a mesh or dragging bodies with the mouse.
+The Genesis World **viewer** is the interactive window that shows a simulation as it runs. Beyond the built-in camera, recording, and visualization controls, extend it two ways: register **keybindings** to bind a key to a callback, and add **viewer plugins** that receive mouse and keyboard events, draw debug geometry each frame, and run logic on every simulation step. Use a plugin for interactive tooling such as picking points on a mesh or dragging bodies with the mouse.
 
 This page assumes a scene built with `show_viewer=True` (see {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`). The runnable examples live under [`examples/viewer_plugin/`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/viewer_plugin).
 
 ## Minimal working example
 
-This scene adds the built-in `MouseInteractionPlugin` so you can click and drag the box, and binds `Esc` to quit. It shows the ordering that matters: **add plugins before `build()`, register keybindings after.**
+This scene adds the built-in `MouseInteractionPlugin` so you can click and drag the box, and binds `Esc` to quit. The ordering matters: add plugins **before** `build()`, and register keybindings after.
 
 ```python
 import genesis as gs
@@ -51,7 +51,7 @@ scene.viewer.register_keybinds(
 )
 ```
 
-`register_keybinds` requires a built scene. It raises if called before `scene.build()`. Register keys after building, as in the example above.
+`register_keybinds` requires a built scene, so it raises if called before `scene.build()`.
 
 A `Keybind` takes a unique `name`, a `key` from the `Key` enum, and a `key_action`:
 
@@ -181,7 +181,7 @@ local_pos = gu.inv_transform_by_trans_quat(world_pos, link_pos, link_quat)
 <source src="../../_static/videos/viewer_plugin_mesh_point.mp4" type="video/mp4">
 </video>
 
-Debug geometry is drawn from `on_draw()`, which runs every frame. Call `self.scene.clear_debug_objects()` at the top and re-issue your draws so stale geometry does not accumulate. `draw_debug_sphere`, `draw_debug_spheres`, and `draw_debug_arrow` are the usual primitives. Register any mode-toggle or quit keys with `scene.viewer.register_keybinds()` so they show up in the instructions overlay alongside the defaults.
+Draw debug geometry from `on_draw()`, which runs every frame. Call `self.scene.clear_debug_objects()` at the top and re-issue your draws so stale geometry does not accumulate. `draw_debug_sphere`, `draw_debug_spheres`, and `draw_debug_arrow` are the usual primitives. Register any mode-toggle or quit keys with `scene.viewer.register_keybinds()` so they show up in the instructions overlay alongside the defaults.
 
 ## See also
 

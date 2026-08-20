@@ -48,7 +48,7 @@ A pattern is a purely local description of the rays: it fixes a start point and 
 
 At each `read()`, Genesis World places the pattern in the world by composing the attached link's pose with the sensor's `pos_offset` and `euler_offset`, then casts every ray against an acceleration structure built over the scene's geometry. Each ray reports the first surface it hits. A ray that hits nothing within `max_range`, or closer than `min_range`, reports `no_hit_value` (which defaults to `max_range`) so the returned tensors keep a fixed shape.
 
-Attach a sensor to a link by setting `entity_idx` and `link_idx_local`; the rays then move with that link. Leave `entity_idx` unset (or `None`) for a world-fixed sensor, in which case `pos_offset` and `euler_offset` are applied in the world frame.
+Attach a sensor to a link by setting `entity_idx` and `link_idx_local`; the rays then move with that link. Leave `entity_idx` unset (or `None`) for a world-fixed sensor, in which case `pos_offset` and `euler_offset` apply in the world frame.
 
 ## Reading data
 
@@ -64,11 +64,11 @@ distances = result.distances  # shape ([n_envs,] *return_shape),    meters
 - **`points`** is the hit location per ray. With `return_world_frame=True` it is in the world frame (Z-up, meters); with the default `return_world_frame=False` it is in the sensor's local frame.
 - **`return_points=False`** measures the hit distances only: `read().points` is `None`, and the sensor's memory and per-step cost drop to about a quarter. Use it for distance-only sensing (e.g. depth images); keep the default `True` when you need the point cloud.
 
-The `return_shape` is set by the pattern, so the trailing axes match the pattern's own layout: `(128, 64)` for the default spherical scan, `(height, width)` for a depth camera, `(n_x, n_y)` for a grid. The leading `[n_envs,]` axis is present only when the scene is built with multiple environments (see [Multiple environments](#multiple-environments)).
+The trailing axes match the pattern's own layout: `(128, 64)` for the default spherical scan, `(height, width)` for a depth camera, `(n_x, n_y)` for a grid. The leading `[n_envs,]` axis is present only when the scene is built with multiple environments (see [Multiple environments](#multiple-environments)).
 
 ## Ray patterns
 
-The pattern decides what the sensor is. All three are constructed under `gs.sensors` and passed as the `pattern` argument.
+The pattern decides what the sensor is. Construct any of the three under `gs.sensors` and pass it as the `pattern` argument.
 
 | Pattern | Ray layout | Typical hardware |
 |---|---|---|
@@ -94,7 +94,7 @@ To model a real unit, set the fov and ray counts from its datasheet. For example
 
 ### DepthCameraPattern
 
-A pinhole camera whose optical axis is the sensor's local **+X** axis. Configure it by field of view or by explicit intrinsics:
+`DepthCameraPattern` is a pinhole camera whose optical axis is the sensor's local **+X** axis. Configure it by field of view or by explicit intrinsics:
 
 ```python
 gs.sensors.DepthCameraPattern(
@@ -108,7 +108,7 @@ gs.sensors.DepthCameraPattern(
 
 ### GridPattern
 
-Parallel rays cast from a plane in a single direction, a height map under the sensor, for instance:
+`GridPattern` casts parallel rays from a plane in a single direction, for instance a height map under the sensor:
 
 ```python
 gs.sensors.GridPattern(
@@ -120,7 +120,7 @@ gs.sensors.GridPattern(
 
 ### Custom pattern
 
-There is no `ray_directions` argument. To cast an arbitrary set of rays, subclass `gs.sensors.RaycastPattern`: return the layout shape from `_get_return_shape()` and fill `_ray_dirs` (unit directions in the sensor frame) in `compute_ray_dirs()`.
+Cast an arbitrary set of rays by subclassing `gs.sensors.RaycastPattern`: return the layout shape from `_get_return_shape()`, and fill `_ray_dirs` inside `compute_ray_dirs()` with unit directions in the sensor frame.
 
 ```python
 import torch

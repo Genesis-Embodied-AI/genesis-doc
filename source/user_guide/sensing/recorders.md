@@ -1,6 +1,6 @@
 # Recording data
 
-A **recorder** samples data from your simulation on a schedule and processes it for you (writing it to a file or drawing it in a live plot) without you threading logging code through your step loop. You describe *what* to record and *how*, then step the scene as usual.
+A **recorder** samples data from your simulation on a schedule and processes it for you (writing it to a file or drawing it in a live plot) without you threading logging code through your step loop. Describe *what* to record and *how*, then step the scene as usual.
 
 Recording runs on a background thread by default, so it adds little overhead to the simulation itself.
 
@@ -24,17 +24,17 @@ Every scene owns a **RecorderManager**. Each call to `start_recording` registers
 
 From then on, the manager drives the recorder for you:
 
-1. On `scene.build()`, every registered recorder is built and started (files are opened, plot windows appear).
+1. On `scene.build()`, the manager builds and starts every registered recorder: files open, plot windows appear.
 2. On each `scene.step()`, the manager calls the data function and hands the result to the recorder at the configured rate.
 3. On `scene.stop_recording()` (or when the scene is destroyed), every recorder flushes and closes cleanly.
 
-Because the manager reads the data function itself, you never call it in your loop. You describe the recording once, before build, and step normally.
+Because the manager reads the data function itself, you never call it in your loop. Describe the recording once, before build, and step normally.
 
 :::{warning}
 Set up all recording **before** `scene.build()`. `scene.start_recording` and `sensor.start_recording` assert the scene is unbuilt and raise otherwise, because recorders allocate their file handles and windows during the build.
 :::
 
-A visualization camera has its own video API, `camera.start_recording()`, which is called *after* build and bypasses the recorder manager entirely; see {doc}`Recording a video </user_guide/rendering/index>`.
+A visualization camera has its own video API, `camera.start_recording()`, which you call *after* build and which bypasses the recorder manager entirely; see {doc}`Recording a video </user_guide/rendering/index>`.
 
 ## Recording sensor data
 
@@ -102,7 +102,7 @@ Pass any of these to `start_recording` as the recorder options. All are exported
 | {py:class}`MPLImagePlot <genesis.options.recorders.MPLImagePlot>` | Live image | `(H, W)`, `(H, W, 1/3/4)` |
 | {py:class}`MPLVectorFieldPlot <genesis.options.recorders.MPLVectorFieldPlot>` | 3D vectors projected to a plane, colored by magnitude | `(N, 3)` at fixed `positions` |
 
-`PyQtGraph` and `matplotlib` are optional dependencies. The example probes for them and falls back gracefully. See `IS_PYQTGRAPH_AVAILABLE` / `IS_MATPLOTLIB_AVAILABLE` in `genesis.recorders.plotters`.
+`PyQtGraph` and `matplotlib` are optional dependencies. The example prefers `PyQtLinePlot`, falls back to `MPLLinePlot` when PyQtGraph is missing, and skips live plotting when neither is installed; it reads `IS_PYQTGRAPH_AVAILABLE` and `IS_MATPLOTLIB_AVAILABLE` from `genesis.recorders.plotters` to decide.
 
 For more usage: camera video and image recording in [`examples/manipulation/grasp_env.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/manipulation/grasp_env.py), joint-torque plotting in [`examples/sensors/joint_torque_franka.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/joint_torque_franka.py), and tactile vector fields in [`examples/sensors/tactile_franka.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/tactile_franka.py).
 

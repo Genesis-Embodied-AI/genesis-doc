@@ -2,15 +2,15 @@
 
 Every Genesis World program is built from the same handful of objects, and every one of them runs in two phases: you describe a scene, then you build it and step it. This page explains that object model and computation model, and then the local-versus-global indexing scheme that lets one entity address its own slice of a solver's data. It assumes you have seen the {doc}`minimal example </user_guide/getting_started/hello_genesis>`.
 
-## The object model
+## Object model
 
 ```{figure} ../../_static/images/overview.png
 :alt: Diagram of the Genesis World object model, showing a scene that contains entities and a simulator, where the simulator holds physics solvers and a coupler
 ```
 
-A **scene** (see the {doc}`Scene API </api_reference/engine/scene>`) is the top-level container. It owns two things: a simulator that advances the physics, and a visualizer that draws what you see. You add everything to the scene, then build and step it.
+A **scene** (see the {doc}`Scene API </api_reference/engine/scene>`) is the top-level container. It owns two things: a simulator that advances the physics, and a visualizer that draws what you see. Add everything to the scene, then build and step it.
 
-An **entity** is one object in the scene, such as a robot, a rigid body, or a body of fluid. You interact with it through its own methods and attributes rather than a global handle. Each entity is described by three pieces:
+An **entity** is one object in the scene, such as a robot, a rigid body, or a body of fluid. Interact with it through its own methods and attributes rather than a global handle. Each entity is described by three pieces:
 
 - **Morph:** the geometry and initial pose, either a primitive shape or a loaded model (see the {doc}`morph API </api_reference/engine/entity/morph/index>`).
 - **Material:** the physical model. The material chooses which solver simulates the entity. Liquids exist for both MPM and SPH, for example, and they behave differently.
@@ -35,7 +35,7 @@ for i in range(1000):
 
 Before `build()`, the scene is just a description. Adding entities registers their morphs, materials, and surfaces, but no simulation data exists yet. `build()` is the moment Genesis World lays out that data, allocates device memory, and just-in-time compiles the GPU kernels for this exact configuration. Because compilation depends on the data layout, the scene must be frozen first: you cannot add entities after building.
 
-`n_envs` controls parallelism. Left at `0`, the scene runs a single environment and results have no batch dimension. Set greater than `0`, it replicates the scene across that many parallel **environments** (**env**), and a leading batch dimension appears on every input and output. This is why shapes throughout the docs are written `([n_envs,] ...)`: the `n_envs` axis is present when you built with multiple environments and absent otherwise. See {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>`.
+`n_envs` controls parallelism. Left at `0`, the scene runs a single environment and results have no batch dimension. With `n_envs > 0`, Genesis World replicates the scene across that many parallel **environments** (**env**), and a leading batch dimension appears on every input and output. This is why shapes throughout the docs are written `([n_envs,] ...)`: the `n_envs` axis is present when you built with multiple environments and absent otherwise. See {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>`.
 
 Each `scene.step()` advances the simulation by one timestep `dt`. To capture or restore the full simulation at a point in time, use `scene.get_state()`, which returns a {py:class}`SimState <genesis.engine.states.solvers.SimState>`, and `scene.reset(state)`.
 
@@ -45,7 +45,7 @@ The first build of a new configuration compiles kernels on the fly and is slow. 
 
 ## Local and global indexing
 
-A single scene often holds many entities of the same kind, and a solver stores their data together in one flat array. Understanding how an entity addresses its own portion of that array explains most questions about reading and setting simulation data.
+A single scene often holds many entities of the same kind, and a solver stores their data together in one flat array. Understanding how an entity addresses its own portion of that array answers most questions about reading and setting simulation data.
 
 ### One field for the whole scene
 
@@ -65,7 +65,7 @@ self.particles_render = struct_particle_state_render.field(
 )
 ```
 
-The field's length is `n_particles`, the total across *all* MPM entities in the scene. Genesis World does not tag each element with an entity id, because that wastes memory and bandwidth. Instead it stores entities contiguously and remembers where each one starts.
+The field's length is `n_particles`, the total across *all* MPM entities in the scene. Genesis World stores those entities contiguously and remembers where each one starts, rather than tagging every element with an entity id, which would cost memory and bandwidth on every kernel that touches the field.
 
 ### Two views of the same data
 
@@ -82,7 +82,7 @@ Local indexing is the interface you use; global indexing is the layout underneat
 
 For a particle entity, `set_velocity(vel)` takes velocities shaped for this entity's particles alone and writes them into the shared field, offsetting by the entity's `particle_start` (its first index in the field; `particle_end` is that plus its particle count).
 
-For a rigid entity, arguments named `*_idx_local` are local indices. To read the third **degree of freedom** (**dof**), you pass a local index:
+For a rigid entity, arguments named `*_idx_local` are local indices. Reading the third **degree of freedom** (**dof**) therefore takes a local index:
 
 ```python
 pos = rigid_entity.get_dofs_position(dofs_idx_local=[2])  # shape ([n_envs,] 1)
@@ -92,9 +92,9 @@ Internally this maps to global index `2 + rigid_entity.dof_start` before touchin
 
 ### Direct access to a field
 
-Prefer the entity APIs, such as `get_dofs_position`. They apply the offset, return batch-first tensors, and stay correct as the internals change. Reach past them only when you need a value no API yet exposes, and expect it to be slower and more fragile.
+Prefer the entity APIs, such as `get_dofs_position`. They apply the offset, return batch-first tensors, and stay correct as the internals change. Go to the field itself only for a value no API yet exposes, and expect that code to be slower and more fragile.
 
-The offset scheme is all you need to do so. Every entity exposes its solver through `entity.solver`, each physical quantity lives at a known place in that solver (dof positions at `dofs_state.pos`, for example), and the field is globally indexed. So a supported call like:
+Every entity exposes its solver through `entity.solver`, each physical quantity lives at a known place in that solver (dof positions at `dofs_state.pos`, for example), and the field is globally indexed. So a supported call like:
 
 ```python
 tgt = entity.get_dofs_position()  # shape ([n_envs,] entity.n_dofs)
