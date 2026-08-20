@@ -40,9 +40,9 @@ All `gs.options.*` classes derive from {py:class}`gs.options.Options <genesis.op
 
 You never instantiate `Options` directly; you always use a concrete subclass. Each option class is documented in the {doc}`API Reference </api_reference/index>` alongside the component it configures.
 
-## Simulator options override solver options
+## Solver options override simulator options
 
-`SimOptions` holds settings that are global by default: most importantly the timestep `dt` (seconds) and `gravity` (N/kg, pointing down `-Z`). Each solver also exposes those same settings on its own options object, where they default to `None`.
+`SimOptions` holds settings that are global by default: most importantly the timestep `dt` (seconds) and `gravity` (m/s², pointing down `-Z`). Each solver also exposes those same settings on its own options object, where they default to `None`.
 
 The rule is: **a value set on a solver's options overrides the global `SimOptions` value, for that solver only.** A solver whose field is left at `None` inherits the global value. This lets most scenes set `dt` once while allowing a single solver to run at a different rate.
 

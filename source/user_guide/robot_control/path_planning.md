@@ -112,7 +112,7 @@ When the mask is not requested, a failed plan still returns a path-shaped tensor
 
 ## Planning across parallel environments
 
-In a {doc}`batched scene </user_guide/getting_started/parallel_simulation>`, `plan_path` plans for every environment at once. The returned tensor gains a leading environment dimension:
+In a {doc}`batched scene </user_guide/getting_started/parallel_simulation>`, `plan_path` plans for every environment at once. The returned tensor gains an environment dimension between the waypoint and joint dimensions:
 
 ```python
 scene.build(n_envs=16)

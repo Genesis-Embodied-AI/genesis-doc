@@ -78,7 +78,7 @@ Three backends render RGB. They share the common options below and differ in spe
 | {py:class}`RaytracerCameraOptions <genesis.options.sensors.camera.RaytracerCameraOptions>` | LuisaRender | single environment | photo-realistic offline renders |
 | {py:class}`BatchRendererCameraOptions <genesis.options.sensors.camera.BatchRendererCameraOptions>` | Madrona (GPU) | parallel | high-throughput RL training (CUDA only) |
 
-Select a backend by choosing the matching options class; no separate scene `renderer` argument is required for the rasterizer. For photo-realistic path tracing, prefer the Nyx renderer described in {doc}`/user_guide/rendering/nyx_renderer`.
+Select a backend by choosing the matching options class. The rasterizer and the batch renderer set themselves up from it, while a raytracer camera also needs its renderer on the scene, `gs.Scene(renderer=gs.renderers.RayTracer(...))`, and raises at build time without it. For photo-realistic path tracing, prefer the Nyx renderer described in {doc}`/user_guide/rendering/nyx_renderer`.
 
 Common parameters (all backends):
 
