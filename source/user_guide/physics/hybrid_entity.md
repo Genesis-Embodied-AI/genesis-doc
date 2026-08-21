@@ -37,7 +37,7 @@ scene = gs.Scene(
 )
 ```
 
-The MPM solver simulates the skin on a background grid; `lower_bound` and `upper_bound` (meters) define that grid, and anything that leaves it is lost. Keep the entity comfortably inside.
+The MPM solver simulates the skin on a background grid; `lower_bound` and `upper_bound` (meters) define that grid's extent. Keep the entity comfortably inside.
 
 ## Add the hybrid entity
 
@@ -112,7 +112,7 @@ The rigid and soft solvers must share the same `dt`. Genesis World asserts this 
 :::
 
 :::{warning}
-The MPM grid defined by `lower_bound` / `upper_bound` is finite. Particles that move outside it are dropped, which shows up as skin tearing away from the skeleton. Size the bounds to contain the entity's full range of motion.
+The MPM grid defined by `lower_bound` / `upper_bound` is finite, and the solver clamps a skin particle that reaches the edge, which shows up as the skin catching on an invisible wall while the skeleton moves on. Size the bounds to contain the entity's full range of motion.
 :::
 
 :::{tip}

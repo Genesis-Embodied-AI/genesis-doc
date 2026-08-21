@@ -126,7 +126,7 @@ On disk, a checkpoint is a pickled dictionary. The `arrays` entry is a flat map 
 ## Reproducibility notes
 
 - **Configuration must match.** A checkpoint restores fields by name into an already-built scene. The entities, solver options, and environment count must match the scene that produced it. There is no compatibility check: a mismatch fails or silently corrupts state.
-- **Precision limits exactness.** Genesis World uses 32-bit floats by default (see {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`). A save/load round trip is therefore accurate to roughly single-precision, not bit-exact. Build with `precision="64"` if you need tighter reproducibility.
+- **Precision limits exactness.** Genesis World uses 32-bit floats by default (see {doc}`initialization`). A save/load round trip is therefore accurate to roughly single-precision, not bit-exact. Initialize with `precision="64"` if you need tighter reproducibility.
 - **Serialize before pickling a `SimState`.** A `SimState` returned by `get_state()` holds live references back into the scene and its autograd graph. Call `state.serializable()` first to detach the tensors and drop those references, then pickle it yourself. `save_checkpoint` handles this for you.
 
 ```python
@@ -142,5 +142,3 @@ with open("state.pkl", "wb") as f:
 
 - {doc}`Parallel simulation </user_guide/getting_started/parallel_simulation>`: how state is batched over environments.
 - {doc}`Scene API </api_reference/engine/scene>`: the full signatures of `get_state`, `reset`, `save_checkpoint`, and `load_checkpoint`.
-</content>
-</invoke>

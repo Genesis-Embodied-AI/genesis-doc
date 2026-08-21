@@ -108,7 +108,7 @@ Two light types are available:
 Ambient light is a separate, uniform fill set through the `ambient_light` field rather than an entry in `lights`.
 
 :::{note}
-This controls the rasterizer only. The ray tracer has no light objects: lights there are entities with an {py:class}`Emission <genesis.options.surfaces.Emission>` surface, covered in {doc}`Surfaces and textures <surfaces_textures>`. The `BatchRenderer` backend instead takes lights at runtime through `scene.add_light(...)`.
+This controls the rasterizer only. The ray tracer ignores `VisOptions.lights` and lights the scene from three sources of its own: the `lights` list of sphere area lights on `gs.renderers.RayTracer(...)`, its `env_surface` environment map, and any entity carrying an {py:class}`Emission <genesis.options.surfaces.Emission>` surface, covered in {doc}`Surfaces and textures <surfaces_textures>`. The `BatchRenderer` backend instead takes lights at runtime through `scene.add_light(...)`.
 :::
 
 ## Rendering backends

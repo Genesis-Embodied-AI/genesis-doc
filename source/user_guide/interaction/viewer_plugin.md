@@ -121,7 +121,7 @@ class MyPlugin(ViewerPlugin):
         return None
 
     def on_draw(self) -> None:
-        # Debug geometry drawn here is cleared and redrawn each frame.
+        self.scene.clear_debug_objects()  # debug geometry persists, so clear last frame's first
         self.scene.draw_debug_sphere((0.0, 0.0, 1.0), radius=0.05)
 ```
 

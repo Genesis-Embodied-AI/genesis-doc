@@ -85,7 +85,7 @@ The gripper stays open throughout the learned rollout. The policy's job is to al
 
 ### Reward
 
-A single reward term drives learning: keypoint alignment. Reference keypoints are attached to both the gripper and the object, and the reward shrinks as the two sets of keypoints coincide:
+A single reward term drives learning: keypoint alignment. Reference keypoints are attached to both the gripper and the object, and the reward grows as the two sets of keypoints coincide:
 
 ```python
 reward_scales = {

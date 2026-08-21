@@ -1,6 +1,6 @@
 # Installation
 
-Genesis World installs from PyPI in two steps: install PyTorch, then install Genesis World. It runs on Linux, macOS, and Windows, on CPU and on CUDA and non-CUDA GPUs.
+Genesis World installs from PyPI in two steps: install PyTorch, then install Genesis World. It runs on Linux, macOS, and Windows, on the CPU and on NVIDIA, AMD, and Apple Silicon GPUs.
 
 ## Install
 
@@ -23,16 +23,16 @@ To run on CUDA, make sure a matching NVIDIA driver is installed on your machine.
 - **Python:** 3.10 to 3.13 (`>=3.10,<3.14`).
 - **Operating system:** Linux, macOS, or Windows. Linux with a CUDA-compatible GPU gives the best performance.
 
-Genesis World is cross-platform across CPU, CUDA GPUs, and non-CUDA GPUs. The following combinations are supported:
+Genesis World simulates on the CPU (`gs.cpu`) and on NVIDIA (`gs.cuda`), AMD (`gs.amdgpu`), and Apple Silicon (`gs.metal`) GPUs, with `gs.gpu` resolving to whichever of the three your machine has. An Intel GPU drives the viewer and offscreen rendering but has no simulation backend, so run the physics on `gs.cpu` there. The following combinations are supported:
 
 | OS | GPU | GPU simulation | CPU simulation | Interactive viewer | Headless rendering |
 |---|---|:---:|:---:|:---:|:---:|
 | Linux | Nvidia | ✅ | ✅ | ✅ | ✅ |
 | Linux | AMD | ✅ | ✅ | ✅ | ✅ |
-| Linux | Intel | ✅ | ✅ | ✅ | ✅ |
+| Linux | Intel | ❌ | ✅ | ✅ | ✅ |
 | Windows | Nvidia | ✅ | ✅ | ✅ | ✅ |
 | Windows | AMD | ✅ | ✅ | ✅ | ✅ |
-| Windows | Intel | ✅ | ✅ | ✅ | ✅ |
+| Windows | Intel | ❌ | ✅ | ✅ | ✅ |
 | macOS | Apple Silicon | ✅ | ✅ | ✅ | ✅ |
 
 ## Optional components

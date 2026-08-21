@@ -74,7 +74,7 @@ scene = gs.Scene(
 )
 ```
 
-The MPM solver discretizes space onto a background grid; `lower_bound` and `upper_bound` set its extent in meters (Z-up). Any particle that leaves the grid is lost, so size the bounds to contain the robot's full range of motion.
+The MPM solver discretizes space onto a background grid; `lower_bound` and `upper_bound` set its extent in meters (Z-up). A particle that reaches the edge is clamped there and loses its velocity into the wall, so size the bounds to contain the robot's full range of motion.
 
 ## Muscle groups and fiber directions
 

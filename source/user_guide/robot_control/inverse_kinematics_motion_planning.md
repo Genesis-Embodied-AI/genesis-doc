@@ -8,7 +8,7 @@ The complete script is [`examples/tutorials/IK_motion_planning_grasp.py`](https:
 :alt: A Franka arm positioned above a small cube on the ground plane, viewed in the Genesis World viewer.
 ```
 
-Motion planning uses the [OMPL](https://ompl.kavrakilab.org/) library. Install it with the instructions on the {doc}`installation </user_guide/overview/installation>` page before running the example.
+Motion planning runs on the sampling-based planners built into Genesis World, so the example needs no extra dependency. See {doc}`path_planning` for the planners and their parameters.
 
 ## Scene and robot setup
 

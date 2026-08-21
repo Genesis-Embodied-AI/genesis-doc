@@ -14,7 +14,7 @@ To pick a solver and run one, see {doc}`/user_guide/physics/beyond_rigid_bodies`
 | **SPH** (Smoothed-Particle Hydrodynamics) | Free-surface liquids | Particles |
 | **SF** (Stable Fluids) | Smoke and gas | Fixed Eulerian grid |
 
-A **kinematic** solver for scripted motion and a **tool** solver for driven manipulators round out the set. Both participate in coupling, and neither is selected through a material.
+A **kinematic** solver for scripted motion and a **tool** solver for driven manipulators round out the set, and a material selects them as it does the five above: `gs.materials.Kinematic` and `gs.materials.Tool`. The tool solver drives the soft solvers through one-way coupling, while a kinematic entity is rendered only and takes no part in physics.
 
 ## Deformation and stress
 
