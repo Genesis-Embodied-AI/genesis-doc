@@ -6,7 +6,7 @@ A data function that returns a `dict` becomes one labeled subplot per key.
 
 ## `gs.recorders.PyQtLinePlot`
 
-Live line plot backed by PyQtGraph. The fastest option for high-rate time-series data, at the cost of a PyQt dependency.
+Draws a live line plot with PyQtGraph. The fastest option for high-rate time-series data, at the cost of a PyQt dependency.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.recorders.PyQtLinePlot
@@ -19,7 +19,7 @@ Live line plot backed by PyQtGraph. The fastest option for high-rate time-series
 
 ## `gs.recorders.MPLLinePlot`
 
-Live line plot backed by Matplotlib. Use it for time-series data when a Matplotlib figure is preferred.
+Draws a live line plot with Matplotlib. Use it for time-series data when you want a Matplotlib figure.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.recorders.MPLLinePlot

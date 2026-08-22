@@ -1,6 +1,6 @@
 # Utilities and helpers
 
-Genesis World bundles a set of helper modules under `genesis.utils` for the operations that surround a simulation: selecting a compute backend, converting between array formats, applying geometric transforms, and loading assets from disk. This page is the entry point to those modules; each linked page documents one of them in detail.
+Genesis World bundles a set of helper modules under `genesis.utils` for the operations that surround a simulation: selecting a compute backend, converting between array formats, applying geometric transforms, and loading assets from disk. Each linked page documents one of them in detail.
 
 ## Modules
 

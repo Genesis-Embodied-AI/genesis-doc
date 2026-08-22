@@ -1,13 +1,11 @@
 # Camera sensors
 
-A camera sensor renders the scene to an RGB image off-screen and returns it through the sensor pipeline. Add one with `scene.add_sensor(...)`, step the simulation, and call `read()` to get pixels back as a tensor. No viewer window required.
+A camera sensor renders the scene to an RGB image off-screen and returns it through the sensor pipeline, with no viewer window involved. Add one with `scene.add_sensor(...)`, step the simulation, and call `read()` to get pixels back as a tensor. It is a first-class {doc}`sensor <index>`: it renders lazily on `read()`, joins the batched `scene.read_sensors()` path, and mounts on a moving link like any other sensor.
 
-A camera sensor is distinct from two things it is easy to confuse it with:
+Genesis World has two other ways to look at a scene:
 
-- The **viewer** (`show_viewer=True`) is the interactive window a human watches. It renders live and returns nothing to your code. See {doc}`/user_guide/interaction/visualization`.
-- The **visualization camera** (`scene.add_camera().render(...)`) renders color, depth, segmentation, and surface-normal images on demand, and captures video with `start_recording()`. Use it when you want the four image channels or a video of the scene. It is covered in {doc}`/user_guide/rendering/index`.
-
-A camera sensor, by contrast, is a first-class {doc}`sensor <index>`: it renders lazily on `read()`, participates in the batched `scene.read_sensors()` path, and can be attached to a moving link like any other sensor. It returns **RGB only**.
+- The **viewer** (`show_viewer=True`) is the interactive window a human watches. It renders live and hands nothing back to your code. See {doc}`/user_guide/interaction/visualization`.
+- The **visualization camera** (`scene.add_camera().render(...)`) renders color, depth, segmentation, and surface-normal images on demand, and captures video with `start_recording()`. Use it when you want those four channels or a video of the scene. See {doc}`/user_guide/rendering/index`.
 
 The complete script is [`examples/sensors/camera_as_sensor.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/camera_as_sensor.py).
 
@@ -49,7 +47,7 @@ data = camera.read()
 rgb = data.rgb  # shape ([n_envs,] H, W, 3), dtype uint8, values 0-255
 ```
 
-The image is `(H, W, 3)` with `H = res[1]` and `W = res[0]`. Note that `res` is `(width, height)` but the array is row-major `(height, width)`, matching NumPy image conventions. The leading `n_envs` axis is present only when the scene is built with environments (`scene.build(n_envs=...)`); an unbatched `scene.build()` drops it.
+The image is `(H, W, 3)` with `H = res[1]` and `W = res[0]`: `res` is `(width, height)`, while the array is row-major `(height, width)` to match NumPy's image conventions. The leading `n_envs` axis is present only when the scene is built with environments (`scene.build(n_envs=...)`); an unbatched `scene.build()` drops it.
 
 Pass `envs_idx` to read a subset of environments:
 
@@ -142,7 +140,7 @@ All `BatchRendererCameraOptions` cameras in a scene must share the same resoluti
 ## Notes and gotchas
 
 :::{note}
-**Camera sensors return RGB only.** `read()` gives you the color image and nothing else. For depth, segmentation masks, or surface normals, use the visualization camera's `render()` method (see {doc}`/user_guide/rendering/index`) or, for depth specifically, the {doc}`depth-camera raycaster sensor <raycaster>`.
+**Camera sensors return RGB only.** `read()` returns the color image and nothing else. For depth, segmentation masks, or surface normals, use the visualization camera's `render()` method (see {doc}`/user_guide/rendering/index`) or, for depth specifically, the {doc}`depth-camera raycaster sensor <raycaster>`.
 :::
 
 :::{warning}

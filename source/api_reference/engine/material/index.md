@@ -16,7 +16,7 @@ Materials live under `gs.materials`. Each family maps to one solver, and the cla
 | `gs.materials.Tool` | Kinematic collider coupling | `Tool` |
 | `gs.materials.Kinematic` | None (visualization only) | `Kinematic` |
 
-`gs.materials.Hybrid` is not a solver of its own: it couples a rigid material and a soft material to simulate a soft skin actuated by an inner rigid skeleton.
+`gs.materials.Hybrid` pairs a rigid material with a soft one, running both solvers to simulate a soft skin actuated by an inner rigid skeleton.
 
 For the modeling background behind the deformable families, including which solver suits which phenomenon, see {doc}`/user_guide/theory/soft_solvers`.
 

@@ -1,8 +1,6 @@
 # Rigid-body constraints
 
-A **constraint** ties two rigid links together so the solver keeps a geometric relationship between them: coincident points, a fixed relative pose, or coupled joint values. Most constraints are declared once in a model file and hold for the whole simulation. One kind, the **weld** constraint, can be added and removed while the simulation runs, which is what makes it the tool for modeling a suction gripper picking up and releasing an object.
-
-This page covers the runtime weld API on the rigid solver, and how the file-declared constraint types relate to it.
+A **constraint** ties two rigid links together so the solver keeps a geometric relationship between them: coincident points, a fixed relative pose, or coupled joint values. A model file declares most constraints once, and they hold for the whole simulation. One kind, the **weld** constraint, can be added and removed while the simulation runs, so a suction gripper can pick an object up and release it.
 
 The complete runnable example is [`examples/rigid/suction_cup.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/suction_cup.py): a Franka arm reaches a cube, welds it to the hand, lifts and moves it, then releases.
 
@@ -10,7 +8,7 @@ The complete runnable example is [`examples/rigid/suction_cup.py`](https://githu
 
 A weld constraint pins two links so their relative pose is frozen at the values they have the instant you add it: all six degrees of freedom, translation and rotation. It is the constraint you toggle to model suction or a magnetic gripper: engage it when the end-effector reaches the object, delete it to let go.
 
-The API lives on the rigid solver, not on an entity, because a weld couples links that belong to two different entities. Reach it through `scene.sim.rigid_solver` after the scene is built:
+The API lives on the rigid solver, not on an entity, because a weld couples links that belong to two different entities. Go through `scene.sim.rigid_solver` after the scene is built:
 
 ```python
 rigid = scene.sim.rigid_solver
@@ -27,10 +25,10 @@ Deleting the constraint releases the object:
 rigid.delete_weld_constraint(link_cube, link_franka)
 ```
 
-Pass the same two link indices you welded. Once released, the object is governed by contact and gravity again, so it will fall unless something supports it.
+Pass the same two link indices you welded. Once released, the object responds to contact and gravity again, so it falls unless something supports it.
 
 :::{note}
-A weld records the relative pose at the moment it is added; it does not snap the links together. Move the end-effector into contact with the object *before* welding, or the object will hang in the air at whatever offset it had when the constraint engaged.
+A weld does not snap the links together, so move the end-effector into contact with the object *before* welding, or the object hangs in the air at whatever offset it had when the constraint engaged.
 :::
 
 ## Applying to a subset of environments
@@ -72,12 +70,12 @@ Pass `to_torch=False` for NumPy arrays, or `as_tensor=False` to get a per-enviro
 
 ## Constraint types
 
-Genesis World supports three equality-constraint types. Weld is the only one you add at runtime; the other two are read from a model's `<equality>` block when it is loaded from MJCF or URDF.
+Genesis World supports three equality-constraint types. Weld is the only one you add at runtime, and the other two come from a model's `<equality>` block when Genesis World loads an MJCF or URDF.
 
 | Type | Constrains | Declared in | Runtime API |
 |---|---|---|---|
-| Connect | A point on each link to coincide (3 DoF), a ball joint. | MJCF | — |
-| Weld | Relative pose fully fixed (6 DoF). | MJCF, or `add_weld_constraint` | `add_weld_constraint` / `delete_weld_constraint` |
+| Connect | A point on each link to coincide (3 dofs), a ball joint. | MJCF | — |
+| Weld | Relative pose fully fixed (6 dofs). | MJCF, or `add_weld_constraint` | `add_weld_constraint` / `delete_weld_constraint` |
 | Joint | One joint's value tied to another's by a polynomial. | MJCF, URDF | — |
 
 A connect or joint constraint enters the simulation with its host model. There is no runtime API to add or remove it; edit the model file's equality section instead.

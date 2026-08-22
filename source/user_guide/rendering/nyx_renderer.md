@@ -6,7 +6,7 @@
 
 **Nyx** is a GPU-accelerated path tracer built in-house for Genesis World. It produces physically based, photorealistic frames (suitable for robotics datasets, demos, and synthetic perception) and plugs into a scene as a **camera sensor** rather than as a scene-wide renderer.
 
-That distinction is the whole idea. The other rendering backends are selected once for the entire scene with `gs.Scene(renderer=...)`. Nyx instead attaches per camera with `scene.add_sensor(NyxCameraOptions(...))`, so a single scene can pair fast rasterized cameras for control loops with a photorealistic Nyx camera for the frames you keep. Rendering runs during `scene.step()`, and you read frames back from `cam.read().rgb`.
+The other rendering backends are selected once for the entire scene with `gs.Scene(renderer=...)`. Nyx instead attaches per camera with `scene.add_sensor(NyxCameraOptions(...))`, so a single scene can pair fast rasterized cameras for control loops with a photorealistic Nyx camera for the frames you keep. Rendering runs during `scene.step()`, and you read frames back from `cam.read().rgb`.
 
 ## When to use Nyx
 
@@ -19,7 +19,7 @@ Genesis World offers several ways to turn a scene into pixels (see {doc}`Renderi
 | High-throughput rendering across many environments | `gs.renderers.BatchRenderer(...)` |
 | Photorealistic frames: PBR materials, HDRI lighting, Gaussian splats | **Nyx** |
 
-Genesis World also ships an older path tracer, `gs.renderers.RayTracer()` (Luisa), for photorealistic stills. Nyx is the recommended path forward for photorealistic rendering; the RayTracer backend is being deprecated.
+Genesis World also ships an older path tracer, `gs.renderers.RayTracer()` (Luisa), for photorealistic stills. It is deprecated in favor of Nyx, which is the recommended path for photorealistic rendering.
 
 ## Installation
 
@@ -30,7 +30,7 @@ pip install gs-nyx
 ```
 
 :::{note}
-`gs-nyx` is currently distributed through an internal package index while the project is being prepared for public release. Public installation instructions will be published at the [Nyx repository](https://github.com/Genesis-Embodied-AI/genesis-nyx) once the wheel is on PyPI.
+`gs-nyx` is currently distributed through an internal package index while we prepare the project for public release. We will publish public installation instructions at the [Nyx repository](https://github.com/Genesis-Embodied-AI/genesis-nyx) once the wheel is on PyPI.
 :::
 
 Verify the install by importing the plugin alongside Genesis World:
@@ -41,8 +41,6 @@ import gs_nyx.nyx_py_renderer as npr
 import gs_nyx.nyx_py_sdk as nps
 from gs_nyx_plugin.nyx_camera_options import NyxCameraOptions
 ```
-
-The full option reference lives in the [Nyx documentation](https://genesis-embodied-ai.github.io/genesis-nyx/).
 
 Feature highlights:
 
@@ -56,7 +54,7 @@ Feature highlights:
 The `gs_nyx` / `gs_nyx_plugin` symbols below (`NyxCameraOptions`, `LightFieldAsset`, `EnvironmentMapAsset`, `nps.*`, `npr.*`) ship with the `gs-nyx` package, not the core `genesis` tree. `scene.add_sensor(...)` is the core sensor interface Nyx hooks into.
 :::
 
-## A minimal example
+## Minimal example
 
 The snippet below renders a PBR ball on a plane lit purely by an HDRI environment map, the canonical "hello world" for Nyx, mirroring [`examples/01_hello_nyx.py`](https://github.com/Genesis-Embodied-AI/genesis-nyx/blob/main/examples/01_hello_nyx.py) in the Nyx repo.
 
@@ -128,15 +126,14 @@ if __name__ == "__main__":
     main()
 ```
 
-Three things distinguish Nyx from the other backends:
+Two things differ from the other backends:
 
-- **Nyx is a sensor.** Register it with `scene.add_sensor(NyxCameraOptions(...))`, not as the scene `renderer`.
 - **Rendering happens during `scene.step()`.** Read frames back via `cam.read().rgb`, a torch tensor with one image per environment.
 - **`spp`** (samples per pixel) and **`render_mode`** trade quality for speed; `FastPathTracer` is a good default for iteration.
 
 ## Rendering a Gaussian splat
 
-Beyond standard meshes, Nyx can render captured **3D Gaussian splats** in the same path-traced frame as simulated geometry. A splat is declared as a `LightFieldAsset` on the Nyx camera, not as a Genesis World entity: every Nyx sensor's `light_fields` are collected at `scene.build()` and rendered each step.
+Beyond standard meshes, Nyx can render captured **3D Gaussian splats** in the same path-traced frame as simulated geometry. A splat is declared as a `LightFieldAsset` on the Nyx camera, not as a Genesis World entity: Nyx collects every sensor's `light_fields` at `scene.build()` and renders them each step. The capture bakes in its own view-dependent color, so an environment map only has to light the simulated geometry beside it.
 
 ```{figure} ../../_static/images/nyx_gaussian_splat.png
 :alt: A captured plant Gaussian splat sitting on a Genesis World plane, rendered by Nyx
@@ -212,12 +209,6 @@ if __name__ == "__main__":
     main()
 ```
 
-Things to notice:
-
-- **Splats are camera-side, not entities.** A `LightFieldAsset` is attached to `NyxCameraOptions.light_fields` and rendered each frame alongside simulated geometry.
-- **Splats are pre-lit.** Their view-dependent color is baked in, so the HDRI environment map only needs to light the simulated `Plane`.
-- **`scene.step()` triggers the render.** Pull frames with `cam.read().rgb`, indexed by environment.
-
-## Where to go next
+## See also
 
 More examples ship in the [Nyx examples folder](https://github.com/Genesis-Embodied-AI/genesis-nyx/tree/main/examples), covering attached cameras, materials, light types, object picking, and multi-camera and multi-environment rendering. For the full option reference and advanced features, see the [Nyx documentation](https://genesis-embodied-ai.github.io/genesis-nyx/).

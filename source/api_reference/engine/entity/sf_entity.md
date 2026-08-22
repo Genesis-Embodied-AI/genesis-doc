@@ -1,6 +1,6 @@
 # SFParticleEntity
 
-The particle entity backing Stable Fluid smoke, created from a {py:class}`gs.materials.SF.Smoke <genesis.engine.materials.SF.smoke.Smoke>` material and simulated by the Stable Fluid (SF) solver.
+`SFParticleEntity` is the particle entity backing Stable Fluid (SF) smoke, created from a {py:class}`gs.materials.SF.Smoke <genesis.engine.materials.SF.smoke.Smoke>` material and simulated by the SF solver.
 
 ```{eval-rst}
 .. autoclass:: genesis.engine.entities.sf_entity.SFParticleEntity

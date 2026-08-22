@@ -6,7 +6,7 @@ The complete script is [`examples/sensors/imu_franka.py`](https://github.com/Gen
 
 ## Minimal example
 
-An IMU is attached to one link of a rigid entity. Identify the link by its owning entity and the link's local index, then read the sensor after the scene is built:
+An IMU attaches to one link of a rigid entity. Identify the link by its owning entity and the link's local index, then read the sensor after the scene is built:
 
 ```python
 end_effector = franka.get_link("hand")
@@ -30,7 +30,7 @@ for _ in range(1000):
 
 ## Frame and conventions
 
-All three fields are expressed in the **sensor's body frame**, the frame of the attached link, rotated by any `euler_offset` you supply. They are not in the world frame, so they rotate with the link.
+The **sensor's body frame** is the attached link's frame rotated by `euler_offset`, so all three fields rotate as the link rotates.
 
 The accelerometer reports **specific force**: coordinate acceleration minus gravity. A sensor at rest therefore reads roughly `(0, 0, 9.81)` m/s² (the reaction to gravity along its local up axis), not zero. This matches real hardware, which cannot distinguish free fall from weightlessness.
 
@@ -56,7 +56,7 @@ With `draw_debug=True`, the viewer shows three arrows at the sensor: red for acc
 
 ## Modeling sensor imperfections
 
-By default the IMU is ideal. Each channel (`acc_*`, `gyro_*`, and `mag_*`) takes the same family of parameters to reproduce real-hardware error, applied per axis:
+By default the IMU is ideal. Each of its three channels (`acc_*`, `gyro_*`, `mag_*`) accepts the same family of per-axis error parameters:
 
 ```python
 imu = scene.add_sensor(
@@ -78,7 +78,7 @@ imu = scene.add_sensor(
 )
 ```
 
-Each channel takes the same family of knobs: `*_noise` (white-noise standard deviation), `*_bias` (constant offset), `*_random_walk` (drift standard deviation), `*_cross_axis_coupling` (axis misalignment), and `*_resolution` (quantization step), plus the shared `delay` and `jitter` timing. Their exact meanings and defaults are in {doc}`the IMU reference </api_reference/engine/sensors/imu>` and the {doc}`sensors overview <index>`; set them from your target hardware's datasheet.
+The family is `*_noise` (white-noise standard deviation), `*_bias` (constant offset), `*_random_walk` (drift standard deviation), `*_cross_axis_coupling` (axis misalignment), and `*_resolution` (quantization step), plus the shared `delay` and `jitter` timing. Their exact meanings and defaults are in {doc}`the IMU reference </api_reference/engine/sensors/imu>` and the {doc}`sensors overview <index>`; set them from your target hardware's datasheet.
 
 The magnetometer also reads a global field, set by `magnetic_field` (default `(0.0, 0.0, 0.5)` T in the world frame) and returned in the body frame.
 

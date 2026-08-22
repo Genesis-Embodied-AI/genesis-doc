@@ -1,13 +1,13 @@
 # Soft robots
 
-A soft robot is a deformable body with **muscle fibers** embedded in it. Instead of joint motors turning a rigid skeleton, you drive it by contracting those fibers: each actuation signal adds an active stress along the fiber direction, and the body deforms in response. This page shows how to build muscle-actuated soft robots and control them.
+A soft robot is a deformable body with **muscle fibers** embedded in it. Instead of joint motors turning a rigid skeleton, you drive it by contracting those fibers: each actuation signal adds an active stress along the fiber direction, and the body deforms in response.
 
-Genesis World simulates muscles with two deformable solvers, and you pick one through the entity's material:
+Genesis World simulates muscles with two deformable solvers; pick one through the entity's material:
 
 - {py:class}`gs.materials.MPM.Muscle <genesis.engine.materials.MPM.muscle.Muscle>`: the Material Point Method solver, actuated per **particle**.
 - {py:class}`gs.materials.FEM.Muscle <genesis.engine.materials.FEM.muscle.Muscle>`: the Finite Element Method solver, actuated per tetrahedral **element**.
 
-Both share the same control interface, so you can swap solvers without rewriting your control loop. The {doc}`beyond_rigid_bodies` tutorial covers the underlying solvers in more depth.
+Both share the same control interface, so swapping solvers leaves your control loop unchanged. The {doc}`beyond_rigid_bodies` tutorial covers the underlying solvers in more depth.
 
 :::{note}
 MPM and FEM are compute-heavy. Run them on the GPU by passing `backend=gs.gpu` to `gs.init()` for interactive frame rates.
@@ -50,12 +50,12 @@ for i in range(1000):
 Everything else (the plane, the scene, `build`, `step`) is the standard flow from {doc}`/user_guide/getting_started/hello_genesis`.
 
 :::{note}
-The constitutive `model` names differ between solvers. MPM uses `"corotation"` or `"neohooken"`; FEM uses `"linear"` or `"stable_neohookean"`. (`"stable_neohooken"` is a deprecated spelling of the FEM model and will warn.)
+The constitutive `model` names differ between solvers. MPM uses `"corotation"` or `"neohooken"`; FEM uses `"linear"` or `"stable_neohookean"`. (`"stable_neohooken"` is a deprecated spelling of the FEM model and logs a warning.)
 :::
 
-## The scene: timestep and gravity
+## Timestep and gravity
 
-Soft-body dynamics need small timesteps and several substeps for numerical stability. Set the timestep on each solver's options, not on `SimOptions`:
+Soft-body dynamics need small timesteps and several substeps for numerical stability. Set the timestep on each soft solver's options, which leaves the rest of the scene at the global timestep:
 
 ```python
 dt = 5e-4  # seconds
@@ -167,7 +167,7 @@ robot = scene.add_entity(
 )
 ```
 
-Because the actuation comes from the rigid skeleton, you control a hybrid robot through the ordinary rigid interface (`control_dofs_velocity`, `control_dofs_position`, `control_dofs_force`) with as many values as the skeleton has degrees of freedom:
+Because the actuation comes from the rigid skeleton, control a hybrid robot through the ordinary rigid interface (`control_dofs_velocity`, `control_dofs_position`, `control_dofs_force`), passing as many values as the skeleton has degrees of freedom:
 
 ```python
 for i in range(1000):

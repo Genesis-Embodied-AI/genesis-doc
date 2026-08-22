@@ -1,6 +1,6 @@
 # Visualization and rendering
 
-Genesis World turns a simulation into pixels through two independent paths: an interactive **viewer** window for watching a scene as it runs, and **cameras** that render frames you can read back as tensors. This page maps the visualization API and points to the reference for each component.
+Genesis World turns a simulation into pixels through two independent paths: an interactive **viewer** window for watching a scene as it runs, and **cameras** that render frames and return them as tensors.
 
 ## Components
 
@@ -26,6 +26,6 @@ lights
 
 ## See also
 
-- {doc}`/user_guide/interaction/visualization`: the interactive viewer and command-line tools
-- {doc}`/user_guide/rendering/index`: cameras, image types, video, and rendering backends
-- {doc}`/api_reference/engine/sensors/camera`: the camera sensor, read through the sensor interface
+- {doc}`/user_guide/interaction/visualization`: the interactive viewer and command-line tools.
+- {doc}`/user_guide/rendering/index`: cameras, image types, video, and rendering backends.
+- {doc}`/api_reference/engine/sensors/camera`: the camera sensor, read through the sensor interface.

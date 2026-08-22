@@ -2,7 +2,7 @@
 
 Every mesh you load into Genesis World serves two different jobs, and they want opposite things. The **visual mesh** should look right, so it keeps every triangle the artist authored. The **collision mesh** feeds the physics solver, which is fastest and most stable when geometry is simple, watertight, and convex. A raw mesh from a scanner or an art tool is usually none of those things.
 
-To bridge the gap, Genesis processes the collision geometry of a rigid entity automatically when you load it (watertightening, decimating, and convex-decomposing it) while leaving the visual mesh untouched. This page explains what that pipeline does, the options that control it, and when to reach for each one.
+To bridge the gap, Genesis processes the collision geometry of a rigid entity automatically when you load it (watertightening, decimating, and convex-decomposing it) while leaving the visual mesh untouched. This page explains what that pipeline does, the options that control it, and when to change each one.
 
 The two runnable examples referenced throughout are the source of truth for the code:
 
@@ -32,15 +32,15 @@ The `vis_mode` shortcut is how you inspect the result of processing. It renders 
 The processing described below applies when the morph becomes a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`. Deformable entities (FEM, MPM, and other particle-based materials) do not convexify their meshes; see {doc}`Beyond rigid bodies </user_guide/physics/beyond_rigid_bodies>`.
 :::
 
-## The collision pipeline
+## Collision pipeline
 
 When a mesh becomes a rigid entity, Genesis prepares its collision geometry in three stages:
 
 - **Watertighten:** close gaps and remove non-manifold artifacts so the mesh bounds a well-defined volume. Controlled by `watertighten` (an integer 0–8, default 5).
 - **Decimate:** reduce the triangle count toward a target so narrow-phase collision stays cheap.
-- **Convexify:** replace the mesh with one or more convex hulls, since the collision solver is fastest and most robust on convex shapes.
+- **Convexify:** replace the mesh with one or more convex hulls, since a convex shape has an exact support function, which is what the collision algorithms query.
 
-Decimation and convexification are on by default for rigid entities and can be disabled independently. The visual mesh is never modified by any of this.
+Decimation and convexification are on by default for rigid entities; turn either off on its own with `decimate=False` or `convexify=False`.
 
 ## Decimation
 
@@ -124,7 +124,7 @@ For the material side of deformable simulation, see {doc}`Soft robots </user_gui
 
 ## Caching
 
-Mesh processing is expensive, so Genesis caches each result on disk keyed by a SHA-256 hash of the input geometry and the options that produced it. Change a relevant option and the key changes, so the stale entry is bypassed and the mesh is reprocessed. Subsequent loads with identical inputs read straight from cache.
+Mesh processing is expensive, so Genesis caches each result on disk keyed by a SHA-256 hash of the input geometry and the options that produced it. Change a relevant option and the key changes, so Genesis bypasses the stale entry and reprocesses the mesh. Subsequent loads with identical inputs read straight from cache.
 
 | Result | Extension | Produced by |
 |---|---|---|

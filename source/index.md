@@ -18,7 +18,7 @@ Install PyTorch by following the [official instructions](https://pytorch.org/get
 pip install genesis-world
 ```
 
-From there, the {doc}`user guide </user_guide/index>` covers installation in detail, tutorials, and the full API reference.
+From there, the {doc}`user guide </user_guide/index>` covers installation and the tutorials, and the {doc}`API reference </api_reference/index>` documents every public class.
 
 ## Contributing
 

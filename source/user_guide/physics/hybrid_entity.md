@@ -6,12 +6,12 @@ The complete script is [`examples/tutorials/advanced_hybrid_robot.py`](https://g
 
 ## Mental model
 
-A hybrid entity is not a single solver's object. Genesis World builds it from two entities that share the same scene and timestep:
+A hybrid entity pairs two entities that share one scene and one timestep:
 
 - A **rigid part** (a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`) parsed from the URDF, carrying the joints and **degrees of freedom** (**dofs**).
 - A **soft part** (an {py:class}`MPMEntity <genesis.engine.entities.mpm_entity.MPMEntity>`) whose particles are attached to the rigid links.
 
-Each simulation step, the rigid solver advances the joints, and the coupling maps every soft particle back onto the link it belongs to; the particles' reaction then feeds a force back onto the rigid link. You drive the entity through the rigid dofs; the skin follows. The soft material must be MPM-based; FEM and PBD skins are not yet supported.
+Each simulation step, the rigid solver advances the joints, and the coupling maps every soft particle back onto the link it belongs to; the particles' reaction then feeds a force back onto the rigid link. Drive the entity through the rigid dofs, and the skin follows. The soft material must be MPM-based; FEM and PBD skins are not yet supported.
 
 ## Minimal setup
 
@@ -32,7 +32,7 @@ scene = gs.Scene(
         lower_bound=(0.0, 0.0, -0.2),  # MPM grid must enclose the soft skin
         upper_bound=(1.0, 1.0, 1.0),
         gravity=(0, 0, 0),  # mimic gravity compensation on the skin
-        enable_CPIC=True,
+        enable_CPIC=True,  # keeps skin particles from slipping through the thin skeleton links
     ),
 )
 ```
@@ -67,7 +67,7 @@ robot = scene.add_entity(
 )
 ```
 
-The skin is generated automatically: for each rigid link with a collision geometry, Genesis World inflates that geometry outward by `thickness` (meters) and fills it with MPM particles bound to the link. Gravity on the skin is cancelled by setting the MPM solver's `gravity` to zero above, and on the skeleton by `gravity_compensation=1.0`, so the arm holds its pose instead of sagging.
+Genesis World generates the skin: for each rigid link with a collision geometry, it inflates that geometry outward by `thickness` (meters) and fills it with MPM particles bound to the link. Setting the MPM solver's `gravity` to zero above cancels gravity on the skin, and `gravity_compensation=1.0` cancels it on the skeleton, so the arm holds its pose instead of sagging.
 
 ### Hybrid material parameters
 
@@ -82,7 +82,7 @@ The skin is generated automatically: for each rigid link with a collision geomet
 
 ## Control
 
-You control a hybrid entity through its rigid dofs, using the same methods as a plain `RigidEntity`. They are forwarded to the rigid part:
+Control a hybrid entity through its rigid dofs, using the same methods as a plain `RigidEntity`, which forward to the rigid part:
 
 ```python
 for i in range(1000):
@@ -95,7 +95,7 @@ for i in range(1000):
 
 ## Accessing the parts
 
-The two underlying entities are exposed as properties if you need to read or render them separately:
+The two underlying entities are exposed as properties, for reading or rendering them separately:
 
 ```python
 robot.part_rigid   # the RigidEntity skeleton

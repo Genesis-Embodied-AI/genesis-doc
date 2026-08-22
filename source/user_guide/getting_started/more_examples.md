@@ -4,7 +4,7 @@ The tutorials in this guide teach one idea at a time. The repository also ships 
 
 Every example is a self-contained script you can run directly, from the repository root: `python examples/tutorials/hello_genesis.py`. They share one command-line convention, so learning one script's flags teaches all of them: `-v/--vis` opens the viewer, `-b/--num-envs` sets the number of parallel environments, `-s/--steps` and `-t/--seconds` bound the run, `-r/--record` saves a video, and `-o/--output-dir` redirects the output. Anything a script writes lands under `out/`, resolved against the directory you launched it from, except the training scripts, which keep checkpoints under `logs/<exp-name>/` for their evaluation counterparts to read back.
 
-Examples run on the CPU by default, so a bare `python examples/...` works on any machine, and the ones that can use a GPU take `-g/--gpu` to opt in. A GPU only pays off past roughly fifty parallel environments, which few examples build. A script that only works on the GPU, such as a batched training run or the batch renderer, selects it internally and takes no backend flag.
+Examples run on the CPU by default, so a bare `python examples/...` works on any machine, and the ones that can use a GPU take `-g/--gpu` to opt in. A GPU only outruns the CPU past roughly fifty parallel environments, which few examples build. A script that only works on the GPU, such as a batched training run or the batch renderer, selects it internally and takes no backend flag.
 
 The directories group the examples by topic:
 

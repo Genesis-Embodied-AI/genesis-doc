@@ -68,9 +68,9 @@ Here `dt` is the simulation timestep in seconds, `gravity` points down along `-Z
 
 ## Add entities
 
-Objects and robots are {doc}`entities </api_reference/engine/entity/index>`. Genesis World is object-oriented: you interact with an entity through its own methods and attributes, not through a global handle or id.
+Objects and robots are {doc}`entities </api_reference/engine/entity/index>`. The API is object-oriented, so `add_entity` returns the entity itself and you drive it through its own methods and attributes.
 
-The first argument to `add_entity` is a {doc}`morph </api_reference/engine/entity/morph/index>`: a combined description of an entity's geometry *and* initial pose. You can build a morph from a shape primitive or load one from a file:
+The first argument to `add_entity` is a {doc}`morph </api_reference/engine/entity/morph/index>`: a combined description of an entity's geometry *and* initial pose. Build a morph from a shape primitive, or load one from a file:
 
 ```python
 plane = scene.add_entity(gs.morphs.Plane())
@@ -99,10 +99,10 @@ franka = scene.add_entity(
 )
 ```
 
-File paths may be absolute or relative. Relative paths are resolved against your working directory *and* against the bundled asset directory (`genesis/assets`), so `xml/franka_emika_panda/panda.xml` loads the Franka model that ships with Genesis World.
+File paths may be absolute or relative. Genesis World resolves a relative path against your working directory *and* against the bundled asset directory (`genesis/assets`), so `xml/franka_emika_panda/panda.xml` loads the Franka model that ships with Genesis World.
 
 :::{note}
-An MJCF file specifies the joint connecting the robot's base to the world; a URDF does not. A URDF base is therefore free (a 6-DoF joint to the world) unless you pass `fixed=True`. The same applies to `gs.morphs.Mesh`.
+An MJCF file specifies the joint connecting the robot's base to the world; a URDF does not. A URDF base is therefore free (a 6-dof joint to the world) unless you pass `fixed=True`. The same applies to `gs.morphs.Mesh`.
 :::
 
 ## Build and step
@@ -121,4 +121,6 @@ for i in range(1000):
 
 ## Next steps
 
-Continue with {doc}`Control your robot <control_your_robot>` to actuate the Franka you just loaded, then {doc}`Visualization </user_guide/interaction/visualization>` to work with the viewer and {doc}`Rendering </user_guide/rendering/index>` to capture images.
+- {doc}`Control your robot <control_your_robot>`: actuate the Franka you just loaded.
+- {doc}`Visualization </user_guide/interaction/visualization>`: watch a scene in the interactive viewer.
+- {doc}`Rendering </user_guide/rendering/index>`: capture images and video from a camera.

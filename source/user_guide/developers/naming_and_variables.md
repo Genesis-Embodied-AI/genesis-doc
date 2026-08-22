@@ -2,13 +2,13 @@
 
 Genesis World uses a small, consistent set of naming rules across its API and its source. This page is the reference for three of them: how an entity is identified (`name`, `uid`, `idx`), how indices switch between an entity's own numbering and the solver's global numbering (`*_idx_local` vs `*_idx`), and the `i_*` loop-variable and field-naming conventions you will meet when reading solver code.
 
-Two conventions in one sentence: identifiers answer "which entity is this," and indices answer "which slot in a state array." They are unrelated numbering systems, and mixing them is the most common source of off-by-entity bugs.
+Identifiers answer "which entity is this," and indices answer "which slot in a state array." They are unrelated numbering systems, so passing one where the other belongs reads and runs as valid code while addressing the wrong entity.
 
 ## Identifying an entity: name, uid, and idx
 
 Every entity carries three identifiers, each for a different job:
 
-- **`name`:** a human-readable string. You pass it to `scene.add_entity(..., name=...)`, or Genesis World generates one from the morph type and a UID prefix. Names are how you look an entity up later.
+- **`name`:** a human-readable string. Pass it to `scene.add_entity(..., name=...)`, or Genesis World generates one from the morph type and a UID prefix. Names are how you look an entity up later.
 - **`uid`:** a globally unique ID assigned at creation. It never collides across entities and is stable for the life of the object. Its `short()` form (a 7-character prefix) is what appears in terminal logs.
 - **`idx`:** the entity's integer position in the scene's creation order. This is an *index*, not an identifier you should hand-write. It exists so the engine can address the entity's data.
 
@@ -69,7 +69,7 @@ franka.set_qpos(qpos, qs_idx_local=...)
 ```
 
 - **Entity methods take local indices.** `dofs_idx_local`, `links_idx_local`, `qs_idx_local`. Passing `None` selects the entity's full range.
-- **Solver methods take global indices.** The `RigidSolver` equivalents accept already-resolved `dofs_idx`, `links_idx`, and so on. Reach for them only when you are working across entities at the solver level.
+- **Solver methods take global indices.** The `RigidSolver` equivalents accept already-resolved `dofs_idx`, `links_idx`, and so on. Use them only when you are working across entities at the solver level.
 - **`envs_idx` has no local form.** Environment (**env**) selection is scene-wide, so batched methods take a single `envs_idx` that indexes environments directly. See {doc}`parallel simulation </user_guide/getting_started/parallel_simulation>` for how the batch dimension works.
 
 :::{note}

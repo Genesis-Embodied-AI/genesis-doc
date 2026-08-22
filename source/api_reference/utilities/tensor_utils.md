@@ -1,13 +1,14 @@
 # Tensor utilities
 
-Genesis World provides utilities for converting between different array and tensor formats.
+Genesis World provides utilities for converting between array and tensor formats.
 
 ## Overview
 
-Genesis World uses:
-- **Quadrants fields**: For GPU-accelerated physics computation
-- **PyTorch tensors**: For state access and differentiability
-- **NumPy arrays**: For data export and visualization
+Genesis World keeps simulation data in three formats:
+
+- **Quadrants fields:** GPU-accelerated physics computation.
+- **PyTorch tensors:** state access and differentiability.
+- **NumPy arrays:** data export and visualization.
 
 ## Conversion helpers
 
@@ -20,14 +21,7 @@ The helpers below are exposed under `gs.utils`. They accept Genesis, PyTorch, or
 .. autofunction:: genesis.utils.misc.assert_gs_tensor
 ```
 
-## Data types
-
-| Genesis World | PyTorch | NumPy | Description |
-|---------|---------|-------|-------------|
-| `gs.tc_float` | `torch.float32` | `np.float32` | Default float |
-| `gs.tc_int` | `torch.int32` | `np.int32` | Default int |
-
 ## See also
 
-- {doc}`device`: Device configuration
-- {doc}`/api_reference/engine/states/index`: State management
+- {doc}`device`: the precision-dependent dtype aliases (`gs.tc_float`, `gs.np_float`, `gs.qd_float`, and their integer counterparts), and the globals `gs.init()` sets.
+- {doc}`/api_reference/engine/states/index`: state management.

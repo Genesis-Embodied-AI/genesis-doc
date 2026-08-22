@@ -1,6 +1,6 @@
 # Other sensors
 
-This page collects the remaining built-in sensors that do not fit the contact, tactile, IMU, camera, or raycaster families: a surface-distance probe, a thermal grid, and a joint-torque sensor.
+Three built-in sensors sit outside the contact, tactile, IMU, camera, and raycaster families: a surface-distance probe, a thermal grid, and a joint-torque sensor.
 
 Create each one from its `gs.sensors.*` options object with `scene.add_sensor()`; the call returns the sensor handle whose `read()` gives the measured value. For the attach-and-read model, batched reads, and configuration with noise, delay, and history, see the {doc}`sensors overview <index>`.
 
@@ -21,7 +21,7 @@ Reports the nearest distance from each probe point to the mesh surfaces of a set
 
 Overlays a 3D voxel grid on one rigid link and reports the temperature of every cell, in degrees Celsius, evolving each cell from contact conduction, radiation, convection, and optional per-cell heat generation. See {doc}`the temperature grid guide </user_guide/sensing/temperature_grid>`.
 
-Material properties are supplied through a `properties_dict` mapping a global rigid-link index to a `TemperatureProperties` entry.
+Supply material properties through `properties_dict`, which maps a global rigid-link index to a `TemperatureProperties` entry.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.sensors.options.TemperatureProperties
@@ -49,6 +49,6 @@ Measures the generalized effort delivered at each selected actuator's output sha
 
 ## See also
 
-- {doc}`index`: Sensor overview
-- {doc}`contact`: Contact and contact-force sensing
-- {doc}`raycaster`: Ray-based distance measurement
+- {doc}`index`: sensor overview.
+- {doc}`contact`: contact and contact-force sensing.
+- {doc}`raycaster`: ray-based distance measurement.

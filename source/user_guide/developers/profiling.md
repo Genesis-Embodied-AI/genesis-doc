@@ -10,7 +10,7 @@ The first is built in and always available. The other two use the PyTorch profil
 
 ## Benchmark against a disposable cache
 
-Before you measure anything, get the compilation cache out of the way. Genesis World compiles GPU kernels just-in-time and caches the results to a persistent local folder, so repeated runs of the same scene start quickly. Quadrants, the compiler, keeps its own cache in the same way. This is what you want for day-to-day work, but it distorts profiling and benchmarking: the first run pays the compilation cost and later runs read from the warm cache.
+Before you measure anything, get the compilation cache out of the way. Genesis World compiles GPU kernels just-in-time and caches the results to a persistent local folder, so repeated runs of the same scene start quickly. Quadrants, the compiler, keeps its own cache in the same way. This is what you want for day-to-day work, but it distorts profiling and benchmarking: the first run compiles the kernels, and later runs read them from the warm cache.
 
 Do not wipe the persistent cache to get around this. Its effect outlives your experiment, and every future simulation is slow until the cache rebuilds. Instead, redirect both caches to a throwaway directory for the duration of a single run, by setting a few environment variables:
 
@@ -41,7 +41,7 @@ Three numbers, all reported per window of wall-clock time:
 - **Per-env FPS:** the total divided by the number of environments. Useful when comparing scenes with different batch sizes.
 - **Environments:** the value of `n_envs` passed to `scene.build()`. It is omitted when the scene has no batch dimension.
 
-The rate is measured over fixed wall-clock windows and lightly smoothed with an exponential moving average, so it settles to a stable value rather than jumping every step.
+Genesis World measures the rate over fixed wall-clock windows and smooths it lightly with an exponential moving average, so it settles to a stable value rather than jumping every step.
 
 ### Configuring the counter
 
@@ -69,7 +69,7 @@ See {doc}`/user_guide/configuration/config_system` for how `ProfilingOptions` fi
 
 ## Measuring throughput
 
-The scripts in [`examples/speed_benchmark`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/speed_benchmark) are the reference for measuring throughput on your own hardware. They are the source of truth for a clean benchmark setup; the excerpts below only highlight the choices that matter.
+The scripts in [`examples/speed_benchmark`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/speed_benchmark) are the source of truth for a clean benchmark setup on your own hardware, so the excerpts below only highlight the choices that matter.
 
 [`examples/speed_benchmark/franka.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/franka.py) runs a Franka arm across tens of thousands of environments:
 
@@ -87,7 +87,7 @@ scene.build(n_envs=30000, env_spacing=(1.0, 1.0))
 
 Three choices make this a throughput benchmark rather than an interactive session:
 
-- **`performance_mode=True`** bakes static tensor shapes into the compiled kernels for faster stepping, at the cost of recompiling whenever the scene changes. It is worth it for a fixed benchmark or a training run, not for iterative development.
+- **`performance_mode=True`** bakes static tensor shapes into the compiled kernels for faster stepping, at the cost of recompiling whenever the scene changes. Use it for a fixed benchmark or a training run, and leave it off while you iterate.
 - **`show_viewer=False`** runs headless. Rendering a window caps throughput at display rates and defeats the purpose.
 - **A large `n_envs`** keeps the GPU saturated. Throughput scales with the batch until you run out of VRAM.
 

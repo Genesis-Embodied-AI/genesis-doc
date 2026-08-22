@@ -1,6 +1,6 @@
 # Extending Genesis World
 
-If you build a package on top of Genesis World that needs to set up and tear down its own resources, GPU buffers, a renderer, a background service, you can tie that lifecycle to Genesis itself. Register a pair of callbacks and Genesis runs your setup on `gs.init()` and your teardown on `gs.destroy()`, so your extension comes up and goes down in lockstep with the engine.
+A package built on top of Genesis World often has resources of its own to set up and tear down: GPU buffers, a renderer, a background service. Tie that lifecycle to Genesis itself. Register a pair of callbacks and Genesis runs your setup on `gs.init()` and your teardown on `gs.destroy()`, so your extension comes up and goes down in lockstep with the engine.
 
 ## Registering a module
 
@@ -43,7 +43,7 @@ Because the two callables identify the registration, pass named functions (or ho
 
 ## Writing a custom recorder
 
-The built-in file writers and plotters cover most needs, but you can capture data any way you like by subclassing `genesis.recorders.Recorder` and passing your options to `scene.start_recording`. A recorder follows a five-method lifecycle driven by the scene, not called directly:
+The built-in file writers and plotters cover most needs; to capture data any other way, subclass `genesis.recorders.Recorder` and pass your options to `scene.start_recording`. The scene drives a recorder through five methods, so you implement them and never call them yourself:
 
 1. **`__init__`** configures the recorder from its options.
 2. **`build()`** initializes resources (called during `scene.build()`).

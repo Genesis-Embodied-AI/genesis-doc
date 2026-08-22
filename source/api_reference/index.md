@@ -13,9 +13,9 @@ This section documents the Genesis World API. It is generated from the source do
 
 ## Options and built objects
 
-Most components in Genesis World come in two halves: an **options** class you configure, and the **built object** the engine constructs from it. You pass an options instance in (`gs.options.RigidOptions`, `gs.sensors.IMU`, `gs.renderers.Rasterizer`, ...), and Genesis builds the working object it configures (`RigidSolver`, `IMUSensor`, the rasterizer backend, ...) when the scene builds. The options carry the settings; the built object carries the runtime state and methods.
+We split most components into two halves: an **options** class you configure, and the **built object** the engine constructs from it. Pass an options instance in (`gs.options.RigidOptions`, `gs.sensors.IMU`, `gs.renderers.Rasterizer`, ...), and Genesis builds the working object it configures (`RigidSolver`, `IMUSensor`, the rasterizer backend, ...) when the scene builds. The options carry the settings; the built object carries the runtime state and methods.
 
-Reference pages follow this flow: the options class is documented **first**, then the built object it produces **below** it. Read the options to see what you can set, and the built object to see what you can call and read back once the scene is running. Configuration classes with no separate built object (morphs, materials, surfaces, textures) appear on their own, and the few options with no built-object page at all are collected on the {doc}`Options <options/index>` page.
+Reference pages follow that split: we document the options class **first**, then the built object it produces **below** it. Read the options for what to set, and the built object for what to call and read back once the scene is running. Configuration classes with no separate built object (morphs, materials, surfaces, textures) appear on their own, and we collect the few options with no built-object page at all on the {doc}`Options <options/index>` page.
 
 ```{toctree}
 :titlesonly:

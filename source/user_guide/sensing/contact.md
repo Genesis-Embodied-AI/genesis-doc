@@ -1,6 +1,6 @@
 # Contact and force sensors
 
-{py:class}`Contact <genesis.options.sensors.options.Contact>`, {py:class}`ContactForce <genesis.options.sensors.options.ContactForce>`, and {py:class}`JointTorque <genesis.options.sensors.options.JointTorque>` read how a rigid link or joint interacts with the rest of the scene straight from the rigid solver. They are **solver-based**: physically consistent with the simulation, but they only report where the solver actually resolves a contact. Reach for them when you want ground-truth, link-level interaction rather than a spatially resolved tactile field. For a dense field of per-taxel readings across a surface, use the {doc}`tactile sensors <tactile>` instead.
+{py:class}`Contact <genesis.options.sensors.options.Contact>`, {py:class}`ContactForce <genesis.options.sensors.options.ContactForce>`, and {py:class}`JointTorque <genesis.options.sensors.options.JointTorque>` read how a rigid link or joint interacts with the rest of the scene straight from the rigid solver. They are **solver-based**: physically consistent with the simulation, but they only report where the solver actually resolves a contact. Use them when you want ground-truth interaction at the level of a link or a joint. For a dense field of per-taxel readings across a surface, use the {doc}`tactile sensors <tactile>` instead.
 
 For how sensors are sampled, read back, batched with `scene.read_sensors()`, and configured with noise, delay, and `history_length`, see the {doc}`sensors overview <index>`.
 
@@ -12,7 +12,7 @@ For how sensors are sampled, read back, batched with `scene.read_sensors()`, and
 | `ContactForce` | net contact force on the link | `([n_envs,] 3)` | link-local, N |
 | `JointTorque` | actuator effort per dof | `([n_envs,] n_dofs)` | N·m (revolute) / N (prismatic) |
 
-The `[n_envs,]` axis is present only when the scene is built with multiple environments. When a sensor is created with `history_length > 0`, an extra axis is inserted after the batch axis (see the {doc}`overview <index>`).
+The `[n_envs,]` axis is present only when the scene is built with multiple environments. A sensor created with `history_length > 0` gains an extra axis after the batch axis (see the {doc}`overview <index>`).
 
 ## Contact and contact force
 
@@ -40,7 +40,7 @@ for link_name in foot_link_names:
     )
 ```
 
-A sensor is bound to one link by `entity_idx` and the entity-local `link_idx_local`. After building and stepping, read it:
+`entity_idx` and the entity-local `link_idx_local` bind a sensor to one link. After building and stepping, read it:
 
 ```python
 force = sensor.read()  # shape ([n_envs,] 3), N, in the link-local frame
@@ -62,7 +62,7 @@ The reading models the effort at the gearbox interface:
 actuator_force = tau_control - armature * qacc + tau_frictionloss + tau_damping
 ```
 
-Because `qacc` is the constraint-solved acceleration, gravity, Coriolis, and contact loads are all captured implicitly. In free space the reading is roughly the gravity-plus-Coriolis load; when the arm presses into an obstacle it also carries the contact reaction.
+Because `qacc` is the constraint-solved acceleration, the reading captures gravity, Coriolis, and contact loads implicitly. In free space the reading is roughly the gravity-plus-Coriolis load; when the arm presses into an obstacle it also carries the contact reaction.
 
 The full script is [`examples/sensors/joint_torque_franka.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/joint_torque_franka.py), which holds a Franka arm against a fixed wall box and plots control torque against sensed torque:
 

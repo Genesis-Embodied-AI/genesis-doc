@@ -2,11 +2,11 @@
 
 This page is for advanced users adding a new sensor type. It is the author's counterpart to the {doc}`sensor pipeline <sensor_pipeline>`, which describes how sensors execute at runtime; here the focus is the interface you implement, the shape and dtype contracts each override must honor, and how the framework pairs your sensor with its options automatically. If you only want to *use* the built-in sensors, start with {doc}`/user_guide/sensing/index` instead.
 
-The base classes live in `genesis/engine/sensors/base_sensor.py`. In almost every case you derive from `SimpleSensor` and override only the hooks you need. Deriving directly from `Sensor` is reserved for sensors that bypass the standard pipeline entirely, and the built-in cameras do exactly that through `BaseCameraSensor`.
+The base classes live in `genesis/engine/sensors/base_sensor.py`. In almost every case, derive from `SimpleSensor` and override only the hooks you need. Derive directly from `Sensor` only for a sensor that bypasses the standard pipeline entirely, as the built-in cameras do through `BaseCameraSensor`.
 
 ## Minimal working example
 
-A complete sensor is three classes: a user-facing options dataclass, a per-class metadata container, and the sensor itself. The following proximity sensor reports the distance from an attached link to the world origin, clamped to a maximum range. It is enough to be usable through `scene.add_sensor(...)`, and every imperfection feature (noise, bias, random walk, delay, jitter, history) is inherited from `SimpleSensor` and applied uniformly.
+A complete sensor is three classes: a user-facing options dataclass, a per-class metadata container, and the sensor itself. The following proximity sensor reports the distance from an attached link to the world origin, clamped to a maximum range. It is enough to be usable through `scene.add_sensor(...)`, and it inherits every imperfection feature (noise, bias, random walk, delay, jitter, history) from `SimpleSensor`, which applies them uniformly.
 
 ```python
 # my_plugin/options.py
@@ -74,7 +74,7 @@ class MyProximitySensor(
 
 The rest of this page explains why each piece exists and which additional hooks the more elaborate sensors override.
 
-## The classes you write
+## Classes you write
 
 Every sensor contributes the same three artifacts, plus two optional ones.
 
@@ -127,7 +127,7 @@ def _update_raw_data(cls, shared_context, shared_metadata, raw_data_T):
 | `SimpleSensor[OptionsT, None, MetadataT]` | Almost always. The standard per-step pipeline: raw, physics imperfections, transform, hardware imperfections, post-process, delay sampling. |
 | `SimpleSensor[OptionsT, None, MetadataT, DataT]` | Same pipeline, but `read()` returns an instance of `DataT`, a `NamedTuple`, instead of a single tensor. The IMU is the canonical example. |
 | `BaseCameraSensor[OptionsT]` | Camera-style sensors that render an image lazily on `read()`. See [Camera-style sensors](#camera-style-sensors). |
-| `Sensor[OptionsT, None, MetadataT]` | Only when neither standard pipeline fits. You then implement `_update_shared_cache` yourself, and set `uses_ring_pipeline = False` if your implementation never touches the timeline rings. |
+| `Sensor[OptionsT, None, MetadataT]` | Only when neither standard pipeline fits. Implement `_update_shared_cache` yourself, and set `uses_ring_pipeline = False` if your implementation never touches the timeline rings. |
 
 Mixins compose onto the base:
 
@@ -160,7 +160,7 @@ Both branches keep their own intermediate-space timeline ring holding post-trans
 
 - **`_apply_physics_imperfections(cls, shared_metadata, data, timeline)`:** random fluctuation of the underlying phenomenon that the simulator does not model (genuine drift, fine-scale turbulence on the field). Measured-only, applied before `_apply_transform`, so it propagates through the response model on later steps. Default: no-op.
 - **`_apply_transform(cls, shared_metadata, data, timeline, *, is_measured)`:** a coordinate transform and/or a stateful response model of the *sensor element* (thermal mass, RC time constant, mechanical bandwidth). Called on both branches; the coordinate part runs unconditionally, and you gate an element-specific effect that must not appear in ground truth on `if is_measured:`. Mutate `data` in place; read history with `timeline.at(1)`, `timeline.at(2)`. The IMU uses this for its body-frame alignment rotation; the temperature-grid sensor uses it for an RC filter.
-- **`_apply_hardware_imperfections(cls, shared_metadata, measured_slot_0)`:** the perturbations the readout electronics introduce at the sensor output. `SimpleSensor` already implements `noise`, `bias`, `random_walk`, and `resolution` here, gated by the `has_any_*` flags so an all-zero class pays nothing. Override only for a non-standard model, and call `super()` first for the standard terms:
+- **`_apply_hardware_imperfections(cls, shared_metadata, measured_slot_0)`:** the perturbations the readout electronics introduce at the sensor output. `SimpleSensor` already implements `noise`, `bias`, `random_walk`, and `resolution` here, gated by the `has_any_*` flags so an all-zero class skips them entirely. Override only for a non-standard model, and call `super()` first for the standard terms:
 
 ```python
 @classmethod
@@ -273,7 +273,7 @@ Two sensor types that declare the same context class share one instance. The man
 - **Link attachment** with `pos` / `lookat` / `up`, handing you the world-space transform to apply to your renderer each frame.
 - **An RGB output** of shape `([n_envs,] h, w, 3)` and dtype `torch.uint8`, declared from `options.res`, returned as a `CameraReturnType` `NamedTuple`.
 
-It opts out of the ring pipeline (`uses_ring_pipeline = False`) and rejects `delay`, `jitter`, and `history_length` at construction, since those depend on the return-space ring it does not allocate. You implement two hooks:
+It opts out of the ring pipeline (`uses_ring_pipeline = False`) and rejects `delay`, `jitter`, and `history_length` at construction, since those depend on the return-space ring it does not allocate. Implement two hooks:
 
 ```python
 class MyCameraSensor(BaseCameraSensor[MyCameraOptions]):
@@ -302,7 +302,7 @@ To pick the right hooks, mirror the closest built-in sensor. Every one implement
 | `TemperatureGridSensor` | yes | yes (RC filter reading `timeline.at(1)`) | identity |
 | Any `*CameraSensor` | — | — | identity; derives from `BaseCameraSensor` |
 
-`_apply_hardware_imperfections` is inherited unchanged by every `SimpleSensor`; override it only for a non-standard imperfection model.
+Every `SimpleSensor` inherits `_apply_hardware_imperfections` unchanged; override it only for a non-standard imperfection model.
 
 ## Things to double-check
 
