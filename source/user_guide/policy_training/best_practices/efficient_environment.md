@@ -66,7 +66,7 @@ self.reset_buf |= torch.abs(self.base_euler[:, 0]) > self.env_cfg["termination_i
 self.reset_buf |= self.scene.rigid_solver.get_error_envs_mask()
 ```
 
-The last line folds in numerical divergence. When the solver hits a NaN or a constraint failure in some environment, `scene.rigid_solver.get_error_envs_mask()` returns a `(n_envs,)` boolean mask of the affected environments. Reset those with the same machinery as a normal episode end, so a single diverged environment terminates on its own instead of crashing the batch.
+The last line folds rigid-solver failures into the normal episode termination path. Read {py:meth}`RigidSolver.get_error_envs_mask() <genesis.engine.solvers.rigid.rigid_solver.RigidSolver.get_error_envs_mask>` after `scene.step()` and reset the selected environments before the next step. See {doc}`simulation_stability` for numerical recovery, capacity errors, and diagnosis of repeated failures.
 
 Genesis World setters and the solver accept a boolean `envs_idx` mask directly, so you never have to materialize indices to use one.
 
@@ -107,7 +107,7 @@ self.robot.control_dofs_position(target_dof_pos[:, self.actions_dof_idx], slice(
 
 Two details keep this cheap.
 
-- **Address dofs with a `slice`, not an index tensor.** The third argument to `control_dofs_position` selects which dofs to drive. A `slice(6, 18)` is a free view; an index tensor forces a gather. Go2 arranges its actuated dofs contiguously and precomputes `actions_dof_idx = torch.argsort(self.motors_dof_idx)` once at init, so policy outputs ordered by joint name can be permuted into that contiguous layout before the call.
+- **Address dofs with a `slice`, not an index tensor.** The second argument to `control_dofs_position` selects which dofs to drive. A `slice(6, 18)` is a free view; an index tensor forces a gather. Go2 arranges its actuated dofs contiguously and precomputes `actions_dof_idx = torch.argsort(self.motors_dof_idx)` once at init, so policy outputs ordered by joint name can be permuted into that contiguous layout before the call.
 - **Reuse the target buffer where you can.** Every `a * scale + b` allocates a fresh tensor. Where a buffer's identity must stay stable, build the target into a pre-allocated tensor with `out=` writes instead. (Operations that change shape, such as `torch.concatenate` when assembling an observation vector, necessarily allocate; that is an accepted exception, not a rule to fight.)
 
 The zero-copy command writers on a rigid entity are `control_dofs_position`, `control_dofs_velocity`, and `control_dofs_force` for PD targets and direct forces, and `set_dofs_position` / `set_dofs_velocity` / `set_qpos` for direct state writes.
