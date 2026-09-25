@@ -58,7 +58,7 @@ For articulated models, two URDF options matter for performance and control:
 
 ## Scene files that carry their own ground
 
-An MJCF file describing a whole scene rather than a single robot often authors a ground plane directly under its `<worldbody>`. Pass `exclude_ground_plane=True` to leave those plane geometries out, so the model lands on the {py:class}`gs.morphs.Plane <genesis.options.morphs.Plane>` or {doc}`terrain </user_guide/physics/terrain>` you added yourself rather than on a second floor:
+An MJCF file describing a whole scene rather than a single robot often authors a ground plane directly under its `<worldbody>`. Pass `exclude_ground_plane=True` to leave those planes out, so the model rests on the {py:class}`gs.morphs.Plane <genesis.options.morphs.Plane>` or {doc}`terrain </user_guide/physics/terrain>` you added yourself rather than on a second floor:
 
 ```python
 scene.add_entity(gs.morphs.MJCF(file="scene.xml", exclude_ground_plane=True))

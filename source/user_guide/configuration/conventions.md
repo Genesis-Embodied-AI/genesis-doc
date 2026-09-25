@@ -115,11 +115,7 @@ Methods that read or write per-environment state take an `envs_idx` argument to 
 
 ## Index arguments
 
-`envs_idx` and the per-entity index arguments (`links_idx_local`, `dofs_idx_local`, `qs_idx_local`, and the like) all follow the same rules, so what works on one works on the others:
-
-- **Forms accepted:** an integer, a `range`, a `slice`, a list or tuple, a NumPy array, or a PyTorch tensor. `None` selects everything.
-- **Negative indices** count from the end, as they do in Python and NumPy: `envs_idx=-1` is the last environment.
-- **Boolean arrays** act as masks, and must have the full length of the dimension they select from.
+`envs_idx` and the per-entity index arguments (`links_idx_local`, `dofs_idx_local`, `qs_idx_local`, and the like) accept the same forms: an integer, a `range`, a `slice`, a list or tuple, a NumPy array, or a PyTorch tensor, with `None` selecting everything. Negative indices count from the end as they do in Python and NumPy, so `envs_idx=-1` is the last environment. A boolean array acts as a mask, and must span the full length of the dimension it selects from.
 
 ## Data types and precision
 

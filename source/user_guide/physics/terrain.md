@@ -152,14 +152,14 @@ terrain = scene.add_entity(
 
 ## Querying the surface height
 
-`scene.add_entity(gs.morphs.Terrain(...))` returns a {py:class}`TerrainEntity <genesis.engine.entities.rigid_entity.terrain_entity.TerrainEntity>`, whose `get_terrain_height` reports the elevation of the terrain surface at world-frame x-y positions. It reads the same piecewise-planar surface bodies rest on, so a locomotion policy can use it to know how far the ground is under each foot.
+`scene.add_entity(gs.morphs.Terrain(...))` returns a {py:class}`TerrainEntity <genesis.engine.entities.rigid_entity.terrain_entity.TerrainEntity>`, whose `get_terrain_height` reports the elevation of the terrain surface at world-frame x-y positions. The heights come from the same piecewise-planar surface that bodies collide with, so a locomotion policy can read how far the ground is below each foot.
 
 ```python
 positions = torch.tensor([[1.0, 1.0], [2.0, 3.5]], device=gs.device)  # x-y, meters
 heights = terrain.get_terrain_height(positions)  # shape ([n_envs,] n_points), meters
 ```
 
-Positions are given in the world frame rather than in grid coordinates, since the terrain's translation and yaw are applied to the query. The shape of `positions` decides how the query is batched:
+The query applies the terrain's translation and yaw, so give positions in the world frame rather than in grid coordinates. The shape of `positions` decides how the query is batched:
 
 - **`(2,)`:** one point, and the result drops the point dimension.
 - **`(n_points, 2)`:** points shared across every environment.
@@ -167,7 +167,7 @@ Positions are given in the world frame rather than in grid coordinates, since th
 
 Pass `envs_idx` alongside any of them to restrict the query to a subset of environments.
 
-A position up to one grid cell outside the terrain is clamped to its edge. Anything farther out, a position holding `NaN` or infinity, and a terrain tilted more than 0.001 rad from world vertical all report `NaN`.
+A position up to one grid cell outside the terrain is clamped to its edge, and one farther out reports `NaN`. So does a position holding `NaN` or infinity, and every position on a terrain tilted more than 0.001 rad from world vertical.
 
 ## Caching generated terrains
 

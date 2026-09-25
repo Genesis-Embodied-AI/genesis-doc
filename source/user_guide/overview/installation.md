@@ -123,7 +123,7 @@ To ensure GPU rendering is active:
    ln -s /usr/lib/x86_64-linux-gnu/libcuda.so.1 /usr/lib/x86_64-linux-gnu/libcuda.so
    ```
 
-5. Genesis World picks the window-less backend of the operating system for you, EGL on Linux and CGL on macOS, so you usually do not need to set `PYOPENGL_PLATFORM`. It accepts `egl`, `osmesa`, `cgl` (macOS only), and `pyglet`, which is the fallback everywhere else. In custom setups (Docker, headless servers) these variables can help:
+5. Genesis World selects the offscreen OpenGL backend for your operating system (EGL on Linux, CGL on macOS, and pyglet elsewhere), so you usually do not need to set `PYOPENGL_PLATFORM`. To override that choice, set it to `egl`, `osmesa`, `cgl` (macOS only), or `pyglet`. In custom setups (Docker, headless servers) these variables can help:
 
    ```bash
    export NVIDIA_DRIVER_CAPABILITIES=all

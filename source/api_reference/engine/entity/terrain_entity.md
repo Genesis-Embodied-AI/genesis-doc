@@ -1,6 +1,6 @@
 # TerrainEntity
 
-The entity `scene.add_entity(gs.morphs.Terrain(...))` returns: a rigid entity whose single fixed link is a height field, a grid of elevations that bodies rest on and that answers a height query at any point. For usage, see {doc}`/user_guide/physics/terrain`.
+A `TerrainEntity` is the rigid entity that `scene.add_entity(gs.morphs.Terrain(...))` returns. Its single fixed link is a height field, a grid of elevations that bodies rest on, and `get_terrain_height` reads the surface elevation at any point of it. For usage, see {doc}`/user_guide/physics/terrain`.
 
 ```{eval-rst}
 .. autoclass:: genesis.engine.entities.rigid_entity.terrain_entity.TerrainEntity

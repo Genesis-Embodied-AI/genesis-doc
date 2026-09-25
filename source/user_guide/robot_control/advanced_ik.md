@@ -94,7 +94,7 @@ Parallel IK is most effective on a GPU backend, where all environments are solve
 
 Inverse kinematics is built on two lower-level operations the same solver exposes directly, and both are useful on their own for analytic control. Forward kinematics is IK's inverse: it maps a joint configuration to the resulting link poses. The Jacobian relates joint velocities to the end-effector's spatial velocity, which is the quantity IK differentiates to take each step; it also underpins Jacobian-transpose control and manipulability analysis.
 
-Both work on any entity the rigid solver simulates, with nothing to declare on the morph. The Jacobian is a method on the entity, while forward kinematics is a query on the solver, because it evaluates a configuration the solver does not currently hold.
+Both work on any rigid entity. The Jacobian is a method of the entity, while forward kinematics is a query on the solver, because it evaluates an arbitrary configuration rather than the one the solver holds.
 
 ```python
 ee_link = robot.get_link("hand")
@@ -109,8 +109,8 @@ links_pos, links_quat = robot.solver.forward_kinematics_query(robot, qpos)
 # links_quat: shape ([n_envs,] n_links, 4)   orientations, (w, x, y, z)
 ```
 
-`get_jacobian` takes an optional `local_point` (a length-3 point in the link's local frame) to evaluate the Jacobian somewhere other than the link origin. `forward_kinematics_query` returns the pose of every link of the entity and takes `envs_idx` to evaluate a subset of environments; the returned poses are in the world frame, consistent with the world-frame `qpos` input. It restores the configuration the solver holds before returning, so querying a hypothetical configuration leaves the simulation untouched.
+`get_jacobian` takes an optional `local_point` (a length-3 point in the link's local frame) to evaluate the Jacobian somewhere other than the link origin. `forward_kinematics_query` returns the world-frame pose of every link of the entity, and takes `envs_idx` to evaluate a subset of environments. It restores the solver's configuration before returning, so the query leaves the simulation state unchanged.
 
 :::{note}
-The `requires_jac_and_IK` morph argument these operations once needed is deprecated. Passing it logs a warning and changes nothing.
+The `requires_jac_and_IK` morph argument is deprecated: passing it logs a warning and has no effect.
 :::
