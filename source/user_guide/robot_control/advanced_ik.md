@@ -94,7 +94,7 @@ Parallel IK is most effective on a GPU backend, where all environments are solve
 
 Inverse kinematics is built on two lower-level operations the same solver exposes directly, and both are useful on their own for analytic control. Forward kinematics is IK's inverse: it maps a joint configuration to the resulting link poses. The Jacobian relates joint velocities to the end-effector's spatial velocity, which is the quantity IK differentiates to take each step; it also underpins Jacobian-transpose control and manipulability analysis.
 
-Both require an entity created with `requires_jac_and_IK=True`, which is the default for the {py:class}`MJCF <genesis.options.morphs.MJCF>` and {py:class}`URDF <genesis.options.morphs.URDF>` robot morphs.
+Both work on any rigid entity. The Jacobian is a method of the entity, while forward kinematics is a query on the solver, because it evaluates an arbitrary configuration rather than the one the solver holds.
 
 ```python
 ee_link = robot.get_link("hand")
@@ -104,13 +104,13 @@ jacobian = robot.get_jacobian(link=ee_link)  # shape ([n_envs,] 6, n_dofs)
 
 # Forward kinematics: joint configuration -> world-frame link poses.
 qpos = robot.get_qpos()
-links_pos, links_quat = robot.forward_kinematics(qpos)
+links_pos, links_quat = robot.solver.forward_kinematics_query(robot, qpos)
 # links_pos:  shape ([n_envs,] n_links, 3)   link-frame origins, world coordinates
 # links_quat: shape ([n_envs,] n_links, 4)   orientations, (w, x, y, z)
 ```
 
-`get_jacobian` takes an optional `local_point` (a length-3 point in the link's local frame) to evaluate the Jacobian somewhere other than the link origin. `forward_kinematics` accepts `qs_idx_local`, `links_idx_local`, and `envs_idx` to compute a subset of the configuration, links, or environments; the returned poses are in the world frame, consistent with the world-frame `qpos` input.
+`get_jacobian` takes an optional `local_point` (a length-3 point in the link's local frame) to evaluate the Jacobian somewhere other than the link origin. `forward_kinematics_query` returns the world-frame pose of every link of the entity, and takes `envs_idx` to evaluate a subset of environments. It restores the solver's configuration before returning, so the query leaves the simulation state unchanged.
 
 :::{note}
-`forward_kinematics` reuses the IK solver's internal buffers, which are allocated the first time you call `inverse_kinematics` on the entity. Solve IK at least once before calling it standalone.
+The `requires_jac_and_IK` morph argument is deprecated: passing it logs a warning and has no effect.
 :::

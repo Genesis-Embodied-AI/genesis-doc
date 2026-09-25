@@ -1,6 +1,6 @@
 # Drone entity
 
-A {py:class}`DroneEntity <genesis.engine.entities.drone_entity.DroneEntity>` is a quadrotor whose actuation is its four propeller speeds. Unlike a robot arm, it takes no joint torques or positions: set each propeller's angular velocity in **RPM** (revolutions per minute), and Genesis World converts those speeds into the aerodynamic forces that lift and steer the drone.
+A {py:class}`DroneEntity <genesis.engine.entities.rigid_entity.drone_entity.DroneEntity>` is a quadrotor whose actuation is its four propeller speeds. Unlike a robot arm, it takes no joint torques or positions: set each propeller's angular velocity in **RPM** (revolutions per minute), and Genesis World converts those speeds into the aerodynamic forces that lift and steer the drone.
 
 The examples below use the Crazyflie 2.X model that ships with Genesis World. For the class API, see the {doc}`DroneEntity reference </api_reference/engine/entity/drone_entity>`.
 

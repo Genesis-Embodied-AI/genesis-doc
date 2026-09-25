@@ -56,7 +56,7 @@ self.drone.set_propellers_rpm((1 + self.actions * 0.8) * 14468.429183500699)
 self.scene.step()
 ```
 
-Learning a fraction of hover RPM rather than an absolute RPM keeps the action range small and centered, which stabilizes early training. See {py:meth}`~genesis.engine.entities.drone_entity.DroneEntity.set_propellers_rpm` for the RPM-to-force conversion.
+Learning a fraction of hover RPM rather than an absolute RPM keeps the action range small and centered, which stabilizes early training. See {py:meth}`~genesis.engine.entities.rigid_entity.drone_entity.DroneEntity.set_propellers_rpm` for the RPM-to-force conversion.
 
 ### Observations
 

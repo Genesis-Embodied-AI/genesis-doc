@@ -65,7 +65,7 @@ contacts = ball.get_contacts(with_entity=plane)  # only ball-plane contacts
 ```
 
 :::{note}
-With multiple environments, every field carries a leading `n_envs` axis and is padded to the largest contact count across environments, so the same array is rectangular. `valid_mask` (shape `(n_envs, n_contacts)`) marks which rows are real; filter with it before using the data. A single-environment scene returns the fields already trimmed, with no `valid_mask`.
+With multiple environments, every field carries a leading `n_envs` axis and is padded to the largest contact count across environments, so the same array is rectangular. `valid_mask` (shape `(n_envs, n_contacts)`) marks which rows are real; filter with it before using the data. A scene built without environments returns the fields already trimmed, with no `valid_mask`.
 :::
 
 ## Net contact force per link

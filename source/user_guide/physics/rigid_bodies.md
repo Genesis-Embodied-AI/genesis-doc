@@ -57,6 +57,8 @@ scene = gs.Scene(
 
 Choose the elliptic `friction_cone` when resting objects have to stay put rather than creeping slowly. Paired with the default Newton `constraint_solver` it also unlocks the `signorini` contact resolution, which we then select by default: friction is bounded by the normal force the contact has developed, so a fast-sliding body decelerates at `friction` times gravity instead of lifting off a flat floor. Set `contact_resolution` explicitly to override that choice.
 
+Two examples show each coefficient on its own. [`examples/rigid/torsional_grasp.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/torsional_grasp.py) pinches a ball between two plates and spins it, and the point contact resists the spin only through `friction_torsional`. [`examples/rigid/rolling_coast.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/rolling_coast.py) rolls two balls side by side, and only the one with a `friction_rolling` coefficient coasts to a stop.
+
 The rigid solver governs how these bodies actually push on each other: contact, collision geometry, and constraints. {doc}`Theory and modeling </user_guide/theory/rigid_solver/index>` documents that model, and covers {doc}`contact resolution </user_guide/theory/rigid_solver/constraints>` in full.
 
 ## See also

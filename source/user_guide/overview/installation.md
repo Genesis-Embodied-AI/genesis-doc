@@ -72,7 +72,7 @@ from typing import TYPE_CHECKING
 import genesis as gs
 
 if TYPE_CHECKING:
-    from genesis.engine.entities.drone_entity import DroneEntity
+    from genesis.engine.entities.rigid_entity.drone_entity import DroneEntity
 ```
 
 ### Circular import error
@@ -123,7 +123,7 @@ To ensure GPU rendering is active:
    ln -s /usr/lib/x86_64-linux-gnu/libcuda.so.1 /usr/lib/x86_64-linux-gnu/libcuda.so
    ```
 
-5. Genesis World tries EGL by default, so you usually do not need to set `PYOPENGL_PLATFORM`. In custom setups (Docker, headless servers) these variables can help:
+5. Genesis World selects the offscreen OpenGL backend for your operating system (EGL on Linux, CGL on macOS, and pyglet elsewhere), so you usually do not need to set `PYOPENGL_PLATFORM`. To override that choice, set it to `egl`, `osmesa`, `cgl` (macOS only), or `pyglet`. In custom setups (Docker, headless servers) these variables can help:
 
    ```bash
    export NVIDIA_DRIVER_CAPABILITIES=all

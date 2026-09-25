@@ -18,6 +18,7 @@ Each physics solver has its own entity type. Choosing a material selects the sol
 
 - **`RigidEntity`:** articulated rigid bodies and robots simulated by the rigid solver. It is the type used for most manipulation and locomotion tasks, and it exposes links, joints, and dofs.
 - **`DroneEntity`:** a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>` subclass that adds propeller and thrust control for quadrotor simulation.
+- **`TerrainEntity`:** a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>` subclass that `gs.morphs.Terrain` builds, with a query for the surface height at any point.
 - **`MPMEntity`:** elastic and plastic solids, sand, snow, and similar continua simulated with the Material Point Method (MPM) solver.
 - **`FEMEntity`:** deformable solids simulated with the Finite Element Method (FEM) solver.
 - **PBD entities:** cloth, ropes, and particle-based fluids simulated by the Position Based Dynamics (PBD) solver. The material determines the concrete type: for example `PBD2DEntity` for cloth and `PBD3DEntity` for elastic volumes.
@@ -37,6 +38,7 @@ pbd_entity/index
 sph_entity
 sf_entity
 drone_entity
+terrain_entity
 hybrid_entity
 tool_entity
 emitter
