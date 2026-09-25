@@ -68,17 +68,6 @@ contacts = ball.get_contacts(with_entity=plane)  # only ball-plane contacts
 With multiple environments, every field carries a leading `n_envs` axis and is padded to the largest contact count across environments, so the same array is rectangular. `valid_mask` (shape `(n_envs, n_contacts)`) marks which rows are real; filter with it before using the data. A scene built without environments returns the fields already trimmed, with no `valid_mask`.
 :::
 
-## Reading contacts without synchronizing the device
-
-By default `get_contacts` trims its arrays to the number of live contacts, which needs that count on the host and so synchronizes the device on every read. Pass `is_padded=True` to skip the synchronization. Every field then keeps the fixed capacity the collider allocated, and `valid_mask` marks the real contacts whether or not the scene has parallel environments:
-
-```python
-contacts = ball.get_contacts(is_padded=True)
-mask = contacts["valid_mask"]  # shape ([n_envs,] capacity), True on a real contact
-```
-
-Use it in a training loop that reads contacts every step, where a synchronization per step keeps the host waiting on the device. For a one-off read while scripting or debugging, keep the default, because its arrays hold real contacts only.
-
 ## Net contact force per link
 
 When you only need the total external contact force on each link rather than the individual contact points, use `get_links_net_contact_force()`. It sums the contact forces the solver applied to every link of the entity:

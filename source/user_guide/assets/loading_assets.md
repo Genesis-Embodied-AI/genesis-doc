@@ -56,14 +56,6 @@ For articulated models, two URDF options matter for performance and control:
 
 - **`merge_fixed_links`** (default `True`) merges links joined by fixed joints into one rigid body, which is faster. If you need a merged link to stay addressable, for example an end-effector frame you drive with {doc}`inverse kinematics </user_guide/robot_control/inverse_kinematics_motion_planning>`, list it in **`links_to_keep`**.
 
-## Scene files that carry their own ground
-
-An MJCF file describing a whole scene rather than a single robot often authors a ground plane directly under its `<worldbody>`. Pass `exclude_ground_plane=True` to leave those planes out, so the model rests on the {py:class}`gs.morphs.Plane <genesis.options.morphs.Plane>` or {doc}`terrain </user_guide/physics/terrain>` you added yourself rather than on a second floor:
-
-```python
-scene.add_entity(gs.morphs.MJCF(file="scene.xml", exclude_ground_plane=True))
-```
-
 ## How file paths are resolved
 
 A morph's `file` may be an absolute path or a relative one. A relative path is resolved first against your current working directory, and if nothing is found there, against the asset directory bundled with Genesis World (`genesis/assets`). That is why `file="xml/franka_emika_panda/panda.xml"` loads the Franka model that ships with the package without any path setup.
