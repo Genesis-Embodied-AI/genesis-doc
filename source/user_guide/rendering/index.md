@@ -72,7 +72,7 @@ If you omit `save_to_filename`, Genesis World generates a name from the calling 
 
 Call `cam.pause_recording()` to keep a span of the simulation out of the video, a settling phase for instance, then `cam.start_recording()` with no argument to resume the same file; the paused span leaves no gap in the video. The filename and framerate are fixed for the whole of a video, so passing either one when resuming raises. After `stop_recording()`, the camera can record again to a new file at a new framerate.
 
-A camera in a batched scene that renders every environment records one file per rendered environment, each suffixed with its environment index (`video_0.mp4`, `video_1.mp4`, ...). That is what the `BatchRenderer` backend does, and what the rasterizer does with `env_separate_rigid=True` in `VisOptions`; otherwise the camera is bound to the single environment `env_idx` and records one file.
+A camera in a batched scene that renders every environment records one file per rendered environment, each suffixed with its environment index (`video_0.mp4`, `video_1.mp4`, ...). That is what the `BatchRenderer` backend does, and what the rasterizer does with `split_envs=True` in `VisOptions`; otherwise the camera is bound to the single environment `env_idx` and records one file.
 
 For recording sensor and simulation data (not just video) on a schedule, see {doc}`Recording data </user_guide/sensing/recorders>`.
 

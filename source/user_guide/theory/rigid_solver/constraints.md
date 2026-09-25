@@ -70,6 +70,8 @@ $$
 
 the solver spawns a single one-dof inequality with Jacobian $J = \pm 1$ and a reference acceleration that pushes the joint back inside its range. `enable_joint_limit` turns this on and off globally.
 
+The range comes from the model file, and `entity.set_dofs_limit(lower, upper, dofs_idx_local)` changes it after the scene is built. To change it in some environments only, pass `envs_idx` and set `batch_dofs_info=True` on {py:class}`RigidOptions <genesis.options.solvers.RigidOptions>`, as for the other per-environment dof properties.
+
 A related row models dry friction in a joint: dofs with a nonzero friction-loss coefficient get a constraint that resists motion up to a bounded force, independent of any limit.
 
 ### Equality constraints

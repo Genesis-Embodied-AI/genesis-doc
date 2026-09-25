@@ -1,12 +1,13 @@
 # Profiling simulation performance
 
-This page covers how to measure where a Genesis World simulation spends its time. There are three questions worth asking, in order of increasing depth:
+This page covers how to measure where a Genesis World simulation spends its time, through four questions of increasing depth:
 
 - **Throughput:** how many steps per second does the whole scene run? This is the headline number, reported as FPS.
+- **Step breakdown:** how much of a step goes to the physics, and how much to the sensors, the viewer, and the recorders around it? The answer tells you whether to optimize the physics at all.
 - **Launch latency:** is the GPU actually busy, or is the CPU stalling between kernel launches? This is what limits large parallel simulations that are not yet GPU-bound.
 - **Per-kernel time:** which solver kernels dominate a step? This tells you what to optimize.
 
-The first is built in and always available. The other two use the PyTorch profiler, which works even in a simulation that never touches PyTorch.
+The first two are built in and always available. The other two use the PyTorch profiler, which works even in a simulation that never touches PyTorch.
 
 ## Benchmark against a disposable cache
 
@@ -66,6 +67,44 @@ scene.profiling_options.show_FPS = False
 ```
 
 See {doc}`/user_guide/configuration/config_system` for how `ProfilingOptions` fits alongside the other options objects.
+
+## Reading the step breakdown
+
+The FPS counter reports the rate of the whole step, which includes everything the scene does around the physics. To see where that time goes, read `scene.timings` after stepping. It maps each phase of a step to its mean wall time in seconds:
+
+| Phase | Covers |
+|---|---|
+| `physics` | the solvers advancing the state over the substeps |
+| `sensors` | the sensor updates, with `sensors/<class name>` giving the share of each sensor class |
+| `rendering` | the viewer refresh |
+| `recorders` | the recorders reading the state |
+| `video` | the cameras rendering and encoding a frame of a recording |
+| `total` | the whole step, the pre-step callbacks included |
+
+A phase the step skips is absent from the mapping, so a scene with no sensors never reports a `sensors` time. The mapping stays empty until the first `scene.step()` returns.
+
+By default each reading covers the last step only, so it jitters from step to step. Set `timings_window` to average over that many steps instead, and a change in speed then takes as many steps to show:
+
+```python
+scene = gs.Scene(
+    profiling_options=gs.options.ProfilingOptions(
+        show_FPS=False,
+        timings_window=100,  # average each phase over the last 100 steps
+    ),
+)
+```
+
+Invert a phase to read it as a rate, for instance the step rate of the physics without the sensors, rendering, and recording around it:
+
+```python
+physics_fps = 1.0 / scene.timings["physics"]  # steps per second of the physics alone
+```
+
+[`examples/rigid/hibernation.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/hibernation.py) plots this rate live against the number of awake bodies while a pile of objects settles.
+
+:::{warning}
+On a GPU backend, a phase measures the host time spent launching its kernels while the device runs them asynchronously, so the phases add up to the real step only on the CPU backend. `total` is accurate on every backend as long as something in the step reads data back from the device, which makes the host wait for it.
+:::
 
 ## Measuring throughput
 

@@ -167,7 +167,7 @@ When MuJoCo compatibility is enabled, a mesh query falls back to an exhaustive v
 
 ## Contact islands and hibernation
 
-The solver partitions links into **contact islands**: connected components of a coupling graph whose edges are kinematic (every link to its parent), contacts, and equality constraints. An articulated body stays one island; an entity holding several free bodies splits into one island per body. Each island is an exactly decoupled block of the constraint solve, so `use_contact_island` (default `True`) lets the solver factor and solve them separately. It has no effect on a scene that is already one coupled tree, or on a differentiable scene, which uses the dense whole-scene solve regardless.
+The solver partitions the scene into **contact islands**: the connected components of a coupling graph whose nodes are the kinematic trees that carry dofs, joined by contacts and by equality constraints. An articulated body stays one island; an entity holding several free bodies splits into one island per body. Each island is an exactly decoupled block of the constraint solve, so the solver factors and solves every island on its own instead of assembling one system for the whole scene. A scene made of a single coupled tree forms one island.
 
 **Hibernation** extends that partition in time. Each step, the solver compares every awake link's maximum degree-of-freedom (dof) speed against `hibernation_thresh_vel`. It weights each dof velocity by its `dof_length`, which is 1 for a translational dof and the swept radius for a rotational one, so a single linear tolerance covers both and the rotational jitter of a small body does not keep it awake. A link that stays under the tolerance for 10 consecutive steps is ready to sleep, and an island hibernates once all of its links are ready, at which point the solver zeroes their dof velocities. Two things wake an island again: a new contact against one of its bodies, resolved before the solve so the body responds the same step, and a coupling force arriving from another solver.
 
@@ -184,7 +184,7 @@ scene = gs.Scene(
 There are no `hibernate()` or `wake()` calls: two options drive the whole mechanism. `use_hibernation` defaults to `False`, and `hibernation_thresh_vel` is the speed below which a link may sleep, in m/s, defaulting to `1e-4` under MuJoCo compatibility and `2e-3` otherwise.
 
 :::{note}
-The gain is largest on the CPU backend, where skipping sleeping islands raises the serial step rate directly. Hibernation is unavailable in differentiable scenes, which fall back to the dense whole-scene solve.
+The gain is largest on the CPU backend, where skipping sleeping islands raises the serial step rate directly. Hibernation stays off in a differentiable scene, because the adjoint pass needs every body in the iteration trace.
 :::
 
 Read which links are asleep from the solver state:
