@@ -49,6 +49,8 @@ scene.viewer.set_camera_pose(pos=(3.5, 0.0, 2.5), lookat=(0, 0, 0.5))
 
 Installing Genesis World adds a `gs` command with a few subcommands, so you can open the viewer without writing a script. Run `gs` with no arguments to list them.
 
+Every subcommand runs on the CPU by default. Pass `-b BACKEND` to run it on `gpu`, `cuda`, `amdgpu`, or `metal` instead: keep the CPU for a few environments, because it compiles faster, and switch to a GPU for many environments, which it simulates faster. `gpu` picks the first GPU backend available on your machine and falls back to the CPU.
+
 **`gs launch [asset]`** opens an asset in the interactive viewer. It accepts a Mesh, URDF, MJCF, or USD file, and for a USD stage it loads every rigid entity in the stage. It also opens a `.gscene` file written by `scene.export`, with every entity and physics option the scene was exported with (see {doc}`Checkpoints and simulation state </user_guide/configuration/checkpoints>`). The viewer's overlay exposes per-joint sliders and play, pause, step, and reset controls, and it starts paused so you can inspect and pose the asset first. With no file, it opens an empty scene to which you can add entities live. Useful flags: `-c` visualize collision geometry, `-r` slowly rotate the asset, `-s SCALE` scale it, and `-l` show link frames.
 
 ```bash
@@ -67,10 +69,10 @@ gs play xml/franka_emika_panda/panda.xml
 gs animate 'frames/*.png' --fps 60
 ```
 
-**`gs replay file.gstraj`** opens the scene a trajectory was recorded from and replays the recording in the viewer, in a loop, until the viewer is closed. See {doc}`Checkpoints and simulation state </user_guide/configuration/checkpoints>` for recording one.
+**`gs replay file.gstraj`** opens the scene a trajectory was recorded from and replays the recording in the viewer, in a loop, until the viewer is closed. See {doc}`Checkpoints and simulation state </user_guide/configuration/checkpoints>` for recording one. Pass `-e` with the indices of the environments to render, so that a recording of many environments replays faster by drawing only a few of them.
 
 ```bash
-gs replay run.gstraj
+gs replay run.gstraj -b gpu -e 0 3
 ```
 
 :::{note}
