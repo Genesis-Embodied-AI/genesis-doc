@@ -109,7 +109,7 @@ $$
 \varepsilon = \texttt{tolerance} \cdot \overline{m} \cdot n_{\text{dof}},
 $$
 
-where $\overline{m}$ is the mean inertia, or after `iterations` iterations. Each step warm-starts from the previous step's solution when one is available, and from the unconstrained acceleration $a^{\text{unc}}$ otherwise.
+where $\overline{m}$ is the mean inertia, or after `iterations` iterations (25 by default). A batch of parallel environments waits for its slowest environment on every step, so raising `iterations` improves accuracy on steps whose hardest contacts never converge, at the cost of making each of those steps slower. Each step warm-starts from the previous step's solution when one is available, and from the unconstrained acceleration $a^{\text{unc}}$ otherwise.
 
 ## See also
 
