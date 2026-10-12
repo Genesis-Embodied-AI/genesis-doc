@@ -10,7 +10,9 @@ The `genesis.utils.tools` module provides small helpers for timing loops and sav
 .. autofunction:: genesis.utils.tools.create_timer
 .. autoclass:: genesis.utils.tools.Rate
     :members:
-.. autoclass:: genesis.utils.tools.FPSTracker
+.. autoclass:: genesis.utils.tools.StepTimer
+    :members:
+.. autoclass:: genesis.utils.tools.RunningMean
     :members:
 ```
 
