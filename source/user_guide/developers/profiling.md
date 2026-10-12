@@ -36,13 +36,13 @@ By default, Genesis World prints the achieved step rate to the terminal as the s
 Running at 43,000,000.00 FPS (1,433.33 FPS per env, 30000 envs).
 ```
 
-Three numbers, all reported per window of wall-clock time:
+Three numbers, all smoothed over the latest steps:
 
 - **Total FPS:** steps per second summed across every environment. This is the throughput figure to compare against benchmarks.
 - **Per-env FPS:** the total divided by the number of environments. Useful when comparing scenes with different batch sizes.
 - **Environments:** the value of `n_envs` passed to `scene.build()`. It is omitted when the scene has no batch dimension.
 
-Genesis World measures the rate over fixed wall-clock windows and smooths it lightly with an exponential moving average, so it settles to a stable value rather than jumping every step.
+Genesis World measures the period from the start of one step to the start of the next, so the time your own code spends between two calls to `scene.step()` counts, and smooths it with an exponential moving average, so the rate settles to a stable value rather than jumping every step. The line prints at most every 50 ms.
 
 ### Configuring the counter
 
@@ -51,7 +51,7 @@ The counter is controlled by {py:class}`gs.options.ProfilingOptions <genesis.opt
 ```python
 scene = gs.Scene(
     profiling_options=gs.options.ProfilingOptions(
-        show_FPS=True,       # print the step rate each window; default True
+        show_FPS=True,       # print the smoothed step rate; default True
         FPS_tracker_alpha=0.95,  # EMA momentum for the smoothed rate
     ),
 )
@@ -70,7 +70,7 @@ See {doc}`/user_guide/configuration/config_system` for how `ProfilingOptions` fi
 
 ## Reading the step breakdown
 
-The FPS counter reports the rate of the whole step, which includes everything the scene does around the physics. To see where that time goes, read `scene.timings` after stepping. It maps each phase of a step to its mean wall time in seconds:
+The FPS counter reports the rate of the whole loop, which includes everything the scene does around the physics and your own code between steps. To see where that time goes, read `scene.timings` after stepping. It maps each phase of the latest step to its wall time in seconds:
 
 | Phase | Covers |
 |---|---|
@@ -79,31 +79,27 @@ The FPS counter reports the rate of the whole step, which includes everything th
 | `rendering` | the viewer refresh |
 | `recorders` | the recorders reading the state |
 | `video` | the cameras rendering and encoding a frame of a recording |
-| `total` | the whole step, the pre-step callbacks included |
+| `step` | the whole call to `scene.step()`, the pre-step callbacks included |
+| `period` | the wall time from the start of the previous step to the start of this one, your own code between the two included, so its inverse is the rate the loop achieves |
 
-A phase the step skips is absent from the mapping, so a scene with no sensors never reports a `sensors` time. The mapping stays empty until the first `scene.step()` returns.
+A phase the step skips is absent from the mapping, so a scene with no sensors never reports a `sensors` time, and the first step has no `period`. The mapping stays empty until the first `scene.step()` returns, and empties again on `scene.reset()` or when a checkpoint is restored. A step a pre-step callback vetoes, such as a paused viewer, leaves it as it was.
 
-By default each reading covers the last step only, so it jitters from step to step. Set `timings_window` to average over that many steps instead, and a change in speed then takes as many steps to show:
-
-```python
-scene = gs.Scene(
-    profiling_options=gs.options.ProfilingOptions(
-        show_FPS=False,
-        timings_window=100,  # average each phase over the last 100 steps
-    ),
-)
-```
-
-Invert a phase to read it as a rate, for instance the step rate of the physics without the sensors, rendering, and recording around it:
+Each reading covers the latest step alone, so it jitters from step to step. Smooth a quantity you read every step with a {py:class}`RunningMean <genesis.utils.tools.RunningMean>`, over a window of steps or as an exponential moving average. Invert a phase to read it as a rate, for instance the step rate of the physics without the sensors, rendering, and recording around it:
 
 ```python
-physics_fps = 1.0 / scene.timings["physics"]  # steps per second of the physics alone
+from genesis.utils.tools import RunningMean
+
+physics_time = RunningMean(window=100)  # mean over the latest 100 steps, NaN until 100 steps have run
+for _ in range(1000):
+    scene.step()
+    physics_time.update(scene.timings["physics"])
+physics_fps = 1.0 / physics_time.value  # steps per second of the physics alone
 ```
 
 [`examples/rigid/hibernation.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/hibernation.py) plots this rate live against the number of awake bodies while a pile of objects settles.
 
 :::{warning}
-On a GPU backend, a phase measures the host time spent launching its kernels while the device runs them asynchronously, so the phases add up to the real step only on the CPU backend. `total` is accurate on every backend as long as something in the step reads data back from the device, which makes the host wait for it.
+On a GPU backend, a phase measures the host time spent launching its kernels while the device runs them asynchronously, so the phases add up to the real step only on the CPU backend. `step` is accurate on every backend as long as something in the step reads data back from the device, which makes the host wait for it.
 :::
 
 ## Measuring throughput

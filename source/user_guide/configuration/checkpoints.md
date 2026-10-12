@@ -162,14 +162,14 @@ for _ in range(1000):
 scene.stop_recording()
 ```
 
-The writer runs on the stepping thread, so every frame is kept, and compresses and writes each completed chunk on a thread of its own while the simulation steps on. Two modes trade size for exactness, and `exact` picks one:
+Every frame is kept. A step only copies its frame aside, without waiting for a GPU to finish the step, while a thread of its own compresses the frames and another writes the file, so recording holds real time on a single environment. Two modes trade size for exactness, and `exact` picks one:
 
 - **Exact** (the default for a single environment): every frame holds everything a step reads or writes, so a replay is bit-for-bit and the simulation resumes from any frame.
 - **Compressed** (the default for a batched scene, with a warning): every frame holds the model parameters, configuration, velocities, accelerations, control inputs, contacts, and constraint forces. The file is several times smaller, and a load recomputes the link and geom poses by forward kinematics, which may differ at the last bits.
 
 `hz` records every few steps, `chunk_size` sets how many frames a chunk holds (larger chunks compress better and seek slower), and `max_size` caps the file, closing it as a valid log and raising at the next step past the cap, so a run left recording fills the disk by at most 2 GiB by default.
 
-`gs.Scene.load_trajectory(path)` creates and builds the recorded scene and returns a {py:class}`Trajectory <genesis.recorders.trajectory.Trajectory>` that plays in it. Frame `i` is the state after `i` steps; `seek(i)` puts the scene there, `play()` seeks every frame and redraws the viewer at the pace the recording ran at, `frame(i)` returns the arrays of a frame by name, and `time(i)` the simulated time of each environment. A negative index counts from the end. The last frame, like a checkpoint file, holds every array but the configs and constants, the scratch of the solvers included, for the analysis of a failure that may depend on the platform and never reproduce once shared:
+`gs.Scene.load_trajectory(path)` creates and builds the recorded scene and returns a {py:class}`Trajectory <genesis.recorders.trajectory.Trajectory>` that plays in it. Frame `i` is the state after `i` steps; `seek(i)` puts the scene there, `play()` seeks every frame and redraws the viewer at the pace the recording ran at, `frame(i)` returns the arrays of a frame by name, `time(i)` the simulated time of each environment, and `timings(i)` the wall time of each phase of the step that led to frame `i`, as `scene.timings` names them. A negative index counts from the end. A file written in an earlier version of the format is refused, with its version named. The last frame, like a checkpoint file, holds every array but the configs and constants, the scratch of the solvers included, for the analysis of a failure that may depend on the platform and never reproduce once shared:
 
 ```python
 trajectory = gs.Scene.load_trajectory("run.gstraj", show_viewer=True)
