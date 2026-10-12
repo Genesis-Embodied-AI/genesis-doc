@@ -42,7 +42,7 @@ Three numbers, all smoothed over the latest steps:
 - **Per-env FPS:** the total divided by the number of environments. Useful when comparing scenes with different batch sizes.
 - **Environments:** the value of `n_envs` passed to `scene.build()`. It is omitted when the scene has no batch dimension.
 
-Genesis World measures the period from the start of one step to the start of the next, so the time your own code spends between two calls to `scene.step()` counts, and smooths it with an exponential moving average, so the rate settles to a stable value rather than jumping every step. The line prints at most every 50 ms.
+Genesis World measures the period from the start of one step to the start of the next, so the time your own code spends between two calls to `scene.step()` counts, and smooths it with an exponential moving average over samples of 50 ms of stepping each, so the rate settles to a stable value whatever the step rate. A line prints with each sample.
 
 ### Configuring the counter
 
@@ -82,7 +82,7 @@ The FPS counter reports the rate of the whole loop, which includes everything th
 | `step` | the whole call to `scene.step()`, the pre-step callbacks included |
 | `period` | the wall time from the start of the previous step to the start of this one, your own code between the two included, so its inverse is the rate the loop achieves |
 
-A phase the step skips is absent from the mapping, so a scene with no sensors never reports a `sensors` time, and the first step has no `period`. The mapping stays empty until the first `scene.step()` returns, and empties again on `scene.reset()` or when a checkpoint is restored. A step a pre-step callback vetoes, such as a paused viewer, leaves it as it was.
+A phase the step skips is absent from the mapping, so a scene with no sensors never reports a `sensors` time, and the first step has no `period`. The mapping stays empty until the first `scene.step()` returns, and a step a pre-step callback vetoes, such as a paused viewer, empties it, since the simulation does not advance. The step that follows has no `period`. Resetting the scene or restoring a checkpoint leaves the timings as they are.
 
 Each reading covers the latest step alone, so it jitters from step to step. Smooth a quantity you read every step with a {py:class}`RunningMean <genesis.utils.tools.RunningMean>`, over a window of steps or as an exponential moving average. Invert a phase to read it as a rate, for instance the step rate of the physics without the sensors, rendering, and recording around it:
 
