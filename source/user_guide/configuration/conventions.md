@@ -124,4 +124,4 @@ Tensors returned by the API are **PyTorch tensors** placed on the active device 
 - **Floating-point values** are `float32` by default, or `float64` when you initialize with `precision="64"`.
 - **Integer indices** (entity, link, and dof indices, `envs_idx`, and the like) are always `int32`, independent of the float precision.
 
-`gs.init()` sets PyTorch's global default dtype and device to match, so tensors you allocate yourself line up with what the API returns. See {doc}`initialization` for how to choose the backend and precision.
+`gs.init()` leaves PyTorch's global default dtype and device untouched, so pass `dtype=gs.tc_float` (or `gs.tc_int`) and `device=gs.device` to tensors you allocate yourself to line them up with what the API returns. See {doc}`initialization` for how to choose the backend and precision.

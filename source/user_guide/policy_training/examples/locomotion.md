@@ -178,10 +178,11 @@ The trained policy is a standard joint-position controller and can be deployed t
 
 ## Variations
 
-`go2_backflip.py` reuses the same `Go2Env` machinery for a dynamic backflip. It subclasses the environment to add a phase-based observation and loads a pre-trained TorchScript policy:
+`go2_backflip.py` reuses the same `Go2Env` machinery for a dynamic backflip. It subclasses the environment to add a phase-based observation and runs a pre-trained policy, whose single and double backflip checkpoints ship in `examples/locomotion/backflip/`:
 
 ```bash
 python examples/locomotion/go2_backflip.py -e single
+python examples/locomotion/go2_backflip.py -e double
 ```
 
 ## See also
