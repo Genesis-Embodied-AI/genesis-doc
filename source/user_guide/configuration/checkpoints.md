@@ -162,10 +162,12 @@ for _ in range(1000):
 scene.stop_recording()
 ```
 
-Every frame is kept. A step only copies its frame aside, without waiting for a GPU to finish the step, while a thread of its own compresses the frames and another writes the file, so recording holds real time on a single environment. Two modes trade size for exactness, and `exact` picks one:
+Every frame is kept. A step only copies its frame aside, without waiting for a GPU to finish the step, while a thread of its own compresses the frames and another writes the file, so recording holds real time on a single environment. Two modes trade size for exactness, and `mode` picks one:
 
-- **Exact** (the default for a single environment): every frame holds everything a step reads or writes, so a replay is bit-for-bit and the simulation resumes from any frame.
-- **Compressed** (the default for a batched scene, with a warning): every frame holds the model parameters, configuration, velocities, accelerations, control inputs, contacts, and constraint forces. The file is several times smaller, and a load recomputes the link and geom poses by forward kinematics, which may differ at the last bits.
+- **Exact**: a replay is bit-for-bit, and the simulation resumes from any frame exactly as it ran, but recording slows the simulation down significantly for large batch sizes.
+- **Minimal**: frames hold only the bare minimum state, which makes them far smaller: everything else is recovered by running a full simulation step, and may differ at the last bits, except the contacts of hibernated links, which are taken from the scene as it stood before the seek. A replay that plays the frames in order from the first one in a freshly loaded scene is unaffected.
+
+By default a trajectory records in exact mode as long as a frame stays within 4 MiB, and in minimal mode otherwise, since every recorded step copies a whole frame.
 
 `hz` records every few steps, `chunk_size` sets how many frames a chunk holds (larger chunks compress better and seek slower), and `max_size` caps the file, closing it as a valid log and raising at the next step past the cap, so a run left recording fills the disk by at most 2 GiB by default.
 
