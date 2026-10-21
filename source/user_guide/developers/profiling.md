@@ -5,9 +5,9 @@ This page covers how to measure where a Genesis World simulation spends its time
 - **Throughput:** how many steps per second does the whole scene run? This is the headline number, reported as FPS.
 - **Step breakdown:** how much of a step goes to the physics, and how much to the sensors, the viewer, and the recorders around it? The answer tells you whether to optimize the physics at all.
 - **Launch latency:** is the GPU actually busy, or is the CPU stalling between kernel launches? This is what limits large parallel simulations that are not yet GPU-bound.
-- **Per-kernel time:** which solver kernels dominate a step? This tells you what to optimize.
+- **Per-kernel time:** which solver kernels dominate a step, and which blocks of code inside them? This tells you what to optimize.
 
-The first two are built in and always available. The other two use the PyTorch profiler, which works even in a simulation that never touches PyTorch.
+The first two are built in and always available. The other two use the PyTorch profiler, which works even in a simulation that never touches PyTorch, and the cycle counter of Quadrants for timing code inside a kernel.
 
 ## Benchmark against a disposable cache
 
@@ -130,49 +130,84 @@ Three choices make this a throughput benchmark rather than an interactive sessio
 
 ## Timing GPU kernels with the PyTorch profiler
 
-The FPS counter tells you *how fast*, not *why*. To see individual GPU kernels and the gaps between them, attach the PyTorch profiler around the steps you care about. It records CUDA activity whether or not your simulation uses PyTorch tensors.
+The FPS counter tells you *how fast*, not *why*. To see individual GPU kernels and the gaps between them, attach the PyTorch profiler around the steps you care about. It records CPU and CUDA activity whether or not your simulation uses PyTorch tensors.
 
-[`examples/speed_benchmark/timers.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/timers.py) wraps a fixed number of steps in a profiler:
+The profiler takes a schedule that picks which steps to record, so that one-time initialization and the first, compiling steps stay out of the trace. Advance it with `profiler.step()` once per simulation step, and export the trace once the context manager has closed:
 
 ```python
-with torch.profiler.profile(
-    on_trace_ready=torch.profiler.tensorboard_trace_handler("./benchmark"),
-    schedule=torch.profiler.schedule(wait=0, warmup=0, active=1),
+from torch.profiler import ProfilerActivity, profile, schedule
+
+with profile(
+    activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+    schedule=schedule(wait=80, warmup=3, active=1, repeat=1),  # tune to your own scene
     record_shapes=False,
     profile_memory=False,
     with_stack=True,
     with_flops=False,
-):
-    for step in range(500):
+) as profiler:
+    for _ in range(100):
         scene.step()
+        profiler.step()
+profiler.export_chrome_trace("trace.json")
 ```
 
-The `schedule` selects which steps to record so you can skip the ones you do not care about. Its phases are:
+The schedule phases are counted in calls to `profiler.step()`, so call it at least `wait + warmup + active` times:
 
-- **`wait`:** steps to ignore at the start, past any one-time initialization.
-- **`warmup`:** steps to run while the profiler primes itself but discards the trace.
+- **`wait`:** steps to skip at the start, long enough to get past everything you do not want to look at.
+- **`warmup`:** steps the profiler runs while it primes itself, with the trace discarded.
 - **`active`:** steps actually recorded. One is usually enough and keeps memory low.
+- **`repeat`:** how many times to run the cycle. Leave it at 1 to record once and stop.
 
-When you use a multi-phase schedule, advance it by calling `profiler.step()` once per iteration so the profiler knows which phase it is in. See the [PyTorch profiler schedule documentation](https://docs.pytorch.org/docs/stable/profiler.html#torch.profiler.schedule) for details. The resulting trace opens in [TensorBoard](https://www.tensorflow.org/tensorboard) or, if you export a Chrome trace, in [Perfetto](https://ui.perfetto.dev/).
+The values above are a starting point rather than a recommendation, so adjust them to your scene; the [PyTorch profiler schedule documentation](https://docs.pytorch.org/docs/stable/profiler.html#torch.profiler.schedule) covers the rest. Open `trace.json` in [Perfetto](https://ui.perfetto.dev/). [`examples/speed_benchmark/timers.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/timers.py) shows the other common output, a trace written for [TensorBoard](https://www.tensorflow.org/tensorboard) through `on_trace_ready=torch.profiler.tensorboard_trace_handler("./benchmark")`.
+
+For the CPU side alone, a sampling profiler such as [py-spy](https://github.com/benfred/py-spy) gives a similar flame graph. The PyTorch profiler has two advantages here: the schedule keeps initialization out of the trace and records the same steps on every run, so timings compare from one run to the next, and it records the actual sequence of calls rather than a statistical sample of them.
 
 ### Reading the trace
 
-On the GPU timeline you get the precise duration of every kernel launch. White gaps between kernels are launch overhead: the GPU sitting idle while the CPU catches up. On a large parallel simulation those gaps should be negligible; if they dominate, the simulation is CPU-bound and no amount of extra environments will help until the stalls are removed. Diagnosing and removing these stalls is the subject of {doc}`/user_guide/policy_training/best_practices/efficient_environment`.
+On the GPU timeline you get the precise start and duration of every kernel launch. White gaps between kernels are launch overhead: the GPU sitting idle while the CPU catches up. On a large parallel simulation those gaps should be negligible; if they dominate, the simulation is CPU-bound and no amount of extra environments will help until the stalls are removed. Diagnosing and removing these stalls is the subject of {doc}`/user_guide/policy_training/best_practices/efficient_environment`.
 
 The GPU timeline has no call hierarchy of its own, so it can be hard to tell which Python-side operation a kernel belongs to. Insert a synchronization before each step to force that alignment:
 
 ```python
 qd.sync()  # block until all Quadrants GPU work completes, so the CPU and GPU timelines line up
 scene.step()
+profiler.step()
 ```
 
 :::{warning}
 Synchronizing every step serializes the CPU and GPU and can roughly halve throughput. Use it to understand a trace, then remove it before measuring speed.
 :::
 
-## Per-solver kernel timings
+## Timing code inside a kernel
 
-To go below CUDA kernels and time blocks of work inside the rigid solver, [`examples/speed_benchmark/timers.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/timers.py) reads the constraint solver's `timers` array and plots per-environment timings in the terminal:
+The PyTorch profiler times whole CUDA kernels, which is already one level deeper than a CPU profiler plus a synchronization can go. It cannot see inside a kernel, though, and a single Quadrants kernel often runs several stages, such as the line search, the gradient update and the constraint update of the rigid solver. To time those stages separately, per environment, read the hardware cycle counter with `qd.clock_counter()` around each block and write the difference to a buffer.
+
+The rigid constraint solver keeps such a buffer for this purpose, `scene.rigid_solver.constraint_solver.constraint_state.timers`, of shape `(10, n_envs)`: one row per timer, one column per environment. The solver ships without any instrumentation, so the buffer stays at zero until you add some. Start with an enum naming the rows, so that the kernel and the script reading the results agree on them:
+
+```python
+from enum import IntEnum
+
+
+class Time(IntEnum):
+    Solve = 0
+    LineSearch = 1
+    UpdateGradient = 2
+```
+
+Then, inside the kernel loop over environments, take a reading before and after each block you want to measure. For instance, to time the whole constraint solve of each environment in `_kernel_solve_monolith` (`genesis/engine/solvers/rigid/constraint/solver.py`):
+
+```python
+for i_b in range(_B):
+    start = qd.clock_counter()
+    # ... the existing body of the loop ...
+    constraint_state.timers[Time.Solve, i_b] = qd.clock_counter() - start
+```
+
+To time consecutive blocks, such as `Time.LineSearch` and `Time.UpdateGradient` inside an iteration, reuse the end reading of one block as the start of the next.
+
+The counter returns raw cycles, not seconds, so compare readings with each other rather than reading them as durations. On CUDA it counts the cycles of the streaming multiprocessor running the thread, and its rate follows the GPU clock, which boosts and throttles. `qd.clock_freq_hz()` gives the nominal clock rate of the GPU, from which you can derive an approximate duration. On Metal the counter always reads 0, and the buffer holds 32-bit integers instead of 64-bit ones.
+
+[`examples/speed_benchmark/timers.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/timers.py) reads the buffer after each step and plots row 0 per environment in the terminal, which works on a remote server without a display:
 
 ```python
 from genesis.utils.misc import qd_to_torch
@@ -180,7 +215,7 @@ from genesis.utils.misc import qd_to_torch
 timers = qd_to_torch(scene.rigid_solver.constraint_solver.constraint_state.timers)
 ```
 
-Run it with `--profiling` to attach the PyTorch profiler instead, or without to collect and plot the per-solver timings. This reaches into solver internals and is aimed at contributors optimizing the physics kernels rather than at typical simulation code.
+Run it without arguments to collect and plot the timings, or with `--profiling` to attach the PyTorch profiler instead. Add a label to its `TIMER_LABELS` for each extra row you fill. Instrumenting the solver means editing its kernels, so this is aimed at contributors optimizing the physics rather than at typical simulation code.
 
 ## See also
 
