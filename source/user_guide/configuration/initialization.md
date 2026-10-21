@@ -55,7 +55,7 @@ Single precision is faster and uses less memory, and double precision buys numer
 
 - **Integer indices are always 32-bit**, regardless of `precision`. Only floating-point values switch.
 - **Double precision is not available on Apple Metal.** Requesting `precision="64"` with `backend=gs.metal` raises an error.
-- `gs.init()` sets PyTorch's global default dtype and device to match, so tensors you create afterward land on the right device with the right dtype without extra arguments.
+- `gs.init()` does not change PyTorch's global default dtype and device. Tensors you create yourself need `dtype=gs.tc_float` and `device=gs.device` to match the simulation.
 
 {doc}`conventions` covers the dtypes the API returns.
 
@@ -83,11 +83,11 @@ gs.init(backend=gs.cpu, seed=0, debug=True)
 gs.init(backend=gs.gpu, use_deterministic_algorithms=True)
 ```
 
-The mode is opt-in because the guarantee is paid for in throughput. Left off, Genesis is free to decide at runtime how a computation is carried out wherever that buys speed, with nothing requiring the decision to come out the same way twice. Today that freedom is spent picking between implementations: several interchangeable ones of the same computation, each written for a different workload, with every site timing its own candidates as the simulation runs and landing on the one fastest for the state the scene is currently in.
+The default, `use_deterministic_algorithms=None`, enables the mode unless `performance_mode=True`, in which case it stays off. Pass `False` or `True` to override it either way. The guarantee is paid for in throughput, which is why performance mode leaves it off. Left off, Genesis is free to decide at runtime how a computation is carried out wherever that buys speed, with nothing requiring the decision to come out the same way twice. Today that freedom is spent picking between implementations: several interchangeable ones of the same computation, each written for a different workload, with every site timing its own candidates as the simulation runs and landing on the one fastest for the state the scene is currently in.
 
 Interchangeable implementations compute the same thing by construction, but agree only to within floating-point noise, and a simulation amplifies such a difference until the two runs have visibly parted ways. Which one ran at which step is therefore part of the trajectory, and nothing about that is reproducible: the timings follow how busy the machine is, and the measurements accumulate across resets, so a rollout also depends on everything the process ran before it. They accumulate on purpose - environments in a training loop reset constantly, often one at a time, and starting the measurements over at every reset would leave them forever measuring instead of exploiting what they measured. Deterministic mode gives up the freedom altogether: every such choice is settled up front, on the option that suits most scenes, and never revisited.
 
-What it costs therefore depends on the scene and on how far its state travels: nothing at all while the settled choice is the one that would have been picked anyway, and up to the gap between the implementations whenever another would have taken over. Measure your own scene before committing to the mode where throughput dominates, policy training in particular; turn it on to compare two runs or to track down a divergence.
+What it costs therefore depends on the scene and on how far its state travels: nothing at all while the settled choice is the one that would have been picked anyway, and up to the gap between the implementations whenever another would have taken over. Where throughput dominates, policy training in particular, measure your scene with `use_deterministic_algorithms=False` before deciding to keep the mode; keep it on to compare two runs or to track down a divergence.
 
 The choice can also be made by hand, by pinning one implementation through the Quadrants `QD_PERFDISPATCH_FORCE` environment variable, which removes the measurement just as the mode does and is therefore reproducible on its own. Use it when the implementation deterministic mode settles on is the wrong one for your scene. For the constraint solve, which is where the choice matters most today, the two candidates are:
 
@@ -109,7 +109,7 @@ Note that this is a workaround naming internal implementations: it is no part of
 gs.init(backend=gs.gpu, logging_level="warning")  # quiet: warnings and errors only
 ```
 
-Set `logger_verbose_time=True` to prefix each log line with a full timestamp instead of the elapsed time alone. The `theme` argument (`"dark"`, `"light"`, or `"dumb"`) controls the terminal color scheme; use `"dumb"` to disable colors in environments that mangle ANSI codes.
+Set `logger_verbose_time=True` to prefix each log line with a full timestamp instead of the elapsed time alone. The `theme` argument (`"dark"`, `"light"`, or `"raw"`) controls how log lines are printed: `"dark"` and `"light"` color them for a terminal of that background, and `"raw"` prints plain, compact lines with no colors, banner box or emojis, for log files, continuous integration and coding agents.
 
 ## Performance mode
 
