@@ -60,7 +60,7 @@ To load USD assets into scenes, see the [USD import setup](../assets/usd_import.
 
 Importing an engine submodule before calling `gs.init()` raises this error:
 
-```python
+```text
 genesis.GenesisException: Genesis hasn't been initialized. Did you call `gs.init()`?
 ```
 

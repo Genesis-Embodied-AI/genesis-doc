@@ -70,13 +70,20 @@ Pass `to_torch=False` for NumPy arrays, or `as_tensor=False` to get a per-enviro
 
 ## Constraint types
 
-Genesis World supports three equality-constraint types. Weld is the only one you add at runtime, and the other two come from a model's `<equality>` block when Genesis World loads an MJCF or URDF.
+Genesis World supports four equality-constraint types. Weld and screw are the ones you add at runtime, and connect and joint come from a model's `<equality>` block when Genesis World loads an MJCF or URDF.
 
 | Type | Constrains | Declared in | Runtime API |
 |---|---|---|---|
 | Connect | A point on each link to coincide (3 dofs), a ball joint. | MJCF | — |
 | Weld | Relative pose fully fixed (6 dofs). | MJCF, or `add_weld_constraint` | `add_weld_constraint` / `delete_weld_constraint` |
+| Screw | Relative motion restricted to a helix about an axis of the first link (5 dofs), with optional travel limits and dry friction. | `add_screw_constraint` | `add_screw_constraint` / `delete_screw_constraint` |
 | Joint | One joint's value tied to another's by a polynomial, or held at a constant offset when the model names a single joint. | MJCF, URDF | — |
+
+`add_screw_constraint` takes the axis in the frame of the first link and the travel per full turn as `pitch`, in meters. A pitch of zero gives a revolute motion and an infinite one a prismatic motion. The two links stop colliding with each other while the constraint holds, and it is not supported yet when `requires_grad=True`:
+
+```python
+rigid.add_screw_constraint(link_bolt, link_nut, axis=(0.0, 0.0, 1.0), pitch=0.003, limit=(-0.02, 0.0))
+```
 
 A connect or joint constraint enters the simulation with its host model. There is no runtime API to add or remove it; edit the model file's equality section instead.
 

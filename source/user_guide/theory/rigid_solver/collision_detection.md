@@ -17,12 +17,12 @@ Detection runs in two phases each step, from a cheap approximate cull to an exac
 
 | Geometry pair | Path |
 |---|---|
-| General convex–convex, including plane–convex | Minkowski Portal Refinement (MPR) by default, or GJK with EPA when `use_gjk_collision=True`; a signed-distance-field query takes over on deep penetration. |
+| General convex–convex, including plane–convex | Minkowski Portal Refinement (MPR) by default, with GJK and EPA refining the contacts MPR cannot resolve reliably. GJK with EPA throughout when `use_gjk_collision=True`. |
 | Plane–box and box–box | Analytic special case, for stability when a box lies flush on a plane. |
 | Any geometry against height-field terrain | Terrain routine that can emit several contact points per supporting cell. |
 | Non-convex meshes | Signed-distance-field sampling: vertices first (vertex–face), then edges (edge–edge), keeping the deepest penetration. |
 
-MPR and GJK both operate through a *support function* ("which vertex lies farthest along a given direction?") so they run branch-free on the GPU without face-adjacency caches. GJK additionally reports a separation distance when the geometries are apart and is the differentiable path. It is the more stable of the two and much the slower, so we default to MPR and turn GJK on automatically when the scene requires gradients. Both accelerate support queries with a precomputed support field, described [below](#support-functions). To capture flush faces rather than a single point, Genesis perturbs the pose slightly around the first contact normal and gathers the extra contacts that result.
+MPR and GJK both operate through a *support function* ("which vertex lies farthest along a given direction?") so they run branch-free on the GPU without face-adjacency caches. GJK additionally reports a separation distance when the geometries are apart and is the differentiable path. It is the more stable of the two and much the slower, so we default to MPR and turn GJK on automatically when the scene requires gradients. With MPR, GJK only refines a contact when MPR did not converge on it, or when the overlap of the two geoms along their frame axes shows the portal MPR found is not the minimal one. Both accelerate support queries with a precomputed support field, described [below](#support-functions). To capture flush faces rather than a single point, Genesis perturbs the pose slightly around the first contact normal and gathers the extra contacts that result.
 
 The `max_collision_pairs` option on {doc}`RigidOptions </api_reference/engine/solvers/rigid_solver>` bounds how many candidate pairs the broad phase may emit. Exceeding it at runtime halts the simulation, so raise it for scenes with dense contact.
 
