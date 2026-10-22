@@ -36,7 +36,11 @@ The viewer always renders with the rasterizer. To select the backend used by the
 To cap the viewer frame rate, set `refresh_rate` on `ViewerOptions`. The older `max_FPS` argument is deprecated and maps to `refresh_rate`.
 :::
 
-`realtime_factor` sets the pace of the simulation itself: how many seconds of simulated time one second of wall-clock time covers, `1.0` for real time and `2.0` for twice as fast. When the viewer is shown, the simulation is throttled to it and falls behind gracefully when it cannot keep up; set it to `None` to always run as fast as possible. It also sets the playback speed of the videos recorded by a {doc}`camera </user_guide/rendering/index>`, viewer or not, with `None` recording at real time since there is no pace to follow. `scene.viewer.realtime_factor` changes it while the scene runs.
+`realtime_factor` sets the pace of the simulation itself: how many seconds of simulated time one second of wall-clock time covers, `1.0` for real time and `2.0` for twice as fast. When the viewer is shown, each step of the simulation is throttled to it and falls behind gracefully when it cannot keep up; set it to `None` to always run as fast as possible. It also sets the playback speed of the videos recorded by a {doc}`camera </user_guide/rendering/index>`, viewer or not, with `None` recording at real time since there is no pace to follow. `scene.viewer.realtime_factor` changes it while the scene runs.
+
+Only the steps of the simulation are paced. A change of state made outside of a step by a setter such as `entity.set_qpos(...)` is shown by the viewer on its own at its next refresh, without calling `scene.visualizer.update()` and without slowing down the loop that makes it. `scene.reset()` redraws the viewer right away. While the simulation is paused from the viewer, the stepping loop waits for the next refresh of the viewer instead of the pace of the simulation. The window stays responsive while a step waits for its pace: on macOS, where the window is driven by the stepping loop, it keeps being repainted and handles the mouse and keyboard during the wait.
+
+A step run with `scene.step(update_visualizer=False)` leaves the viewer untouched and is not paced. Call `scene.visualizer.update(force=False)` after such a step to show it and pace it like any other, or `scene.visualizer.update()` to redraw everything right away.
 
 Once the scene exists, reach the viewer through the `scene.viewer` shortcut to read or set the camera pose at runtime:
 
@@ -69,7 +73,7 @@ gs play xml/franka_emika_panda/panda.xml
 gs animate 'frames/*.png' --fps 60
 ```
 
-**`gs replay file.gstraj`** opens the scene a trajectory was recorded from and replays the recording in the viewer, in a loop, until the viewer is closed. See {doc}`Checkpoints and simulation state </user_guide/configuration/checkpoints>` for recording one. Pass `-e` with the indices of the environments to render, so that a recording of many environments replays faster by drawing only a few of them.
+**`gs replay file.gstraj`** opens the scene a trajectory was recorded from and replays the recording in the viewer, in a loop, until the viewer is closed. The recording plays at the pace the simulation would run, honoring `realtime_factor`, each frame being held for the steps it spans. See {doc}`Checkpoints and simulation state </user_guide/configuration/checkpoints>` for recording one. Pass `-e` with the indices of the environments to render, so that a recording of many environments replays faster by drawing only a few of them.
 
 ```bash
 gs replay run.gstraj -b gpu -e 0 3

@@ -116,6 +116,8 @@ The available primitives:
 
 See {doc}`/api_reference/engine/scene` for the full signatures and defaults.
 
+The markers that the scene draws on its own show what the last step computed: the contact arrows of `visualize_contact` and the markers of the sensors created with `draw_debug=True`. They are drawn anew at every refresh of the viewer. A setter that moves the scene, such as `entity.set_pos(...)`, hides them in the environments it touches until the next step, since the contacts and the sensor readings they show belong to the previous pose.
+
 ## Interactive GUI panel
 
 The **ImGui overlay** adds a Dear ImGui panel on top of the viewer, so you can drive the simulation without editing code. It exposes:
