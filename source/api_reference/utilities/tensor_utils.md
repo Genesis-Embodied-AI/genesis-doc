@@ -18,7 +18,6 @@ The helpers below are exposed under `gs.utils`. They accept Genesis, PyTorch, or
 .. autofunction:: genesis.utils.misc.tensor_to_array
 .. autofunction:: genesis.utils.misc.tensor_to_cpu
 .. autofunction:: genesis.utils.misc.to_gs_tensor
-.. autofunction:: genesis.utils.misc.assert_gs_tensor
 ```
 
 ## See also

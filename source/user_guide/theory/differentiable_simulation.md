@@ -22,14 +22,14 @@ robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 scene.build()
 
 # A control signal we want gradients for
-force = torch.zeros(robot.n_dofs, device=gs.device, requires_grad=True)
+force = torch.zeros(robot.n_dofs, dtype=gs.tc_float, device=gs.device, requires_grad=True)
 
 for _ in range(100):
     robot.control_dofs_force(force)
     scene.step()
 
-target = torch.tensor([1.0, 0.0, 0.5], device=gs.device)
-loss = torch.nn.functional.mse_loss(robot.get_pos(), target)
+target = torch.tensor([1.0, 0.0, 0.5], dtype=gs.tc_float, device=gs.device)
+loss = ((robot.get_state().pos - target) ** 2).sum()
 
 loss.backward()  # propagates through every step back to `force`
 print(force.grad)
@@ -38,27 +38,38 @@ print(force.grad)
 ## How autodiff works
 
 - **Enable it once, on the scene:** set `requires_grad=True` in `gs.options.SimOptions`. Genesis World then records the intermediate substep state each step needs for the backward pass. The flag defaults to `False`, so a simulation is non-differentiable unless you opt in; see [Limitations](#limitations) for what differentiable mode costs.
-- **State getters return differentiable tensors:** methods such as `get_pos()`, `get_vel()`, and `get_qpos()` return a {py:class}`gs.Tensor <genesis.grad.tensor.Tensor>` (a subclass of `torch.Tensor` that also carries a reference to the scene it came from). See the {doc}`Tensor reference </api_reference/differentiation/tensor>`.
-- **`backward()` flows through the physics:** calling `backward()` on any tensor derived from scene state runs the standard PyTorch backward pass, then continues the gradient backward through time across the recorded steps, down to the inputs you marked with `requires_grad=True`.
-- **Inputs are ordinary leaf tensors:** control forces, initial positions, and target values are plain PyTorch tensors created with `requires_grad=True`. Any operation that mixes them with scene-derived tensors yields a scene-tracked tensor, which keeps the graph connected.
+- **Queried states are differentiable:** `get_state()` on an entity (`robot.get_state().pos`) or on a solver (`scene.rigid_solver.get_state().qpos`) returns states whose tensors carry gradients. They are plain `torch.Tensor`s. The other getters (`get_pos()`, `get_qpos()`, ...) return values without gradient.
+- **Inputs are any torch tensors:** control forces, initial positions, and target values passed to the setters can be leaf tensors created with `requires_grad=True`, or the output of a torch computation, such as a neural network policy.
+- **The simulation is part of the PyTorch graph:** each `scene.step()` is a node of the autograd graph, so `loss.backward()` and `torch.autograd.grad(loss, params)` both differentiate through the physics, down to whatever produced each input, in a single pass.
 
-A single forward run supports one backward pass. Reset the scene with `scene.reset()` before the next forward pass, for example once per optimization step. State tensors follow the batched-optional shape convention (`([n_envs,] ...)`); see {doc}`/user_guide/configuration/conventions`.
+A single forward run supports one backward pass. Reset the scene with `scene.reset()` before the next forward pass, for example once per optimization step, and call backward before that reset: differentiating a run after `scene.reset()` raises an error. `scene.backward(loss)` runs the backward pass and then restores the physics state the scene was in, so the rollout can continue from there. The tensors of a queried state always lead with the environment dimension, of size 1 when the scene has no parallel environments (`[max(1, n_envs), ...]`).
 
-## Detaching from the scene
+## Training a policy through the dynamics
 
-To stop gradients from flowing back into the simulation, drop the tensor's scene association:
+An input may depend on states queried earlier in the same rollout, which closes the loop between a policy and the simulation. The gradient reaches the policy parameters through every step, and an action penalty can share the loss with the states without passing `retain_graph=True`. Here the scene is built with parallel environments (`scene.build(n_envs=16)`), so the actions have one row per environment:
 
 ```python
-pos = robot.get_pos()
-pos_detached = pos.detach()      # detaches from autograd and from the scene
-pos_sceneless = pos.sceneless()  # keeps autograd, drops only the scene link
+n_qs, n_dofs = scene.rigid_solver.n_qs, scene.rigid_solver.n_dofs
+policy = torch.nn.Linear(n_qs + n_dofs, n_dofs).to(device=gs.device, dtype=gs.tc_float)
+optimizer = torch.optim.Adam(policy.parameters(), lr=1e-3)
+target_qpos = scene.rigid_solver.get_state().qpos.detach() + 0.1
+
+for _ in range(100):  # optimization iterations
+    scene.reset()
+    loss = 0.0
+    for _ in range(50):  # horizon
+        state = scene.rigid_solver.get_state()
+        force = policy(torch.cat((state.qpos, state.dofs_vel), dim=-1))
+        robot.control_dofs_force(force)
+        scene.step()
+        loss = loss + 1e-4 * (force**2).sum()
+    loss = loss + ((scene.rigid_solver.get_state().qpos - target_qpos) ** 2).sum()
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
 ```
 
-`detach()` removes the scene link by default (`sceneless=True`); pass `sceneless=False` to keep it. Use `sceneless()` when you want a tensor to stay in the PyTorch graph but not feed gradients back through the physics. Reading `tensor.scene` tells you which scene, if any, a tensor is bound to.
-
-:::{note}
-Mixing two tensors that belong to different scenes raises an error, since gradients cannot flow into more than one scene. Call `sceneless()` on one of them first if you do not need the gradient to reach its scene.
-:::
+An input given after the last state the loss reads cannot affect the loss, so its gradient stays `None`, as for any tensor that does not contribute to a PyTorch loss. To stop gradients from flowing back through a state, use `detach()` as for any PyTorch tensor.
 
 ## Limitations
 
@@ -70,6 +81,5 @@ Mixing two tensors that belong to different scenes raises an error, since gradie
 
 ## See also
 
-- {doc}`/api_reference/differentiation/index`: the differentiable tensor and creation-op reference.
 - {doc}`/user_guide/configuration/checkpoints`: resetting the scene between optimization passes.
 - {doc}`coupling/index`: which coupler to use for gradients.
