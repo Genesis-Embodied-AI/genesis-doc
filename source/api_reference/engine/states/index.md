@@ -78,4 +78,4 @@ A state holds the runtime data of a simulation: positions, velocities, forces, a
 
 - {doc}`/user_guide/configuration/checkpoints`: saving and restoring simulation state.
 - {doc}`/user_guide/configuration/conventions`: tensor shape and dtype conventions.
-- {doc}`/api_reference/differentiation/index`: gradient-tracking state in differentiable simulation.
+- {doc}`/user_guide/theory/differentiable_simulation`: gradient-tracking state in differentiable simulation.

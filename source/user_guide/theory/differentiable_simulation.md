@@ -22,13 +22,13 @@ robot = scene.add_entity(gs.morphs.URDF(file="robot.urdf"))
 scene.build()
 
 # A control signal we want gradients for
-force = torch.zeros(robot.n_dofs, device=gs.device, requires_grad=True)
+force = torch.zeros(robot.n_dofs, dtype=gs.tc_float, device=gs.device, requires_grad=True)
 
 for _ in range(100):
     robot.control_dofs_force(force)
     scene.step()
 
-target = torch.tensor([1.0, 0.0, 0.5], device=gs.device)
+target = torch.tensor([1.0, 0.0, 0.5], dtype=gs.tc_float, device=gs.device)
 loss = ((robot.get_state().pos - target) ** 2).sum()
 
 loss.backward()  # propagates through every step back to `force`
@@ -81,6 +81,5 @@ An input given after the last state the loss reads cannot affect the loss, so it
 
 ## See also
 
-- {doc}`/api_reference/differentiation/index`: the creation-op reference.
 - {doc}`/user_guide/configuration/checkpoints`: resetting the scene between optimization passes.
 - {doc}`coupling/index`: which coupler to use for gradients.

@@ -8,7 +8,6 @@ This section documents the Genesis World API. It is generated from the source do
 - **{doc}`Engine <engine/index>`** (`genesis.engine`): the scene, simulator, solvers, coupler, entities, materials, states, and sensors that make up a simulation.
 - **{doc}`Visualization <visualization/index>`** (`genesis.vis`): the viewer, cameras, renderer backends, and lights.
 - **{doc}`Recording <recording/index>`** (`genesis.recorders`): recorders that capture simulation data to files or live plots.
-- **{doc}`Differentiable simulation <differentiation/index>`** (`genesis.grad`): the gradient-carrying tensor type and its creation ops.
 - **{doc}`Utilities <utilities/index>`** (`genesis.utils`): geometry, mesh, tensor, and device helpers.
 
 ## Options and built objects
@@ -26,6 +25,5 @@ options/index
 engine/index
 visualization/index
 recording/index
-differentiation/index
 utilities/index
 ```
