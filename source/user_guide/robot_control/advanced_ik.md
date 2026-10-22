@@ -29,13 +29,17 @@ Each target need not be a full 6-dof pose. `pos_mask` and `rot_mask` are length-
 
 Orientations follow the `(w, x, y, z)` quaternion convention, so `target_quat = np.array([0, 1, 0, 0])` points the finger's z-axis straight down.
 
-This example is purely kinematic: it demonstrates the solver, not the physics. After solving, it writes the result directly to the robot and refreshes the display rather than stepping the simulation:
+This example is purely kinematic: it demonstrates the solver, not the physics. After solving, it writes the result directly to the robot rather than stepping the simulation. Setting the state redraws the viewer by itself, so the loop only has to hold each pose for one simulation step of wall time, with `gs.tools.Rate`, for the poses to play at the pace of the simulation rather than as fast as the solver runs:
 
 ```python
-# Note that this IK is for visualization purposes, so here we do not call scene.step(), but only update the state and the visualizer
-# In actual control applications, you should instead use robot.control_dofs_position() and scene.step()
+# The poses follow the target along a continuous path, so they are shown at the pace of the simulation
+rate = gs.tools.Rate(1.0 / scene.dt)
+...
+# Note that this IK is for visualization purposes, so here we do not call scene.step(), but only set the state,
+# which redraws the viewer. In actual control applications, you should instead use robot.control_dofs_position()
+# and scene.step().
 robot.set_dofs_position(q)
-scene.visualizer.update()
+rate.sleep()
 ```
 
 The example draws the target frames in the video with `scene.draw_debug_frame()` and moves them each iteration with `scene.update_debug_objects()`. These markers live at the visualizer level and take no part in the simulation. See {doc}`/user_guide/interaction/interactive_debugging` for the debug-drawing API.

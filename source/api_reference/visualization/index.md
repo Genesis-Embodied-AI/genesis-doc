@@ -4,7 +4,7 @@ Genesis World turns a simulation into pixels through two independent paths: an i
 
 ## Components
 
-- **Visualizer:** the orchestrator behind `scene.visualizer`. It owns the viewer, the cameras, and the renderer backend, and it refreshes them when you call `scene.visualizer.update()`.
+- **Visualizer:** the orchestrator behind `scene.visualizer`. It owns the viewer, the cameras, and the renderer backend, and it refreshes them at every step of the scene and after every change of state.
 - **Viewer:** the interactive window for real-time viewing, with mouse and keyboard camera controls. It always uses the rasterizer backend; configure its look through `gs.options.VisOptions` and its initial pose through `gs.options.ViewerOptions`.
 - **Cameras:** the `Camera` objects added with `scene.add_camera(...)`. They capture RGB, depth, segmentation, and surface-normal images from a chosen viewpoint. Rendering happens through the scene's renderer backend.
 - **Renderers:** the backend those cameras use to produce images. Choose one per scene with `gs.Scene(renderer=...)`; the choice does not affect the viewer.
