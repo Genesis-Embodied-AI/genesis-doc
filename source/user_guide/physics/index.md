@@ -7,6 +7,7 @@ A Genesis World scene is not limited to rigid robots: one {py:class}`Scene <gene
 :maxdepth: 1
 
 rigid_bodies
+joints_and_actuators
 beyond_rigid_bodies
 soft_robots
 hybrid_entity

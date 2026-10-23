@@ -10,5 +10,6 @@ concepts
 initialization
 config_system
 conventions
+stability
 checkpoints
 ```
