@@ -1,4 +1,4 @@
-# Rigid-body constraints
+# Welds and Screw Constraints
 
 A **constraint** ties two rigid links together so the solver keeps a geometric relationship between them: coincident points, a fixed relative pose, or coupled joint values. A model file declares most constraints once, and they hold for the whole simulation. One kind, the **weld** constraint, can be added and removed while the simulation runs, so a suction gripper can pick an object up and release it.
 

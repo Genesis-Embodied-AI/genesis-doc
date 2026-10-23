@@ -34,7 +34,7 @@ Because the manager reads the data function itself, you never call it in your lo
 Set up all recording **before** `scene.build()`. `scene.add_recorder`, `scene.start_recording`, and `sensor.start_recording` assert the scene is unbuilt and raise otherwise, because recorders allocate their file handles and windows during the build.
 :::
 
-A visualization camera has its own video API, `camera.start_recording()`, which you call *after* build and which bypasses the recorder manager entirely; see {doc}`Recording a video </user_guide/rendering/index>`. `scene.start_recording` records the scene itself, every array of its simulation at every step, to a file that replays it; see {doc}`Checkpoints and simulation state </user_guide/configuration/checkpoints>`.
+A visualization camera has its own video API, `camera.start_recording()`, which you call *after* build and which bypasses the recorder manager entirely; see {doc}`Recording a video </user_guide/rendering/cameras>`. `scene.start_recording` records the scene itself, every array of its simulation at every step, to a file that replays it; see {doc}`Checkpoints and simulation state </user_guide/configuration/checkpoints>`.
 
 ## Recording sensor data
 

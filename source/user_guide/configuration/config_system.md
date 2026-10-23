@@ -105,5 +105,5 @@ franka = scene.add_entity(
 
 - {doc}`/user_guide/getting_started/hello_genesis`: the minimal scene that uses these options.
 - {doc}`/user_guide/interaction/visualization`: the interactive viewer and command-line tools.
-- {doc}`/user_guide/rendering/index`: cameras, image types, video, and rendering backends.
+- {doc}`/user_guide/rendering/cameras`: cameras, image types, video, and rendering backends.
 - {doc}`API Reference </api_reference/index>`: each option class, documented with the component it configures.

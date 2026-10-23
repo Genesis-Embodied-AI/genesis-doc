@@ -186,4 +186,4 @@ Draw debug geometry from `on_draw()`, which runs every frame. Call `self.scene.c
 ## See also
 
 - {doc}`Interactive GUI and debugging </user_guide/interaction/interactive_debugging>`: the ImGui overlay, joint sliders, and simulation controls.
-- {doc}`Rendering </user_guide/rendering/index>`: cameras, rendering, and recording video.
+- {doc}`Rendering </user_guide/rendering/cameras>`: cameras, rendering, and recording video.

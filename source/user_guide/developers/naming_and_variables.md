@@ -34,28 +34,12 @@ Prefer `name` for lookups you write by hand, and reserve `uid` for disambiguatin
 
 ## Local and global indices
 
-A rigid solver stores the state of *every* entity in flat, shared arrays: one row per **dof** (degree of freedom), one per link, one per configuration variable `q`, and so on. So there are two ways to number the same dof:
-
-- **Global index (`*_idx`):** the dof's absolute row in the solver's arrays, counting across all entities. A two-armed scene numbers the second arm's dofs after the first arm's.
-- **Local index (`*_idx_local`):** the dof's position *within its own entity*, always starting at zero. The first dof of any entity is local index `0`, regardless of what was added before it.
-
-The two differ by a per-entity offset. For dofs it is `entity.dof_start`; the entity also exposes `link_start` and `q_start` for the link and `q` arrays. A joint's `dofs_idx` (global) and `dofs_idx_local` (local) properties are defined by exactly this shift:
+{doc}`Core concepts </user_guide/configuration/concepts>` explains the two indexing schemes: a global index (`*_idx`) counts across every entity in the solver, and a local index (`*_idx_local`) counts from zero within one entity. The two differ by a per-entity offset: `entity.dof_start` for dofs, `link_start` for links, and `q_start` for configuration variables. A joint's index properties apply exactly this shift:
 
 ```python
 # genesis/engine/entities/rigid_entity/rigid_joint.py
 dofs_idx       = list(range(dof_start, dof_end))
 dofs_idx_local = list(range(dof_start - entity.dof_start, dof_end - entity.dof_start))
-```
-
-Because local indices are stable no matter how many other entities share the scene, they are what you build control targets from. The control tutorial [`examples/tutorials/control_your_robot.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/control_your_robot.py) reads a Franka's motor dofs by joint name, then addresses them locally:
-
-```python
-motors_dof_idx = [franka.get_joint(name).dofs_idx_local[0] for name in joints_name]
-
-franka.set_dofs_kp(
-    kp=np.array([4500, 4500, 3500, 3500, 2000, 2000, 2000, 100, 100]),
-    dofs_idx_local=motors_dof_idx,
-)
 ```
 
 ## How indices appear in the API

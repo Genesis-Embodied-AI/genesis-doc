@@ -118,10 +118,10 @@ Once the environment is finalized, `gs.init(performance_mode=True)` bakes the no
 
 ## Verify with the profiler
 
-Do not guess where the syncs are. Attach the PyTorch profiler around a few steps and look for gaps between kernel launches, which are the CPU waiting on the GPU. See {doc}`/user_guide/developers/profiling` for the profiling setup and how to read Quadrants kernel timings.
+Do not guess where the syncs are. Attach the PyTorch profiler around a few steps and look for gaps between kernel launches, which are the CPU waiting on the GPU. See {doc}`/user_guide/performance/profiling` for the profiling setup and how to read Quadrants kernel timings.
 
 ## See also
 
 - {doc}`/user_guide/getting_started/parallel_simulation`: how batched builds and `n_envs` work.
-- {doc}`domain_randomization`: vary physics across environments without breaking the sync-free step.
-- {doc}`/user_guide/developers/profiling`: measure kernel time and launch latency.
+- {doc}`/user_guide/policy_training/domain_randomization`: vary physics across environments without breaking the sync-free step.
+- {doc}`/user_guide/performance/profiling`: measure kernel time and launch latency.

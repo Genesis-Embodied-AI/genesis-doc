@@ -6,7 +6,7 @@ Lights illuminate a rendered scene. How you add them depends on the backend:
 - **RayTracer:** there are no light objects. A light is an entity with an `Emission` {doc}`surface </api_reference/engine/entity/surface/emission>`, plus the optional `SphereLight` area lights below.
 - **BatchRenderer:** lights are added at runtime with `scene.add_light(...)`; see {doc}`renderers/batch_renderer`.
 
-For usage and worked examples, see {doc}`/user_guide/rendering/index`.
+For usage and worked examples, see {doc}`/user_guide/rendering/cameras`.
 
 ## Rasterizer lights
 
