@@ -75,11 +75,11 @@ Open an issue with the [bug report template](https://github.com/Genesis-Embodied
 
 ## The simulation raises an error
 
-The rigid solver checks for errors every 10 substeps and raises a `gs.GenesisException` that names the cause.
+The rigid solver checks for errors periodically and raises a `gs.GenesisException` that names the cause.
 
-**`Invalid constraint forces causing 'nan'` or `Invalid accelerations causing 'nan'`.** The integration became unstable. Reduce `dt`, or increase `substeps` in `SimOptions`. {doc}`Stability and accuracy </user_guide/configuration/stability>` explains how to choose them.
+**`Invalid constraint forces causing 'nan'` or `Invalid accelerations causing 'nan'`.** The integration became unstable. Reduce `dt`, or increase `substeps` in `SimOptions`. {doc}`Tuning simulation parameters </user_guide/configuration/simulation_tuning>` explains how to choose them.
 
-**`Exceeding max number of candidate contact points`.** Increase `max_collision_pairs` in `RigidOptions`. The default is 150.
+**`Exceeding max number of candidate contact points`.** Increase `max_collision_pairs` in `RigidOptions`.
 
 **`Exceeding max number of post-pruning contact points`.** Increase `max_contacts` in `RigidOptions`.
 

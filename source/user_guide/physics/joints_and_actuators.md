@@ -55,5 +55,5 @@ Batched parameters cost one copy per environment, in memory and in the bandwidth
 
 - {doc}`Control your robot </user_guide/getting_started/control_your_robot>`: position, velocity, and force control in one tutorial.
 - {doc}`Rigid bodies </user_guide/physics/rigid_bodies>`: link mass, density, and contact friction.
-- {doc}`Stability and accuracy </user_guide/configuration/stability>`: how `dt` and armature interact.
+- {doc}`Tuning simulation parameters </user_guide/configuration/simulation_tuning>`: when to tune joints before contacts.
 - {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`: the full list of `set_dofs_*` and `get_dofs_*` methods.
