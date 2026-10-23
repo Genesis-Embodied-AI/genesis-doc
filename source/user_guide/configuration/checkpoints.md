@@ -118,7 +118,7 @@ What a description carries is what travels, and `export` tells you about the res
 
 ## Checkpointing a built scene
 
-A `SimState` holds what you read back as positions and velocities. A **checkpoint** holds everything a step reads from one step to the next: the reduced-space state and the control inputs, the contacts and the constraint solution, the warm-start caches, and the link and geom poses the last step derived. Stepping a restored scene therefore lands bit-for-bit where the original went, on every backend.
+A `SimState` holds what you read back as positions and velocities. A **checkpoint** holds everything a step reads from one step to the next: the reduced-space state and the control inputs, the contacts and the constraint solution, the warm-start caches, and the link and geom poses the last step derived. Stepping a restored scene therefore lands bit-for-bit where the original went, on every backend. Checkpoints, checkpoint files, and trajectories cover the rigid and kinematic solvers only for now: a scene with any other active solver, or one coupled by IPC, raises when you checkpoint it.
 
 The checkpoint is the pickle protocol. `scene.__getstate__()` returns a {py:class}`SceneCheckpoint <genesis.engine.scene.SceneCheckpoint>`: the scene description, the environment layout the scene was built with, and the arrays of every solver, copied where they live, so a save and a restore within one process stay on the device. `scene.__setstate__(checkpoint)` puts a scene built from the same description and layout back in that state, and rejects a checkpoint from another build by the name of what differs. Pickling a scene reads the same record, and unpickling creates and builds the scene before restoring it:
 
@@ -190,7 +190,7 @@ The dynamic state each solver contributes to a `SimState`:
 |---|---|
 | Rigid | `qpos`, `dofs_vel`, `dofs_acc`, `links_pos`, `links_quat`, `friction_ratio` |
 | Kinematic | `qpos`, `dofs_vel`, `links_pos`, `links_quat` |
-| MPM | `pos`, `vel`, `C`, `F`, `Jp`, `active` |
+| MPM | `pos`, `vel`, `C`, `F`, `Jp`, `actu`, `active` |
 | SPH | `pos`, `vel`, `active` |
 | PBD | `pos`, `vel`, `free` |
 | FEM | `pos`, `vel`, `active` |

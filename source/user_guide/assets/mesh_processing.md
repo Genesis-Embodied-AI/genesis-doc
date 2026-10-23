@@ -2,7 +2,7 @@
 
 Every mesh you load into Genesis World serves two different jobs, and they want opposite things. The **visual mesh** should look right, so it keeps every triangle the artist authored. The **collision mesh** feeds the physics solver, which is fastest and most stable when geometry is simple, watertight, and convex. A raw mesh from a scanner or an art tool is usually none of those things.
 
-To bridge the gap, Genesis processes the collision geometry of a rigid entity automatically when you load it (watertightening, decimating, and convex-decomposing it) while leaving the visual mesh untouched. This page explains what that pipeline does, the options that control it, and when to change each one.
+To bridge the gap, Genesis processes the collision geometry of a rigid entity automatically when you load it (decimating and convex-decomposing it, or watertightening it if it stays non-convex) while leaving the visual mesh untouched. This page explains what that pipeline does, the options that control it, and when to change each one.
 
 The two runnable examples referenced throughout are the source of truth for the code:
 
@@ -36,7 +36,7 @@ The processing described below applies when the morph becomes a {py:class}`Rigid
 
 When a mesh becomes a rigid entity, Genesis prepares its collision geometry in three stages:
 
-- **Watertighten:** close gaps and remove non-manifold artifacts so the mesh bounds a well-defined volume. Controlled by `watertighten` (an integer 0–8, default 5).
+- **Watertighten:** for a mesh kept non-convex with `convexify=False`, close gaps and remove non-manifold artifacts so the mesh bounds a well-defined volume. Controlled by `watertighten` (an integer 0–8, default 5). The convex path skips this stage, since the hull replaces the surface anyway.
 - **Decimate:** reduce the triangle count toward a target so narrow-phase collision stays cheap.
 - **Convexify:** replace the mesh with one or more convex hulls, since a convex shape has an exact support function, which is what the collision algorithms query.
 
@@ -63,7 +63,7 @@ If you load a mesh with more than 5000 faces without decimating, Genesis warns y
 
 ## Convex decomposition
 
-The collision solver treats every collision shape as convex. A single convex hull is enough for a mug or a box, but a concave shape (a bowl, a tank hull, a tool with a handle) would lose its cavities if wrapped in one hull. Convex decomposition instead splits the mesh into a set of convex pieces that together approximate the original, using the [CoACD](https://github.com/SarahWeiii/CoACD) library.
+By default the collision solver works on convex shapes, while a mesh kept non-convex with `convexify=False` collides through a signed distance field instead. A single convex hull is enough for a mug or a box, but a concave shape (a bowl, a tank hull, a tool with a handle) would lose its cavities if wrapped in one hull. Convex decomposition instead splits the mesh into a set of convex pieces that together approximate the original, using the [CoACD](https://github.com/SarahWeiii/CoACD) library.
 
 ```python
 gs.morphs.Mesh(
@@ -111,7 +111,7 @@ See the [CoACD documentation](https://github.com/SarahWeiii/CoACD) for the full 
 
 ## Meshes for deformable simulation
 
-Deformable solvers need a volumetric mesh, not a surface. When a mesh drives an FEM entity, Genesis tetrahedralizes it (filling the interior with tetrahedra) after an isotropic remeshing pass that regularizes edge lengths so the tetrahedralization is well-conditioned. This happens automatically:
+Deformable solvers need a volumetric mesh, not a surface. When a mesh drives an FEM entity, Genesis welds its surface and tetrahedralizes it (filling the interior with tetrahedra), while FEM cloth uses the surface triangles directly. PBD entities instead remesh the surface to a uniform edge length. This happens automatically:
 
 ```python
 entity = scene.add_entity(

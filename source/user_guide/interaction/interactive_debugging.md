@@ -57,10 +57,10 @@ The same applies to entities. Inspect the Franka arm to see its geoms and links:
 Go one level deeper with `franka.links[0]`:
 
 ```{figure} ../../_static/images/interactive_link.png
-:alt: IPython repr of a single link showing geoms, vgeoms, inertial_mass, idx, entity, and joint
+:alt: IPython repr of a single link showing geoms, vgeoms, idx, entity, and joints
 ```
 
-A link exposes its collision geoms (`geoms`), visual geoms (`vgeoms`), `inertial_mass`, its global index in the scene (`idx`), the `entity` it belongs to, and its `joint`.
+A link exposes its collision geoms (`geoms`), visual geoms (`vgeoms`), its global index in the scene (`idx`), the `entity` it belongs to, and its `joints`. Read its mass with `get_mass()`.
 
 ## Drawing debug geometry
 

@@ -56,7 +56,7 @@ Each entry shares a leading contact axis. Index and scalar fields have shape `([
 - **`normal`:** contact normal, a world-space unit vector.
 - **`penetration`:** penetration depth, positive when the geometries overlap.
 - **`force_a`, `force_b`:** contact force on geometry A and on geometry B. They are equal and opposite, in newtons.
-- **`valid_mask`:** present only when the scene is parallelized. See the note below.
+- **`valid_mask`:** present when the scene is parallelized, or when `is_padded=True`. See the note below.
 
 To restrict the result to contacts against one other entity, pass `with_entity`. Passing the entity itself returns self-collisions only, and `exclude_self_contact=True` drops them:
 
@@ -121,45 +121,46 @@ Primitives have analytical support functions: the extreme point follows directly
 
 ## Support field
 
-Only convex meshes use the field. It precomputes the answer for a dense set of directions once, then answers any query by table lookup. The collider builds it when the scene is built.
+Only convex meshes use the field. It precomputes the answer for a dense set of directions once, then answers any query by table lookup. The collider builds it when the scene is built: one table for every geometry except height-field terrain, shared by the geometries of the same trimesh.
 
 ### Precomputation
 
-Genesis samples the unit sphere of directions on a regular latitude–longitude grid of `support_res × support_res` cells. The default resolution is `support_res = 180`, giving $180 \times 180 = 32{,}400$ sample directions. Cell $(i, j)$ maps to angles
+Genesis covers the unit sphere of directions with two spherical charts, the poles of the second a quarter turn away from those of the first. Each chart answers for the band of directions 45 to 135 degrees off its own poles, and stores only the cells of that band. The resolution is `support_res = 120`, giving $2 \times 120 \times 60 = 14{,}400$ cells per table. Cell $(i, j)$ of a chart maps to angles
 
 $$
 \theta = \frac{i}{\text{res}}\,2\pi - \pi \in [-\pi, \pi), \qquad
-\phi = \frac{j}{\text{res}}\,\pi \in [0, \pi),
+\phi = \frac{j}{\text{res}}\,\pi \in [\pi/4, 3\pi/4),
 $$
 
-and to the direction $d = (\sin\phi\cos\theta,\; \sin\phi\sin\theta,\; \cos\phi)$, with angles in radians.
+and to the direction $d = (\sin\phi\cos\theta,\; \sin\phi\sin\theta,\; \cos\phi)$ in the chart's own coordinates, with angles in radians.
 
-For each geometry, Genesis projects all of its vertices onto every sample direction and records the winning vertex: its position in the mesh's local frame and its index. The results for all geometries are packed into flat arrays, so a single query needs no host round-trip.
+For each table, Genesis lists every vertex that can support a direction of the cell: the supports of its four corners, the vertices of the hull faces whose normal falls inside the cell, and the two vertices of every hull edge whose arc crosses it. Each candidate is stored with its position in the mesh's local frame and its index. The first two candidates of a cell go in a record at the index of the cell, and the others in a list apart. The results for all tables are packed into flat arrays, so a single query needs no host round-trip.
 
 ### Query
 
-A query rotates the world-space direction into the mesh's local frame, looks up the precomputed vertex, and transforms it back to world space. The lookup inverts the grid mapping (`theta = atan2(d_y, d_x)`, `phi = acos(d_z)`) to find the continuous cell coordinates, then evaluates the four cells bracketing them (`floor` and `ceil` of each coordinate) and keeps the vertex with the largest dot product. This is a fixed, four-cell search regardless of mesh size, so the query is $O(1)$ in the vertex count.
+A query rotates the world-space direction into the mesh's local frame, looks up the precomputed candidates, and transforms the winner back to world space. The lookup hands the direction to the chart whose polar axis it is least aligned with, which keeps it at least 45 degrees off that chart's poles, inverts the chart's mapping (`theta = atan2(d_y, d_x)`, `phi = acos(d_z)`) to find the cell the direction falls in, and keeps the candidate of that cell with the largest dot product. Most cells list at most two candidates, so a query reads a few vertices instead of scanning all of them.
 
-The four-cell neighborhood also lets the field report how many distinct vertices tie for the maximum. GJK uses that count to detect directions where the support point is ambiguous and perturb the query, which keeps the algorithm numerically stable on flat faces and shared edges.
+Since a cell lists every vertex that can support its directions, the field can also report how many distinct vertices tie for the maximum. GJK uses that count to detect directions where the support point is ambiguous and perturb the query, which keeps the algorithm numerically stable on flat faces and shared edges.
 
 ### Data layout
 
-The field lives in a Quadrants-resident struct of flat arrays, so collision kernels read it without pointer chasing. A prefix-sum offset indexes into the concatenated per-geometry blocks.
+The field lives in a Quadrants-resident struct of flat arrays, so collision kernels read it without pointer chasing. A prefix-sum offset indexes into the concatenated per-table blocks.
 
 | Field | Shape | Description |
 |---|---|---|
-| `support_v` | `(n_support_cells, 3)` | Winning vertex positions, in each geometry's local frame. |
-| `support_vid` | `(n_support_cells,)` | Corresponding vertex index in the original mesh. |
-| `support_cell_start` | `(n_geoms,)` | Offset of each geometry's block into the flattened arrays. |
+| `support_v` | `(2 n_support_cells + n_extras, 3)` | Candidate vertex positions, in each geometry's local frame: the record of every cell, then the extra candidates of all cells. |
+| `support_vid` | `(2 n_support_cells + n_extras,)` | Corresponding vertex index in the original mesh. |
+| `support_list_start` | `(n_support_cells + 1,)` | Start of the extra candidates of each cell. |
+| `support_cell_start` | `(n_geoms,)` | Offset of each geometry's table into the flattened arrays. Geometries sharing a trimesh share a table. |
 
-At the default resolution, each convex mesh contributes $32{,}400$ cells. At single precision (three floats plus one integer per cell) that is roughly 0.5 MB per mesh, independent of the mesh's vertex count.
+Each distinct trimesh contributes $14{,}400$ cells. A cell's record holds two candidates (three floats plus one integer each), roughly 0.5 MB per table at single precision, plus the extra candidates of the cells crossed by several hull features.
 
 ### Trade-offs
 
-- **Constant-time lookups:** a query is a fixed four-cell search rather than a scan over vertices, which also means fewer diverging branches on the GPU.
+- **Short lookups:** a query scans the candidates of a single cell rather than every vertex.
 - **Uniform representation:** every convex mesh reduces to the same struct-of-arrays layout, with no per-shape bounding volume or hierarchy to build or traverse.
-- **Approximate, not exact:** the grid has a fixed angular resolution, so a query direction snaps to the nearest sampled cells. A feature narrower than one angular cell may return a neighboring vertex rather than the true extreme point.
-- **Fixed preprocessing cost:** the field is built for every geometry at scene build time and stored at full resolution, so both build time and memory grow with the number of geometries in the scene.
+- **Exact:** each cell lists every vertex whose normal cone meets it, so the lookup returns the true extreme point, up to the angle error of the binning in single precision.
+- **Fixed preprocessing cost:** the field is built once per distinct trimesh at scene build time (instances of an asset share one table, and terrain gets none), so both build time and memory grow with the number of distinct meshes in the scene.
 
 :::{note}
 When MuJoCo compatibility is enabled, a mesh query falls back to an exhaustive vertex scan for bit-level agreement with MuJoCo.
@@ -169,7 +170,7 @@ When MuJoCo compatibility is enabled, a mesh query falls back to an exhaustive v
 
 The solver partitions the scene into **contact islands**: the connected components of a coupling graph whose nodes are the kinematic trees that carry dofs, joined by contacts and by equality constraints. An articulated body stays one island; an entity holding several free bodies splits into one island per body. Each island is an exactly decoupled block of the constraint solve, so the solver factors and solves every island on its own instead of assembling one system for the whole scene. A scene made of a single coupled tree forms one island.
 
-**Hibernation** extends that partition in time. Each step, the solver compares every awake link's maximum degree-of-freedom (dof) speed against `hibernation_thresh_vel`. It weights each dof velocity by its `dof_length`, which is 1 for a translational dof and the swept radius for a rotational one, so a single linear tolerance covers both and the rotational jitter of a small body does not keep it awake. A link that stays under the tolerance for 10 consecutive steps is ready to sleep, and an island hibernates once all of its links are ready, at which point the solver zeroes their dof velocities. Two things wake an island again: a new contact against one of its bodies, resolved before the solve so the body responds the same step, and a coupling force arriving from another solver.
+**Hibernation** extends that partition in time. Each substep, the solver compares every awake link's maximum degree-of-freedom (dof) speed against `hibernation_thresh_vel`. It weights each dof velocity by its `dof_length`, which is 1 for a translational dof and the swept radius for a rotational one, so a single linear tolerance covers both and the rotational jitter of a small body does not keep it awake. A link that stays under the tolerance for 10 consecutive substeps is ready to sleep, and an island hibernates once all of its links are ready, at which point the solver zeroes their dof velocities. Three things wake an island again: a new contact against one of its bodies (resolved before the solve, so the body responds the same step), actuation of one of its links, and a coupling force arriving from another solver.
 
 A sleeping island is skipped by the solve and by the broad phase. In a scene with many settled bodies, per-step cost then follows the number of *awake* bodies rather than the total.
 
@@ -192,7 +193,7 @@ Read which links are asleep from the solver state:
 ```python
 from genesis.utils.misc import qd_to_numpy
 
-is_hibernated = qd_to_numpy(scene.rigid_solver.links_state.is_hibernated, transpose=True)
+is_hibernated = qd_to_numpy(scene.rigid_solver.dyn_state.links.is_hibernated, transpose=True)
 n_awake = is_hibernated.size - is_hibernated.sum()
 ```
 

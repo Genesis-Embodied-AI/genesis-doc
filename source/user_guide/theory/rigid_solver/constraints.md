@@ -76,11 +76,12 @@ A related row models dry friction in a joint: dofs with a nonzero friction-loss 
 
 ### Equality constraints
 
-Equality constraints are holonomic, tying bodies together for as long as they exist. Genesis World supports three kinds.
+Equality constraints are holonomic, tying bodies together for as long as they exist. Genesis World supports four kinds.
 
 - **Connect:** pins two points on different bodies to the same world position, removing 3 translational dofs, as a ball-and-socket joint does.
 - **Weld:** holds two frames at a fixed relative pose, removing all 6 dofs. This is the constraint the {doc}`suction-gripper example </user_guide/robot_control/constraints>` toggles at runtime.
 - **Joint:** couples two scalar joints so one follows the other through a quartic polynomial, removing 1 dof, as a geared mechanism does.
+- **Screw:** restricts the relative motion of two links to a helix about an axis of the first, removing 5 dofs, as a bolt and nut do. It is added at runtime with `add_screw_constraint`.
 
 Each writes its rows into $J$ so that the solve drives the constrained relative velocity to zero. `disable_constraint=True` turns off all constraints, contacts included.
 

@@ -17,8 +17,8 @@ Shape primitives, {py:class}`gs.morphs.Plane <genesis.options.morphs.Plane>`, {p
 franka = scene.add_entity(
     gs.morphs.MJCF(file="xml/franka_emika_panda/panda.xml"),
 )
-mug = scene.add_entity(
-    gs.morphs.Mesh(file="meshes/mug.obj", scale=0.1),
+duck = scene.add_entity(
+    gs.morphs.Mesh(file="meshes/duck.obj", scale=0.1),
 )
 ```
 

@@ -181,7 +181,7 @@ python examples/manipulation/grasp_eval.py --stage=rl
 :width: 100%
 ```
 
-Student policy, reading only the stereo cameras. Pass `--record` to save the rendered views to `logs/grasp_bc/` as video:
+Student policy, reading only the stereo cameras. Pass `--record` to save the rendered views to `out/grasp_bc/` as video (`video.mp4`, `left_cam.mp4`, and `right_cam.mp4`):
 
 ```bash
 python examples/manipulation/grasp_eval.py --stage=bc --record

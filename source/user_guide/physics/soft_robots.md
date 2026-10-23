@@ -50,18 +50,17 @@ for i in range(1000):
 Everything else (the plane, the scene, `build`, `step`) is the standard flow from {doc}`/user_guide/getting_started/hello_genesis`.
 
 :::{note}
-The constitutive `model` names differ between solvers. MPM uses `"corotation"` or `"neohooken"`; FEM uses `"linear"` or `"stable_neohookean"`. (`"stable_neohooken"` is a deprecated spelling of the FEM model and logs a warning.)
+The constitutive `model` names differ between solvers. MPM uses `"corotation"` or `"neohooken"`; FEM uses `"linear"`, `"stable_neohookean"`, or `"linear_corotated"`. (`"stable_neohooken"` is a deprecated spelling of the FEM model and logs a warning.)
 :::
 
 ## Timestep and gravity
 
-Soft-body dynamics need small timesteps and several substeps for numerical stability. Set the timestep on each soft solver's options, which leaves the rest of the scene at the global timestep:
+Soft-body dynamics need small timesteps and several substeps for numerical stability. Set the timestep on each soft solver's options. Genesis World derives the number of substeps per step from it (`SimOptions.dt / dt`) and advances every solver in the scene at that rate:
 
 ```python
 dt = 5e-4  # seconds
 scene = gs.Scene(
     sim_options=gs.options.SimOptions(
-        substeps=10,
         gravity=(0, 0, 0),  # float freely so the muscle motion is easy to see
     ),
     mpm_options=gs.options.MPMOptions(
@@ -105,7 +104,7 @@ scene.build(n_envs=3)
 `set_muscle` takes two per-unit arrays, where a *unit* is a particle for MPM and an element for FEM:
 
 - `muscle_group`: an integer in `[0, n_groups)` per unit, naming which muscle each unit belongs to.
-- `muscle_direction`: a fiber direction per unit (or one shared vector). Genesis does **not** normalize it; pass unit vectors.
+- `muscle_direction`: a fiber direction per unit. MPM also accepts one shared vector; FEM requires one per element. Genesis does **not** normalize it: pass unit vectors (FEM asserts that they are).
 
 The worm example carves the body into upper/lower and fore/hind quarters by particle position, then points every fiber along `+Y`:
 

@@ -81,7 +81,7 @@ The bundled models are:
 `set_propellers_rpm` is the single actuation call. It takes one RPM per propeller:
 
 ```python
-propellers_rpm  # shape ([n_envs,] n_propellers), non-negative
+propellers_rpm  # shape ([n_envs,] n_propellers), non-negative (not checked)
 ```
 
 :::{warning}
@@ -97,7 +97,7 @@ rpms = self.thrust + clipped_dir * self.rotation_delta
 return np.clip(rpms, 0, 25000)  # keep RPM within the motor's range
 ```
 
-The direction vectors show the pattern directly: moving forward uses `(1, 1, -1, -1)` (front pair up, rear pair down, so the drone pitches forward), while yaw-style rotation uses `(-1, 1, -1, 1)`, matching the propeller spin directions.
+The direction vectors show the pattern directly: moving forward uses `(1, 1, -1, -1)` (front pair up, rear pair down, so the drone pitches forward), while moving left uses `(-1, 1, -1, 1)` and moving right uses `(1, -1, 1, -1)`.
 
 ## Closed-loop control
 

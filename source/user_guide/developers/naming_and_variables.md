@@ -19,7 +19,7 @@ box = scene.add_entity(gs.morphs.Box(pos=(0, 0, 0.5), size=(0.2, 0.2, 0.2)))
 ground = scene.add_entity(gs.morphs.Plane(), name="ground")
 
 scene.get_entity(name="ground")        # exact-name lookup
-scene.get_entity(uid=box.uid.short())  # short-UID lookup (substring of the full uid)
+scene.get_entity(uid=box.uid.short())  # short-UID lookup (the first 7 characters of the full uid)
 
 scene.entity_names  # tuple of every entity's name, in creation order
 ```
@@ -83,9 +83,9 @@ The conventions above surface names you also see when reading solver code. If yo
 **Data fields follow `<representation>_<computation-type>`.** The representation is always plural (`dofs`, `links`, `particles`, `elements`), and the computation-type suffix marks how the field is used:
 
 - **`*_state`:** dynamic state updated every solver step (for example `dofs_state`, `links_state`).
-- **`*_info`:** static properties fixed for the simulation, such as mass or stiffness (`dofs_info`, `geom_info`).
+- **`*_info`:** static properties fixed for the simulation, such as mass or stiffness (`dofs_info`, `geoms_info`).
 - **`*_render`:** fields consumed only by visualization, never by physics (`particles_render`).
-- **`*_ng`:** a state variant with `requires_grad` disabled (`particles_state_ng`); `*_reordered` marks a spatially reordered cache.
+- **`*_ng`:** a state variant with `requires_grad` disabled (`particles_ng`); `*_reordered` marks a spatially reordered cache.
 
 **Loop indices are `i_<representation-initial>`.** Kernels iterate flat arrays with short names whose letter names the thing being indexed. These are the global indices described above, not local ones:
 
