@@ -67,7 +67,7 @@ trajectory.scene.step()
 
 ### What a file cannot hold
 
-`save_checkpoint` and `TrajectoryFile` raise if the scene holds an entity, an emitter, or a force field that has no scene description, since a file without it would restore different physics. Sensors, cameras, and pre-step callbacks do not change the physics, so the file leaves them out and Genesis World logs a warning that names them.
+`save_checkpoint` and `TrajectoryFile` raise if the scene holds an entity, an emitter, or a force field that has no scene description, since a file without it would restore different physics. The file leaves out sensors, cameras, and pre-step callbacks, and Genesis World logs a warning that names them. Pre-step callbacks can drive controllers or pause the simulation, so register them again before stepping a restored scene to reproduce the original behavior.
 
 ### Report the bug
 
