@@ -1,6 +1,10 @@
 # Assets
 
-Almost everything you put in a scene comes from an asset file loaded through a **morph**: the object that pairs an entity's geometry with its initial pose and scale, and that you pass as the first argument to `scene.add_entity(...)`. This section covers getting external geometry into Genesis World correctly, from the supported file formats to the mesh preparation that makes a model simulate well. Start with the general loading workflow, which applies to every format.
+Use asset files to bring robot models, objects, and scene geometry into Genesis World. Choose a guide based on what you need to load or prepare:
+
+- {doc}`Loading assets <loading_assets>`: choose a supported file format, find asset files, and set a model's position, orientation, and scale.
+- {doc}`USD import <usd_import>`: import individual USD assets or a complete stage, including articulated models, materials, and collision geometry.
+- {doc}`Mesh processing <mesh_processing>`: prepare mesh geometry for simulation, including simplification, convex decomposition for rigid-body collisions, and meshing for deformable bodies.
 
 ```{toctree}
 :hidden:
