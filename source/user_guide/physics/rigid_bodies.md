@@ -1,6 +1,6 @@
 # Rigid bodies
 
-A rigid body is the default kind of entity in Genesis World: a solid that does not deform, simulated by the rigid solver. It is what you get from {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`, and it covers most of robotics: robot arms, grippers, mobile bases, and the props they interact with. The rest of this section covers the non-rigid families that build on the same `Scene`.
+A rigid body is the default kind of entity in Genesis World: a solid that does not deform, simulated by the rigid solver. It is what you get from {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`, and it covers most of robotics: robot arms, grippers, mobile bases, and the props they interact with. The linked guides cover joint parameters, drones, and terrain. For materials that deform or flow, see {doc}`Deformables and fluids <beyond_rigid_bodies>`.
 
 ## Adding a rigid body
 
@@ -67,3 +67,11 @@ The rigid solver governs how these bodies actually push on each other: contact, 
 - {doc}`/user_guide/robot_control/inverse_kinematics_motion_planning`: inverse kinematics and collision-free planning.
 - {doc}`beyond_rigid_bodies`: the non-rigid solvers (MPM, FEM, PBD, SPH) that share the scene.
 - {doc}`/user_guide/theory/rigid_solver/index`: the contact and constraint model behind rigid dynamics.
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+drone_entity
+terrain
+```

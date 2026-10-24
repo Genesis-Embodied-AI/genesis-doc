@@ -53,7 +53,7 @@ The available pair flags on `LegacyCouplerOptions` are `rigid_mpm`, `rigid_sph`,
 
 ## See also
 
-- {doc}`Beyond rigid bodies </user_guide/physics/beyond_rigid_bodies>`: choose a solver and run a minimal example for each.
+- {doc}`Deformables and fluids </user_guide/physics/beyond_rigid_bodies>`: choose a solver and run a minimal example for each.
 - {doc}`soft_solvers </user_guide/theory/soft_solvers>`: the solvers being coupled and the models they integrate.
 - {doc}`Concepts </user_guide/configuration/concepts>`: how entity state maps onto each solver's global data fields.
 - Runnable cross-solver pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling).

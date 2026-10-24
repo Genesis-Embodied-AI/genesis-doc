@@ -29,7 +29,7 @@ tank = scene.add_entity(
 The `vis_mode` shortcut is how you inspect the result of processing. It renders either `"visual"` (the default) or `"collision"` geometry, so you can see exactly what the solver sees.
 
 :::{note}
-The processing described below applies when the morph becomes a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`. Deformable entities (FEM, MPM, and other particle-based materials) do not convexify their meshes; see {doc}`Beyond rigid bodies </user_guide/physics/beyond_rigid_bodies>`.
+The processing described below applies when the morph becomes a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`. Deformable entities (FEM, MPM, and other particle-based materials) do not convexify their meshes; see {doc}`Deformables and fluids </user_guide/physics/beyond_rigid_bodies>`.
 :::
 
 ## Collision pipeline
@@ -120,7 +120,7 @@ entity = scene.add_entity(
 )
 ```
 
-For the material side of deformable simulation, see {doc}`Soft robots </user_guide/physics/soft_robots>`.
+For the material side of deformable simulation, see {doc}`Muscle actuation </user_guide/physics/soft_robots>`.
 
 ## Caching
 
@@ -138,4 +138,4 @@ Mesh processing is expensive, so Genesis caches each result on disk keyed by a S
 
 - {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`: morphs, file formats, and loading entities.
 - {doc}`Conventions </user_guide/configuration/conventions>`: coordinate frames and Y-up versus Z-up mesh handling.
-- {doc}`Beyond rigid bodies </user_guide/physics/beyond_rigid_bodies>`: deformable and particle-based materials.
+- {doc}`Deformables and fluids </user_guide/physics/beyond_rigid_bodies>`: deformable and particle-based materials.
