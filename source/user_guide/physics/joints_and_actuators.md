@@ -1,6 +1,6 @@
 # Joints and Actuators
 
-Every joint of a rigid entity adds one or more **degrees of freedom** (**dofs**), and each dof carries its own physical and actuator parameters. Genesis World reads them from the URDF or MJCF file when the model provides them. After `scene.build()`, a `set_dofs_*` method overrides a parameter, and the matching `get_dofs_*` method reads it back:
+A movable joint of a rigid entity adds one or more **degrees of freedom** (**dofs**); a fixed joint adds none. Each dof carries its own physical and actuator parameters. Genesis World reads them from the URDF or MJCF file when the model provides them. After `scene.build()`, a `set_dofs_*` method overrides a parameter, and the matching `get_dofs_*` method reads it back:
 
 ```python
 franka.set_dofs_damping(np.full(7, 2.0), dofs_idx_local=np.arange(7))
@@ -8,6 +8,14 @@ print(franka.get_dofs_damping())  # shape ([n_envs,] n_dofs) when batch_dofs_inf
 ```
 
 All of these methods take values paired with `dofs_idx_local`, the same pattern as the {doc}`control tutorial </user_guide/getting_started/control_your_robot>`. They require a built scene and raise if called before `build()`.
+
+## Choose the parameter that matches the model
+
+**Passive damping** opposes joint velocity even when the actuator is not commanding the joint. The controller's **velocity gain** `kv` instead sets the response to a velocity error in the active control mode. They can both reduce oscillation, but tune damping to represent the joint's physical resistance and `kv` to set the controller response.
+
+**Armature** adds inertia in joint coordinates, for example to represent motor inertia reflected through a gearbox. Changing a link's mass also changes its weight and the forces it exerts on other bodies. Use armature for the joint-side inertia you intend to model, rather than changing link mass to obtain the same control response.
+
+The tables below connect these physical choices to the setters and model-file fields. See {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>` for method signatures and argument details.
 
 ## Passive joint parameters
 
@@ -21,7 +29,7 @@ These parameters act on the dof whether or not you command it.
 | Friction loss | `set_dofs_frictionloss` | Dry friction in the joint: the dof does not move until the applied force exceeds this value. | URDF `<dynamics friction>`, MJCF joint `frictionloss`. |
 | Limits | `set_dofs_limit` | The position range of the dof, enforced as a constraint when `RigidOptions.enable_joint_limit` is on. | URDF `<limit>`, MJCF joint `range`. |
 
-Armature matters most for small, fast links such as fingers and the distal joints of an arm. A real actuator adds inertia to these joints through its gearbox. Without armature, these joints can respond faster than the hardware does, and a large `dt` makes them unstable.
+Armature matters most for small, fast links such as fingers and the distal joints of an arm. A real actuator adds inertia to these joints through its gearbox. Omitting that inertia can make the simulated response faster than the hardware response and can make high-gain control harder to integrate at a large `dt`.
 
 ## Actuator parameters
 
