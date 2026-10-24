@@ -60,10 +60,10 @@ scene = gs.Scene(
 - **`show_FPS`:** whether to print the rate at all. Set it to `False` for quiet runs, or when the log lines interfere with your own output.
 - **`FPS_tracker_alpha`:** the smoothing momentum, between 0 and 1. Higher values react more slowly and read more steadily; lower values track sudden changes in speed more closely.
 
-The scene exposes the live options as `scene.profiling_options`, so you can toggle the counter after construction:
+The scene exposes the live options as `scene.options.profiling`, so you can toggle the counter after construction:
 
 ```python
-scene.profiling_options.show_FPS = False
+scene.options.profiling.show_FPS = False
 ```
 
 See {doc}`/user_guide/configuration/config_system` for how `ProfilingOptions` fits alongside the other options objects.
@@ -82,7 +82,7 @@ The FPS counter reports the rate of the whole loop, which includes everything th
 | `step` | the whole call to `scene.step()`, the pre-step callbacks included |
 | `period` | the wall time from the start of the previous step to the start of this one, your own code between the two included, so its inverse is the rate the loop achieves |
 
-A phase the step skips is absent from the mapping, so a scene with no sensors never reports a `sensors` time, and the first step has no `period`. The mapping stays empty until the first `scene.step()` returns, and a step a pre-step callback vetoes, such as a paused viewer, empties it, since the simulation does not advance. The step that follows has no `period`. Resetting the scene or restoring a checkpoint leaves the timings as they are.
+A phase the step skips is absent from the mapping, for instance `rendering` after `scene.step(update_visualizer=False)`, and the first step has no `period`. The mapping stays empty until the first `scene.step()` returns. A step a pre-step callback vetoes, such as a paused viewer, leaves the timings of the previous step as they are, since the simulation does not advance, and the `period` of the next step counts from the start of the last step that advanced. Resetting the scene or restoring a checkpoint leaves the timings as they are.
 
 Each reading covers the latest step alone, so it jitters from step to step. Smooth a quantity you read every step with a {py:class}`RunningMean <genesis.utils.tools.RunningMean>`, over a window of steps or as an exponential moving average. Invert a phase to read it as a rate, for instance the step rate of the physics without the sensors, rendering, and recording around it:
 
@@ -112,7 +112,7 @@ The scripts in [`examples/speed_benchmark`](https://github.com/Genesis-Embodied-
 gs.init(backend=gs.gpu, performance_mode=True)
 
 scene = gs.Scene(
-    rigid_options=gs.options.RigidOptions(dt=0.01),
+    sim_options=gs.options.SimOptions(dt=0.01),
     show_viewer=False,
 )
 # ... add plane and franka ...
@@ -126,7 +126,7 @@ Three choices make this a throughput benchmark rather than an interactive sessio
 - **`show_viewer=False`** runs headless. Rendering a window caps throughput at display rates and defeats the purpose.
 - **A large `n_envs`** keeps the GPU saturated. Throughput scales with the batch until you run out of VRAM.
 
-[`examples/speed_benchmark/anymal_c.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/anymal_c.py) is the equivalent for a legged robot. For the reasoning behind these settings and other ways to raise throughput, see {doc}`/user_guide/getting_started/parallel_simulation` and {doc}`/user_guide/policy_training/best_practices/efficient_environment`.
+[`examples/speed_benchmark/anymal_c.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/anymal_c.py) is the equivalent for a legged robot. For the reasoning behind these settings and other ways to raise throughput, see {doc}`/user_guide/getting_started/parallel_simulation` and {doc}`/user_guide/performance/efficient_environment`.
 
 ## Timing GPU kernels with the PyTorch profiler
 
@@ -164,7 +164,7 @@ For the CPU side alone, a sampling profiler such as [py-spy](https://github.com/
 
 ### Reading the trace
 
-On the GPU timeline you get the precise start and duration of every kernel launch. White gaps between kernels are launch overhead: the GPU sitting idle while the CPU catches up. On a large parallel simulation those gaps should be negligible; if they dominate, the simulation is CPU-bound and no amount of extra environments will help until the stalls are removed. Diagnosing and removing these stalls is the subject of {doc}`/user_guide/policy_training/best_practices/efficient_environment`.
+On the GPU timeline you get the precise start and duration of every kernel launch. White gaps between kernels are launch overhead: the GPU sitting idle while the CPU catches up. On a large parallel simulation those gaps should be negligible; if they dominate, the simulation is CPU-bound and no amount of extra environments will help until the stalls are removed. Diagnosing and removing these stalls is the subject of {doc}`/user_guide/performance/efficient_environment`.
 
 The GPU timeline has no call hierarchy of its own, so it can be hard to tell which Python-side operation a kernel belongs to. Insert a synchronization before each step to force that alignment:
 
@@ -220,5 +220,5 @@ Run it without arguments to collect and plot the timings, or with `--profiling` 
 ## See also
 
 - {doc}`/user_guide/getting_started/parallel_simulation`: scaling to many environments for throughput.
-- {doc}`/user_guide/policy_training/best_practices/efficient_environment`: removing CPU–GPU stalls in a training loop.
+- {doc}`/user_guide/performance/efficient_environment`: removing CPU–GPU stalls in a training loop.
 - {doc}`/user_guide/configuration/config_system`: how `ProfilingOptions` fits with the other options objects.

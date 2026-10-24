@@ -89,7 +89,7 @@ def get_observations(self):
     return TensorDict({"policy": self.obs_buf}, batch_size=[self.num_envs])
 ```
 
-The **command** is the task: a per-environment target of forward velocity, lateral velocity, and yaw rate. The environment resamples the command at random within configured ranges every `resampling_time_s` and on reset, so a single policy learns to follow a distribution of velocity commands rather than one fixed gait.
+The **command** is the task: a per-environment target of forward velocity, lateral velocity, and yaw rate. The environment resamples the command at random within configured ranges every `resampling_time_s` and on reset. The default config in `go2_train.py` pins the ranges to a single command (forward at 0.5 m/s, no lateral velocity or yaw rate); widen `lin_vel_x_range`, `lin_vel_y_range`, and `ang_vel_range` to train a policy that follows a distribution of velocity commands.
 
 ### Rewards
 
@@ -187,6 +187,6 @@ python examples/locomotion/go2_backflip.py -e double
 
 ## See also
 
-- {doc}`Best practices <../best_practices/index>`: keeping the step loop on the GPU and randomizing physics across environments.
+- {doc}`Efficient environments </user_guide/performance/efficient_environment>` and {doc}`domain randomization </user_guide/policy_training/domain_randomization>`: keeping the step loop on the GPU and randomizing physics across environments.
 - {doc}`hover_env`: the same pipeline applied to a quadcopter.
 - {doc}`manipulation`: a two-stage pipeline that combines reinforcement learning with imitation learning.

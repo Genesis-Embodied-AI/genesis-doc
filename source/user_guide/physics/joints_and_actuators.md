@@ -57,7 +57,7 @@ damping = torch.rand(1024, 7, device=gs.device) * 5.0
 franka.set_dofs_damping(damping, dofs_idx_local=np.arange(7))
 ```
 
-Batched parameters cost one copy per environment, in memory and in the bandwidth to read them, so enable this only when you need it. Heterogeneous scenes enable it automatically. {doc}`Domain randomization </user_guide/policy_training/best_practices/domain_randomization>` covers the full workflow.
+Batched parameters cost one copy per environment, in memory and in the bandwidth to read them, so enable this only when you need it. Heterogeneous scenes enable it automatically. {doc}`Domain randomization </user_guide/policy_training/domain_randomization>` covers the full workflow.
 
 ## See also
 

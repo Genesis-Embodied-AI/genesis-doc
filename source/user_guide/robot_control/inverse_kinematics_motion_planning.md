@@ -73,7 +73,7 @@ qpos[-2:] = 0.04  # open gripper, meters per finger
 
 ## Planning a path to the configuration
 
-IK gives a goal configuration but not how to get there. `plan_path` finds a collision-free trajectory from the current configuration to `qpos_goal` and returns a list of waypoints, one per simulation step:
+IK gives a goal configuration but not how to get there. `plan_path` finds a collision-free trajectory from the current configuration to `qpos_goal` and returns a tensor of waypoints, one per simulation step:
 
 ```python
 path = franka.plan_path(
@@ -137,7 +137,7 @@ The fingers stay under force control from the grasp step, so the cube rises with
 
 ## See also
 
-- {doc}`advanced_ik`: multi-target IK, null-space control, and solver tuning.
-- {doc}`constraints`: weld and connect constraints for locking links together at runtime.
+- {doc}`advanced_ik`: multi-link IK, parallel IK, forward kinematics and the Jacobian.
+- {doc}`/user_guide/physics/dynamic_equality_constraints`: weld and screw constraints added at runtime.
 - {doc}`path_planning`: collision-free motion planning with RRT.
 - {doc}`/user_guide/getting_started/control_your_robot`: position, velocity, and force control in depth.

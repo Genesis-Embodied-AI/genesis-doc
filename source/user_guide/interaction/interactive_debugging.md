@@ -57,10 +57,10 @@ The same applies to entities. Inspect the Franka arm to see its geoms and links:
 Go one level deeper with `franka.links[0]`:
 
 ```{figure} ../../_static/images/interactive_link.png
-:alt: IPython repr of a single link showing geoms, vgeoms, inertial_mass, idx, entity, and joint
+:alt: IPython repr of a single link showing geoms, vgeoms, idx, entity, and joints
 ```
 
-A link exposes its collision geoms (`geoms`), visual geoms (`vgeoms`), `inertial_mass`, its global index in the scene (`idx`), the `entity` it belongs to, and its `joint`.
+A link exposes its collision geoms (`geoms`), visual geoms (`vgeoms`), its global index in the scene (`idx`), the `entity` it belongs to, and its `joints`. Read its mass with `get_mass()`.
 
 ## Drawing debug geometry
 
@@ -177,5 +177,5 @@ The full example is [`imgui_joint_control.py`](https://github.com/Genesis-Embodi
 ## See also
 
 - {doc}`/user_guide/interaction/viewer_plugin`: keybindings and writing your own viewer plugins.
-- {doc}`/user_guide/rendering/index`: cameras, rendering, and recording.
+- {doc}`/user_guide/rendering/cameras`: cameras, rendering, and recording.
 - {doc}`/user_guide/getting_started/hello_genesis`: the core simulation loop.

@@ -12,4 +12,5 @@ config_system
 conventions
 simulation_tuning
 checkpoints
+differentiable_simulation
 ```

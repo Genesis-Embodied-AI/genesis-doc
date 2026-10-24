@@ -12,7 +12,7 @@ Use this page to choose which Genesis World settings to investigate when rigid c
 | A grasped object slipping or twisting | Check [friction and contact geometry](#contact-behavior) and the gripper's [force range](#joint-and-controller-behavior). |
 | A robot tracking slowly or oscillating | Check [joint properties, gains, and commands](#joint-and-controller-behavior). |
 | Contact-buffer capacity errors | Follow the buffer-specific instructions in {doc}`Troubleshooting </user_guide/overview/troubleshooting>`. |
-| Excessive time per step | Measure the cause with {doc}`Profiling </user_guide/developers/profiling>` before reducing substeps or iterations. |
+| Excessive time per step | Measure the cause with {doc}`Profiling </user_guide/performance/profiling>` before reducing substeps or iterations. |
 
 ## Before changing solver settings
 

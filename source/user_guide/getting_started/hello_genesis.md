@@ -79,7 +79,7 @@ franka = scene.add_entity(
 )
 ```
 
-Shape primitives include `Plane`, `Box`, `Cylinder`, `Sphere`, `Terrain` (see the {doc}`terrain tutorial </user_guide/physics/terrain>`), and `Drone`. Supported file formats include:
+Shape primitives include `Plane`, `Box`, `Cylinder`, and `Sphere`. `Terrain` builds a height-field ground (see the {doc}`terrain tutorial </user_guide/physics/terrain>`), and `Drone` loads a quadrotor from a URDF file. Supported file formats include:
 
 - {py:class}`gs.morphs.MJCF <genesis.options.morphs.MJCF>`: MuJoCo `.xml` models
 - {py:class}`gs.morphs.URDF <genesis.options.morphs.URDF>`: robot descriptions (`.urdf`, and `.xacro`, which is preprocessed automatically)
@@ -113,7 +113,7 @@ for i in range(1000):
     scene.step()
 ```
 
-`scene.build()` is a required, explicit step. Genesis World compiles GPU kernels just-in-time, so building is what allocates device memory, creates the simulation data fields, and triggers that compilation. With `show_viewer=True`, the viewer window opens once the scene is built. Each `scene.step()` then advances the simulation by one `dt`.
+`scene.build()` is a required, explicit step. Genesis World compiles GPU kernels just-in-time, so building is what allocates device memory, creates the simulation data fields, and triggers that compilation. With `show_viewer=True`, the viewer window opens once the scene is built. Each `scene.step()` then advances the simulation by one `dt`. When the viewer is shown, stepping is paced to real time by default; pass `gs.options.ViewerOptions(realtime_factor=None)` to run as fast as possible.
 
 :::{note}
 **Kernel compilation and caching.** The first build with a new scene configuration (different robots, a different number of objects, anything that changes the internal data layout) compiles kernels on the fly, which is slow. Genesis World caches compiled kernels: as long as the first run exits normally or via `Ctrl-C` (**not** `Ctrl-\`), later runs with the same configuration load from cache and start quickly.
@@ -123,4 +123,4 @@ for i in range(1000):
 
 - {doc}`Control your robot <control_your_robot>`: actuate the Franka you just loaded.
 - {doc}`Visualization </user_guide/interaction/visualization>`: watch a scene in the interactive viewer.
-- {doc}`Rendering </user_guide/rendering/index>`: capture images and video from a camera.
+- {doc}`Rendering </user_guide/rendering/cameras>`: capture images and video from a camera.

@@ -84,7 +84,7 @@ These methods share the pattern used throughout the control API: a tensor of val
 - `set_*` writes the robot state directly, without consulting the dynamics. The dof lands on the requested value in a single step.
 - `control_*` sends a target to the controller, which produces forces that move the robot toward it over several steps, respecting the dynamics and the force range set above.
 
-Use `set_dofs_position` to reset an episode or place a robot at a starting configuration, and keep it out of a control loop. On a rigid entity it zeroes the dof velocities as well, so the robot starts from rest; pass `zero_velocity=False` to keep the velocities it had:
+Use `set_dofs_position` to reset an episode or place a robot at a starting configuration, and keep it out of a control loop. On a rigid entity, pass `zero_velocity=True` to also zero the velocities of all the entity's dofs, so the robot starts from rest:
 
 ```python
 for i in range(150):
@@ -168,7 +168,7 @@ for i in range(150):
     scene.step()
 ```
 
-Both components are optional, and `apply_external_force` and `apply_external_torque` are shortcuts for the one-sided cases. Forces are in newtons and torques in newton-meters. To drive many links in one call, `RigidEntity.apply_links_external_wrench` and `RigidSolver.apply_links_external_wrench` take the same arguments plus a `links_idx`, with force and torque of shape `([n_envs,] n_links, 3)`.
+Both components are optional, and `apply_external_force` and `apply_external_torque` are shortcuts for the one-sided cases. Forces are in newtons and torques in newton-meters. To drive many links in one call, `RigidEntity.apply_links_external_wrench` and `RigidSolver.apply_links_external_wrench` take the same arguments plus the link indices (`links_idx_local` on the entity, scene-level `links_idx` on the solver), with force and torque of shape `([n_envs,] n_links, 3)`.
 
 Three arguments decide where the wrench acts and in which coordinates it is read:
 

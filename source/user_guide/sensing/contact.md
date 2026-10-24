@@ -78,6 +78,62 @@ joint_torque = scene.add_sensor(
 tau = joint_torque.read()  # shape ([n_envs,] n_dofs)
 ```
 
+## Reading contacts without a sensor
+
+Read the contacts from the most recent `scene.step()` with `get_contacts()` on any {doc}`rigid entity </api_reference/engine/entity/rigid_entity/rigid_entity>`. It returns a dict of parallel arrays, one entry per contact that involves the entity.
+
+```python
+import genesis as gs
+
+gs.init(backend=gs.gpu)
+
+scene = gs.Scene()
+plane = scene.add_entity(gs.morphs.Plane())
+ball = scene.add_entity(gs.morphs.Sphere(radius=0.2, pos=(0.0, 0.0, 0.5)))
+
+scene.build()
+for _ in range(200):
+    scene.step()
+
+contacts = ball.get_contacts()  # all contacts involving the ball
+positions = contacts["position"]  # world-frame contact points, shape ([n_envs,] n_contacts, 3)
+forces = contacts["force_a"]  # force on geom A, shape ([n_envs,] n_contacts, 3), N
+```
+
+Each entry shares a leading contact axis. Index and scalar fields have shape `([n_envs,] n_contacts)`; vector fields have shape `([n_envs,] n_contacts, 3)`. The fields are:
+
+- **`geom_a`, `geom_b`:** global geometry indices of the two geometries in the pair. Recover a geometry with `scene.rigid_solver.geoms[idx]`.
+- **`link_a`, `link_b`:** global link indices of the links owning those geometries, recoverable via `scene.rigid_solver.links[idx]`.
+- **`position`:** contact point in the world frame, in meters.
+- **`normal`:** contact normal, a world-space unit vector.
+- **`penetration`:** penetration depth, positive when the geometries overlap.
+- **`force_a`, `force_b`:** contact force on geometry A and on geometry B. They are equal and opposite, in newtons.
+- **`valid_mask`:** present only when the scene is parallelized. See the note below.
+
+To restrict the result to contacts against one other entity, pass `with_entity`. Passing the entity itself returns self-collisions only, and `exclude_self_contact=True` drops them:
+
+```python
+contacts = ball.get_contacts(with_entity=plane)  # only ball-plane contacts
+```
+
+:::{note}
+With multiple environments, every field carries a leading `n_envs` axis and is padded to the largest contact count across environments, so the same array is rectangular. `valid_mask` (shape `(n_envs, n_contacts)`) marks which rows are real; filter with it before using the data. A scene built without environments returns the fields already trimmed, with no `valid_mask`.
+:::
+
+## Net contact force per link
+
+When you only need the total external contact force on each link rather than the individual contact points, use `get_links_net_contact_force()`. It sums the contact forces the solver applied to every link of the entity:
+
+```python
+net = ball.get_links_net_contact_force()  # world frame, shape ([n_envs,] n_links, 3), N
+```
+
+This is the aggregate the constraint solver accumulated, so it reflects the resolved contact forces rather than the raw manifold. For a link resting on the ground, it balances gravity.
+
+## When to use a contact sensor instead
+
+`get_contacts()` and `get_links_net_contact_force()` pull the whole contact set on demand, which is convenient for scripting and debugging. For a per-link signal you sample every step in a control or training loop (with history, noise, and delay handled for you), attach a contact sensor instead. {py:class}`ContactForce <genesis.options.sensors.options.ContactForce>` reports the net force on a link in its own frame, and the tactile probes estimate dense per-taxel forces. See {doc}`/user_guide/sensing/contact`.
+
 ## See also
 
 - {doc}`Tactile <tactile>`: dense per-taxel contact fields (probes and taxels) for tactile skins.

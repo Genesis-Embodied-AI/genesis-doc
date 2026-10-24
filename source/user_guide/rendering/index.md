@@ -1,220 +1,23 @@
 # Rendering
 
-A camera renders a Genesis World scene to images off-screen: color, depth, segmentation, and surface normals, plus video. Unlike the {doc}`viewer </user_guide/interaction/visualization>`, it needs no display, so it works headless on a render farm, in a container, or over SSH. This page covers adding a camera, the image types it produces, recording a video, lighting, and the rendering backends, from the fast default rasterizer to photorealistic path tracing.
+Choose how to view the scene or read images from it before choosing a renderer. The interactive viewer, visualization cameras, and camera sensors serve different purposes and use different interfaces:
 
-The complete script is [`examples/tutorials/visualization.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/visualization.py).
+| Task | Interface | Guide |
+|---|---|---|
+| Inspect and interact with a running scene | `gs.Scene(show_viewer=True)` | {doc}`Viewer </user_guide/interaction/visualization>` |
+| Render RGB, depth, segmentation, or normals on demand, or record video | `scene.add_camera(...)`, then `render()` or `start_recording()` | {doc}`Cameras <cameras>` |
+| Read RGB images through the sensor pipeline, for example from a robot-mounted camera | `scene.add_sensor(...)`, then `read()` | {doc}`Camera sensors </user_guide/sensing/camera_sensors>` |
+| Render photorealistic images through a Nyx camera sensor | `scene.add_sensor(NyxCameraOptions(...))`, then `read()` | {doc}`Nyx renderer <nyx_renderer>` |
 
-## Adding a camera
+Visualization cameras use the renderer selected on the scene; the {doc}`camera guide <cameras>` covers the rasterizer, batch renderer, and legacy Luisa ray tracer. Nyx attaches as a camera sensor with its own renderer. The available image channels and recording workflow depend on the interface.
 
-Add a camera with `scene.add_camera()`. It renders independently of the viewer, so use it for headless rendering and for capturing angles the viewer is not pointed at:
-
-```python
-cam = scene.add_camera(
-    res=(640, 480),  # (width, height) in pixels
-    pos=(3.5, 0.0, 2.5),
-    lookat=(0, 0, 0.5),
-    fov=30,
-    GUI=False,
-)
-```
-
-With `GUI=True`, the camera opens an OpenCV window, separate from the viewer window, that displays each rendered frame. Leave it `False` when running headless.
-
-:::{note}
-`scene.add_camera()` gives you a **visualization camera**: an object you drive yourself, calling `render()` for pixels and `start_recording()` for video. It is the camera you want for looking at a scene, and the whole of this page is about it. A robot's onboard camera is instead a {doc}`camera sensor </user_guide/sensing/camera_sensors>`, added with `scene.add_sensor(...)`, read with `read()` like any other sensor, RGB only, and saved to video through the {doc}`recorders </user_guide/sensing/recorders>`.
-:::
-
-## Rendering images
-
-Build the scene, then call `cam.render()`. The camera can produce four image types: color, depth, segmentation mask, and surface normals. Only RGB is rendered by default; enable the others with keyword flags. `render()` always returns the four in the same order, with disabled types returned as `None`:
-
-```python
-scene.build()
-
-# render rgb, depth, segmentation, normal
-rgb, depth, segmentation, normal = cam.render(rgb=True, depth=True, segmentation=True, normal=True)
-```
-
-Each returned array is shaped `(height, width, ...)`, transposed from `res=(width, height)`. By default the segmentation mask stores an integer object index per pixel; set `colorize_seg=True` for a viewable color mask. The index maps back to scene objects at the level set by `VisOptions.segmentation_level` (for example, `link_idx` into `scene.rigid_solver.links`).
-
-```{figure} ../../_static/images/multimodal.png
-:alt: The Franka scene rendered four ways: color, depth, segmentation mask, and surface normals
-```
-
-:::{tip}
-OpenCV windows opened with `GUI=True` sometimes render black on the first frame. Call `cam.render()` again to refresh them, or `cv2.waitKey(1)`.
-:::
-
-## Recording a video
-
-To capture a video, call `start_recording()` with the output file and framerate, step the scene, then `stop_recording()` to finalize the file. The camera renders itself from inside `scene.step()` whenever a frame is due, and each frame is encoded and streamed to disk straight away, so the length of a recording is not bounded by memory. Here the camera orbits the scene while the simulation steps:
-
-```python
-import math
-
-cam.start_recording(save_to_filename="video.mp4", fps=60)
-
-for i in range(120):
-    cam.set_pose(
-        pos=(3.0 * math.sin(i / 60), 3.0 * math.cos(i / 60), 2.5),
-        lookat=(0, 0, 0.5),
-    )
-    scene.step()
-
-cam.stop_recording()
-```
-
-If you omit `save_to_filename`, Genesis World generates a name from the calling script, and `fps` defaults to 60. Two frames are always a whole number of simulation steps apart, so a framerate off that grid is rounded to it and logged, and the highest framerate a scene can record is one frame per step. One second of video stands for one second of `realtime_factor`-paced time (see {doc}`the viewer </user_guide/interaction/visualization>`), so at the default `realtime_factor=1.0` playback runs at real time whatever the framerate and one frame per step encodes at `1 / dt`. The result:
-
-<video preload="auto" controls="True" width="100%">
-<source src="../../_static/videos/cam_record.mp4" type="video/mp4">
-</video>
-
-Call `cam.pause_recording()` to keep a span of the simulation out of the video, a settling phase for instance, then `cam.start_recording()` with no argument to resume the same file; the paused span leaves no gap in the video. The filename and framerate are fixed for the whole of a video, so passing either one when resuming raises. After `stop_recording()`, the camera can record again to a new file at a new framerate.
-
-A camera in a batched scene that renders every environment records one file per rendered environment, each suffixed with its environment index (`video_0.mp4`, `video_1.mp4`, ...). That is what the `BatchRenderer` backend does, and what the rasterizer does with `split_envs=True` in `VisOptions`; otherwise the camera is bound to the single environment `env_idx` and records one file.
-
-For recording sensor and simulation data (not just video) on a schedule, see {doc}`Recording data </user_guide/sensing/recorders>`.
-
-## Lighting
-
-The rasterizer (the viewer, and any camera or camera sensor that rasterizes) lights the scene from a list of lights on `VisOptions`. With no configuration it uses a single directional light, so scenes are lit out of the box; set `lights` to control direction, color, and intensity yourself. The light classes live in `gs.options.vis`:
-
-```python
-scene = gs.Scene(
-    vis_options=gs.options.VisOptions(
-        lights=[
-            gs.options.vis.DirectionalLight(
-                dir=(-1, -1, -1),  # direction the light travels, world frame
-                color=(1.0, 1.0, 1.0),  # RGB in [0, 1]
-                intensity=5.0,
-            ),
-            gs.options.vis.PointLight(
-                pos=(2.0, 0.0, 3.0),  # meters, world frame
-                color=(1.0, 0.9, 0.8),
-                intensity=8.0,
-            ),
-        ],
-        ambient_light=(0.1, 0.1, 0.1),  # uniform fill so shadows are not pure black
-    ),
-)
-```
-
-The `lights` list takes two types:
-
-- **{py:class}`DirectionalLight <genesis.options.vis.DirectionalLight>`:** parallel rays from a fixed direction, like sunlight. Set `dir` (the direction the light travels), `color`, and `intensity`. Position does not matter.
-- **{py:class}`PointLight <genesis.options.vis.PointLight>`:** light radiating outward from a point. Set `pos`, `color`, and `intensity`.
-
-Ambient light is a separate, uniform fill set through the `ambient_light` field rather than an entry in `lights`.
-
-:::{note}
-This controls the rasterizer only. The ray tracer ignores `VisOptions.lights` and lights the scene from three sources of its own: the `lights` list of sphere area lights on `gs.renderers.RayTracer(...)`, its `env_surface` environment map, and any entity carrying an {py:class}`Emission <genesis.options.surfaces.Emission>` surface. See {doc}`Surfaces and textures <surfaces_textures>`. The `BatchRenderer` backend instead takes lights at runtime through `scene.add_light(...)`.
-:::
-
-## Rendering backends
-
-`gs.Scene(renderer=...)` selects how the scene's cameras turn the scene into pixels:
-
-- `gs.renderers.Rasterizer()`: the default. Fast, and what the viewer always uses.
-- `gs.renderers.RayTracer()`: a path tracer for photorealistic stills (see [below](#photorealistic-rendering-with-luisa-deprecating)).
-- `gs.renderers.BatchRenderer(...)`: high-throughput rendering across many environments (see [Batch rendering with gs-madrona](#batch-rendering-with-gs-madrona)).
-
-### Photorealistic rendering with Nyx
-
-**Nyx** is the recommended path toward photorealistic rendering. Unlike the backends above, it attaches as a camera *sensor* rather than a scene-wide renderer: add a `NyxCameraOptions` sensor and read frames back from `cam.read().rgb`. It supports PBR materials, HDRI lighting, 3D Gaussian splat assets, multi-camera and multi-environment rendering, and per-pixel object picking. See the {doc}`Nyx renderer <nyx_renderer>` page for installation, a minimal example, and the full feature set.
-
-:::{note}
-**Roadmap.** We are unifying rasterization and path tracing under Nyx as a single, sensor-based rendering interface. Nyx will gradually replace both the Luisa backend below and the default rasterizer, until all camera-based rendering in Genesis World goes through it.
-:::
-
-### Photorealistic rendering with Luisa (deprecating)
-
-Genesis World also ships a Luisa-based ray-tracing backend. Enable it by passing `renderer=gs.renderers.RayTracer()` when creating the scene; it exposes extra parameters such as `spp`, `aperture`, and camera `model`.
-
-:::{warning}
-This backend is deprecated in favor of Nyx and requires building `LuisaRender` from source.
-:::
-
-Setup, tested on Ubuntu 22.04 with CUDA 12.4 and Python 3.9:
-
-1. Fetch the submodule and install the render extras:
-
-   ```bash
-   # inside the genesis-world repo
-   git submodule update --init --recursive
-   pip install -e ".[render]"
-   ```
-
-2. Ensure `gcc`/`g++` >= 11 and CMake >= 3.26 are on your `PATH`, and install the Vulkan, X11, UUID, and zlib development headers (via `apt` with sudo, or `conda install -c conda-forge` without).
-
-3. Build `LuisaRender`:
-
-   ```bash
-   cd genesis/ext/LuisaRender
-   cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 \
-       -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON -D LUISA_COMPUTE_ENABLE_GUI=OFF \
-       -D LUISA_RENDER_BUILD_TESTS=OFF
-   cmake --build build -j $(nproc)
-   ```
-
-4. Run the demo:
-
-   ```bash
-   cd examples/rendering
-   python demo.py
-   ```
-
-```{figure} ../../_static/images/raytracing_demo.png
-:alt: A scene rendered photorealistically with the Luisa ray-tracing backend
-```
-
-:::{note}
-Prebuilt LuisaRender binaries for common CUDA and Python combinations are available [on Google Drive](https://drive.google.com/drive/folders/1Ah580EIylJJ0v2vGOeSBU_b8zPDWESxS?usp=sharing), named `build_<commit-tag>_cuda<version>_python<version>`. Download the one matching your system, rename it to `build/`, and place it in `genesis/ext/LuisaRender`. For build and CUDA-toolkit troubleshooting, see the [genesis-world README](https://github.com/Genesis-Embodied-AI/genesis-world#quick-installation).
-:::
-
-### Batch rendering with gs-madrona
-
-For high-throughput rendering across many parallel environments, use the gs-madrona backend by passing `renderer=gs.renderers.BatchRenderer(use_rasterizer=True)` (set `use_rasterizer=False` to path-trace instead).
-
-Install the package first. Prebuilt wheels are available on PyPI for x86 and Python >= 3.10:
-
-```bash
-pip install gs-madrona
-```
-
-Then run the bundled example, which writes frames to `out/batch_render`, or elsewhere with `-o`:
-
-```bash
-python examples/rigid/single_franka_batch_render.py
-```
-
-The batch renderer runs on CUDA only, so this example has no CPU backend to fall back on.
-
-The batch renderer takes its lights at runtime through `scene.add_light(...)` after the scene is created, rather than from `VisOptions`:
-
-```python
-scene.add_light(
-    pos=(0.0, 0.0, 10.0),   # position, used for positional lights
-    dir=(0.0, 0.0, -1.0),   # direction the light travels, normalized internally
-    color=(1.0, 1.0, 1.0),  # RGB, each channel in [0, 1]
-    intensity=1.0,
-    directional=True,       # parallel rays if True, positional if False
-    castshadow=True,
-    cutoff=45.0,            # spotlight cutoff angle, degrees
-    attenuation=0.0,        # distance falloff for positional lights
-)
-```
-
-## See also
-
-- {doc}`Visualization </user_guide/interaction/visualization>`: the interactive viewer and the `gs` command-line tools.
-- {doc}`Surfaces and textures <surfaces_textures>`: how entities look when rendered.
-- {doc}`Nyx renderer <nyx_renderer>`: photorealistic path tracing in depth.
+{doc}`Surfaces and textures <surfaces_textures>` explains how to configure materials and appearance for rendering.
 
 ```{toctree}
 :hidden:
 :maxdepth: 1
 
+cameras
 surfaces_textures
 nyx_renderer
 ```

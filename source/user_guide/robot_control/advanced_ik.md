@@ -27,6 +27,8 @@ q = robot.inverse_kinematics_multilink(
 
 Each target need not be a full 6-dof pose. `pos_mask` and `rot_mask` are length-3 boolean masks that select which position axes and which rotation axes the solver has to satisfy; both default to `[True, True, True]`. Here `rot_mask=[False, False, True]` asks only that each fingertip's z-axis align with the z-axis of `target_quat`, leaving its heading in the horizontal plane free. Masking out constraints you do not care about gives the solver more freedom and makes it more likely to converge.
 
+To place a point other than the link origin on the target, such as a tool center point or a fingertip, pass `local_points`, one point per link in that link's local frame (`local_point` for `inverse_kinematics()`). Pass `return_error=True` to also get the final pose error of each target, so you can check whether the solver converged.
+
 Orientations follow the `(w, x, y, z)` quaternion convention, so `target_quat = np.array([0, 1, 0, 0])` points the finger's z-axis straight down.
 
 This example is purely kinematic: it demonstrates the solver, not the physics. After solving, it writes the result directly to the robot rather than stepping the simulation. Setting the state redraws the viewer by itself, so the loop only has to hold each pose for one simulation step of wall time, with `gs.tools.Rate`, for the poses to play at the pace of the simulation rather than as fast as the solver runs:

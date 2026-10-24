@@ -1,6 +1,6 @@
-# Rigid-body constraints
+# Dynamic equality constraints
 
-A **constraint** ties two rigid links together so the solver keeps a geometric relationship between them: coincident points, a fixed relative pose, or coupled joint values. A model file declares most constraints once, and they hold for the whole simulation. One kind, the **weld** constraint, can be added and removed while the simulation runs, so a suction gripper can pick an object up and release it.
+A **constraint** ties two rigid links together so the solver keeps a geometric relationship between them: coincident points, a fixed relative pose, or coupled joint values. A model file declares most constraints once, and they hold for the whole simulation. Two kinds, the **weld** and **screw** constraints, can be added and removed while the simulation runs, so a suction gripper can pick an object up and release it.
 
 The complete runnable example is [`examples/rigid/suction_cup.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/suction_cup.py): a Franka arm reaches a cube, welds it to the hand, lifts and moves it, then releases.
 
@@ -46,7 +46,7 @@ The two link indices are the same across environments; only the environment sele
 
 ## Budgeting for dynamic constraints
 
-Runtime welds draw from a fixed pool sized before the scene is built. The pool holds `max_dynamic_constraints` welds (default 8), set on {py:class}`gs.options.RigidOptions <genesis.options.solvers.RigidOptions>`:
+Runtime welds and screws draw from a fixed pool sized before the scene is built. The pool holds `max_dynamic_constraints` of them together (default 8), set on {py:class}`gs.options.RigidOptions <genesis.options.solvers.RigidOptions>`:
 
 ```python
 scene = gs.Scene(
@@ -55,7 +55,7 @@ scene = gs.Scene(
 ```
 
 :::{warning}
-Adding a weld once the pool is full has no effect: the solver logs a warning and ignores the request rather than raising. If a gripper silently fails to hold its object, check that you have released stale welds and that `max_dynamic_constraints` is large enough for the number held at once.
+Adding a weld once the pool is full raises an error asking you to increase `max_dynamic_constraints`, and no environment receives the weld. Welding two links that are already welded raises as well. Release stale welds before adding new ones, and size `max_dynamic_constraints` for the number held at once.
 :::
 
 ## Querying active welds
@@ -70,7 +70,7 @@ Pass `to_torch=False` for NumPy arrays, or `as_tensor=False` to get a per-enviro
 
 ## Constraint types
 
-Genesis World supports four equality-constraint types. Weld and screw are the ones you add at runtime, and connect and joint come from a model's `<equality>` block when Genesis World loads an MJCF or URDF.
+Genesis World supports four equality-constraint types. Weld and screw are the ones you add at runtime, and connect and joint come from the model: an MJCF `<equality>` block, or a URDF `<mimic>` tag for joint constraints.
 
 | Type | Constrains | Declared in | Runtime API |
 |---|---|---|---|
@@ -90,4 +90,4 @@ A connect or joint constraint enters the simulation with its host model. There i
 ## See also
 
 - {doc}`Control your robot </user_guide/getting_started/control_your_robot>`: joint-level position, velocity, and force control.
-- {doc}`Inverse kinematics and motion planning <inverse_kinematics_motion_planning>`: the IK solving and path planning the suction example uses to reach the object.
+- {doc}`Inverse kinematics and motion planning </user_guide/robot_control/inverse_kinematics_motion_planning>`: the IK solving and path planning the suction example uses to reach the object.
