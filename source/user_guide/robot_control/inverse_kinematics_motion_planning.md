@@ -138,6 +138,6 @@ The fingers stay under force control from the grasp step, so the cube rises with
 ## See also
 
 - {doc}`advanced_ik`: multi-link IK, parallel IK, forward kinematics and the Jacobian.
-- {doc}`constraints`: weld and connect constraints for locking links together at runtime.
+- {doc}`/user_guide/physics/dynamic_equality_constraints`: weld and screw constraints added at runtime.
 - {doc}`path_planning`: collision-free motion planning with RRT.
 - {doc}`/user_guide/getting_started/control_your_robot`: position, velocity, and force control in depth.

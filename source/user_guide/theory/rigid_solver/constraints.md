@@ -2,7 +2,7 @@
 
 Once {doc}`collision_detection` has produced contacts, the rigid solver decides what forces those contacts, joint limits, and equality constraints exert on the bodies. It is the third of the rigid solver's {doc}`three layers <index>`. The solver gathers every constraint into one system and solves it once per step for the generalized accelerations that satisfy them together, under a *soft* formulation that tolerates small violations.
 
-For where contacts come from, see {doc}`collision_detection`; for the API that declares and toggles constraints, see {doc}`/user_guide/robot_control/constraints`.
+For where contacts come from, see {doc}`collision_detection`; for the API that declares and toggles constraints, see {doc}`/user_guide/physics/dynamic_equality_constraints`.
 
 ## Constraint system
 
@@ -79,7 +79,7 @@ A related row models dry friction in a joint: dofs with a nonzero friction-loss 
 Equality constraints are holonomic, tying bodies together for as long as they exist. Genesis World supports four kinds.
 
 - **Connect:** pins two points on different bodies to the same world position, removing 3 translational dofs, as a ball-and-socket joint does.
-- **Weld:** holds two frames at a fixed relative pose, removing all 6 dofs. This is the constraint the {doc}`suction-gripper example </user_guide/robot_control/constraints>` toggles at runtime.
+- **Weld:** holds two frames at a fixed relative pose, removing all 6 dofs. This is the constraint the {doc}`suction-gripper example </user_guide/physics/dynamic_equality_constraints>` toggles at runtime.
 - **Joint:** couples two scalar joints so one follows the other through a quartic polynomial, removing 1 dof, as a geared mechanism does.
 - **Screw:** restricts the relative motion of two links to a helix about an axis of the first, removing 5 dofs, as a bolt and nut do. It is added at runtime with `add_screw_constraint`.
 
@@ -115,5 +115,5 @@ where $\overline{m}$ is the mean inertia, or after `iterations` iterations. Each
 ## See also
 
 - {doc}`collision_detection`: how contacts are detected and what each carries into the solve.
-- {doc}`/user_guide/robot_control/constraints`: declaring equality constraints and toggling welds at runtime.
+- {doc}`/user_guide/physics/dynamic_equality_constraints`: declaring equality constraints and toggling welds at runtime.
 - [MuJoCo constraint model](https://mujoco.readthedocs.io/en/latest/computation/index.html#constraint-model): the soft-constraint formulation in more mathematical depth.

@@ -10,7 +10,7 @@ Genesis World turns a simulation into pixels through two independent paths: an i
 - **Renderers:** the backend those cameras use to produce images. Choose one per scene with `gs.Scene(renderer=...)`; the choice does not affect the viewer.
 - **Lights:** the light sources that illuminate a rendered scene.
 
-For the interactive viewer see {doc}`/user_guide/interaction/visualization`, and for camera rendering and choosing a backend see {doc}`/user_guide/rendering/index`.
+For the interactive viewer see {doc}`/user_guide/interaction/visualization`, and for camera rendering and choosing a backend see {doc}`/user_guide/rendering/cameras`.
 
 ## Reference
 
@@ -27,5 +27,5 @@ lights
 ## See also
 
 - {doc}`/user_guide/interaction/visualization`: the interactive viewer and command-line tools.
-- {doc}`/user_guide/rendering/index`: cameras, image types, video, and rendering backends.
+- {doc}`/user_guide/rendering/cameras`: cameras, image types, video, and rendering backends.
 - {doc}`/api_reference/engine/sensors/camera`: the camera sensor, read through the sensor interface.

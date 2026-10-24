@@ -2,7 +2,7 @@
 
 The Semi-Analytic Primal (SAP) coupler resolves contact between rigid bodies and FEM soft bodies with a convex, semi-analytic solver derived from the model Drake uses ([paper](https://arxiv.org/abs/2110.10107)). Use it when a rigid robot manipulates a moderately deformable volumetric object (grasping, pressing, lifting) and you need contact forces that stay stable and accurate under sustained load.
 
-SAP handles two solvers: `Rigid` and `FEM`. For cloth and highly deformable bodies, use the {doc}`IPC coupler <ipc_coupler>` instead; for multi-solver scenes (MPM, SPH, PBD) or differentiable simulation, use the default coupler described in {doc}`Solvers and coupling </user_guide/theory/coupling/index>`.
+SAP handles two solvers: `Rigid` and `FEM`. For cloth and highly deformable bodies, use the {doc}`IPC coupler </user_guide/physics/coupling/ipc_coupler>` instead; for multi-solver scenes (MPM, SPH, PBD) or differentiable simulation, use the default coupler described in {doc}`Solvers and coupling </user_guide/physics/coupling/index>`.
 
 ## Requirements
 
@@ -11,7 +11,7 @@ SAP coupling imposes four hard requirements. Genesis World checks each at build 
 - **64-bit precision:** initialize with `precision="64"`, because the solver is ill-conditioned in 32-bit.
 - **Implicit FEM solver:** any FEM entity must be simulated with {py:class}`FEMOptions <genesis.options.solvers.FEMOptions>`(use_implicit_solver=True).
 - **Rigid or FEM only:** SAP couples the rigid and FEM solvers. Other solvers (MPM, SPH, PBD) are not supported.
-- **Paired joint equalities:** a joint equality must name two joints, so a model holding a single joint at a constant is not supported (see {doc}`/user_guide/robot_control/constraints`).
+- **Paired joint equalities:** a joint equality must name two joints, so a model holding a single joint at a constant is not supported (see {doc}`/user_guide/physics/dynamic_equality_constraints`).
 
 SAP does not support differentiable simulation. Calls into the gradient path raise and direct you to the default coupler.
 
@@ -110,11 +110,11 @@ To hold a target vertex of an FEM body in place (a fixed constraint rather than 
 ## When to use SAP
 
 - **Use SAP** for rigid-FEM manipulation of moderately deformable volumetric bodies, where you need stable, accurate contact under sustained load and can afford 64-bit precision.
-- **Use the {doc}`IPC coupler <ipc_coupler>`** for cloth and highly deformable soft bodies.
-- **Use the default coupler** ({doc}`Solvers and coupling </user_guide/theory/coupling/index>`) for scenes with MPM, SPH, or PBD, for rigid-only simulation, or when you need gradients for differentiable simulation.
+- **Use the {doc}`IPC coupler </user_guide/physics/coupling/ipc_coupler>`** for cloth and highly deformable soft bodies.
+- **Use the default coupler** ({doc}`Solvers and coupling </user_guide/physics/coupling/index>`) for scenes with MPM, SPH, or PBD, for rigid-only simulation, or when you need gradients for differentiable simulation.
 
 ## See also
 
-- {doc}`IPC coupler <ipc_coupler>`: barrier-based contact for cloth and highly deformable bodies.
-- {doc}`Solvers and coupling </user_guide/theory/coupling/index>`: how solvers and couplers fit together.
+- {doc}`IPC coupler </user_guide/physics/coupling/ipc_coupler>`: barrier-based contact for cloth and highly deformable bodies.
+- {doc}`Solvers and coupling </user_guide/physics/coupling/index>`: how solvers and couplers fit together.
 - {doc}`FEM options </api_reference/engine/solvers/fem_solver>` and {doc}`FEM elastic material </api_reference/engine/material/fem/elastic>`: configuring the deformable bodies SAP couples.

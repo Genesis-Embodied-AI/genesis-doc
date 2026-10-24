@@ -1,6 +1,6 @@
-# Soft robots
+# Muscle actuation
 
-A soft robot is a deformable body with **muscle fibers** embedded in it. Instead of joint motors turning a rigid skeleton, you drive it by contracting those fibers: each actuation signal adds an active stress along the fiber direction, and the body deforms in response.
+Muscle materials model deformable bodies with embedded **muscle fibers**. Drive the body by contracting those fibers: each actuation signal adds an active stress along the fiber direction, and the body deforms in response.
 
 Genesis World simulates muscles with two deformable solvers; pick one through the entity's material:
 

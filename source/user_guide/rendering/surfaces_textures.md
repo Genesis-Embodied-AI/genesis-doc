@@ -110,7 +110,7 @@ scene = gs.Scene(
 ```
 
 :::{note}
-Surfaces render on both the interactive viewer's rasterizer and the ray tracer, but reflections, refraction, transmission, and emission-based lighting are only fully resolved by the ray tracer. See {doc}`Rendering <index>` for how to choose and configure a renderer.
+Surfaces render on both the interactive viewer's rasterizer and the ray tracer, but reflections, refraction, transmission, and emission-based lighting are only fully resolved by the ray tracer. See {doc}`Rendering </user_guide/rendering/cameras>` for how to choose and configure a renderer.
 :::
 
 ## Visualizing something other than the visual mesh
@@ -162,6 +162,6 @@ scene.add_entity(
 
 ## See also
 
-- {doc}`Rendering <index>`: cameras and choosing a renderer.
+- {doc}`Rendering </user_guide/rendering/cameras>`: cameras and choosing a renderer.
 - {doc}`Nyx renderer <nyx_renderer>`: photorealistic path tracing in depth.
 - {doc}`USD import </user_guide/assets/usd_import>`: loading assets that carry their own surfaces.

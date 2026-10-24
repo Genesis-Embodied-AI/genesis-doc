@@ -11,4 +11,5 @@ initialization
 config_system
 conventions
 checkpoints
+differentiable_simulation
 ```

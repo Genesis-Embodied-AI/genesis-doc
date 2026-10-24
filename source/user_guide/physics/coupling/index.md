@@ -32,8 +32,8 @@ We ship three couplers, all configured through options classes deriving from {py
 | Coupler | Contact model | Best for | Requirements |
 |---|---|---|---|
 | **Legacy** (default) | Impulse-based | Rigid with MPM, SPH, PBD, or FEM; differentiable simulation | None |
-| **{doc}`SAP <sap_coupler>`** | Semi-analytic primal, from [Drake](https://drake.mit.edu/) | Rigid-FEM contact under moderate deformation, such as grasping a deformable | 64-bit precision; implicit FEM solver |
-| **{doc}`IPC <ipc_coupler>`** | Barrier-based (Incremental Potential Contact) | Cloth and large-deformation soft bodies; intersection-free contact | `libuipc` library |
+| **{doc}`SAP </user_guide/physics/coupling/sap_coupler>`** | Semi-analytic primal, from [Drake](https://drake.mit.edu/) | Rigid-FEM contact under moderate deformation, such as grasping a deformable | 64-bit precision; implicit FEM solver |
+| **{doc}`IPC </user_guide/physics/coupling/ipc_coupler>`** | Barrier-based (Incremental Potential Contact) | Cloth and large-deformation soft bodies; intersection-free contact | `libuipc` library |
 
 The legacy coupler covers the widest set of solver pairs. SAP raises rigid-FEM contact accuracy where the impulse model is too coarse, and IPC keeps contact intersection-free under large deformation, representing rigid bodies through affine body dynamics (ABD). Both specialized couplers have their own pages for setup and parameters.
 
@@ -53,7 +53,7 @@ The available pair flags on `LegacyCouplerOptions` are `rigid_mpm`, `rigid_sph`,
 
 ## See also
 
-- {doc}`Beyond rigid bodies </user_guide/physics/beyond_rigid_bodies>`: choose a solver and run a minimal example for each.
+- {doc}`Deformables and fluids </user_guide/physics/beyond_rigid_bodies>`: choose a solver and run a minimal example for each.
 - {doc}`soft_solvers </user_guide/theory/soft_solvers>`: the solvers being coupled and the models they integrate.
 - {doc}`Concepts </user_guide/configuration/concepts>`: how entity state maps onto each solver's global data fields.
 - Runnable cross-solver pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling).

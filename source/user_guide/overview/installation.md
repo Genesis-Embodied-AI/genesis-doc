@@ -45,11 +45,11 @@ To render particle-based entities (fluids, deformables, and the like) as smooth 
 
 ### Ray-tracing renderer
 
-For photorealistic stills, Genesis World includes a ray-tracing renderer built on [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute). It is built from source; see {doc}`/user_guide/rendering/index` for setup. For new work, prefer the {doc}`Nyx renderer </user_guide/rendering/nyx_renderer>`, installed with `pip install gs-nyx`.
+For photorealistic stills, Genesis World includes a ray-tracing renderer built on [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute). It is built from source; see {doc}`/user_guide/rendering/cameras` for setup. For new work, prefer the {doc}`Nyx renderer </user_guide/rendering/nyx_renderer>`, installed with `pip install gs-nyx`.
 
 ### IPC coupler
 
-The [libuipc](https://github.com/spiriMirror/libuipc)-based IPC coupler (`gs.options.IPCCouplerOptions`) needs `pip install pyuipc`, available on Linux and Windows x86 with an NVIDIA GPU. See {doc}`/user_guide/theory/coupling/ipc_coupler`.
+The [libuipc](https://github.com/spiriMirror/libuipc)-based IPC coupler (`gs.options.IPCCouplerOptions`) needs `pip install pyuipc`, available on Linux and Windows x86 with an NVIDIA GPU. See {doc}`/user_guide/physics/coupling/ipc_coupler`.
 
 ### USD assets
 

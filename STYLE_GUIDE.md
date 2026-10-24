@@ -390,6 +390,19 @@ A configuration class that is itself the public API with no separate built objec
 
 **One idea per sentence, and no nesting.** A parenthetical inside a parenthetical, or a third subordinate clause, is a sentence that wants to be two. Splitting is not the same as chopping: join the halves with the word that names their relationship ("because", "so", "while") rather than leaving two stubs side by side. See §2 on rhythm.
 
+**Procedures take inspiration from Simplified Technical English.** We borrow selected rules from [ASD-STE100](https://www.asd-ste100.org/) to make sequences easier to follow with a terminal open. A procedure is any sequence the reader performs in order: installing, configuring a scene step by step, running a training script.
+
+- Write the steps as a numbered list, with one instruction per step.
+- Keep each instruction short and focused on one action. Put lengthy explanations before the list or after the instruction, while keeping a brief reason attached when it helps.
+- Put a warning or caution *before* the step it applies to, never after. A reader who has already run the command cannot act on a warning below it.
+- Start each step with the verb, and give the step its object: "Install PyTorch", not "Next, PyTorch should be installed".
+
+Use sentence length as a readability check rather than a word limit. Keep a longer sentence when a "because" or "so" connects the reason to the claim (see §2 on rhythm). We do not use the STE dictionary, since our technical names (raycasting, rendering, hibernation) are not in it.
+
+**Use consistent technical terms.** Give each technical term the same meaning across pages, and use the settled term for each concept. "Body" means a rigid body in the physics sense and never an entity, "environment" is never a "world" or an "instance", and "build" never means "compile". §6 lists the settled terms and the words they replace.
+
+**Prefer a single verb to a phrasal verb.** "Configure" over "set up", "enable" over "turn on", "start" over "spin up", "remove" over "get rid of". A phrasal verb often has several meanings, and readers who learned English as a second language parse the single verb faster. Keep the phrasal verb when it is the API name (`set_up_*`) or when no single verb says the same thing.
+
 **Define a term once, then reuse it exactly.** Don't alternate between "degree of freedom", "dof", and "motor" for the same thing. Introduce the term, bold it on first use, then use it consistently. (See §6 for the terms we've standardized.)
 
 **Prefer concrete over abstract.** "Returns a tensor of shape `(n_envs, 3)`" beats "returns the relevant data."
@@ -569,6 +582,8 @@ The `[n_envs,]` bracket means "present when the scene is built with multiple env
 Before opening a docs PR, confirm:
 
 - [ ] Every code block runs against the current release, and I've run it.
+- [ ] Procedures use short, numbered instructions, one action each, with warnings before the step they apply to.
+- [ ] Technical terms match §6 and keep the same meaning across pages.
 - [ ] Every fenced block is tagged with a lowercase language (`python`, `bash`, …).
 - [ ] No space-aligned keyword arguments; Python is `black`-clean.
 - [ ] The page leads with what it's for and a runnable example within one screen.

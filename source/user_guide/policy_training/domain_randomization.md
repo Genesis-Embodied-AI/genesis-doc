@@ -115,4 +115,4 @@ All seven accept an optional `envs_idx` to update a subset of environments. The 
 
 - {doc}`/user_guide/getting_started/parallel_simulation`: how batched environments work and why per-env tensors are cheap.
 - {doc}`/user_guide/policy_training/examples/locomotion`: an end-to-end policy that uses these techniques.
-- {doc}`/user_guide/policy_training/best_practices/efficient_environment`: keeping the randomized environment fast.
+- {doc}`/user_guide/performance/efficient_environment`: keeping the randomized environment fast.

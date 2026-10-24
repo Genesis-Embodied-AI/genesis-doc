@@ -1,4 +1,4 @@
-# Beyond rigid bodies
+# Deformables and fluids
 
 The {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` tutorial simulated a rigid robot. That same `Scene` can hold water, sand, cloth, and soft tissue at the same time, because Genesis World unifies several physics **solvers** under one scene. A solver is the set of algorithms that advances one family of materials; the material you assign to an entity decides which solver simulates it.
 
@@ -136,7 +136,15 @@ Full script, including the jet class and writing the density field to images: [`
 
 ## See also
 
-- {doc}`Soft robots <soft_robots>`: actuate MPM and FEM muscles.
+- {doc}`Muscle actuation <soft_robots>`: actuate MPM and FEM muscles.
 - {doc}`Hybrid entities <hybrid_entity>`: couple a rigid skeleton to a soft skin.
 - {doc}`Particle emitters <emitters>`: stream MPM, SPH, or PBD particles into a scene.
-- {doc}`Solvers and coupling </user_guide/theory/coupling/index>`: how solvers exchange forces across material boundaries. Runnable pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling), and the IPC contact solver for stiff soft-body contact in [`examples/ipc`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/ipc).
+- {doc}`Solvers and coupling </user_guide/physics/coupling/index>`: how solvers exchange forces across material boundaries. Runnable pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling), and the IPC contact solver for stiff soft-body contact in [`examples/ipc`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/ipc).
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+soft_robots
+hybrid_entity
+```

@@ -1,6 +1,6 @@
 # Visualization
 
-This page covers watching a Genesis World scene as it runs: the interactive **viewer** window, and the `gs` command-line tools that open it without writing a script. Both are for developing on a machine with a display. To render images off-screen (color, depth, segmentation, video) or produce photorealistic frames, see {doc}`Rendering </user_guide/rendering/index>`.
+This page covers watching a Genesis World scene as it runs: the interactive **viewer** window, and the `gs` command-line tools that open it without writing a script. Both are for developing on a machine with a display. To render images off-screen (color, depth, segmentation, video) or produce photorealistic frames, see {doc}`Rendering </user_guide/rendering/cameras>`.
 
 Every scene owns a `visualizer` (`scene.visualizer`) that drives both the viewer and the cameras added with `scene.add_camera()`. The viewer runs in its own thread and follows the simulation in real time; cameras render frames on demand and work headless.
 
@@ -30,13 +30,13 @@ scene = gs.Scene(
 
 `camera_pos` and `camera_lookat` are in meters, in the right-handed, Z-up world frame. `camera_fov` is the vertical field of view in degrees. If `res` is `None`, Genesis World opens a 4:3 window sized to half your display height.
 
-The viewer always renders with the rasterizer. To select the backend used by the scene's cameras (rasterizer, ray tracer, or batch renderer), see {doc}`Rendering backends </user_guide/rendering/index>`.
+The viewer always renders with the rasterizer. To select the backend used by the scene's cameras (rasterizer, ray tracer, or batch renderer), see {doc}`Rendering backends </user_guide/rendering/cameras>`.
 
 :::{note}
 To cap the viewer frame rate, set `refresh_rate` on `ViewerOptions`. The older `max_FPS` argument is deprecated and maps to `refresh_rate`.
 :::
 
-`realtime_factor` sets the pace of the simulation itself: how many seconds of simulated time one second of wall-clock time covers, `1.0` for real time and `2.0` for twice as fast. When the viewer is shown, each step of the simulation is throttled to it and falls behind gracefully when it cannot keep up; set it to `None` to always run as fast as possible. It also sets the playback speed of the videos recorded by a {doc}`camera </user_guide/rendering/index>`, viewer or not, with `None` recording at real time since there is no pace to follow. `scene.viewer.realtime_factor` changes it while the scene runs.
+`realtime_factor` sets the pace of the simulation itself: how many seconds of simulated time one second of wall-clock time covers, `1.0` for real time and `2.0` for twice as fast. When the viewer is shown, each step of the simulation is throttled to it and falls behind gracefully when it cannot keep up; set it to `None` to always run as fast as possible. It also sets the playback speed of the videos recorded by a {doc}`camera </user_guide/rendering/cameras>`, viewer or not, with `None` recording at real time since there is no pace to follow. `scene.viewer.realtime_factor` changes it while the scene runs.
 
 Only the steps of the simulation are paced. A change of state made outside of a step by a setter such as `entity.set_qpos(...)` is shown by the viewer on its own at its next refresh, without calling `scene.visualizer.update()` and without slowing down the loop that makes it. `scene.reset()` redraws the viewer right away. While the simulation is paused from the viewer, the stepping loop waits for the next refresh of the viewer instead of the pace of the simulation. The window stays responsive while a step waits for its pace: on macOS, where the window is driven by the stepping loop, it keeps being repainted and handles the mouse and keyboard during the wait.
 
@@ -85,6 +85,6 @@ gs replay run.gstraj -b gpu -e 0 3
 
 ## See also
 
-- {doc}`Rendering </user_guide/rendering/index>`: cameras, image types, video, lighting, and rendering backends.
+- {doc}`Rendering </user_guide/rendering/cameras>`: cameras, image types, video, lighting, and rendering backends.
 - {doc}`Interactive GUI and debugging </user_guide/interaction/interactive_debugging>`: inspecting objects, drawing debug geometry, and the in-viewer control panel.
 - {doc}`Viewer interaction and plugins </user_guide/interaction/viewer_plugin>`: extending the viewer with keybindings and plugins.

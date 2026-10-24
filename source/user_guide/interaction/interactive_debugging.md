@@ -177,5 +177,5 @@ The full example is [`imgui_joint_control.py`](https://github.com/Genesis-Embodi
 ## See also
 
 - {doc}`/user_guide/interaction/viewer_plugin`: keybindings and writing your own viewer plugins.
-- {doc}`/user_guide/rendering/index`: cameras, rendering, and recording.
+- {doc}`/user_guide/rendering/cameras`: cameras, rendering, and recording.
 - {doc}`/user_guide/getting_started/hello_genesis`: the core simulation loop.

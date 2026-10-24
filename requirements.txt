@@ -13,6 +13,7 @@ sphinx-subfigure
 sphinxcontrib-video
 sphinx-togglebutton
 sphinx_design
+sphinx-reredirects
 psutil
 scikit-image
 quadrants

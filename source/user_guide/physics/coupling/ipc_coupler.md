@@ -2,7 +2,7 @@
 
 The IPC coupler resolves contact with Incremental Potential Contact, a barrier-based model built on the [libuipc](https://github.com/spiriMirror/libuipc) library. It advances every coupled body through a single smooth potential whose barrier term grows without bound as two surfaces approach, so contact under IPC stays intersection-free even under large deformation. IPC costs more per step than the legacy coupler, so we keep legacy as the default and let you select IPC per scene.
 
-Use it for cloth with self-collision, for FEM solids pressed hard against each other, and for a gripper closing on a deformable object. For mixed continuum scenes (MPM, SPH, PBD) or coarse rigid contact, stay on the legacy coupler; see {doc}`the couplers overview <index>` for the full comparison.
+Use it for cloth with self-collision, for FEM solids pressed hard against each other, and for a gripper closing on a deformable object. For mixed continuum scenes (MPM, SPH, PBD) or coarse rigid contact, stay on the legacy coupler; see {doc}`the couplers overview </user_guide/physics/coupling/index>` for the full comparison.
 
 An FEM body couples directly through its vertex positions, and a rigid body enters the IPC world as an affine body (ABD). Time step, gravity, and differentiable-simulation mode come from {doc}`SimOptions </api_reference/engine/simulator>` rather than from the coupler.
 
@@ -147,6 +147,6 @@ For an interactive version you can teleoperate from the keyboard, see [`examples
 
 ## See also
 
-- {doc}`Couplers overview <index>`: how to choose between the legacy, SAP, and IPC couplers.
-- {doc}`SAP coupler <sap_coupler>`: the semi-analytic alternative for rigid-FEM contact.
+- {doc}`Couplers overview </user_guide/physics/coupling/index>`: how to choose between the legacy, SAP, and IPC couplers.
+- {doc}`SAP coupler </user_guide/physics/coupling/sap_coupler>`: the semi-analytic alternative for rigid-FEM contact.
 - {doc}`Non-rigid models </user_guide/theory/soft_solvers>`: FEM, cloth, and other deformable materials.

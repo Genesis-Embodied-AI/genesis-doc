@@ -20,4 +20,4 @@ The `LegacyCoupler` is the default: a scene that names no `coupler_options` gets
 ## See also
 
 - {doc}`index`: coupler overview and how to choose one.
-- {doc}`/user_guide/theory/coupling/index`: the theory behind each coupler.
+- {doc}`/user_guide/physics/coupling/index`: the theory behind each coupler.

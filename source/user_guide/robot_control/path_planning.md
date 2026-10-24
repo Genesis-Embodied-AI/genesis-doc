@@ -96,7 +96,7 @@ path = franka.plan_path(
 )
 ```
 
-The planner accounts for the attachment while it searches, and creates no physical constraint. One attachment covers a single non-articulated entity. To weld links together in the simulation itself, see {doc}`constraints`.
+The planner accounts for the attachment while it searches, and creates no physical constraint. One attachment covers a single non-articulated entity. To weld links together in the simulation itself, see {doc}`/user_guide/physics/dynamic_equality_constraints`.
 
 ## Checking whether planning succeeded
 
@@ -142,4 +142,4 @@ path, valid = franka.plan_path(
 - {doc}`inverse_kinematics_motion_planning`: IK, planning, and gripper control in one pick-and-place task.
 - {doc}`advanced_ik`: multi-link IK, parallel IK, forward kinematics and the Jacobian.
 - {doc}`/user_guide/getting_started/control_your_robot`: position, velocity, and force control in depth.
-- {doc}`constraints`: weld and connect constraints for locking links at runtime.
+- {doc}`/user_guide/physics/dynamic_equality_constraints`: weld and screw constraints added at runtime.

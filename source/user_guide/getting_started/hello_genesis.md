@@ -123,4 +123,4 @@ for i in range(1000):
 
 - {doc}`Control your robot <control_your_robot>`: actuate the Franka you just loaded.
 - {doc}`Visualization </user_guide/interaction/visualization>`: watch a scene in the interactive viewer.
-- {doc}`Rendering </user_guide/rendering/index>`: capture images and video from a camera.
+- {doc}`Rendering </user_guide/rendering/cameras>`: capture images and video from a camera.

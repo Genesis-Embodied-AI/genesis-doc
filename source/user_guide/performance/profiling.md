@@ -126,7 +126,7 @@ Three choices make this a throughput benchmark rather than an interactive sessio
 - **`show_viewer=False`** runs headless. Rendering a window caps throughput at display rates and defeats the purpose.
 - **A large `n_envs`** keeps the GPU saturated. Throughput scales with the batch until you run out of VRAM.
 
-[`examples/speed_benchmark/anymal_c.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/anymal_c.py) is the equivalent for a legged robot. For the reasoning behind these settings and other ways to raise throughput, see {doc}`/user_guide/getting_started/parallel_simulation` and {doc}`/user_guide/policy_training/best_practices/efficient_environment`.
+[`examples/speed_benchmark/anymal_c.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/anymal_c.py) is the equivalent for a legged robot. For the reasoning behind these settings and other ways to raise throughput, see {doc}`/user_guide/getting_started/parallel_simulation` and {doc}`/user_guide/performance/efficient_environment`.
 
 ## Timing GPU kernels with the PyTorch profiler
 
@@ -164,7 +164,7 @@ For the CPU side alone, a sampling profiler such as [py-spy](https://github.com/
 
 ### Reading the trace
 
-On the GPU timeline you get the precise start and duration of every kernel launch. White gaps between kernels are launch overhead: the GPU sitting idle while the CPU catches up. On a large parallel simulation those gaps should be negligible; if they dominate, the simulation is CPU-bound and no amount of extra environments will help until the stalls are removed. Diagnosing and removing these stalls is the subject of {doc}`/user_guide/policy_training/best_practices/efficient_environment`.
+On the GPU timeline you get the precise start and duration of every kernel launch. White gaps between kernels are launch overhead: the GPU sitting idle while the CPU catches up. On a large parallel simulation those gaps should be negligible; if they dominate, the simulation is CPU-bound and no amount of extra environments will help until the stalls are removed. Diagnosing and removing these stalls is the subject of {doc}`/user_guide/performance/efficient_environment`.
 
 The GPU timeline has no call hierarchy of its own, so it can be hard to tell which Python-side operation a kernel belongs to. Insert a synchronization before each step to force that alignment:
 
@@ -220,5 +220,5 @@ Run it without arguments to collect and plot the timings, or with `--profiling` 
 ## See also
 
 - {doc}`/user_guide/getting_started/parallel_simulation`: scaling to many environments for throughput.
-- {doc}`/user_guide/policy_training/best_practices/efficient_environment`: removing CPU–GPU stalls in a training loop.
+- {doc}`/user_guide/performance/efficient_environment`: removing CPU–GPU stalls in a training loop.
 - {doc}`/user_guide/configuration/config_system`: how `ProfilingOptions` fits with the other options objects.
