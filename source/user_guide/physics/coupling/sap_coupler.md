@@ -11,7 +11,7 @@ SAP coupling imposes four hard requirements. Genesis World checks each at build 
 - **64-bit precision:** initialize with `precision="64"`, because the solver is ill-conditioned in 32-bit.
 - **Implicit FEM solver:** any FEM entity must be simulated with {py:class}`FEMOptions <genesis.options.solvers.FEMOptions>`(use_implicit_solver=True).
 - **Rigid or FEM only:** SAP couples the rigid and FEM solvers. Other solvers (MPM, SPH, PBD) are not supported.
-- **Paired joint equalities:** a joint equality must name two joints, so a model holding a single joint at a constant is not supported (see {doc}`/user_guide/robot_control/constraints`).
+- **Paired joint equalities:** a joint equality must name two joints, so a model holding a single joint at a constant is not supported (see {doc}`/user_guide/physics/dynamic_equality_constraints`).
 
 SAP does not support differentiable simulation. Calls into the gradient path raise and direct you to the default coupler.
 

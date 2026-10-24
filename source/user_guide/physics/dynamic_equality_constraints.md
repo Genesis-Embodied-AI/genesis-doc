@@ -1,4 +1,4 @@
-# Welds and Screw Constraints
+# Dynamic equality constraints
 
 A **constraint** ties two rigid links together so the solver keeps a geometric relationship between them: coincident points, a fixed relative pose, or coupled joint values. A model file declares most constraints once, and they hold for the whole simulation. One kind, the **weld** constraint, can be added and removed while the simulation runs, so a suction gripper can pick an object up and release it.
 
@@ -90,4 +90,4 @@ A connect or joint constraint enters the simulation with its host model. There i
 ## See also
 
 - {doc}`Control your robot </user_guide/getting_started/control_your_robot>`: joint-level position, velocity, and force control.
-- {doc}`Inverse kinematics and motion planning <inverse_kinematics_motion_planning>`: the IK solving and path planning the suction example uses to reach the object.
+- {doc}`Inverse kinematics and motion planning </user_guide/robot_control/inverse_kinematics_motion_planning>`: the IK solving and path planning the suction example uses to reach the object.

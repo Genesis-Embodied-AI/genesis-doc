@@ -72,6 +72,7 @@ The rigid solver governs how these bodies actually push on each other: contact, 
 :hidden:
 :maxdepth: 1
 
+dynamic_equality_constraints
 drone_entity
 terrain
 ```

@@ -177,6 +177,7 @@ autosummary_generate = True
 
 # Old page paths that moved, so external links keep working.
 redirects = {
+    "user_guide/robot_control/constraints": "../physics/dynamic_equality_constraints.html",
     "user_guide/theory/coupling/index": "../../physics/coupling/index.html",
     "user_guide/theory/coupling/ipc_coupler": "../../physics/coupling/ipc_coupler.html",
     "user_guide/theory/coupling/sap_coupler": "../../physics/coupling/sap_coupler.html",
