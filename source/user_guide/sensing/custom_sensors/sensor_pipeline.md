@@ -135,6 +135,7 @@ Both are pure views into per-class caches the manager already populated during `
 By default a sensor stores only the current snapshot. Set `history_length=N` and the manager keeps the last `N` finished snapshots so `read()` can return them stacked along a new axis:
 
 ```python
+robot = scene.add_entity(gs.morphs.URDF(file="urdf/go2/urdf/go2.urdf", links_to_keep=("FL_foot",)))
 contact = scene.add_sensor(
     gs.sensors.Contact(
         entity_idx=robot.idx,

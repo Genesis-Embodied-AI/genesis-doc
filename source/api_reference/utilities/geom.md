@@ -59,4 +59,4 @@ They follow the project conventions: quaternions are `(w, x, y, z)` scalar-first
 ## See also
 
 - {doc}`/user_guide/configuration/conventions`: coordinate frame, rotation, and quaternion conventions.
-- {doc}`tensor_utils`: converting between NumPy, PyTorch, and Genesis tensors.
+- {doc}`tensor_utils`: converting between NumPy arrays and PyTorch tensors.

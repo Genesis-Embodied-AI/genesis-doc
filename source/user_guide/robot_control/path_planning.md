@@ -1,6 +1,6 @@
 # Path planning
 
-`plan_path` finds a collision-free trajectory through a robot's joint space, from its current configuration to a goal configuration. It is a kinematic planner: it reasons about which joint angles collide with the scene, not about forces or dynamics. The result is a list of waypoints you then execute with the controller of your choice.
+`plan_path` finds a collision-free trajectory through a robot's joint space, from its current configuration to a goal configuration. It is a kinematic planner: it reasons about which joint angles collide with the scene, not about forces or dynamics. The result is a tensor of waypoints you then execute with the controller of your choice.
 
 This page covers `plan_path` on its own. For the full pick-and-place workflow that pairs it with inverse kinematics and gripper control, see {doc}`inverse_kinematics_motion_planning`, whose runnable script ([`examples/tutorials/IK_motion_planning_grasp.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/IK_motion_planning_grasp.py)) is the source of truth for the excerpts below.
 
@@ -77,8 +77,8 @@ The remaining arguments control the search and the output:
 | `timeout` | `None` | Wall-clock budget per attempt, in seconds (approximate). |
 | `max_retry` | `1` | Extra attempts after the first if planning fails. |
 | `smooth_path` | `True` | Shortcut-smooth the raw path before resampling. |
-| `num_waypoints` | `300` | Number of waypoints to resample the path to. `None` skips interpolation. |
-| `ignore_collision` | `False` | Skip all collision checks. |
+| `num_waypoints` | `300` | Number of waypoints to resample the path to. |
+| `ignore_collision` | `False` | Accept colliding configurations while growing the tree and when validating the result. |
 
 :::{warning}
 `resolution` sets how far apart two configurations may be before the planner treats the segment between them as collision-checked. If it is larger than the thinnest obstacle in configuration space, the planner can step over a collision and return a path that clips through geometry. Reduce it when paths look valid but pass through obstacles.
@@ -135,11 +135,11 @@ path, valid = franka.plan_path(
 
 - **Free and spherical joints are unsupported.** The planner rejects an entity with a free or spherical joint, so a mobile base modeled as a free joint cannot be planned for directly.
 - **Planning is randomized.** For reliability on hard problems, give the planner room with `timeout` and `max_retry` rather than expecting the first attempt to succeed.
-- **`ignore_collision=True` skips every collision check.** It produces a straight-line interpolation in joint space, useful only for a quick trajectory when you already know the space is clear.
+- **`ignore_collision=True` skips collision rejection.** The planner still grows its randomized tree, so the path is not a straight line in joint space. Use it only when you already know the space is clear.
 
 ## See also
 
 - {doc}`inverse_kinematics_motion_planning`: IK, planning, and gripper control in one pick-and-place task.
-- {doc}`advanced_ik`: multi-target IK, null-space control, and solver tuning.
+- {doc}`advanced_ik`: multi-link IK, parallel IK, forward kinematics and the Jacobian.
 - {doc}`/user_guide/getting_started/control_your_robot`: position, velocity, and force control in depth.
 - {doc}`constraints`: weld and connect constraints for locking links at runtime.
