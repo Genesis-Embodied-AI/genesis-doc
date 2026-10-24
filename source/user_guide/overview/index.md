@@ -14,4 +14,5 @@ This section orients you and gets the platform installed before the {doc}`Gettin
 
 what_is_genesis
 installation
+troubleshooting
 ```
