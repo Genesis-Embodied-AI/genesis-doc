@@ -35,7 +35,7 @@ scene.build()
 rgb, depth, segmentation, normal = cam.render(rgb=True, depth=True, segmentation=True, normal=True)
 ```
 
-Each returned array is shaped `(height, width, ...)`, transposed from `res=(width, height)`. By default the segmentation mask stores an integer object index per pixel; set `colorize_seg=True` for a viewable color mask. The index maps back to scene objects at the level set by `VisOptions.segmentation_level` (for example, `link_idx` into `scene.rigid_solver.links`).
+Each returned array is shaped `(height, width, ...)`, transposed from `res=(width, height)`. By default the segmentation mask stores an integer object index per pixel; set `colorize_seg=True` for a viewable color mask. Index 0 is the background, and `scene.segmentation_idx_dict` maps every other index to the key of the object at the level set by `VisOptions.segmentation_level`, for example `(entity_idx, link_idx)` at the default `"link"` level.
 
 ```{figure} ../../_static/images/multimodal.png
 :alt: The Franka scene rendered four ways: color, depth, segmentation mask, and surface normals
@@ -78,7 +78,7 @@ For recording sensor and simulation data (not just video) on a schedule, see {do
 
 ## Lighting
 
-The rasterizer (the viewer, and any camera or camera sensor that rasterizes) lights the scene from a list of lights on `VisOptions`. With no configuration it uses a single directional light, so scenes are lit out of the box; set `lights` to control direction, color, and intensity yourself. The light classes live in `gs.options.vis`:
+The rasterizer (the viewer, and any camera added with `scene.add_camera()`) lights the scene from a list of lights on `VisOptions`. With no configuration it uses a single directional light, so scenes are lit out of the box; set `lights` to control direction, color, and intensity yourself. A rasterized camera sensor shares these lights only when a viewer is open; otherwise it uses the default light plus the lights set in its own `lights` option. The light classes live in `gs.options.vis`:
 
 ```python
 scene = gs.Scene(
@@ -108,7 +108,7 @@ The `lights` list takes two types:
 Ambient light is a separate, uniform fill set through the `ambient_light` field rather than an entry in `lights`.
 
 :::{note}
-This controls the rasterizer only. The ray tracer ignores `VisOptions.lights` and lights the scene from three sources of its own: the `lights` list of sphere area lights on `gs.renderers.RayTracer(...)`, its `env_surface` environment map, and any entity carrying an {py:class}`Emission <genesis.options.surfaces.Emission>` surface. See {doc}`Surfaces and textures </user_guide/rendering/surfaces_textures>`. The `BatchRenderer` backend instead takes lights at runtime through `scene.add_light(...)`.
+This controls the rasterizer only. The ray tracer ignores `VisOptions.lights` and lights the scene from sources of its own: the `lights` list of sphere area lights on `gs.renderers.RayTracer(...)`, mesh lights added with `scene.add_mesh_light(...)`, its `env_surface` environment map, and any entity carrying an {py:class}`Emission <genesis.options.surfaces.Emission>` surface. See {doc}`Surfaces and textures </user_guide/rendering/surfaces_textures>`. The `BatchRenderer` backend instead takes lights through `scene.add_light(...)` before the scene is built.
 :::
 
 ## Rendering backends
@@ -129,13 +129,13 @@ This controls the rasterizer only. The ray tracer ignores `VisOptions.lights` an
 
 ### Photorealistic rendering with Luisa (deprecating)
 
-Genesis World also ships a Luisa-based ray-tracing backend. Enable it by passing `renderer=gs.renderers.RayTracer()` when creating the scene; it exposes extra parameters such as `spp`, `aperture`, and camera `model`.
+Genesis World also ships a Luisa-based ray-tracing backend. Enable it by passing `renderer=gs.renderers.RayTracer()` when creating the scene; it exposes extra parameters such as `tracing_depth`, `env_surface`, and `lights`, and unlocks the `spp`, `aperture`, and `model="thinlens"` arguments of `scene.add_camera()`.
 
 :::{warning}
 This backend is deprecated in favor of Nyx and requires building `LuisaRender` from source.
 :::
 
-Setup, tested on Ubuntu 22.04 with CUDA 12.4 and Python 3.9:
+Setup, tested on Ubuntu 22.04 with CUDA 12.4:
 
 1. Fetch the submodule and install the render extras:
 
@@ -151,7 +151,7 @@ Setup, tested on Ubuntu 22.04 with CUDA 12.4 and Python 3.9:
 
    ```bash
    cd genesis/ext/LuisaRender
-   cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.9 \
+   cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=$(python -c 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}")') \
        -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON -D LUISA_COMPUTE_ENABLE_GUI=OFF \
        -D LUISA_RENDER_BUILD_TESTS=OFF
    cmake --build build -j $(nproc)
@@ -176,11 +176,7 @@ Prebuilt LuisaRender binaries for common CUDA and Python combinations are availa
 
 For high-throughput rendering across many parallel environments, use the gs-madrona backend by passing `renderer=gs.renderers.BatchRenderer(use_rasterizer=True)` (set `use_rasterizer=False` to path-trace instead).
 
-Install the package first. Prebuilt wheels are available on PyPI for x86 and Python >= 3.10:
-
-```bash
-pip install gs-madrona
-```
+On Linux x86_64, Genesis World installs gs-madrona as a dependency, so there is nothing extra to install.
 
 Then run the bundled example, which writes frames to `out/batch_render`, or elsewhere with `-o`:
 
@@ -190,7 +186,7 @@ python examples/rigid/single_franka_batch_render.py
 
 The batch renderer runs on CUDA only, so this example has no CPU backend to fall back on.
 
-The batch renderer takes its lights at runtime through `scene.add_light(...)` after the scene is created, rather than from `VisOptions`:
+The batch renderer takes its lights through `scene.add_light(...)`, called after the scene is created and before `scene.build()`, rather than from `VisOptions`:
 
 ```python
 scene.add_light(
@@ -210,4 +206,3 @@ scene.add_light(
 - {doc}`Visualization </user_guide/interaction/visualization>`: the interactive viewer and the `gs` command-line tools.
 - {doc}`Surfaces and textures </user_guide/rendering/surfaces_textures>`: how entities look when rendered.
 - {doc}`Nyx renderer </user_guide/rendering/nyx_renderer>`: photorealistic path tracing in depth.
-

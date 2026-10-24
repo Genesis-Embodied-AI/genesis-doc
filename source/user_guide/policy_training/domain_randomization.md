@@ -46,10 +46,10 @@ The three methods differ in what they modify:
 Randomizing the PD controller models the fact that real motors are neither perfectly tuned nor identical. The gain setters take a value per dof, and when you pass a leading `n_envs` dimension they assign a distinct controller to each environment:
 
 ```python
-# Per-env, per-dof position and velocity gains. Shapes: (n_envs, n_dofs).
-robot.set_dofs_kp(4000 + 1000 * torch.rand(scene.n_envs, robot.n_dofs), motors_dof_idx)
-robot.set_dofs_kv(400 + 100 * torch.rand(scene.n_envs, robot.n_dofs), motors_dof_idx)
-robot.set_dofs_armature(0.01 + 0.02 * torch.rand(scene.n_envs, robot.n_dofs), motors_dof_idx)
+# Per-env, per-dof position and velocity gains. Shapes: (n_envs, len(motors_dof_idx)).
+robot.set_dofs_kp(4000 + 1000 * torch.rand(scene.n_envs, len(motors_dof_idx)), motors_dof_idx)
+robot.set_dofs_kv(400 + 100 * torch.rand(scene.n_envs, len(motors_dof_idx)), motors_dof_idx)
+robot.set_dofs_armature(0.01 + 0.02 * torch.rand(scene.n_envs, len(motors_dof_idx)), motors_dof_idx)
 ```
 
 `set_dofs_kp` and `set_dofs_kv` set the position and velocity gains of the PD controller; `set_dofs_armature` sets the reflected motor inertia, which stabilizes stiff joints. The second positional argument is `dofs_idx_local`, the entity-local dof indices to update, matching the `motors_dof_idx` you build from joint names.
@@ -98,9 +98,9 @@ The same principle applies to spawn poses and reset states: build the randomized
 | `set_links_mass` | `(n_envs, n_links)` | Per-link mass (kg) |
 | `set_links_COM` | `(n_envs, n_links, 3)` | Per-link center of mass (m), in the link frame |
 | `set_links_inertia` | `(n_envs, n_links, 3, 3)` | Per-link inertia matrix, in the inertial frame |
-| `set_dofs_kp` | `(n_envs, n_dofs)` | PD position gain |
-| `set_dofs_kv` | `(n_envs, n_dofs)` | PD velocity gain |
-| `set_dofs_armature` | `(n_envs, n_dofs)` | Reflected motor inertia |
+| `set_dofs_kp` | `(n_envs, len(dofs_idx_local))` | PD position gain |
+| `set_dofs_kv` | `(n_envs, len(dofs_idx_local))` | PD velocity gain |
+| `set_dofs_armature` | `(n_envs, len(dofs_idx_local))` | Reflected motor inertia |
 
 All seven accept an optional `envs_idx` to update a subset of environments. The gain and armature setters require `batch_dofs_info=True`, the mass, center of mass and inertia setters require `batch_links_info=True`, and `set_friction_ratio` requires neither.
 

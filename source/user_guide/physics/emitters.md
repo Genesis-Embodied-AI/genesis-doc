@@ -128,8 +128,8 @@ emitter_b = scene.add_emitter(
 )
 
 for i in range(500):
-    emitter_a.emit(pos=(0.3, 0.5, 2.0), direction=(0, 0, -1), speed=3.0, droplet_shape="circle", droplet_size=0.1)
-    emitter_b.emit(pos=(0.7, 0.5, 2.0), direction=(0, 0, -1), speed=3.0, droplet_shape="circle", droplet_size=0.1)
+    emitter_a.emit(pos=(0.3, 0.5, 0.8), direction=(0, 0, -1), speed=3.0, droplet_shape="circle", droplet_size=0.1)
+    emitter_b.emit(pos=(0.7, 0.5, 0.8), direction=(0, 0, -1), speed=3.0, droplet_shape="circle", droplet_size=0.1)
     scene.step()
 ```
 

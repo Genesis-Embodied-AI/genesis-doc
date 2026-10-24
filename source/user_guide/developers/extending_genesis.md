@@ -24,7 +24,7 @@ gs.init(backend=gs.gpu)  # my_init() runs here, after core initialization
 gs.destroy()             # my_destroy() runs here
 ```
 
-- **`init_fun`** runs once, immediately after Genesis finishes initializing. If Genesis is *already* initialized when you register, `init_fun` runs right away instead.
+- **`init_fun`** runs immediately after Genesis finishes initializing, on every `gs.init()` until you unregister it. If Genesis is *already* initialized when you register, `init_fun` runs right away instead.
 - **`destroy_fun`** runs when `gs.destroy()` is called. Genesis also registers `destroy()` with `atexit`, so teardown happens on normal interpreter exit even if you do not call it yourself.
 
 Register before `gs.init()` when you can, so setup happens as part of a single, ordered initialization.
@@ -43,7 +43,7 @@ Because the two callables identify the registration, pass named functions (or ho
 
 ## Writing a custom recorder
 
-The built-in file writers and plotters cover most needs; to capture data any other way, subclass `genesis.recorders.Recorder` and pass your options to `scene.add_recorder`. The scene drives a recorder through five methods, so you implement them and never call them yourself:
+The built-in file writers and plotters cover most needs; to capture data any other way, subclass `genesis.recorders.base_recorder.Recorder`, define a `RecorderOptions` subclass for it, and register the pair with `@register_recording(MyRecorderOptions)`. `scene.add_recorder(data_func, MyRecorderOptions(...))` then picks your recorder from the type of the options. The scene drives a recorder through five methods, so you implement them and never call them yourself:
 
 1. **`__init__`** configures the recorder from its options.
 2. **`build()`** initializes resources (called during `scene.build()`).
@@ -51,14 +51,25 @@ The built-in file writers and plotters cover most needs; to capture data any oth
 4. **`cleanup()`** finalizes and releases resources (called when recording stops).
 5. **`reset(envs_idx=None)`** resets state for a new episode.
 
+The recorder also has to define the `run_in_thread` property: return `True` to process data in a background thread, which is only safe if the recorder is thread-safe, and `False` otherwise.
+
 ```python
 import genesis as gs
-from genesis.recorders import Recorder
+from genesis.recorders import register_recording
+from genesis.recorders.base_recorder import Recorder
 
+class MyRecorderOptions(gs.recorders.RecorderOptions):
+    pass
+
+@register_recording(MyRecorderOptions)
 class MyRecorder(Recorder):
     def __init__(self, manager, options, data_func):
         super().__init__(manager, options, data_func)
         self.data_buffer = []
+
+    @property
+    def run_in_thread(self):
+        return False
 
     def build(self):
         super().build()

@@ -72,7 +72,7 @@ Genesis World parses `UsdPhysics` joints into a `dof` graph. Rigid bodies with n
 | `UsdPhysics.PrismaticJoint` | prismatic | 1 translational, with limits |
 | `UsdPhysics.SphericalJoint` | spherical | 3 rotational |
 | `UsdPhysics.FixedJoint` | fixed | 0 (rigid link-to-link weld) |
-| `UsdPhysics.Joint` (generic) | free | 6 (full translation + rotation) |
+| `UsdPhysics.Joint` (generic) | detected from its per-axis `DriveAPI` and `LimitAPI`: fixed, revolute, prismatic, spherical, or free | 0 to 6 (free when no axis is configured) |
 
 A joint's root link is *fixed* or *floating* according to the asset. Override this with `fixed` on the morph, which applies only to root (base) links:
 

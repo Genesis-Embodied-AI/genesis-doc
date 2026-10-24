@@ -102,6 +102,8 @@ franka = scene.add_entity(
 | `two_way_coupling` | `True` | Whether IPC forces and torques act back on Genesis rigid bodies. Set `False` for one-way coupling. |
 | `enable_rigid_ground_contact` | `True` | Whether IPC bodies collide with the ground plane. Disable to avoid double-counting ground contact already handled by Genesis. |
 | `enable_rigid_rigid_contact` | `True` | Whether IPC detects contact between rigid (ABD) bodies. Disable to keep only soft-soft and soft-rigid contact. |
+| `enable_rigid_dofs_sync` | `False` | For `external_articulation` entities, whether to sync the IPC reference dof state with Genesis each step. Tighter coupling, but it can amplify small divergences. |
+| `free_base_driven_by_ipc` | `False` | For `external_articulation` entities with a non-fixed base, whether IPC fully drives the base link instead of a soft transform constraint controlled by Genesis. |
 
 Friction is a per-material property, not a coupler-wide setting: set `coup_friction` on a {py:class}`gs.materials.Rigid <genesis.engine.materials.rigid.Rigid>` and `friction_mu` on an FEM material.
 

@@ -6,7 +6,7 @@ This page assumes a scene built with `show_viewer=True` (see {doc}`Hello, Genesi
 
 ## Minimal working example
 
-This scene adds the built-in `MouseInteractionPlugin` so you can click and drag the box, and binds `Esc` to quit. The ordering matters: add plugins **before** `build()`, and register keybindings after.
+This scene adds the built-in `MouseInteractionPlugin` so you can click and drag the box, and binds `Esc` to quit. Register keybindings after `build()`, since they need a built viewer. Plugins can be added before or after `build()`.
 
 ```python
 import genesis as gs
@@ -81,7 +81,7 @@ scene = gs.Scene(
 
 A viewer plugin is an object the viewer calls back into as things happen. The viewer dispatches window events (mouse, keyboard, resize) to each plugin, calls it once per simulation step, and once per rendered frame. This lets a plugin maintain its own state, respond to input, and draw debug geometry, all without touching the render loop directly.
 
-Add a plugin with `scene.viewer.add_plugin(plugin)` **before** `scene.build()`; the viewer calls the plugin's `build()` hook once the scene is built. The built-in `MouseInteractionPlugin` is ready to use; anything more specific you write by subclassing `ViewerPlugin`.
+Add a plugin with `scene.viewer.add_plugin(plugin)`, before or after `scene.build()`; the viewer calls the plugin's `build()` hook once the scene is built, or right away if it already is. The built-in `MouseInteractionPlugin` is ready to use; anything more specific you write by subclassing `ViewerPlugin`.
 
 :::{note}
 The ImGui overlay plugin (the entity browser, joint sliders, and simulation controls) is enabled with `ViewerOptions(enable_gui=True)` and documented on the {doc}`Interactive GUI and debugging </user_guide/interaction/interactive_debugging>` page.

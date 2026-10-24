@@ -60,10 +60,10 @@ scene = gs.Scene(
 - **`show_FPS`:** whether to print the rate at all. Set it to `False` for quiet runs, or when the log lines interfere with your own output.
 - **`FPS_tracker_alpha`:** the smoothing momentum, between 0 and 1. Higher values react more slowly and read more steadily; lower values track sudden changes in speed more closely.
 
-The scene exposes the live options as `scene.profiling_options`, so you can toggle the counter after construction:
+The scene exposes the live options as `scene.options.profiling`, so you can toggle the counter after construction:
 
 ```python
-scene.profiling_options.show_FPS = False
+scene.options.profiling.show_FPS = False
 ```
 
 See {doc}`/user_guide/configuration/config_system` for how `ProfilingOptions` fits alongside the other options objects.
@@ -82,7 +82,7 @@ The FPS counter reports the rate of the whole loop, which includes everything th
 | `step` | the whole call to `scene.step()`, the pre-step callbacks included |
 | `period` | the wall time from the start of the previous step to the start of this one, your own code between the two included, so its inverse is the rate the loop achieves |
 
-A phase the step skips is absent from the mapping, so a scene with no sensors never reports a `sensors` time, and the first step has no `period`. The mapping stays empty until the first `scene.step()` returns, and a step a pre-step callback vetoes, such as a paused viewer, empties it, since the simulation does not advance. The step that follows has no `period`. Resetting the scene or restoring a checkpoint leaves the timings as they are.
+A phase the step skips is absent from the mapping, for instance `rendering` after `scene.step(update_visualizer=False)`, and the first step has no `period`. The mapping stays empty until the first `scene.step()` returns. A step a pre-step callback vetoes, such as a paused viewer, leaves the timings of the previous step as they are, since the simulation does not advance, and the `period` of the next step counts from the start of the last step that advanced. Resetting the scene or restoring a checkpoint leaves the timings as they are.
 
 Each reading covers the latest step alone, so it jitters from step to step. Smooth a quantity you read every step with a {py:class}`RunningMean <genesis.utils.tools.RunningMean>`, over a window of steps or as an exponential moving average. Invert a phase to read it as a rate, for instance the step rate of the physics without the sensors, rendering, and recording around it:
 
@@ -112,7 +112,7 @@ The scripts in [`examples/speed_benchmark`](https://github.com/Genesis-Embodied-
 gs.init(backend=gs.gpu, performance_mode=True)
 
 scene = gs.Scene(
-    rigid_options=gs.options.RigidOptions(dt=0.01),
+    sim_options=gs.options.SimOptions(dt=0.01),
     show_viewer=False,
 )
 # ... add plane and franka ...

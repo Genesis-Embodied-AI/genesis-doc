@@ -14,7 +14,7 @@ ipc_coupler
 
 ## Base options
 
-Every coupler options class inherits these fields from `BaseCouplerOptions`.
+Every coupler options class derives from `BaseCouplerOptions`, which defines no fields of its own.
 
 ```{eval-rst}
 .. autoclass:: genesis.options.solvers.BaseCouplerOptions

@@ -14,7 +14,7 @@ The drone is actuated purely through its four propeller speeds. If you have not 
 
 ## Task
 
-Each episode places a target point in front of the drone and rewards it for flying to that point and holding position. When the drone gets within `at_target_threshold` (0.1 m) of the target, a fresh target is resampled, so a single episode chains many reach-and-hold maneuvers. An episode lasts up to `episode_length_s` (15 s) and terminates early on a crash.
+Each episode places a target point at random up to 1 m from the drone's start along x and y, at the 1 m height it spawns at, and rewards it for flying to that point and holding position. When the drone gets within `at_target_threshold` (0.1 m) of the target, a fresh target is resampled, so a single episode chains many reach-and-hold maneuvers. An episode lasts up to `episode_length_s` (15 s) and terminates early on a crash.
 
 The environment must specify the three things any RL problem needs: an observation the policy sees, an action it produces, and a reward that scores the outcome.
 
@@ -29,9 +29,9 @@ The constructor builds a scene at a 100 Hz control rate and adds a ground plane,
 ```python
 self.dt = 0.01  # 100 Hz control loop
 self.scene = gs.Scene(
-    sim_options=gs.options.SimOptions(dt=self.dt, substeps=2),
+    sim_options=gs.options.SimOptions(dt=self.dt),
     rigid_options=gs.options.RigidOptions(
-        dt=self.dt,
+        dt=self.dt / 2,
         constraint_solver=gs.constraint_solver.Newton,
         enable_collision=True,
         enable_joint_limit=True,
