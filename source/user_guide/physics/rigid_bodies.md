@@ -61,6 +61,13 @@ Two examples show each coefficient on its own. [`examples/rigid/torsional_grasp.
 
 The rigid solver governs how these bodies actually push on each other: contact, collision geometry, and constraints. {doc}`Theory and modeling </user_guide/theory/rigid_solver/index>` documents that model, and covers {doc}`contact resolution </user_guide/theory/rigid_solver/constraints>` in full.
 
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+joints_and_actuators
+```
+
 ## See also
 
 - {doc}`/user_guide/getting_started/control_your_robot`: driving a rigid robot with the built-in controller.
