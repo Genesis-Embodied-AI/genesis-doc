@@ -11,11 +11,11 @@ A hybrid entity pairs two entities that share one scene and one timestep:
 - A **rigid part** (a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`) parsed from the URDF, carrying the joints and **degrees of freedom** (**dofs**).
 - A **soft part** (an {py:class}`MPMEntity <genesis.engine.entities.mpm_entity.MPMEntity>`) whose particles are attached to the rigid links.
 
-Each simulation step, the rigid solver advances the joints, and the coupling maps every soft particle back onto the link it belongs to; the particles' reaction then feeds a force back onto the rigid link. Drive the entity through the rigid dofs, and the skin follows. The soft material must be MPM-based; FEM and PBD skins are not yet supported.
+Each simulation step, the rigid solver advances the joints, and the coupling maps every soft particle back onto the link it belongs to; the particles' reaction then feeds a force back onto the rigid link. Drive the entity through the rigid dofs, and the skin follows. The MPM solver simulates the skin; FEM and PBD skins are not yet supported.
 
 ## Minimal setup
 
-A hybrid scene needs three things the earlier tutorials did not: an MPM domain, a soft-enough rigid contact solver, and a hybrid material.
+A hybrid scene needs three things the earlier tutorials did not: an MPM domain, a soft-enough rigid contact solver, and hybrid entity options.
 
 ```python
 scene = gs.Scene(
@@ -41,40 +41,38 @@ The MPM solver simulates the skin on a background grid; `lower_bound` and `upper
 
 ## Add the hybrid entity
 
-Pass a {py:class}`gs.morphs.URDF <genesis.options.morphs.URDF>` for the skeleton and a {py:class}`gs.materials.Hybrid <genesis.engine.materials.hybrid.Hybrid>` that wraps one rigid and one soft material:
+Add the entity with {py:class}`gs.options.HybridEntityOptions <genesis.options.entities.HybridEntityOptions>`, passing a {py:class}`gs.morphs.URDF <genesis.options.morphs.URDF>` for the skeleton and a material for the skin. The skeleton takes `gs.materials.Material()` unless you pass `material_rigid`:
 
 ```python
 robot = scene.add_entity(
-    morph=gs.morphs.URDF(
-        file="urdf/simple/two_link_arm.urdf",
-        pos=(0.5, 0.5, 0.3),
-        scale=0.2,
-        fixed=True,
-    ),
-    material=gs.materials.Hybrid(
-        material_rigid=gs.materials.Rigid(
-            gravity_compensation=1.0,  # cancel gravity on the skeleton
+    options=gs.options.HybridEntityOptions(
+        morph=gs.morphs.URDF(
+            file="urdf/simple/two_link_arm.urdf",
+            pos=(0.5, 0.5, 0.3),
+            scale=0.2,
+            fixed=True,
         ),
-        material_soft=gs.materials.MPM.Muscle(
-            E=1e4,  # Young's modulus, Pa
-            nu=0.45,  # Poisson's ratio
-            rho=1000.0,  # kg/m^3
-            model="neohooken",
+        material_soft=gs.materials.Muscle(
+            density=1000.0,  # kg/m^3
+            youngs_modulus=1e4,  # Pa
+            poisson_ratio=0.45,
         ),
-        thickness=0.05,  # m; skin inflated outward from each link's collision mesh
+        gravity_compensation=1.0,  # cancel gravity on the skeleton
         damping=1000.0,
+        thickness=0.05,  # m; skin inflated outward from each link's collision mesh
     ),
 )
 ```
 
 Genesis World generates the skin: for each rigid link with a collision geometry, it inflates that geometry outward by `thickness` (meters) and fills it with MPM particles bound to the link. Setting the MPM solver's `gravity` to zero above cancels gravity on the skin, and `gravity_compensation=1.0` cancels it on the skeleton, so the arm holds its pose instead of sagging.
 
-### Hybrid material parameters
+### Hybrid entity options
 
 | Parameter | Default | Meaning |
 |---|---|---|
-| `material_rigid` | required | Material of the rigid skeleton, e.g. {py:class}`gs.materials.Rigid <genesis.engine.materials.rigid.Rigid>`. |
-| `material_soft` | required | Material of the soft skin. Must be an `gs.materials.MPM.*` type. |
+| `material_rigid` | `gs.materials.Material()` | Material of the rigid skeleton, a {py:class}`gs.materials.Material <genesis.options.materials.Material>`. |
+| `material_soft` | required | Material of the soft skin, which the MPM solver simulates: `Elastic`, `ElastoPlastic`, `Liquid`, `Sand`, `Snow`, or `Muscle`. |
+| `gravity_compensation` | `0.0` | Fraction of gravity cancelled on the skeleton, `1.0` letting it float. |
 | `thickness` | `0.05` | Skin thickness in meters, inflated outward from each link's mesh. |
 | `damping` | `0.0` | Damps the relative velocity between skin and skeleton; higher values reduce oscillation. |
 | `soft_dv_coef` | `0.01` | Fraction of the coupling velocity fed from the skeleton back into the skin. |
@@ -116,10 +114,10 @@ The MPM grid defined by `lower_bound` / `upper_bound` is finite, and the solver 
 :::
 
 :::{tip}
-Hybrid dynamics are stiff. If the simulation is unstable, lower `dt`, raise `damping`, or soften the rigid contact solver with a larger `constraint_timeconst` before touching the material stiffness `E`.
+Hybrid dynamics are stiff. If the simulation is unstable, lower `dt`, raise `damping`, or soften the rigid contact solver with a larger `constraint_timeconst` before touching the material stiffness `youngs_modulus`.
 :::
 
-A hybrid entity can also be built from a bare {py:class}`gs.morphs.Mesh <genesis.options.morphs.Mesh>`: Genesis World skeletonizes the mesh, builds a rigid body from the extracted skeleton, and binds the soft particles to it. The tested example uses the URDF path shown above; the mesh path is available through the same `gs.materials.Hybrid` material.
+A hybrid entity can also be built from a bare {py:class}`gs.morphs.Mesh <genesis.options.morphs.Mesh>`: Genesis World skeletonizes the mesh, builds a rigid body from the extracted skeleton, and binds the soft particles to it. The tested example uses the URDF path shown above; the mesh path is available through the same `HybridEntityOptions`.
 
 ## See also
 

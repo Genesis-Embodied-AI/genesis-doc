@@ -13,7 +13,10 @@ Almost every component in Genesis World is configured through an **Options** cla
 |---|---|
 | {doc}`/api_reference/engine/scene` | `gs.options.ProfilingOptions` |
 | {doc}`/api_reference/engine/simulator` | `gs.options.SimOptions` |
-| {doc}`/api_reference/engine/solvers/index` | `gs.options.RigidOptions`, `gs.options.MPMOptions`, `gs.options.FEMOptions`, `gs.options.PBDOptions`, `gs.options.SPHOptions`, `gs.options.SFOptions`, `gs.options.ToolOptions`, `gs.options.KinematicOptions` |
+| {doc}`/api_reference/engine/solvers/index` | `gs.options.RigidOptions`, `gs.options.MPMOptions`, `gs.options.FEMOptions`, `gs.options.PBDOptions`, `gs.options.SPHOptions`, `gs.options.SFOptions`, `gs.options.KinematicOptions` |
+| {doc}`/api_reference/engine/entity/index` | `gs.options.EntityOptions` and its subclasses, one per kind of entity (`gs.options.RigidEntityOptions`, `gs.options.FEMEntityOptions`, ...), with their solver options and the scoped `gs.options.LinkOptions`, `gs.options.GeomOptions` and `gs.options.VertexOptions` |
+| {doc}`/api_reference/options/material/index` | `gs.materials.*` |
+| {doc}`/api_reference/options/selections` | `gs.LinkIndex`, `gs.GeomIndex`, `gs.VertexIndex` |
 | {doc}`/api_reference/engine/couplers/index` | `gs.options.LegacyCouplerOptions`, `gs.options.SAPCouplerOptions`, `gs.options.IPCCouplerOptions` |
 | {doc}`/api_reference/engine/entity/morph/index` | `gs.morphs.*` |
 | {doc}`/api_reference/engine/entity/surface/index` | `gs.surfaces.*`, `gs.textures.*` |
@@ -21,6 +24,14 @@ Almost every component in Genesis World is configured through an **Options** cla
 | {doc}`/api_reference/visualization/renderers/index` | `gs.renderers.*` |
 | {doc}`/api_reference/engine/sensors/index` | `gs.sensors.*` |
 | {doc}`/api_reference/recording/index` | `gs.recorders.*` |
+
+```{toctree}
+:titlesonly:
+:hidden:
+
+material/index
+selections
+```
 
 ## See also
 

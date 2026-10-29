@@ -4,8 +4,8 @@ This section documents the Genesis World API. It is generated from the source do
 
 ## How this reference is organized
 
-- **{doc}`Options <options/index>`** (`genesis.options`): the index to every options class, and the home for those with no built-object page.
-- **{doc}`Engine <engine/index>`** (`genesis.engine`): the scene, simulator, solvers, coupler, entities, materials, states, and sensors that make up a simulation.
+- **{doc}`Options <options/index>`** (`genesis.options`): the index to every options class, and the home for the materials, the selections, and the options with no built-object page.
+- **{doc}`Engine <engine/index>`** (`genesis.engine`): the scene, simulator, solvers, coupler, entities, states, and sensors that make up a simulation.
 - **{doc}`Visualization <visualization/index>`** (`genesis.vis`): the viewer, cameras, renderer backends, and lights.
 - **{doc}`Recording <recording/index>`** (`genesis.recorders`): recorders that capture simulation data to files or live plots.
 - **{doc}`Utilities <utilities/index>`** (`genesis.utils`): geometry, mesh, tensor, and device helpers.

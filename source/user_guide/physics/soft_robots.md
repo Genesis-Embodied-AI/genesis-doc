@@ -2,10 +2,10 @@
 
 Muscle materials model deformable bodies with embedded **muscle fibers**. Drive the body by contracting those fibers: each actuation signal adds an active stress along the fiber direction, and the body deforms in response.
 
-Genesis World simulates muscles with two deformable solvers; pick one through the entity's material:
+Genesis World simulates the {py:class}`gs.materials.Muscle <genesis.options.materials.Muscle>` material with two deformable solvers; pick one through the class of the entity options:
 
-- {py:class}`gs.materials.MPM.Muscle <genesis.engine.materials.MPM.muscle.Muscle>`: the Material Point Method solver, actuated per **particle**.
-- {py:class}`gs.materials.FEM.Muscle <genesis.engine.materials.FEM.muscle.Muscle>`: the Finite Element Method solver, actuated per tetrahedral **element**.
+- {py:class}`gs.options.MPMEntityOptions <genesis.options.entities.MPMEntityOptions>`: the Material Point Method solver, actuated per **particle**.
+- {py:class}`gs.options.FEMEntityOptions <genesis.options.entities.FEMEntityOptions>`: the Finite Element Method solver, actuated per tetrahedral **element**.
 
 Both share the same control interface, so swapping solvers leaves your control loop unchanged. The {doc}`beyond_rigid_bodies` tutorial covers the underlying solvers in more depth.
 
@@ -28,12 +28,33 @@ E, nu = 3.0e4, 0.45  # Young's modulus (Pa) and Poisson ratio
 rho = 1000.0  # density, kg/m3
 
 robot_mpm = scene.add_entity(
-    morph=gs.morphs.Sphere(pos=(0.5, 0.2, 0.3), radius=0.1),
-    material=gs.materials.MPM.Muscle(E=E, nu=nu, rho=rho, model="neohooken"),
+    options=gs.options.MPMEntityOptions(
+        morph=gs.morphs.Sphere(
+            pos=(0.5, 0.2, 0.3),
+            radius=0.1,
+        ),
+        material=gs.materials.Muscle(
+            density=rho,
+            youngs_modulus=E,
+            poisson_ratio=nu,
+        ),
+    ),
 )
 robot_fem = scene.add_entity(
-    morph=gs.morphs.Sphere(pos=(0.5, -0.2, 0.3), radius=0.1),
-    material=gs.materials.FEM.Muscle(E=E, nu=nu, rho=rho, model="stable_neohookean"),
+    options=gs.options.FEMEntityOptions(
+        morph=gs.morphs.Sphere(
+            pos=(0.5, -0.2, 0.3),
+            radius=0.1,
+        ),
+        material=gs.materials.Muscle(
+            density=rho,
+            youngs_modulus=E,
+            poisson_ratio=nu,
+        ),
+        solver_options=gs.options.FEMEntitySolverOptions(
+            model="stable_neohookean",
+        ),
+    ),
 )
 ```
 
@@ -50,7 +71,7 @@ for i in range(1000):
 Everything else (the plane, the scene, `build`, `step`) is the standard flow from {doc}`/user_guide/getting_started/hello_genesis`.
 
 :::{note}
-The constitutive `model` names differ between solvers. MPM uses `"corotation"` or `"neohooken"`; FEM uses `"linear"`, `"stable_neohookean"`, or `"linear_corotated"`. (`"stable_neohooken"` is a deprecated spelling of the FEM model and logs a warning.)
+The constitutive `model` lives in the solver options of the entity, and its names differ between solvers. {py:class}`gs.options.MPMEntitySolverOptions <genesis.options.entities.MPMEntitySolverOptions>` takes `"corotation"` or `"neohooken"`, the default for a muscle; {py:class}`gs.options.FEMEntitySolverOptions <genesis.options.entities.FEMEntitySolverOptions>` takes `"linear"`, `"stable_neohookean"`, or `"linear_corotated"`.
 :::
 
 ## Timestep and gravity
@@ -79,22 +100,25 @@ The MPM solver discretizes space onto a background grid; `lower_bound` and `uppe
 
 By default a soft robot has a single muscle group spanning its whole body, with all fibers pointing along `+Z` (`[0, 0, 1]`). A single actuation value then contracts the entire body along that axis: useful for the sphere demo, useless for locomotion.
 
-To make a robot move deliberately, partition it into groups and assign each part a fiber direction. Declare the number of groups on the material, then call `set_muscle` after `build` (it reads the built particle positions):
+To make a robot move deliberately, partition it into groups and assign each part a fiber direction. Declare the number of groups in the solver options, then call `set_muscle` after `build` (it reads the built particle positions):
 
 ```python
 worm = scene.add_entity(
-    morph=gs.morphs.Mesh(
-        file="meshes/worm/worm.obj",
-        pos=(0.3, 0.3, 0.001),
-        scale=0.1,
-        euler=(90, 0, 0),  # extrinsic x-y-z, degrees
-    ),
-    material=gs.materials.MPM.Muscle(
-        E=5e5,
-        nu=0.45,
-        rho=10000.0,
-        model="neohooken",
-        n_groups=4,  # at most 4 independently actuated muscles
+    options=gs.options.MPMEntityOptions(
+        morph=gs.morphs.Mesh(
+            file="meshes/worm/worm.obj",
+            pos=(0.3, 0.3, 0.001),
+            scale=0.1,
+            euler=(90, 0, 0),  # extrinsic x-y-z, degrees
+        ),
+        material=gs.materials.Muscle(
+            density=10000.0,
+            youngs_modulus=5e5,
+            poisson_ratio=0.45,
+        ),
+        solver_options=gs.options.MPMEntitySolverOptions(
+            n_groups=4,  # at most 4 independently actuated muscles
+        ),
     ),
 )
 
@@ -147,21 +171,25 @@ The full script is [`examples/tutorials/advanced_worm.py`](https://github.com/Ge
 
 ## Hybrid rigid-soft robots
 
-A hybrid robot drives a soft outer skin with a rigid inner skeleton: the skeleton carries the degrees of freedom, and the skin deforms around it. Build one with {py:class}`gs.materials.Hybrid <genesis.engine.materials.hybrid.Hybrid>`, which pairs a {py:class}`gs.materials.Rigid <genesis.engine.materials.rigid.Rigid>` skeleton with a soft material that must be `gs.materials.MPM.Muscle`:
+A hybrid robot drives a soft outer skin with a rigid inner skeleton: the skeleton carries the degrees of freedom, and the skin deforms around it. Build one with {py:class}`gs.options.HybridEntityOptions <genesis.options.entities.HybridEntityOptions>`, which pairs a rigid skeleton with a skin that the MPM solver simulates. A `Muscle` skin lets each link actuate its own group:
 
 ```python
 robot = scene.add_entity(
-    morph=gs.morphs.URDF(
-        file="urdf/simple/two_link_arm.urdf",
-        pos=(0.5, 0.5, 0.3),
-        scale=0.2,
-        fixed=True,
-    ),
-    material=gs.materials.Hybrid(
-        material_rigid=gs.materials.Rigid(gravity_compensation=1.0),
-        material_soft=gs.materials.MPM.Muscle(E=1e4, nu=0.45, rho=1000.0, model="neohooken"),
-        thickness=0.05,  # skin thickness grown around the skeleton, meters
+    options=gs.options.HybridEntityOptions(
+        morph=gs.morphs.URDF(
+            file="urdf/simple/two_link_arm.urdf",
+            pos=(0.5, 0.5, 0.3),
+            scale=0.2,
+            fixed=True,
+        ),
+        material_soft=gs.materials.Muscle(
+            density=1000.0,
+            youngs_modulus=1e4,
+            poisson_ratio=0.45,
+        ),
+        gravity_compensation=1.0,
         damping=1000.0,
+        thickness=0.05,  # skin thickness grown around the skeleton, meters
     ),
 )
 ```

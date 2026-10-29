@@ -31,8 +31,12 @@ scene = gs.Scene(
 
 scene.add_entity(gs.morphs.Plane())
 liquid = scene.add_entity(
-    material=gs.materials.SPH.Liquid(),
-    morph=gs.morphs.Box(pos=(0.0, 0.0, 0.65), size=(0.4, 0.4, 0.4)),
+    options=gs.options.SPHEntityOptions(
+        morph=gs.morphs.Box(
+            pos=(0.0, 0.0, 0.65),
+            size=(0.4, 0.4, 0.4),
+        ),
+    ),
 )
 
 # Instantiate, then register with the scene *before* building.

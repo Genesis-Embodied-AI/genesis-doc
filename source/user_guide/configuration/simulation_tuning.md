@@ -57,7 +57,7 @@ First check the collision meshes: the visual surface is not necessarily the surf
 
 Material properties and solver options affect different parts of contact:
 
-- Set sliding friction through `friction` on `gs.materials.Rigid`. For a slipping grasp, check the contact points and gripper force range as well as the coefficient.
+- Set sliding friction through `friction` on {py:class}`gs.materials.Material <genesis.options.materials.Material>`, for the whole entity or for some links through {py:class}`gs.options.LinkOptions <genesis.options.entities.LinkOptions>`. For a slipping grasp, check the contact points and gripper force range as well as the coefficient.
 - Compare `RigidOptions.friction_cone` when a resting stack or grasp creeps. The elliptic cone avoids the pyramidal approximation and can reduce drift; measure both the drift and solve time in your scene. `impratio` controls friction impedance relative to the normal response.
 - Enable `enable_torsional_friction` in `RigidOptions` for resistance to twisting. For rolling resistance, enable both `enable_torsional_friction` and `enable_rolling_friction`; rolling friction requires torsional friction. Their strengths come from `friction_torsional` and `friction_rolling` on the material. [`examples/rigid/torsional_grasp.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/torsional_grasp.py) combines these with the elliptic cone.
 

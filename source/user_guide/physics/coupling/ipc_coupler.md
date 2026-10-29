@@ -36,27 +36,42 @@ scene = gs.Scene(
 )
 ```
 
-Entities join the IPC world through their {doc}`material </api_reference/engine/material/index>`. A cloth is an FEM shell:
+Entities join the IPC world through their entity options. A cloth is an FEM shell, added with {py:class}`gs.options.FEMEntityOptions <genesis.options.entities.FEMEntityOptions>` and a {py:class}`gs.materials.Cloth <genesis.options.materials.Cloth>` material:
 
 ```python
 cloth = scene.add_entity(
-    morph=gs.morphs.Mesh(file="path/to/grid20x20.obj", pos=(0.0, 0.0, 1.0)),
-    material=gs.materials.FEM.Cloth(
-        E=1e5,  # Young's modulus (Pa)
-        nu=0.499,  # Poisson's ratio, nearly incompressible
-        rho=200,  # density (kg/m3)
-        thickness=0.001,  # shell thickness (m)
-        bending_stiffness=50.0,
+    options=gs.options.FEMEntityOptions(
+        morph=gs.morphs.Mesh(
+            file="path/to/grid20x20.obj",
+            pos=(0.0, 0.0, 1.0),
+        ),
+        material=gs.materials.Cloth(
+            density=200,  # kg/m3
+            youngs_modulus=1e5,  # Pa
+            poisson_ratio=0.499,  # nearly incompressible
+            thickness=0.001,  # shell thickness (m)
+            bending_stiffness=50.0,
+        ),
     ),
 )
 ```
 
-A rigid body that should be driven entirely by IPC uses `coup_type="ipc_only"`:
+A rigid body that should be driven entirely by IPC sets `coup_type="ipc_only"` in its {py:class}`gs.options.RigidEntitySolverOptions <genesis.options.entities.RigidEntitySolverOptions>`:
 
 ```python
 box = scene.add_entity(
-    morph=gs.morphs.Box(pos=(-0.25, 0.0, 0.3), size=(0.2, 0.2, 0.2)),
-    material=gs.materials.Rigid(rho=500, coup_type="ipc_only"),
+    options=gs.options.RigidEntityOptions(
+        morph=gs.morphs.Box(
+            pos=(-0.25, 0.0, 0.3),
+            size=(0.2, 0.2, 0.2),
+        ),
+        material=gs.materials.Material(
+            density=500,
+        ),
+        solver_options=gs.options.RigidEntitySolverOptions(
+            coup_type="ipc_only",
+        ),
+    ),
 )
 ```
 
@@ -66,7 +81,7 @@ The example downloads a coarse `grid20x20.obj` cloth mesh rather than a dense on
 
 ## How entities couple
 
-Each entity's {doc}`Rigid material </api_reference/engine/material/rigid>` declares how it participates, through `coup_type`, so the coupler needs no per-link registration:
+Each rigid entity declares how it participates through the `coup_type` of its solver options, so the coupler needs no per-link registration:
 
 - **`two_way_soft_constraint`:** Genesis and IPC exchange forces through a soft position-and-orientation constraint. Use it for a floating-base robot or any rigid body whose motion Genesis controls but that must also feel contact.
 - **`external_articulation`:** joint-level coupling for articulated robots: IPC couples at the dof level rather than per link. Use it for a fixed-base arm.
@@ -74,18 +89,31 @@ Each entity's {doc}`Rigid material </api_reference/engine/material/rigid>` decla
 
 When `coup_type` is `None` (the default), Genesis picks one from the entity type: `external_articulation` for fixed-base robots, `two_way_soft_constraint` for floating-base robots, and `ipc_only` for non-articulated objects.
 
-To restrict a `two_way_soft_constraint` robot so that only certain links participate (for example, coupling a gripper's fingers but not its arm), pass `coup_links`:
+To restrict a `two_way_soft_constraint` robot so that only certain links participate (for example, coupling a gripper's fingers but not its arm), disable `needs_coup` for the entity and enable it again for those links, selected by a {py:class}`gs.LinkIndex <genesis.options.indices.LinkIndex>` in `links`:
 
 ```python
 franka = scene.add_entity(
-    gs.morphs.MJCF(file="xml/franka_emika_panda/panda_non_overlap.xml"),
-    material=gs.materials.Rigid(
-        coup_type="two_way_soft_constraint",
-        coup_links=("left_finger", "right_finger"),  # only these links couple
-        coup_friction=0.8,
+    options=gs.options.RigidEntityOptions(
+        morph=gs.morphs.MJCF(
+            file="xml/franka_emika_panda/panda_non_overlap.xml",
+        ),
+        solver_options=gs.options.RigidEntitySolverOptions(
+            needs_coup=False,  # only the links enabled below couple
+            coup_friction=0.8,
+            coup_type="two_way_soft_constraint",
+        ),
+        links={
+            gs.LinkIndex.named("left_finger", "right_finger"): gs.options.LinkOptions(
+                solver_options=gs.options.RigidLinkSolverOptions(
+                    needs_coup=True,
+                ),
+            ),
+        },
     ),
 )
 ```
+
+`enable_coup_collision` follows the same pattern: disable it for the entity and enable it again in the `RigidLinkSolverOptions` of the links that should collide in IPC, while every other link keeps its coupling forces without contact.
 
 ## Coupler options
 
@@ -95,8 +123,8 @@ franka = scene.add_entity(
 |---|---|---|
 | `contact_d_hat` | `None` (libuipc: 0.01) | Contact barrier distance in meters. Size it to the mesh resolution. |
 | `contact_enable` | `None` (libuipc: `True`) | Whether contact detection is active. |
-| `contact_friction_enable` | `None` (libuipc: `True`) | Whether contact applies friction. Per-body friction comes from the material (`coup_friction` for rigid, `friction_mu` for FEM). |
-| `contact_resistance` | `1e9` | Ground and default contact stiffness; the per-entity fallback when a material sets no `contact_resistance`. |
+| `contact_friction_enable` | `None` (libuipc: `True`) | Whether contact applies friction. Per-entity friction comes from `coup_friction` of the rigid solver options and `friction` of an FEM material. |
+| `contact_resistance` | `1e9` | Ground and default contact stiffness; the per-entity fallback when the solver options of an entity set no `contact_resistance`. |
 | `constraint_strength_translation` | `100.0` | Stiffness of the position coupling between Genesis rigid bodies and their IPC affine bodies. |
 | `constraint_strength_rotation` | `100.0` | Stiffness of the orientation coupling. Higher is stiffer but can destabilize. |
 | `two_way_coupling` | `True` | Whether IPC forces and torques act back on Genesis rigid bodies. Set `False` for one-way coupling. |
@@ -105,7 +133,7 @@ franka = scene.add_entity(
 | `enable_rigid_dofs_sync` | `False` | For `external_articulation` entities, whether to sync the IPC reference dof state with Genesis each step. Tighter coupling, but it can amplify small divergences. |
 | `free_base_driven_by_ipc` | `False` | For `external_articulation` entities with a non-fixed base, whether IPC fully drives the base link instead of a soft transform constraint controlled by Genesis. |
 
-Friction is a per-material property, not a coupler-wide setting: set `coup_friction` on a {py:class}`gs.materials.Rigid <genesis.engine.materials.rigid.Rigid>` and `friction_mu` on an FEM material.
+Friction is a per-entity property, not a coupler-wide setting: set `coup_friction` in the solver options of a rigid entity and `friction` on the material of an FEM entity.
 
 ## Robot grasping
 
@@ -123,22 +151,40 @@ scene = gs.Scene(
 )
 
 franka = scene.add_entity(
-    gs.morphs.MJCF(file="xml/franka_emika_panda/panda_non_overlap.xml"),
-    material=gs.materials.Rigid(
-        coup_type="two_way_soft_constraint",
-        coup_links=("left_finger", "right_finger"),
-        coup_friction=0.8,
+    options=gs.options.RigidEntityOptions(
+        morph=gs.morphs.MJCF(
+            file="xml/franka_emika_panda/panda_non_overlap.xml",
+        ),
+        solver_options=gs.options.RigidEntitySolverOptions(
+            needs_coup=False,
+            coup_friction=0.8,
+            coup_type="two_way_soft_constraint",
+        ),
+        links={
+            gs.LinkIndex.named("left_finger", "right_finger"): gs.options.LinkOptions(
+                solver_options=gs.options.RigidLinkSolverOptions(
+                    needs_coup=True,
+                ),
+            ),
+        },
     ),
 )
 
 cube = scene.add_entity(
-    morph=gs.morphs.Box(pos=(0.65, 0.0, 0.03), size=(0.05, 0.05, 0.05)),
-    material=gs.materials.FEM.Elastic(
-        E=5.0e4,  # Young's modulus (Pa)
-        nu=0.45,
-        rho=1000.0,
-        friction_mu=0.5,
-        model="stable_neohookean",
+    options=gs.options.FEMEntityOptions(
+        morph=gs.morphs.Box(
+            pos=(0.65, 0.0, 0.03),
+            size=(0.05, 0.05, 0.05),
+        ),
+        material=gs.materials.Elastic(
+            density=1000.0,
+            friction=0.5,
+            youngs_modulus=5.0e4,  # Pa
+            poisson_ratio=0.45,
+        ),
+        solver_options=gs.options.FEMEntitySolverOptions(
+            model="stable_neohookean",
+        ),
     ),
 )
 ```

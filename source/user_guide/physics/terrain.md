@@ -44,7 +44,7 @@ A terrain is a static rigid entity backed by a height field: a 2D array `height_
 So grid cell `(i, j)` sits at world position `(i * horizontal_scale, j * horizontal_scale, height_field[i, j] * vertical_scale)`, offset by the morph's `pos`. Genesis World turns this grid into two representations at build time: a height map and SDF for collision queries, and a watertight triangle mesh for rendering.
 
 :::{note}
-Genesis World computes the terrain's collision SDF resolution automatically, ignoring any resolution set on `gs.materials.Rigid()`.
+Genesis World computes the terrain's collision SDF resolution automatically, ignoring any resolution set in {py:class}`gs.options.RigidEntitySolverOptions <genesis.options.entities.RigidEntitySolverOptions>`.
 :::
 
 ## Procedural sub-terrains

@@ -31,12 +31,23 @@ scene = gs.Scene(
 )
 ```
 
-Selecting the coupler is a single line: pass {py:class}`SAPCouplerOptions <genesis.options.solvers.SAPCouplerOptions>`() as `coupler_options`. Everything else is a normal Genesis scene. Add FEM entities with an elastic material and step as usual:
+Selecting the coupler is a single line: pass {py:class}`SAPCouplerOptions <genesis.options.solvers.SAPCouplerOptions>`() as `coupler_options`. Everything else is a normal Genesis scene. Add FEM entities with {py:class}`gs.options.FEMEntityOptions <genesis.options.entities.FEMEntityOptions>` and an elastic material, and step as usual:
 
 ```python
 sphere = scene.add_entity(
-    morph=gs.morphs.Sphere(pos=(0.0, 0.0, 0.1), radius=0.1),
-    material=gs.materials.FEM.Elastic(model="linear_corotated", E=1e5, nu=0.4),
+    options=gs.options.FEMEntityOptions(
+        morph=gs.morphs.Sphere(
+            pos=(0.0, 0.0, 0.1),
+            radius=0.1,
+        ),
+        material=gs.materials.Elastic(
+            youngs_modulus=1e5,  # Pa
+            poisson_ratio=0.4,
+        ),
+        solver_options=gs.options.FEMEntitySolverOptions(
+            model="linear_corotated",
+        ),
+    ),
 )
 ```
 
@@ -117,4 +128,4 @@ To hold a target vertex of an FEM body in place (a fixed constraint rather than 
 
 - {doc}`IPC coupler </user_guide/physics/coupling/ipc_coupler>`: barrier-based contact for cloth and highly deformable bodies.
 - {doc}`Solvers and coupling </user_guide/physics/coupling/index>`: how solvers and couplers fit together.
-- {doc}`FEM options </api_reference/engine/solvers/fem_solver>` and {doc}`FEM elastic material </api_reference/engine/material/fem/elastic>`: configuring the deformable bodies SAP couples.
+- {doc}`FEM options </api_reference/engine/solvers/fem_solver>`, {doc}`FEM entity options </api_reference/engine/entity/fem_entity>` and {doc}`Elastic material </api_reference/options/material/elastic>`: configuring the deformable bodies SAP couples.

@@ -38,11 +38,6 @@ A state holds the runtime data of a simulation: positions, velocities, forces, a
     :members:
     :undoc-members:
     :show-inheritance:
-
-.. autoclass:: genesis.engine.states.solvers.ToolSolverState
-    :members:
-    :undoc-members:
-    :show-inheritance:
 ```
 
 ## Per-entity states
@@ -64,11 +59,6 @@ A state holds the runtime data of a simulation: positions, velocities, forces, a
     :show-inheritance:
 
 .. autoclass:: genesis.engine.states.entities.SPHEntityState
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. autoclass:: genesis.engine.states.entities.ToolEntityState
     :members:
     :undoc-members:
     :show-inheritance:

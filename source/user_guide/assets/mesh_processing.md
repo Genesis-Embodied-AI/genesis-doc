@@ -115,8 +115,15 @@ Deformable solvers need a volumetric mesh, not a surface. When a mesh drives an 
 
 ```python
 entity = scene.add_entity(
-    morph=gs.morphs.Mesh(file="model.obj"),
-    material=gs.materials.FEM.Elastic(E=1e5, nu=0.4),  # E in Pa, nu dimensionless
+    options=gs.options.FEMEntityOptions(
+        morph=gs.morphs.Mesh(
+            file="model.obj",
+        ),
+        material=gs.materials.Elastic(
+            youngs_modulus=1e5,  # Pa
+            poisson_ratio=0.4,
+        ),
+    ),
 )
 ```
 

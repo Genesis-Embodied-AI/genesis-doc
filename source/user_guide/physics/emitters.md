@@ -2,7 +2,7 @@
 
 An emitter is a nozzle that streams particles into a particle solver as the simulation runs. Where {doc}`Deformables and fluids <beyond_rigid_bodies>` fills a fixed volume of particles once at build time, an emitter injects new particles every step: a faucet, a hose, or a jet of sand that keeps flowing for as long as you call it.
 
-An emitter does not simulate anything itself. It owns a particle entity, pre-allocated with `max_particles` slots, and feeds positions and velocities into that entity's solver. The emitter's material decides which solver runs the particles: `gs.materials.SPH.*` for smoothed-particle hydrodynamics, `gs.materials.MPM.*` for the material point method, and `gs.materials.PBD.*` for position-based dynamics.
+An emitter does not simulate anything itself. It owns a particle entity, pre-allocated with a fixed number of particle slots, and feeds positions and velocities into that entity's solver. The class of the emitter's entity options decides which solver runs the particles: {py:class}`gs.options.SPHEntityOptions <genesis.options.entities.SPHEntityOptions>` for smoothed-particle hydrodynamics, {py:class}`gs.options.MPMEntityOptions <genesis.options.entities.MPMEntityOptions>` for the material point method, and {py:class}`gs.options.PBDLiquidEntityOptions <genesis.options.entities.PBDLiquidEntityOptions>` or {py:class}`gs.options.PBDParticleEntityOptions <genesis.options.entities.PBDParticleEntityOptions>` for position-based dynamics.
 
 The complete script is [`examples/coupling/water_wheel.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/coupling/water_wheel.py):
 
@@ -20,9 +20,15 @@ scene = gs.Scene(
 scene.add_entity(gs.morphs.Plane())
 
 emitter = scene.add_emitter(
-    material=gs.materials.SPH.Liquid(),
-    max_particles=100000,
-    surface=gs.surfaces.Glass(color=(0.7, 0.85, 1.0, 0.7)),
+    gs.options.SPHEntityOptions(
+        morph=gs.morphs.Nowhere(
+            n_particles=100000,
+        ),
+        surface=gs.surfaces.Glass(
+            color=(0.7, 0.85, 1.0, 0.7),
+        ),
+        material=gs.materials.Liquid(),
+    ),
 )
 
 scene.build()
@@ -44,14 +50,20 @@ for i in range(500):
 
 ```python
 emitter = scene.add_emitter(
-    material=gs.materials.SPH.Liquid(),
-    max_particles=100000,
-    surface=gs.surfaces.Glass(color=(0.7, 0.85, 1.0, 0.7)),
+    gs.options.SPHEntityOptions(
+        morph=gs.morphs.Nowhere(
+            n_particles=100000,
+        ),
+        surface=gs.surfaces.Glass(
+            color=(0.7, 0.85, 1.0, 0.7),
+        ),
+        material=gs.materials.Liquid(),
+    ),
 )
 ```
 
-- `material` selects the solver and the physical behavior. Pass any MPM or SPH material ({py:class}`gs.materials.SPH.Liquid <genesis.engine.materials.SPH.liquid.Liquid>`, {py:class}`gs.materials.MPM.Liquid <genesis.engine.materials.MPM.liquid.Liquid>`, or {py:class}`gs.materials.MPM.Sand <genesis.engine.materials.MPM.sand.Sand>`, for example), or one of {py:class}`gs.materials.PBD.Particle <genesis.engine.materials.PBD.particle.Particle>` and {py:class}`gs.materials.PBD.Liquid <genesis.engine.materials.PBD.liquid.Liquid>`. Any other material raises at `add_emitter` time.
-- `max_particles` caps how many particles the emitter holds. Once emission reaches the cap, the emitter recycles the oldest particles, so a long-running stream stays bounded in memory. Default is `20000`.
+- The class of the options selects the solver, and their `material` the physical behavior. Pass `gs.options.SPHEntityOptions`, `gs.options.MPMEntityOptions`, `gs.options.PBDLiquidEntityOptions`, or `gs.options.PBDParticleEntityOptions`, with a material the solver supports, such as {py:class}`gs.materials.Liquid <genesis.options.materials.Liquid>` or, under MPM, {py:class}`gs.materials.Sand <genesis.options.materials.Sand>`. Any other options class raises at `add_emitter` time.
+- The morph is {py:class}`gs.morphs.Nowhere <genesis.options.morphs.Nowhere>`, whose `n_particles` caps how many particles the emitter holds. Once emission reaches the cap, the emitter recycles the oldest particles, so a long-running stream stays bounded in memory.
 - `surface` controls appearance only. If omitted, the emitter uses `gs.surfaces.Default(color=(0.6, 0.8, 1.0, 1.0))`. `vis_mode="visual"` is not supported for emitters; use the default `"particle"`, or `"recon"` to render a reconstructed fluid surface.
 
 ## Emit each step
@@ -117,14 +129,26 @@ Each emitter owns its own particle entity, so add as many as you need: different
 
 ```python
 emitter_a = scene.add_emitter(
-    material=gs.materials.MPM.Liquid(),
-    max_particles=500000,
-    surface=gs.surfaces.Rough(color=(0.0, 0.9, 0.4, 1.0)),
+    gs.options.MPMEntityOptions(
+        morph=gs.morphs.Nowhere(
+            n_particles=500000,
+        ),
+        surface=gs.surfaces.Rough(
+            color=(0.0, 0.9, 0.4, 1.0),
+        ),
+        material=gs.materials.Liquid(),
+    ),
 )
 emitter_b = scene.add_emitter(
-    material=gs.materials.MPM.Liquid(),
-    max_particles=500000,
-    surface=gs.surfaces.Rough(color=(0.0, 0.4, 0.9, 1.0)),
+    gs.options.MPMEntityOptions(
+        morph=gs.morphs.Nowhere(
+            n_particles=500000,
+        ),
+        surface=gs.surfaces.Rough(
+            color=(0.0, 0.4, 0.9, 1.0),
+        ),
+        material=gs.materials.Liquid(),
+    ),
 )
 
 for i in range(500):

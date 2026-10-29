@@ -1,6 +1,6 @@
 # KinematicSolver
 
-The `KinematicSolver` is a lightweight solver for ghost or reference entities that only computes forward kinematics for visualization. It performs no collision detection, physics integration, or constraint solving, so its entities move exactly as scripted without interacting with the rest of the scene. An entity uses it when built with the `gs.materials.Kinematic` material.
+The `KinematicSolver` is a lightweight solver for ghost or reference entities that only computes forward kinematics for visualization. It performs no collision detection, physics integration, or constraint solving, so its entities move exactly as scripted without interacting with the rest of the scene. It simulates the entities built from `gs.options.KinematicEntityOptions`.
 
 ## Options
 
@@ -19,4 +19,4 @@ The `KinematicSolver` is a lightweight solver for ghost or reference entities th
 
 ## See also
 
-- {doc}`/api_reference/engine/material/kinematic`: the kinematic material that selects this solver.
+- {doc}`/api_reference/engine/entity/kinematic_entity`: the kinematic entity options that select this solver.

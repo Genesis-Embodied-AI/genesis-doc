@@ -73,7 +73,6 @@ Each of these is an optional argument to `gs.Scene(...)`.
 | {py:class}`gs.options.SFOptions <genesis.options.solvers.SFOptions>` | `sf_options` | Stable Fluid solver (Eulerian gaseous simulation). |
 | {py:class}`gs.options.PBDOptions <genesis.options.solvers.PBDOptions>` | `pbd_options` | Position-Based Dynamics solver (cloth, deformables, liquids, particles). |
 | {py:class}`gs.options.KinematicOptions <genesis.options.solvers.KinematicOptions>` | `kinematic_options` | Kinematic (non-dynamic) entities. |
-| {py:class}`gs.options.ToolOptions <genesis.options.solvers.ToolOptions>` | `tool_options` | Legacy tool solver. Slated for deprecation. |
 | {py:class}`gs.options.VisOptions <genesis.options.VisOptions>` | `vis_options` | Visualization independent of any viewer or camera. |
 | {py:class}`gs.options.ViewerOptions <genesis.options.ViewerOptions>` | `viewer_options` | The interactive viewer: camera pose, resolution, refresh rate. |
 | {py:class}`gs.options.ProfilingOptions <genesis.options.profiling.ProfilingOptions>` | `profiling_options` | Timing and FPS reporting. |
@@ -82,27 +81,34 @@ Each of these is an optional argument to `gs.Scene(...)`.
 The solver and coupler options are documented beside their solver and coupler in the {doc}`physics engine reference </api_reference/engine/index>`, the global `SimOptions` under {doc}`Scene </api_reference/engine/index>`, and the viewer, visualization, and renderer options in the {doc}`visualization reference </api_reference/visualization/index>`.
 
 :::{note}
-Not every solver runs in every scene. A solver is active only once you add an entity whose material targets it: adding a rigid entity activates the rigid solver, and so on. Options for an inactive solver are simply unused.
+Not every solver runs in every scene. A solver is active only once you add an entity it simulates: adding a rigid entity activates the rigid solver, and so on. Options for an inactive solver are simply unused.
 :::
 
 ## Per-entity options
 
-`add_entity` takes its own options describing a single entity rather than the scene:
+`add_entity` takes entity options describing a single entity rather than the scene. The class of the options decides the kind of entity and the solver simulating it:
 
 ```python
 franka = scene.add_entity(
-    morph=gs.morphs.MJCF(file="xml/franka_emika_panda/panda.xml"),
-    material=gs.materials.Rigid(),
-    surface=gs.surfaces.Default(),
+    options=gs.options.RigidEntityOptions(
+        morph=gs.morphs.MJCF(
+            file="xml/franka_emika_panda/panda.xml",
+        ),
+        surface=gs.surfaces.Default(),
+        material=gs.materials.Material(),
+    ),
 )
 ```
 
 - **Morph:** the entity's geometry and initial pose. See {doc}`/user_guide/getting_started/hello_genesis` for loading morphs and the {doc}`morph API </api_reference/engine/entity/morph/index>`.
-- **Material:** how the entity responds to physical forces, and which solver simulates it. See {doc}`/user_guide/physics/beyond_rigid_bodies`.
 - **Surface:** how the entity looks when rendered. See {doc}`/user_guide/rendering/surfaces_textures`.
+- **Material:** the physical law the entity follows, such as an elastic solid or a liquid, and its parameters. See {doc}`/user_guide/physics/beyond_rigid_bodies`.
+
+Each options class also holds the settings of its solver that apply to this entity alone, under `solver_options`, and the options of a rigid or FEM entity can single out some of its links, geoms or vertices. {doc}`/user_guide/configuration/entity_options` covers both. For a rigid entity, passing the morph, material and surface straight to `add_entity` is a shorthand for `RigidEntityOptions`.
 
 ## See also
 
+- {doc}`/user_guide/configuration/entity_options`: entity options, solver options per entity, and options per link, geom or vertex.
 - {doc}`/user_guide/getting_started/hello_genesis`: the minimal scene that uses these options.
 - {doc}`/user_guide/interaction/visualization`: the interactive viewer and command-line tools.
 - {doc}`/user_guide/rendering/cameras`: cameras, image types, video, and rendering backends.

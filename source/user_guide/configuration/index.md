@@ -9,6 +9,7 @@ Where Getting Started shows what a program looks like, this section explains why
 concepts
 initialization
 config_system
+entity_options
 conventions
 simulation_tuning
 checkpoints

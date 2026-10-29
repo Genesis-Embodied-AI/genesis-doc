@@ -1,6 +1,6 @@
 # PBDSolver
 
-The `PBDSolver` implements Position Based Dynamics for simulating cloth, soft bodies, and particle systems with fast, stable steps. The materials it supports are listed in {doc}`/api_reference/engine/material/pbd/index`. For the algorithm, its constraint groups, and usage, see {doc}`/user_guide/theory/soft_solvers` and {doc}`/user_guide/physics/beyond_rigid_bodies`.
+The `PBDSolver` implements Position Based Dynamics for simulating cloth, soft bodies, and particle systems with fast, stable steps. It simulates the entities built from the PBD entity options; see {doc}`/api_reference/engine/entity/pbd_entity/index`. For the algorithm, its constraint groups, and usage, see {doc}`/user_guide/theory/soft_solvers` and {doc}`/user_guide/physics/beyond_rigid_bodies`.
 
 ## Options
 
@@ -20,4 +20,4 @@ The `PBDSolver` implements Position Based Dynamics for simulating cloth, soft bo
 ## See also
 
 - {doc}`/api_reference/engine/entity/pbd_entity/index`: PBD entities.
-- {doc}`/api_reference/engine/material/pbd/index`: PBD materials.
+- {doc}`/api_reference/engine/entity/pbd_entity/index`: the PBD entity options and the materials they accept.

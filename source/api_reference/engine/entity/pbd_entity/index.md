@@ -1,6 +1,6 @@
 # PBD entities
 
-The Position Based Dynamics solver simulates several entity types, one per PBD material: cloth, elastic volumes, and free particles. The concrete class depends on the material you assign.
+The Position Based Dynamics solver simulates several entity types: cloth, elastic volumes, liquids, and free particles. The entity options class decides which one `add_entity` builds.
 
 ```{toctree}
 :titlesonly:

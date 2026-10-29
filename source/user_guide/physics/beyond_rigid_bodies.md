@@ -1,19 +1,19 @@
 # Deformables and fluids
 
-The {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` tutorial simulated a rigid robot. That same `Scene` can hold water, sand, cloth, and soft tissue at the same time, because Genesis World unifies several physics **solvers** under one scene. A solver is the set of algorithms that advances one family of materials; the material you assign to an entity decides which solver simulates it.
+The {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` tutorial simulated a rigid robot. That same `Scene` can hold water, sand, cloth, and soft tissue at the same time, because Genesis World unifies several physics **solvers** under one scene. A solver is the set of algorithms that advances one family of materials; the class of the entity options you add an entity with decides which solver simulates it.
 
 Choose a solver from the table below, then follow its linked example for the full script.
 
 ## Choosing a solver
 
-Every entity carries a `material`. In {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` the material defaulted to `gs.materials.Rigid()`, so the rigid solver handled the arm. Assign a material from a different family and its solver runs instead:
+Every entity is built from entity options, whose class decides the solver, and which carry a `material` stating the physical law the entity follows. In {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` the arm was added from a morph alone, which builds a rigid entity, so the rigid solver handled it. Add an entity with options of another class and its solver runs instead:
 
-| Solver | Representation | Use it when you need | Materials (`gs.materials.<S>.*`) |
-|---|---|---|---|
-| **MPM** (Material Point Method) | Hybrid particles + background grid | The widest range of continuum materials in one solver: elastic, plastic, sand, snow | `Elastic`, `Liquid`, `ElastoPlastic`, `Sand`, `Snow`, `Muscle` |
-| **FEM** (Finite Element Method) | Tetrahedral mesh | Accurate elasticity and volumetric muscles, where mesh fidelity matters | `Elastic`, `Cloth`, `Muscle` |
-| **PBD** (Position-Based Dynamics) | Particles + constraints | Fast cloth, ropes, and topology-preserving deformables | `Cloth`, `Elastic`, `Liquid`, `Particle` |
-| **SPH** (Smoothed-Particle Hydrodynamics) | Particles (Lagrangian) | Free-surface liquids driven by real fluid parameters | `Liquid` |
+| Solver | Representation | Use it when you need | Entity options (`gs.options.*`) | Materials (`gs.materials.*`) |
+|---|---|---|---|---|
+| **MPM** (Material Point Method) | Hybrid particles + background grid | The widest range of continuum materials in one solver: elastic, plastic, sand, snow | `MPMEntityOptions` | `Elastic`, `Liquid`, `ElastoPlastic`, `Sand`, `Snow`, `Muscle` |
+| **FEM** (Finite Element Method) | Tetrahedral mesh | Accurate elasticity and volumetric muscles, where mesh fidelity matters | `FEMEntityOptions` | `Elastic`, `Cloth`, `Muscle` |
+| **PBD** (Position-Based Dynamics) | Particles + constraints | Fast cloth, ropes, and topology-preserving deformables | `PBDClothEntityOptions`, `PBDElasticEntityOptions`, `PBDLiquidEntityOptions`, `PBDParticleEntityOptions` | `Cloth`, `Elastic`, `Liquid` |
+| **SPH** (Smoothed-Particle Hydrodynamics) | Particles (Lagrangian) | Free-surface liquids driven by real fluid parameters | `SPHEntityOptions` | `Liquid` |
 
 MPM and SPH also power {doc}`particle emitters <emitters>`; MPM and FEM power {doc}`volumetric soft robots <soft_robots>`.
 
@@ -39,13 +39,23 @@ mpm_options=gs.options.MPMOptions(
 )
 ```
 
-**3. Set the material and how it renders.** Swap the entity's `material` to pick the solver, and pass a `surface` to control appearance. `vis_mode="particle"` draws the underlying particles; `vis_mode="visual"` deforms the original mesh to follow the internal state (called *skinning* in computer graphics).
+**3. Pick the solver, the material, and how it renders.** Choose the class of the entity options to pick the solver, such as {py:class}`gs.options.MPMEntityOptions <genesis.options.entities.MPMEntityOptions>`, give it a material such as {py:class}`gs.materials.Elastic <genesis.options.materials.Elastic>`, and pass a `surface` to control appearance. `vis_mode="particle"` draws the underlying particles; `vis_mode="visual"` deforms the original mesh to follow the internal state (called *skinning* in computer graphics).
 
 ```python
 obj = scene.add_entity(
-    material=gs.materials.MPM.Elastic(),
-    morph=gs.morphs.Box(pos=(0.0, -0.5, 0.25), size=(0.2, 0.2, 0.2)),
-    surface=gs.surfaces.Default(color=(1.0, 0.4, 0.4), vis_mode="visual"),
+    options=gs.options.MPMEntityOptions(
+        morph=gs.morphs.Box(
+            pos=(0.0, -0.5, 0.25),
+            size=(0.2, 0.2, 0.2),
+        ),
+        surface=gs.surfaces.Default(
+            color=(1.0, 0.4, 0.4),
+            vis_mode="visual",
+        ),
+        material=gs.materials.Elastic(
+            youngs_modulus=3e5,
+        ),
+    ),
 )
 ```
 
@@ -56,9 +66,9 @@ The Material Point Method carries mass on particles while resolving forces on a 
 Only the `material` differs between an elastic cube, a liquid cube, and an elastoplastic sphere:
 
 ```python
-scene.add_entity(material=gs.materials.MPM.Elastic(), ...)
-scene.add_entity(material=gs.materials.MPM.Liquid(), ...)
-scene.add_entity(material=gs.materials.MPM.ElastoPlastic(), ...)
+scene.add_entity(options=gs.options.MPMEntityOptions(material=gs.materials.Elastic(youngs_modulus=3e5), ...))
+scene.add_entity(options=gs.options.MPMEntityOptions(material=gs.materials.Liquid(), ...))
+scene.add_entity(options=gs.options.MPMEntityOptions(material=gs.materials.ElastoPlastic(), ...))
 ```
 
 Full script: [`examples/tutorials/mpm.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/mpm.py).
@@ -70,13 +80,13 @@ Three MPM objects falling and deforming: an elastic cube, a liquid cube, and an 
 
 ## FEM: accurate elasticity and muscles
 
-The Finite Element Method discretizes an entity into a tetrahedral mesh and solves the elasticity equations on it. Choose FEM over MPM when mesh-level accuracy matters: stiff elastic bodies, volumetric muscles, and contact-rich soft-body manipulation. {py:class}`gs.materials.FEM.Elastic <genesis.engine.materials.FEM.elastic.Elastic>` exposes the physical parameters directly, such as Young's modulus `E` (Pa) and Poisson ratio `nu`.
+The Finite Element Method discretizes an entity into a tetrahedral mesh and solves the elasticity equations on it. Choose FEM over MPM when mesh-level accuracy matters: stiff elastic bodies, volumetric muscles, and contact-rich soft-body manipulation. Under {py:class}`gs.options.FEMEntityOptions <genesis.options.entities.FEMEntityOptions>`, an `Elastic` material exposes the physical parameters directly, such as Young's modulus `youngs_modulus` (Pa) and Poisson ratio `poisson_ratio`.
 
 FEM underpins the {doc}`soft robots tutorial <soft_robots>`, which actuates a volumetric muscle. FEM entities also couple to rigid arms for grasping; see [`examples/coupling/fem_cube_linked_with_arm.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/coupling/fem_cube_linked_with_arm.py).
 
 ## PBD: cloth and topology-preserving deformables
 
-Position-Based Dynamics represents an entity as particles linked by constraints and solves for positions directly, which makes it fast and stable for cloth, ropes, and other 1D/2D/3D bodies that keep their topology. {py:class}`gs.materials.PBD.Cloth <genesis.engine.materials.PBD.cloth.Cloth>` loads a 2D mesh as a sheet.
+Position-Based Dynamics represents an entity as particles linked by constraints and solves for positions directly, which makes it fast and stable for cloth, ropes, and other 1D/2D/3D bodies that keep their topology. {py:class}`gs.options.PBDClothEntityOptions <genesis.options.entities.PBDClothEntityOptions>` loads a 2D mesh as a sheet of {py:class}`gs.materials.Cloth <genesis.options.materials.Cloth>`.
 
 You can pin individual particles after building. `find_closest_particle` locates the particle nearest a world-space point (meters), and `fix_particles` anchors it:
 
@@ -101,15 +111,23 @@ Skinning a flat 2D cloth mesh with `vis_mode="visual"` can produce degenerate ba
 
 ## SPH: free-surface liquids
 
-Smoothed-Particle Hydrodynamics is a purely Lagrangian (particle-only) solver aimed at liquids. Use SPH when you want fluid governed by physical parameters (rest density `rho` in kg/m³, viscosity `mu`, and surface tension `gamma`) rather than the coarser liquid model MPM provides.
+Smoothed-Particle Hydrodynamics is a purely Lagrangian (particle-only) solver aimed at liquids. Use SPH when you want fluid governed by physical parameters (rest density `density` in kg/m³, `viscosity`, and `surface_tension` of {py:class}`gs.materials.Liquid <genesis.options.materials.Liquid>`) rather than the coarser liquid model MPM provides.
 
-Turning a rigid block into water is one line: give it an SPH liquid material. Tune the flow with its parameters:
+Turning a rigid block into water takes one change: add it with {py:class}`gs.options.SPHEntityOptions <genesis.options.entities.SPHEntityOptions>`, whose material defaults to `gs.materials.Liquid()`. Tune the flow with the parameters of the material:
 
 ```python
 liquid = scene.add_entity(
-    material=gs.materials.SPH.Liquid(),  # or Liquid(mu=0.02, gamma=0.02) for a thicker fluid
-    morph=gs.morphs.Box(pos=(0.0, 0.0, 0.65), size=(0.4, 0.4, 0.4)),
-    surface=gs.surfaces.Default(color=(0.4, 0.8, 1.0), vis_mode="particle"),
+    options=gs.options.SPHEntityOptions(
+        morph=gs.morphs.Box(
+            pos=(0.0, 0.0, 0.65),
+            size=(0.4, 0.4, 0.4),
+        ),
+        surface=gs.surfaces.Default(
+            color=(0.4, 0.8, 1.0),
+            vis_mode="particle",
+        ),
+        material=gs.materials.Liquid(),  # or Liquid(viscosity=0.02, surface_tension=0.02) for a thicker fluid
+    ),
 )
 ```
 
@@ -123,7 +141,7 @@ An SPH liquid block collapsing and spreading across the ground, contained within
 </video>
 
 :::{note}
-The `Liquid` material accepts a `sampler` that controls how particles fill the morph: `"regular"` (a grid lattice, the SPH default for numerical stability), `"pbs"` (physics-based sampling, which runs extra steps for a natural arrangement), or `"random"`.
+{py:class}`gs.options.SPHEntitySolverOptions <genesis.options.entities.SPHEntitySolverOptions>` accepts a `sampler` that controls how particles fill the morph: `"regular"` (a grid lattice, the SPH default for numerical stability), `"pbs"` (physics-based sampling, which runs extra steps for a natural arrangement), or `"random"`.
 :::
 
 ## SF: gaseous phenomena (smoke)

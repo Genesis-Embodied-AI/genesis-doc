@@ -1,5 +1,15 @@
 # RigidEntity
 
+## Options
+
+```{eval-rst}
+.. autoclass:: genesis.options.entities.RigidEntityOptions
+
+.. autoclass:: genesis.options.entities.RigidEntitySolverOptions
+```
+
+## RigidEntity
+
 ```{eval-rst}
 .. autoclass:: genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity
     :members:

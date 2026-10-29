@@ -3,7 +3,7 @@
 A **surface** describes how an entity *looks* when rendered: its color, glossiness, transparency, and texture maps. Every entity takes up to three independent descriptions:
 
 - a {doc}`morph </api_reference/engine/entity/morph/index>`: geometry and initial pose,
-- a {doc}`material </api_reference/engine/material/index>`: physical behavior (mass, stiffness, friction),
+- a {doc}`material </api_reference/options/material/index>`: physical behavior (mass, stiffness, friction),
 - a {doc}`surface </api_reference/engine/entity/surface/index>`: visual appearance, the subject of this page.
 
 Changing a surface never changes how an entity moves or collides; it only changes the rendered image. If you omit the surface, Genesis World uses {py:class}`gs.surfaces.Default <genesis.options.surfaces.Default>` (a Disney principled BSDF) and honors any material the asset file already defines.
@@ -135,18 +135,23 @@ Enable it on the fluid's surface with `generate_foam=True`, and tune the look wi
 
 ```python
 scene.add_entity(
-    material=gs.materials.SPH.Liquid(),
-    morph=gs.morphs.Box(pos=(0.0, 0.0, 0.5), size=(0.4, 0.4, 0.4)),
-    surface=gs.surfaces.Water(
-        vis_mode="recon",  # foam sits on the reconstructed fluid surface
-        generate_foam=True,
-        foam_options=gs.options.FoamOptions(
-            radius_scale=0.2,  # foam particle radius relative to a fluid particle
-            k_foam=1000.0,  # foam particles generated per frame
-            spray_decay=2.0,
-            foam_decay=1.0,
-            bubble_decay=5.0,
+    options=gs.options.SPHEntityOptions(
+        morph=gs.morphs.Box(
+            pos=(0.0, 0.0, 0.5),
+            size=(0.4, 0.4, 0.4),
         ),
+        surface=gs.surfaces.Water(
+            vis_mode="recon",  # foam sits on the reconstructed fluid surface
+            generate_foam=True,
+            foam_options=gs.options.FoamOptions(
+                radius_scale=0.2,  # foam particle radius relative to a fluid particle
+                k_foam=1000.0,  # foam particles generated per frame
+                spray_decay=2.0,
+                foam_decay=1.0,
+                bubble_decay=5.0,
+            ),
+        ),
+        material=gs.materials.Liquid(),
     ),
 )
 ```

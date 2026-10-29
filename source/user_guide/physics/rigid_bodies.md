@@ -4,14 +4,22 @@ A rigid body is the default kind of entity in Genesis World: a solid that does n
 
 ## Adding a rigid body
 
-An entity is rigid whenever its `material` is {py:class}`gs.materials.Rigid <genesis.engine.materials.rigid.Rigid>`, which is the default, so you usually pass only a {doc}`morph </user_guide/assets/loading_assets>`:
+`scene.add_entity` adds a rigid entity whenever it gets a {doc}`morph </user_guide/assets/loading_assets>` rather than entity options, so you usually pass only the morph:
 
 ```python
 box = scene.add_entity(gs.morphs.Box(pos=(0, 0, 0.5), size=(0.2, 0.2, 0.2)))
 franka = scene.add_entity(gs.morphs.MJCF(file="xml/franka_emika_panda/panda.xml"))
 ```
 
-Both are rigid entities. The box is a single body; the Franka is **articulated**, a tree of rigid **links** connected by **joints**.
+Both are rigid entities. The box is a single body; the Franka is **articulated**, a tree of rigid **links** connected by **joints**. The same entities written out in full take {py:class}`gs.options.RigidEntityOptions <genesis.options.entities.RigidEntityOptions>`, which also hold the settings of the rigid solver specific to the entity and the options of individual links and geoms:
+
+```python
+box = scene.add_entity(
+    options=gs.options.RigidEntityOptions(
+        morph=gs.morphs.Box(pos=(0, 0, 0.5), size=(0.2, 0.2, 0.2)),
+    ),
+)
+```
 
 ## Single bodies and articulated bodies
 
@@ -29,15 +37,15 @@ Whether an entity's base is bolted to the world or floats freely depends on the 
 
 ## Physical properties
 
-The rigid material sets how a body interacts physically. Pass a configured `gs.materials.Rigid` to override the defaults:
+The material sets how a body interacts physically. Pass a configured {py:class}`gs.materials.Material <genesis.options.materials.Material>` to override the defaults:
 
 ```python
 box = scene.add_entity(
     gs.morphs.Box(pos=(0, 0, 0.5), size=(0.2, 0.2, 0.2)),
-    material=gs.materials.Rigid(
-        rho=1000.0,               # density in kg/m3, used to estimate mass
-        friction=1.0,             # sliding (Coulomb) friction coefficient
-        friction_torsional=0.005, # resists spin about the contact normal (meters)
+    material=gs.materials.Material(
+        density=1000.0,  # kg/m3, used to estimate mass
+        friction=1.0,  # sliding (Coulomb) friction coefficient
+        friction_torsional=0.005,  # resists spin about the contact normal (meters)
         friction_rolling=0.0001,  # resists rolling about the tangent axes (meters)
     ),
 )
