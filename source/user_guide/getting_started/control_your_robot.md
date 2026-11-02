@@ -140,11 +140,11 @@ Two accessors report the forces at each dof after a step:
 ```python
 # force applied by the controller
 print("control force:", franka.get_dofs_control_force(motors_dof_idx))
-# actual force experienced by each dof
+# control force plus passive forces, minus bias forces
 print("internal force:", franka.get_dofs_force(motors_dof_idx))
 ```
 
-`get_dofs_control_force` is what the controller commanded, computed from the target and gains under position or velocity control, and equal to your input under force control. `get_dofs_force` is the total force the dof actually experiences, combining that control force with internal effects such as contact and Coriolis forces.
+Both report the force over the last step. `get_dofs_control_force` is the force the controller applied, computed from the target and gains under position or velocity control, equal to your input under force control, and clamped to the force range of the dof. A target set since the last step shows only in the force of the next step. `get_dofs_force` adds the passive damping and stiffness forces to that control force and subtracts the bias forces of gravity, Coriolis and centrifugal effects. It leaves out constraint, contact and external forces.
 
 Running the full example produces this sequence:
 

@@ -63,10 +63,10 @@ Termination is the classic place a sync sneaks in. Computing which environments 
 self.reset_buf = self.episode_length_buf > self.max_episode_length
 self.reset_buf |= torch.abs(self.base_euler[:, 1]) > self.env_cfg["termination_if_pitch_greater_than"]
 self.reset_buf |= torch.abs(self.base_euler[:, 0]) > self.env_cfg["termination_if_roll_greater_than"]
-self.reset_buf |= self.scene.rigid_solver.get_error_envs_mask()
+self.reset_buf |= self.scene.get_error_envs_mask()
 ```
 
-The last line folds in numerical divergence. When the solver hits a NaN or a constraint failure in some environment, `scene.rigid_solver.get_error_envs_mask()` returns a `(n_envs,)` boolean mask of the affected environments. Reset those with the same machinery as a normal episode end, so a single diverged environment terminates on its own instead of crashing the batch.
+The last line folds in numerical divergence. When any solver hits a NaN, a contact overflow, or a constraint failure in some environment, `scene.get_error_envs_mask()` returns a `(n_envs,)` boolean mask of the affected environments. A flagged error raises at the start of the next step until it is cleared, either by resetting the environment or with `scene.clear_errno(envs_idx)`. Reset those environments with the same machinery as a normal episode end, so a single diverged environment terminates on its own instead of crashing the batch.
 
 Genesis World setters and the solver accept a boolean `envs_idx` mask directly, so you never have to materialize indices to use one.
 
