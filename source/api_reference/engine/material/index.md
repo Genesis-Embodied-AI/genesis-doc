@@ -13,7 +13,6 @@ Materials live under `gs.materials`. Each family maps to one solver, and the cla
 | `gs.materials.SPH.*` | Smoothed Particle Hydrodynamics | `Liquid` |
 | `gs.materials.SF.*` | Stable Fluid | `Smoke` |
 | `gs.materials.Hybrid` | Rigid + deformable coupling | `Hybrid` |
-| `gs.materials.Tool` | Kinematic collider coupling | `Tool` |
 | `gs.materials.Kinematic` | None (visualization only) | `Kinematic` |
 
 `gs.materials.Hybrid` pairs a rigid material with a soft one, running both solvers to simulate a soft skin actuated by an inner rigid skeleton.
@@ -30,6 +29,5 @@ pbd/index
 sph
 sf
 hybrid
-tool
 kinematic
 ```

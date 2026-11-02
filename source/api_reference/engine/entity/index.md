@@ -24,7 +24,6 @@ Each physics solver has its own entity type. Choosing a material selects the sol
 - **PBD entities:** cloth, ropes, and particle-based fluids simulated by the Position Based Dynamics (PBD) solver. The material determines the concrete type: for example `PBD2DEntity` for cloth and `PBD3DEntity` for elastic volumes.
 - **`SPHEntity`:** liquids and gases simulated with the Smoothed Particle Hydrodynamics (SPH) solver.
 - **`SFParticleEntity`:** smoke and gaseous media simulated with the Stable Fluid (SF) solver.
-- **`ToolEntity`:** a kinematically-scripted collider that couples one-way with soft and particle-based entities to push or deform them.
 - **`HybridEntity`:** an entity composed of both rigid and soft components, used to couple, for example, a soft body to a rigid skeleton.
 - **`Emitter`:** a helper that continuously injects particles into a particle-based entity during simulation, for spraying and streaming effects.
 
@@ -40,7 +39,6 @@ sf_entity
 drone_entity
 terrain_entity
 hybrid_entity
-tool_entity
 emitter
 ```
 
