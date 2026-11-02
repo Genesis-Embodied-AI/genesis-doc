@@ -4,10 +4,6 @@ A solver is the physics engine for one class of material. Each solver owns the e
 
 You rarely construct a solver directly. Add an entity with a material and the scene routes it to the matching solver; configure that solver through its options object. For how to combine solvers in one scene and choose between them, see {doc}`/user_guide/physics/beyond_rigid_bodies` and {doc}`/user_guide/physics/coupling/index`.
 
-:::{note}
-`ToolSolver` is a temporary solver for one-way differentiable coupling from a rigid tool to soft bodies. It will be removed once the `RigidSolver` supports differentiability directly.
-:::
-
 ```{toctree}
 :titlesonly:
 
@@ -17,7 +13,6 @@ fem_solver
 pbd_solver
 sph_solver
 sf_solver
-tool_solver
 kinematic_solver
 ```
 

@@ -161,7 +161,7 @@ The patterns above are the defaults, so most Isaac Sim assets need no configurat
 (material-baking)=
 ## Material baking
 
-`usd-core` parses `UsdPreviewSurface` materials, which covers most assets. Materials built on other shader networks require NVIDIA Omniverse Kit to bake them into a supported form. Baking is available on Python 3.10 and 3.11 with a GPU backend:
+`usd-core` parses `UsdPreviewSurface` materials, which covers most assets. Materials built on other shader networks require NVIDIA Omniverse Kit to bake them into a supported form. Baking needs a GPU backend and Omniverse Kit 107 or later:
 
 ```bash
 pip install --extra-index-url https://pypi.nvidia.com/ omniverse-kit
