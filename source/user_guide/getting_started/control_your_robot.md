@@ -57,7 +57,7 @@ motors_dof_idx = [franka.get_joint(name).dofs_idx_local[0] for name in joints_na
 
 ## Control gains
 
-Position and velocity control run through a PD controller with two gains. `kp` (stiffness) scales the force by the distance to the target, and `kv` (damping) opposes the motion in proportion to the current velocity, which keeps the dof from overshooting. Genesis World parses both from the MJCF or URDF file when the model provides them, but setting them explicitly makes the behavior reproducible. `set_dofs_force_range` caps the controller's output.
+Position and velocity control run through a PD controller with two gains. `kp` (stiffness) scales the force by the distance to the target, and `kv` (damping) opposes the motion in proportion to the current velocity, which keeps the dof from overshooting. Genesis World parses both from the MJCF or URDF file when the model provides them, but setting them explicitly makes the behavior reproducible. `set_dofs_force_range` caps the controller's output. Under a constant load such as gravity, a PD controller settles slightly short of its target. `set_dofs_ki` adds an integral gain that removes this offset, and {doc}`Joints and actuators </user_guide/physics/joints_and_actuators>` covers when to use it.
 
 ```python
 franka.set_dofs_kp(
