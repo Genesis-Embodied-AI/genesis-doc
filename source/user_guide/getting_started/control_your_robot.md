@@ -1,6 +1,6 @@
 # Control your robot
 
-Without actuation, the arm from {doc}`hello_genesis` falls under gravity. Genesis World has a built-in [PD controller](https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller) that takes a target joint position or velocity, plus a force path that bypasses it. This tutorial covers both, plus writing the joint state without going through physics. The complete script is [`examples/tutorials/control_your_robot.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/control_your_robot.py).
+Without actuation, the arm from {doc}`hello_genesis` falls under gravity. Genesis World has a built-in [PID controller](https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller) that takes a target joint position or velocity, plus a force path that bypasses it. This tutorial covers both, plus writing the joint state without going through physics. The complete script is [`examples/tutorials/control_your_robot.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/tutorials/control_your_robot.py).
 
 ## Scene setup
 
@@ -57,7 +57,7 @@ motors_dof_idx = [franka.get_joint(name).dofs_idx_local[0] for name in joints_na
 
 ## Control gains
 
-Position and velocity control run through a PD controller with two gains. `kp` (stiffness) scales the force by the distance to the target, and `kv` (damping) opposes the motion in proportion to the current velocity, which keeps the dof from overshooting. Genesis World parses both from the MJCF or URDF file when the model provides them, but setting them explicitly makes the behavior reproducible. `set_dofs_force_range` caps the controller's output. Under a constant load such as gravity, a PD controller settles slightly short of its target. `set_dofs_ki` adds an integral gain that removes this offset, and {doc}`Joints and actuators </user_guide/physics/joints_and_actuators>` covers when to use it.
+Position and velocity control run through a PID controller with three gains. `kp` (stiffness) scales the force by the distance to the target, `kv` (damping) opposes the motion in proportion to the current velocity, which keeps the dof from overshooting, and `ki` (integral) removes the offset that a constant load such as gravity leaves at the target. Genesis World parses `kp` and `kv` from the MJCF or URDF file when the model provides them, but setting them explicitly makes the behavior reproducible. `ki` is zero by default, and {doc}`Joints and actuators </user_guide/physics/joints_and_actuators>` covers when to set it. `set_dofs_force_range` caps the controller's output.
 
 ```python
 franka.set_dofs_kp(
@@ -124,7 +124,7 @@ franka.control_dofs_velocity(
 )
 ```
 
-`control_dofs_force` applies a torque (or force, for prismatic dofs) directly, skipping the PD controller. Commanding zero force lets gravity take over and the arm falls:
+`control_dofs_force` applies a torque (or force, for prismatic dofs) directly, skipping the PID controller. Commanding zero force lets gravity take over and the arm falls:
 
 ```python
 franka.control_dofs_force(
