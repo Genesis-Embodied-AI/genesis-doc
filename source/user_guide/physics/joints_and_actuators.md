@@ -33,17 +33,22 @@ Armature matters most for small, fast links such as fingers and the distal joint
 
 ## Actuator parameters
 
-`control_dofs_position` and `control_dofs_velocity` drive a dof through a PD controller. Its gains and the force it may apply are dof parameters too:
+`control_dofs_position` and `control_dofs_velocity` drive a dof through a PID controller. Its gains and the force it may apply are dof parameters too:
 
 | Parameter | Setter | Effect |
 |---|---|---|
 | Position gain | `set_dofs_kp` | Force per unit of position error. |
 | Velocity gain | `set_dofs_kv` | Force per unit of velocity error. |
+| Integral gain | `set_dofs_ki` | Force per unit of accumulated error: the position error integrated over time under position control, and the velocity error under velocity control. |
 | Force range | `set_dofs_force_range` | Lower and upper bound on the actuator force, in N·m or N. The controller output is clipped to it. |
 
-`control_dofs_force` skips the PD controller and applies the force directly, still clipped to the force range. {doc}`Control your robot </user_guide/getting_started/control_your_robot>` shows the three control modes together.
+With `ki` at zero, a joint holding a constant load, such as an arm against gravity, settles short of its target, because the position gain only pushes back once there is an error to push against. The integral term removes that offset: it grows for as long as the error persists, until it carries the load by itself. Under velocity control, the same term closes the gap between the velocity of the dof and its target. The cost is overshoot and slower settling, both growing with the gain, so we leave `ki` at zero by default and recommend setting it only on the dofs that hold a load.
 
-For actuators that a PD controller does not describe, `set_dofs_act_gain` and `set_dofs_act_bias` set a general affine actuator: the force is the gain times the command, plus a bias made of a constant term, a position term, and a velocity term. `set_dofs_kp` and `set_dofs_kv` write into these same values, so a call to `set_dofs_kp` after `set_dofs_act_gain` resets the actuator to a PD controller.
+The accumulated error stops growing while the force sits at the limit of the force range, so a saturated joint does not build up a backlog that it later overshoots to work off. It restarts from zero when the scene is reset, when `set_dofs_position`, `set_qpos`, or another setter zeroes the dof velocities, which they do by default as in the reset of an episode, and when the dof runs a step under another control mode.
+
+`control_dofs_force` skips the PID controller and applies the force directly, still clipped to the force range. {doc}`Control your robot </user_guide/getting_started/control_your_robot>` shows the three control modes together.
+
+For actuators that a PID controller does not describe, `set_dofs_act_gain` and `set_dofs_act_bias` set a general affine actuator: the force is the gain times the command, plus a bias made of a constant term, a position term, and a velocity term. `set_dofs_kp` and `set_dofs_kv` write into these same values, so a call to `set_dofs_kp` after `set_dofs_act_gain` resets the actuator to a PID controller.
 
 ## Different values per environment
 
