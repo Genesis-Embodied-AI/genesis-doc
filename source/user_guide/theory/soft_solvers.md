@@ -1,6 +1,6 @@
 # Soft solvers
 
-Beyond the {doc}`rigid solver <rigid_solver/index>`, Genesis World ships five solvers for continuum and particle materials. Assigning a `material` to an entity selects both the solver that advances it and the **constitutive model** it obeys, the rule that turns deformation into stress. The simulator activates a solver at build time only if it holds at least one entity.
+Beyond the {doc}`rigid solver <rigid_solver/index>`, Genesis World ships four solvers for continuum and particle materials. Assigning a `material` to an entity selects both the solver that advances it and the **constitutive model** it obeys, the rule that turns deformation into stress. The simulator activates a solver at build time only if it holds at least one entity.
 
 To pick a solver and run one, see {doc}`/user_guide/physics/beyond_rigid_bodies`. For how forces cross material boundaries, see {doc}`/user_guide/physics/coupling/index`.
 
@@ -12,9 +12,8 @@ To pick a solver and run one, see {doc}`/user_guide/physics/beyond_rigid_bodies`
 | **FEM** (Finite Element Method) | Stiff elastic solids, volumetric muscles, thin shells | Tetrahedral mesh |
 | **PBD** (Position-Based Dynamics) | Cloth, ropes, topology-preserving deformables | Particles linked by constraints |
 | **SPH** (Smoothed-Particle Hydrodynamics) | Free-surface liquids | Particles |
-| **SF** (Stable Fluids) | Smoke and gas | Fixed Eulerian grid |
 
-A **kinematic** solver for scripted motion and a **tool** solver for driven manipulators round out the set, and a material selects them as it does the five above: `gs.materials.Kinematic` and `gs.materials.Tool`. The tool solver drives the soft solvers through one-way coupling, while a kinematic entity is rendered only and takes no part in physics.
+A **kinematic** solver for scripted motion and a **tool** solver for driven manipulators round out the set, and a material selects them as it does the four above: `gs.materials.Kinematic` and `gs.materials.Tool`. The tool solver drives the soft solvers through one-way coupling, while a kinematic entity is rendered only and takes no part in physics.
 
 ## Deformation and stress
 

@@ -28,7 +28,7 @@ scene = gs.Scene(
 The options split into three roles, plus a set of per-entity options passed to `add_entity` rather than to the scene:
 
 - **Global.** `SimOptions` sets the properties of the simulation as a whole, and the coupler options set how solvers interact.
-- **Per solver.** One options object per physics solver (rigid, MPM, SPH, FEM, SF, PBD), each configuring that solver alone.
+- **Per solver.** One options object per physics solver (rigid, MPM, SPH, FEM, PBD), each configuring that solver alone.
 - **Visualization.** The viewer, the solver-independent visualization, and the renderer.
 
 ## Every options object shares one base
@@ -70,7 +70,6 @@ Each of these is an optional argument to `gs.Scene(...)`.
 | {py:class}`gs.options.MPMOptions <genesis.options.solvers.MPMOptions>` | `mpm_options` | Material Point Method solver (elastic, plastic, granular, fluid). |
 | {py:class}`gs.options.SPHOptions <genesis.options.solvers.SPHOptions>` | `sph_options` | Smoothed Particle Hydrodynamics solver (fluids, granular flow). |
 | {py:class}`gs.options.FEMOptions <genesis.options.solvers.FEMOptions>` | `fem_options` | Finite Element Method solver (elastic material). |
-| {py:class}`gs.options.SFOptions <genesis.options.solvers.SFOptions>` | `sf_options` | Stable Fluid solver (Eulerian gaseous simulation). |
 | {py:class}`gs.options.PBDOptions <genesis.options.solvers.PBDOptions>` | `pbd_options` | Position-Based Dynamics solver (cloth, deformables, liquids, particles). |
 | {py:class}`gs.options.KinematicOptions <genesis.options.solvers.KinematicOptions>` | `kinematic_options` | Kinematic (non-dynamic) entities. |
 | {py:class}`gs.options.ToolOptions <genesis.options.solvers.ToolOptions>` | `tool_options` | Legacy tool solver. Slated for deprecation. |
