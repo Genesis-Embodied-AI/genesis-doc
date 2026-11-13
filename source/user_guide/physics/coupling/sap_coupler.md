@@ -31,9 +31,10 @@ scene = gs.Scene(
 )
 ```
 
-Selecting the coupler is a single line: pass {py:class}`SAPCouplerOptions <genesis.options.solvers.SAPCouplerOptions>`() as `coupler_options`. Everything else is a normal Genesis scene. Add FEM entities with an elastic material and step as usual:
+Selecting the coupler is a single line: pass {py:class}`SAPCouplerOptions <genesis.options.solvers.SAPCouplerOptions>`() as `coupler_options`. Everything else is a normal Genesis scene. Add a ground plane for the bodies to rest on, then add FEM entities with an elastic material and step as usual:
 
 ```python
+scene.add_entity(gs.morphs.Plane())
 sphere = scene.add_entity(
     morph=gs.morphs.Sphere(pos=(0.0, 0.0, 0.1), radius=0.1),
     material=gs.materials.FEM.Elastic(model="linear_corotated", E=1e5, nu=0.4),
@@ -80,6 +81,8 @@ Three parameters select the contact discretization per pair. Each accepts one of
 | `fem_floor_contact_type` | `"tet"` | `"tet"`, `"vert"`, `"none"` |
 | `rigid_floor_contact_type` | `"tet"` | `"tet"`, `"vert"`, `"none"` |
 | `rigid_rigid_contact_type` | `"tet"` | `"tet"`, `"none"` |
+
+The floor for `fem_floor_contact_type` and `rigid_floor_contact_type` is the rigid ground plane of the scene, added with `gs.morphs.Plane()`. SAP supports a single fixed plane facing up as ground, and raises at build on a terrain, a second plane, or a tilted or movable plane. A scene without a ground plane has no floor contact.
 
 :::{note}
 `rigid_rigid_contact_type` is declared to accept `"vert"`, but the solver only implements `"tet"` and `"none"`; passing `"vert"` raises. Use `"tet"` or `"none"` for rigid-rigid contact.
