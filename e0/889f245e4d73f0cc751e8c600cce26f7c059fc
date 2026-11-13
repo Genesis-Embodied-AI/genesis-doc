@@ -1,0 +1,14 @@
+source/index.md
+  h_ed57f36e04086a 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e0889f245e4d73f0cc751e8c600cce26f7c059fc",
+  "prompts": {},
+  "humans": {
+    "h_ed57f36e04086a": {
+      "author": "Trinity Chung <19580648+Milotrince@users.noreply.github.com>"
+    }
+  }
+}
