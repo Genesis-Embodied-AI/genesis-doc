@@ -1,4 +1,4 @@
-# Genesis World
+# Genesis World is so cool
 
 ![Genesis World teaser: simulated robots and environments rendered in Genesis World](_static/images/genesis_world_teaser.png)
 
