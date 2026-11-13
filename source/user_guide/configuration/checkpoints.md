@@ -137,7 +137,7 @@ for _ in range(50):
 scene.__setstate__(checkpoint)  # back to step 100, and the next 50 steps land where they did
 ```
 
-A restore also restarts what surrounds the state, as a reset does: the gradient tape, the sensors, and the recorders forget the run that led there, and the viewer redraws. The simulated time of each environment comes back as recorded, since it is state. A differentiable scene carries the gradients of its arrays along, so a checkpoint taken after a backward pass restores them.
+A restore also restarts what surrounds the state, as a reset does: the autograd graph of the rollout, the sensors, and the recorders forget the run that led there, and the viewer redraws. The simulated time of each environment comes back as recorded, since it is state. A differentiable scene carries the gradients of its arrays along, so a checkpoint taken after a backward pass restores them.
 
 ## Checkpoint and trajectory files
 

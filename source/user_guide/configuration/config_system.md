@@ -72,7 +72,6 @@ Each of these is an optional argument to `gs.Scene(...)`.
 | {py:class}`gs.options.FEMOptions <genesis.options.solvers.FEMOptions>` | `fem_options` | Finite Element Method solver (elastic material). |
 | {py:class}`gs.options.PBDOptions <genesis.options.solvers.PBDOptions>` | `pbd_options` | Position-Based Dynamics solver (cloth, deformables, liquids, particles). |
 | {py:class}`gs.options.KinematicOptions <genesis.options.solvers.KinematicOptions>` | `kinematic_options` | Kinematic (non-dynamic) entities. |
-| {py:class}`gs.options.ToolOptions <genesis.options.solvers.ToolOptions>` | `tool_options` | Legacy tool solver. Slated for deprecation. |
 | {py:class}`gs.options.VisOptions <genesis.options.VisOptions>` | `vis_options` | Visualization independent of any viewer or camera. |
 | {py:class}`gs.options.ViewerOptions <genesis.options.ViewerOptions>` | `viewer_options` | The interactive viewer: camera pose, resolution, refresh rate. |
 | {py:class}`gs.options.ProfilingOptions <genesis.options.profiling.ProfilingOptions>` | `profiling_options` | Timing and FPS reporting. |

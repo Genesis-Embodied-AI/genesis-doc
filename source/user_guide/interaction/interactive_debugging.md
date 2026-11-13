@@ -134,7 +134,7 @@ The overlay ships behind Genesis World's `render` extras. Install them before en
 pip install "genesis-world[render]"
 ```
 
-If pre-built `imgui-bundle` wheels are unavailable for your Python and OS combination (for example Python 3.10 on Linux aarch64), install with `pip install imgui-bundle`, which builds from source and requires CMake. Enabling the GUI without the dependency raises an error pointing back at this step.
+If pre-built `imgui-bundle` wheels are unavailable for your Python and OS combination, install with `pip install imgui-bundle`, which builds from source and requires CMake. Enabling the GUI without the dependency raises an error pointing back at this step.
 :::
 
 The simplest way to get the panel is to set `enable_gui=True` on `ViewerOptions`. The viewer attaches the overlay for you and lets it manage scene editing internally, so a plain {py:class}`gs.Scene <genesis.engine.scene.Scene>` is the whole setup:
