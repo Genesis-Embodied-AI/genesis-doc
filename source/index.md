@@ -24,6 +24,8 @@ From there, the {doc}`user guide </user_guide/index>` covers installation and th
 
 Genesis World aims to be a transparent, community-driven ecosystem where roboticists and graphics researchers build a fast, physically and visually realistic virtual world together. Contributions of every size are welcome: pull requests for new features, bug reports, and suggestions that make the API more intuitive. See the {doc}`introduction </user_guide/overview/what_is_genesis>` for the longer story.
 
+weeeeeee
+
 ## Support
 
 - Report bugs and request features through GitHub [Issues](https://github.com/Genesis-Embodied-AI/genesis-world/issues).
