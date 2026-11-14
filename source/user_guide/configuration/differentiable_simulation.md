@@ -29,7 +29,7 @@ for _ in range(100):
     scene.step()
 
 target = torch.tensor([1.0, 0.0, 0.5], dtype=gs.tc_float, device=gs.device)
-loss = ((robot.get_state().pos - target) ** 2).sum()
+loss = ((robot.get_pos() - target) ** 2).sum()
 
 loss.backward()  # propagates through every step back to `force`
 print(force.grad)
@@ -38,32 +38,31 @@ print(force.grad)
 ## How autodiff works
 
 - **Enable it once, on the scene:** set `requires_grad=True` in `gs.options.SimOptions`. Each step then saves the state it starts from, and its backward pass replays the step from there. The flag defaults to `False`, so a simulation is non-differentiable unless you opt in; see [Limitations](#limitations) for what differentiable mode costs.
-- **Queried states are differentiable:** `get_state()` on the scene, an entity (`robot.get_state().pos`) or a solver (`scene.rigid_solver.get_state().qpos`) returns states whose tensors carry gradients, and so do the entity getters (`get_pos()`, `get_qpos()`, `get_dofs_position()`, `get_dofs_velocity()`, `get_links_pos()`, `get_dofs_control_force()`, `get_dofs_force()`, ...). They are plain `torch.Tensor`s. A query inside `torch.no_grad()`, for example for logging, returns values without gradient.
+- **Queried states are differentiable:** the entity getters (`get_pos()`, `get_qpos()`, `get_dofs_position()`, `get_dofs_velocity()`, `get_links_pos()`, `get_dofs_control_force()`, `get_dofs_force()`, `get_particles_pos()`, ...) return tensors that carry gradients. They are plain `torch.Tensor`s. A query inside `torch.no_grad()`, for example for logging, returns values without gradient. `scene.get_state()` returns a copy outside of the autograd graph, for restoring the scene rather than computing a loss.
 - **Inputs are any torch tensors:** control forces, PD control targets (`control_dofs_position`, `control_dofs_velocity`, `control_dofs_position_velocity`), initial positions, and velocities passed to the setters can be leaf tensors created with `requires_grad=True`, or the output of a torch computation, such as a neural network policy.
 - **The simulation is part of the PyTorch graph:** each `scene.step()`, each setter call, and each query is a node of the autograd graph, so `loss.backward()` and `torch.autograd.grad(loss, params)` both differentiate through the physics, down to whatever produced each input, in a single pass.
 
-The rollout behaves like a tensor that the simulator modifies in place. Pass `retain_graph=True` to run backward through the same rollout more than once. Call backward before any of these, each of which makes a later backward pass through the rollout raise an error: `scene.reset()`, a change to the model (such as `set_dofs_kv`), or a setter call inside `torch.no_grad()`. Reset the scene with `scene.reset()` before the next forward pass, for example once per optimization step. `scene.backward(loss)` runs the backward pass and then restores the physics state the scene was in, so the rollout can continue from there. A gradient that is not finite raises an error during the backward pass, which names the step where it appeared. The tensors of a queried state always lead with the environment dimension, of size 1 when the scene has no parallel environments (`[max(1, n_envs), ...]`).
+The rollout behaves like a tensor that the simulator modifies in place. Pass `retain_graph=True` to run backward through the same rollout more than once. Call backward before any of these, each of which makes a later backward pass through the rollout raise an error: `scene.reset()`, a change to the model (such as `set_dofs_kv`), or a setter call inside `torch.no_grad()`. Reset the scene with `scene.reset()` before the next forward pass, for example once per optimization step. `scene.backward(loss)` runs the backward pass and then restores the physics state the scene was in, so the rollout can continue from there. A gradient that is not finite raises an error during the backward pass, which names the step where it appeared.
 
 ## Training a policy through the dynamics
 
 An input may depend on states queried earlier in the same rollout, which closes the loop between a policy and the simulation. The gradient reaches the policy parameters through every step, and an action penalty can share the loss with the states without passing `retain_graph=True`. Here the scene is built with parallel environments (`scene.build(n_envs=16)`), so the actions have one row per environment:
 
 ```python
-n_qs, n_dofs = scene.rigid_solver.n_qs, scene.rigid_solver.n_dofs
+n_qs, n_dofs = robot.n_qs, robot.n_dofs
 policy = torch.nn.Linear(n_qs + n_dofs, n_dofs).to(device=gs.device, dtype=gs.tc_float)
 optimizer = torch.optim.Adam(policy.parameters(), lr=1e-3)
-target_qpos = scene.rigid_solver.get_state().qpos.detach() + 0.1
+target_qpos = robot.get_qpos().detach() + 0.1
 
 for _ in range(100):  # optimization iterations
     scene.reset()
     loss = 0.0
     for _ in range(50):  # horizon
-        state = scene.rigid_solver.get_state()
-        force = policy(torch.cat((state.qpos, state.dofs_vel), dim=-1))
+        force = policy(torch.cat((robot.get_qpos(), robot.get_dofs_velocity()), dim=-1))
         robot.control_dofs_force(force)
         scene.step()
         loss = loss + 1e-4 * (force**2).sum()
-    loss = loss + ((scene.rigid_solver.get_state().qpos - target_qpos) ** 2).sum()
+    loss = loss + ((robot.get_qpos() - target_qpos) ** 2).sum()
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()

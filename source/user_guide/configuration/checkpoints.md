@@ -15,7 +15,7 @@ A state snapshot assumes the scene it came from is already built. A scene file c
 
 A snapshot captures only the *dynamic* state: the fields that change as the simulation steps. It does not capture the scene's *structure*: the entities, their morphs, the solver options, or the number of environments. That structure is fixed by how you build the scene, and restoring a snapshot assumes it is already in place.
 
-- **`SimState`:** the object returned by `scene.get_state()`. It holds one per-solver state object for each active solver, batched over environments.
+- **`SimState`:** the object returned by `scene.get_state()`. Its `solvers` dictionary holds the state of each active solver under the name of its class, batched over environments.
 - **Dynamic state:** positions, velocities, and the internal fields each solver integrates. This is what a snapshot holds.
 - **Static structure:** entities, morphs, geometry, and solver configuration. A snapshot leaves it out, and a scene file is how it travels (see below).
 
@@ -45,15 +45,14 @@ A reset also sets the simulated time of the environments it touches back to zero
 Passing `state` to `reset()` also registers it as the scene's initial state. A subsequent bare `scene.reset()` returns to *this* snapshot, not to the state the scene had at build time. Keep a separate reference to your build-time state if you need both.
 :::
 
-The per-solver state objects are plain attribute holders. The rigid solver's state carries `qpos`, `dofs_vel`, `links_pos`, and `links_quat`; reading one field looks like this:
+A `SimState` is a copy of the state, kept outside of the autograd graph of a differentiable rollout. Read positions and velocities through the entity and solver getters instead, which return live tensors and carry gradients:
 
 ```python
-state = scene.get_state()
-rigid_state = state.solvers_state[scene.solvers.index(scene.rigid_solver)]
-qpos = rigid_state.qpos  # shape ([n_envs,] n_qs)
+qpos = robot.get_qpos()  # shape ([n_envs,] n_qs)
+particles_pos = scene.mpm_solver.get_particles_pos()  # shape ([n_envs,] n_particles, 3)
 ```
 
-The differentiable example [`examples/deformable/differentiable_push.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/deformable/differentiable_push.py) uses this pattern: it calls `scene.reset()` to restart each optimization pass from a fixed initial state, and reads `scene.get_state().solvers_state[...]` to compute a loss from particle positions mid-rollout.
+The differentiable example [`examples/deformable/differentiable_push.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/deformable/differentiable_push.py) uses this pattern: it calls `scene.reset()` to restart each optimization pass from a fixed initial state, and reads `scene.mpm_solver.get_particles_pos()` to compute a loss from particle positions mid-rollout.
 
 ## Resetting environments in parallel simulation
 
@@ -184,16 +183,18 @@ A trajectory replays on another machine, backend, or precision: the frames are s
 
 ## What a snapshot contains
 
-The dynamic state each solver contributes to a `SimState`:
+Each entry of `SimState.solvers` is a {py:class}`SolverCheckpoint <genesis.engine.states.solvers.SolverCheckpoint>`, whose `arrays` dictionary holds the state arrays of that solver under their internal names, such as `rigid_info.qpos` or `mpm_state.particles.pos`. The dynamic state each solver contributes:
 
-| Solver | State fields |
+| Solver | State arrays |
 |---|---|
-| Rigid | `qpos`, `dofs_vel`, `dofs_acc`, `links_pos`, `links_quat`, `friction_ratio` |
-| Kinematic | `qpos`, `dofs_vel`, `links_pos`, `links_quat` |
-| MPM | `pos`, `vel`, `C`, `F`, `Jp`, `actu`, `active` |
-| SPH | `pos`, `vel`, `active` |
-| PBD | `pos`, `vel`, `free` |
-| FEM | `pos`, `vel`, `active` |
+| Rigid | Joint positions, dof velocities and accelerations, link poses, control targets, hibernation flags, and the contact and constraint warm-start caches |
+| Kinematic | Joint positions, dof velocities and accelerations, link poses, and control targets |
+| MPM | Particle positions, velocities, `C`, `F`, `Jp`, actuation, and activity flags |
+| SPH | Particle positions, velocities, accelerations, densities, pressures, and activity flags |
+| PBD | Particle positions, velocities, and the free and activity flags |
+| FEM | Vertex positions and velocities, and element actuation |
+
+The legacy coupler also contributes its state, under `LegacyCoupler`.
 
 ## Reproducibility notes
 

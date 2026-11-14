@@ -1,6 +1,6 @@
 # States
 
-A state holds the runtime data of a simulation: positions, velocities, forces, and the solver-specific variables that evolve each step. `scene.get_state()` returns a `SimState`, an aggregate snapshot of the whole scene that holds one per-solver state for each active solver. In practice, read state through the entity or solver getters and restore snapshots with `scene.reset(state=...)`; see {doc}`/user_guide/configuration/checkpoints` and {doc}`/user_guide/configuration/conventions`.
+A state holds the runtime data of a simulation: positions, velocities, forces, and the solver-specific variables that evolve each step. `scene.get_state()` returns a `SimState`, an aggregate snapshot of the whole scene that holds a `SolverCheckpoint` for each active solver. In practice, read state through the entity or solver getters and restore snapshots with `scene.reset(state=...)`; see {doc}`/user_guide/configuration/checkpoints` and {doc}`/user_guide/configuration/conventions`.
 
 ## Simulation state
 
@@ -14,56 +14,10 @@ A state holds the runtime data of a simulation: positions, velocities, forces, a
 ## Per-solver states
 
 ```{eval-rst}
-.. autoclass:: genesis.engine.states.solvers.RigidSolverState
+.. autoclass:: genesis.engine.states.solvers.SolverCheckpoint
     :members:
     :undoc-members:
     :show-inheritance:
-
-.. autoclass:: genesis.engine.states.solvers.MPMSolverState
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. autoclass:: genesis.engine.states.solvers.FEMSolverState
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. autoclass:: genesis.engine.states.solvers.PBDSolverState
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. autoclass:: genesis.engine.states.solvers.SPHSolverState
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-```
-
-## Per-entity states
-
-```{eval-rst}
-.. autoclass:: genesis.engine.states.entities.RigidEntityState
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. autoclass:: genesis.engine.states.entities.MPMEntityState
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. autoclass:: genesis.engine.states.entities.FEMEntityState
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. autoclass:: genesis.engine.states.entities.SPHEntityState
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 ```
 
 ## See also

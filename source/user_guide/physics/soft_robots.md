@@ -109,7 +109,7 @@ scene.build(n_envs=3)
 The worm example carves the body into upper/lower and fore/hind quarters by particle position, then points every fiber along `+Y`:
 
 ```python
-pos = worm.get_state().pos[0]  # ([n_envs,] n_particles, 3) - take env 0
+pos = worm.get_particles_pos()[0]  # ([n_envs,] n_particles, 3) - take env 0
 n_units = worm.n_particles  # FEM instead uses worm.n_elements
 
 pos_max, pos_min = pos.max(dim=0).values, pos.min(dim=0).values

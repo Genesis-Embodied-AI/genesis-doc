@@ -6,23 +6,23 @@ SAP handles two solvers: `Rigid` and `FEM`. For cloth and highly deformable bodi
 
 ## Requirements
 
-SAP coupling imposes four hard requirements. Genesis World checks each at build time and raises if one is unmet:
+SAP coupling imposes two hard requirements:
 
-- **64-bit precision:** initialize with `precision="64"`, because the solver is ill-conditioned in 32-bit.
-- **Implicit FEM solver:** any FEM entity must be simulated with {py:class}`FEMOptions <genesis.options.solvers.FEMOptions>`(use_implicit_solver=True).
+- **Implicit FEM solver:** any FEM entity must be simulated with {py:class}`FEMOptions <genesis.options.solvers.FEMOptions>`(use_implicit_solver=True). Genesis World checks this at build time and raises if it is unmet.
 - **Rigid or FEM only:** SAP couples the rigid and FEM solvers. Other solvers (MPM, SPH, PBD) are not supported.
-- **Paired joint equalities:** a joint equality must name two joints, so a model holding a single joint at a constant is not supported (see {doc}`/user_guide/physics/dynamic_equality_constraints`).
+
+SAP runs in both precisions. Single precision runs fastest, while `precision="64"` solves the contacts about ten times more accurately for a quarter to two thirds more Newton iterations.
 
 SAP does not support differentiable simulation. Calls into the gradient path raise and direct you to the default coupler.
 
 ## Minimal example
 
-The complete script is [`examples/sap_coupling/fem_sphere_and_cube.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/fem_sphere_and_cube.py), which drops an FEM cube onto an FEM sphere. Three choices turn SAP coupling on:
+The complete script is [`examples/sap_coupling/fem_sphere_and_cube.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/fem_sphere_and_cube.py), which drops an FEM cube onto an FEM sphere. Two choices turn SAP coupling on, and the example also picks 64-bit precision for accuracy:
 
 ```python
 import genesis as gs
 
-gs.init(backend=gs.gpu, precision="64")  # SAP requires 64-bit
+gs.init(backend=gs.gpu, precision="64")  # optional: SAP also runs in 32-bit
 
 scene = gs.Scene(
     sim_options=gs.options.SimOptions(dt=1 / 60, substeps=2),
@@ -43,76 +43,60 @@ sphere = scene.add_entity(
 
 ## Solver parameters
 
-SAP runs an outer convex solver whose Newton steps are solved by a preconditioned conjugate gradient (PCG) inner loop and refined by a line search. The defaults below are tuned for typical manipulation scenes; tighten the tolerances when contact forces look noisy or a grasp drifts.
+SAP runs an outer convex solver whose Newton steps are solved by a preconditioned conjugate gradient (PCG) inner loop and refined by a line search. Each solve stops once it converges, so the iteration counts below are caps rather than fixed costs. The defaults suit typical manipulation scenes; lower `sap_convergence_rtol` when resting contacts slip or a grasp drifts.
 
 | Parameter | Default | Meaning |
 |---|---|---|
-| `n_sap_iterations` | `5` | Outer SAP (Newton) iterations per step |
+| `n_sap_iterations` | `100` | Maximum Newton iterations per substep |
 | `n_pcg_iterations` | `100` | Maximum PCG iterations per Newton step |
-| `n_linesearch_iterations` | `10` | Maximum line-search iterations per Newton step |
-| `sap_convergence_atol` | `1e-6` | Absolute tolerance for SAP convergence |
-| `sap_convergence_rtol` | `1e-5` | Relative tolerance for SAP convergence |
-| `pcg_threshold` | `1e-6` | Convergence threshold for the PCG inner solve |
+| `n_linesearch_iterations` | `100` | Maximum line-search iterations per Newton step |
+| `sap_convergence_atol` | `None` | Absolute tolerance on the gradient of the SAP cost, in momentum units; `None` uses the relative tolerance alone |
+| `sap_convergence_rtol` | `None` | Tolerance relative to the momentum of the scene; `None` takes `1e-4` in 64-bit and `1e-3` in 32-bit |
+| `pcg_threshold` | `1e-2` | Reduction of the squared PCG residual relative to its initial value |
 | `linesearch_ftol` | `1e-6` | Sufficient-decrease tolerance for exact line search |
 | `linesearch_max_step_size` | `1.5` | Maximum line-search step size |
 | `sap_taud` | `0.1` | Contact dissipation time scale |
-| `sap_beta` | `1.0` | Normal-force regularization |
+| `sap_beta` | `0.125` | Stiffness of rigid-body contacts, as the settling time of a resting body in substeps; smaller is stiffer |
 | `sap_sigma` | `1e-3` | Friction regularization |
+| `enable_lagged_friction` | `True` | Scale friction with the normal force of the previous substep, so sliding bodies stay on the surface |
+| `stiction_tolerance` | `1e-4` | Sliding speed in m/s below which lagged friction holds a contact as sticking |
 
 ## Contact model parameters
 
-SAP models contact with a compliant, hydroelastic pressure field. The stiffness parameters set how firmly surfaces resist interpenetration; the contact-type parameters choose how each contact pair is discretized.
+SAP models contact with a compliant, hydroelastic pressure field. The stiffness parameter sets how firmly surfaces resist interpenetration, and the capacity parameters size the contact buffers.
 
 | Parameter | Default | Meaning |
 |---|---|---|
-| `hydroelastic_stiffness` | `1e8` | Stiffness of the hydroelastic (pressure-field) contact |
-| `point_contact_stiffness` | `1e8` | Stiffness of point contact |
-| `enable_rigid_fem_contact` | `True` | Couple the rigid and FEM solvers |
-| `enable_fem_self_tet_contact` | `True` | Detect FEM self-contact using tetrahedra |
+| `hydroelastic_stiffness` | `1e8` | Stiffness of the hydroelastic (pressure-field) contact, which also bounds the stiffness of FEM-floor contact |
+| `enable_fem_self_collision` | `True` | Let distant parts of one FEM entity collide, such as a long body folding onto itself; distinct FEM entities always collide |
+| `enable_fem_neutral_collision` | `False` | Also collide parts of an FEM entity adjacent in its rest shape, for thin bodies whose faces get pressed together |
+| `max_collision_pairs` | `32768` | Maximum collision pairs of each kind of contact per environment |
+| `max_contacts` | `4096` | Maximum contact points of each kind of contact per environment |
 
-Three parameters select the contact discretization per pair. Each accepts one of:
+Exceeding `max_collision_pairs` or `max_contacts` at runtime halts the simulation with an error naming the option. Raise it for large or finely meshed contact patches, at a memory cost proportional to it and to the number of environments. `enable_fem_neutral_collision` multiplies the collision pairs of fine meshes, so it usually needs a much larger `max_collision_pairs`.
 
-- **`"tet"`:** tetrahedralization-based contact. The default and the most accurate choice for most meshes.
-- **`"vert"`:** vertex-based contact, preferable for very coarse meshes such as a single cube or tetrahedron.
-- **`"none"`:** disable contact for that pair.
-
-| Parameter | Default | Accepted values |
-|---|---|---|
-| `fem_floor_contact_type` | `"tet"` | `"tet"`, `"vert"`, `"none"` |
-| `rigid_floor_contact_type` | `"tet"` | `"tet"`, `"vert"`, `"none"` |
-| `rigid_rigid_contact_type` | `"tet"` | `"tet"`, `"none"` |
-
-The floor for `fem_floor_contact_type` and `rigid_floor_contact_type` is the rigid ground plane of the scene, added with `gs.morphs.Plane()`. SAP supports a single fixed plane facing up as ground, and raises at build on a terrain, a second plane, or a tilted or movable plane. A scene without a ground plane has no floor contact.
-
-:::{note}
-`rigid_rigid_contact_type` is declared to accept `"vert"`, but the solver only implements `"tet"` and `"none"`; passing `"vert"` raises. Use `"tet"` or `"none"` for rigid-rigid contact.
-:::
+The floor is the rigid ground plane of the scene, added with `gs.morphs.Plane()`. The surface vertices of FEM entities and the vertices of rigid bodies touch it. SAP supports a single fixed plane facing up as ground, and raises at build on a terrain, a second plane, or a tilted or movable plane. A scene without a ground plane has no floor contact.
 
 ## Grasping a deformable object
 
 [`examples/sap_coupling/franka_grasp_fem_sphere.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/franka_grasp_fem_sphere.py) has a Franka arm grasp and lift an FEM sphere, the workload SAP is built for. A rigid-cube variant lives in [`franka_grasp_rigid_cube.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/franka_grasp_rigid_cube.py).
 
-A steady grasp demands tighter convergence than the defaults, because a loose solve lets the object creep out of the fingers over many steps. The example tightens both the PCG threshold and the SAP tolerances, and disables self-collision on the arm so the fingers can close fully:
+The default tolerances hold a steady grasp. The example only disables self-collision on the arm so the fingers can close fully:
 
 ```python
 scene = gs.Scene(
     sim_options=gs.options.SimOptions(dt=1 / 60, substeps=2),
     rigid_options=gs.options.RigidOptions(enable_self_collision=False),
-    fem_options=gs.options.FEMOptions(use_implicit_solver=True, pcg_threshold=1e-10),
-    coupler_options=gs.options.SAPCouplerOptions(
-        pcg_threshold=1e-10,
-        sap_convergence_atol=1e-10,
-        sap_convergence_rtol=1e-10,
-        linesearch_ftol=1e-10,
-    ),
+    fem_options=gs.options.FEMOptions(use_implicit_solver=True),
+    coupler_options=gs.options.SAPCouplerOptions(),
 )
 ```
 
-To hold a target vertex of an FEM body in place (a fixed constraint rather than a grasp), see [`fem_fixed_constraint.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/fem_fixed_constraint.py), which sets `FEMOptions(enable_vertex_constraints=True)` and drives a vertex with `set_vertex_constraints`.
+To hold a target vertex of an FEM body in place (a fixed constraint rather than a grasp), see [`fem_fixed_constraint.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sap_coupling/fem_fixed_constraint.py), which drives a vertex with `set_vertex_constraints`. `FEMOptions(max_vertex_constraints=...)` caps the constrained vertices per environment at 64 by default, and constraining one more raises.
 
 ## When to use SAP
 
-- **Use SAP** for rigid-FEM manipulation of moderately deformable volumetric bodies, where you need stable, accurate contact under sustained load and can afford 64-bit precision.
+- **Use SAP** for rigid-FEM manipulation of moderately deformable volumetric bodies, where you need stable, accurate contact under sustained load.
 - **Use the {doc}`IPC coupler </user_guide/physics/coupling/ipc_coupler>`** for cloth and highly deformable soft bodies.
 - **Use the default coupler** ({doc}`Solvers and coupling </user_guide/physics/coupling/index>`) for scenes with MPM, SPH, or PBD, for rigid-only simulation, or when you need gradients for differentiable simulation.
 
