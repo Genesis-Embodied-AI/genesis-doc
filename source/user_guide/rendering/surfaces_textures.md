@@ -54,7 +54,7 @@ surface = gs.surfaces.Default(
 
 Two constraints follow from how the shortcuts map onto channels:
 
-- A shortcut and its texture cannot both be set: passing `color=...` together with `diffuse_texture=...` raises an error, because the texture already carries the color.
+- A shortcut and its texture cannot both be set: passing `color=...` together with the texture it fills (`diffuse_texture` on most surfaces, `specular_texture` on `Glass` and `Water`, `emissive_texture` on `Emission`) raises an error, because the texture already carries the color. Surface types with a default roughness (`Rough`, `Smooth`, `Reflective`, `Metal`, `Glass`, `Water`) count it as set, so pass `roughness=None` before giving them a `roughness_texture`.
 - A shortcut only applies to channels the surface actually has. `metallic` is meaningful on `Default`/`BSDF`; `Metal`, `Glass`, and the plastics ignore it because their reflectance is fixed by their type.
 
 Genesis World treats a fourth color component as opacity, so `color=(r, g, b, a)` is the concise way to make a surface semi-transparent:
@@ -75,7 +75,7 @@ When a property varies across a surface (a wood grain, a painted logo, a roughne
 Assign a texture to the channel it drives. The base color goes to `diffuse_texture`; data maps go to `roughness_texture`, `normal_texture`, `opacity_texture`, and so on:
 
 ```python
-surface = gs.surfaces.Rough(
+surface = gs.surfaces.Default(
     diffuse_texture=gs.textures.ImageTexture(image_path="textures/checker.png"),
     roughness_texture=gs.textures.ImageTexture(image_path="rough.png", encoding="linear"),
     normal_texture=gs.textures.ImageTexture(image_path="normal.png", encoding="linear"),
@@ -83,14 +83,14 @@ surface = gs.surfaces.Rough(
 ```
 
 :::{warning}
-Set `encoding="linear"` for any map that stores data rather than a color: roughness, metallic, normal, and opacity maps. The default `encoding="srgb"` applies gamma correction that is correct for color images but corrupts data maps. Genesis World forces `.hdr` and `.exr` files to `linear`.
+Set `encoding="linear"` for any map that stores data rather than a color: roughness, metallic, normal, and opacity maps. The default `encoding="srgb"` applies gamma correction that is correct for color images but corrupts data maps. `.hdr` and `.exr` files must be loaded with `encoding="linear"`; any other encoding raises an error.
 :::
 
 Genesis World resolves an image path against your working directory first, then against the bundled asset directory (`genesis/assets`), so `"textures/checker.png"` loads the checker image that ships with the library. A loaded asset (a `.glb` or textured `.obj`, for example) brings its own surface; pass a `surface` to `add_entity` only when you want to override it.
 
 ## Lighting a ray-traced scene
 
-In the {doc}`Nyx <nyx_renderer>` ray tracer, lights are not a special object: they are ordinary entities with an `Emission` surface. An environment map is the same idea applied to the background: an emissive image wrapped around the scene lights everything in it.
+In the Luisa ray tracer (`gs.renderers.RayTracer`), lights are emissive geometry: the sphere lights listed in `RayTracer(lights=...)`, meshes added with `scene.add_mesh_light(...)`, and any entity with an `Emission` surface. An environment map is the same idea applied to the background: an emissive image wrapped around the scene lights everything in it.
 
 This excerpt from `examples/rendering/demo.py` sets an HDRI-style environment map and one area light:
 
@@ -110,7 +110,7 @@ scene = gs.Scene(
 ```
 
 :::{note}
-Surfaces render on both the interactive viewer's rasterizer and the ray tracer, but reflections, refraction, transmission, and emission-based lighting are only fully resolved by the ray tracer. See {doc}`Rendering <index>` for how to choose and configure a renderer.
+Surfaces render on both the interactive viewer's rasterizer and the ray tracer, but reflections, refraction, transmission, and emission-based lighting are only fully resolved by the ray tracer. See {doc}`Rendering </user_guide/rendering/cameras>` for how to choose and configure a renderer.
 :::
 
 ## Visualizing something other than the visual mesh
@@ -162,6 +162,6 @@ scene.add_entity(
 
 ## See also
 
-- {doc}`Rendering <index>`: cameras and choosing a renderer.
+- {doc}`Rendering </user_guide/rendering/cameras>`: cameras and choosing a renderer.
 - {doc}`Nyx renderer <nyx_renderer>`: photorealistic path tracing in depth.
 - {doc}`USD import </user_guide/assets/usd_import>`: loading assets that carry their own surfaces.

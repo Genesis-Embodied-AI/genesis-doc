@@ -27,15 +27,21 @@ q = robot.inverse_kinematics_multilink(
 
 Each target need not be a full 6-dof pose. `pos_mask` and `rot_mask` are length-3 boolean masks that select which position axes and which rotation axes the solver has to satisfy; both default to `[True, True, True]`. Here `rot_mask=[False, False, True]` asks only that each fingertip's z-axis align with the z-axis of `target_quat`, leaving its heading in the horizontal plane free. Masking out constraints you do not care about gives the solver more freedom and makes it more likely to converge.
 
+To place a point other than the link origin on the target, such as a tool center point or a fingertip, pass `local_points`, one point per link in that link's local frame (`local_point` for `inverse_kinematics()`). Pass `return_error=True` to also get the final pose error of each target, so you can check whether the solver converged.
+
 Orientations follow the `(w, x, y, z)` quaternion convention, so `target_quat = np.array([0, 1, 0, 0])` points the finger's z-axis straight down.
 
-This example is purely kinematic: it demonstrates the solver, not the physics. After solving, it writes the result directly to the robot and refreshes the display rather than stepping the simulation:
+This example is purely kinematic: it demonstrates the solver, not the physics. After solving, it writes the result directly to the robot rather than stepping the simulation. Setting the state redraws the viewer by itself, so the loop only has to hold each pose for one simulation step of wall time, with `gs.tools.Rate`, for the poses to play at the pace of the simulation rather than as fast as the solver runs:
 
 ```python
-# Note that this IK is for visualization purposes, so here we do not call scene.step(), but only update the state and the visualizer
-# In actual control applications, you should instead use robot.control_dofs_position() and scene.step()
+# The poses follow the target along a continuous path, so they are shown at the pace of the simulation
+rate = gs.tools.Rate(1.0 / scene.dt)
+...
+# Note that this IK is for visualization purposes, so here we do not call scene.step(), but only set the state,
+# which redraws the viewer. In actual control applications, you should instead use robot.control_dofs_position()
+# and scene.step().
 robot.set_dofs_position(q)
-scene.visualizer.update()
+rate.sleep()
 ```
 
 The example draws the target frames in the video with `scene.draw_debug_frame()` and moves them each iteration with `scene.update_debug_objects()`. These markers live at the visualizer level and take no part in the simulation. See {doc}`/user_guide/interaction/interactive_debugging` for the debug-drawing API.
@@ -94,7 +100,7 @@ Parallel IK is most effective on a GPU backend, where all environments are solve
 
 Inverse kinematics is built on two lower-level operations the same solver exposes directly, and both are useful on their own for analytic control. Forward kinematics is IK's inverse: it maps a joint configuration to the resulting link poses. The Jacobian relates joint velocities to the end-effector's spatial velocity, which is the quantity IK differentiates to take each step; it also underpins Jacobian-transpose control and manipulability analysis.
 
-Both require an entity created with `requires_jac_and_IK=True`, which is the default for the {py:class}`MJCF <genesis.options.morphs.MJCF>` and {py:class}`URDF <genesis.options.morphs.URDF>` robot morphs.
+Both work on any rigid entity. The Jacobian is a method of the entity, while forward kinematics is a query on the solver, because it evaluates an arbitrary configuration rather than the one the solver holds.
 
 ```python
 ee_link = robot.get_link("hand")
@@ -104,13 +110,13 @@ jacobian = robot.get_jacobian(link=ee_link)  # shape ([n_envs,] 6, n_dofs)
 
 # Forward kinematics: joint configuration -> world-frame link poses.
 qpos = robot.get_qpos()
-links_pos, links_quat = robot.forward_kinematics(qpos)
+links_pos, links_quat = robot.solver.forward_kinematics_query(robot, qpos)
 # links_pos:  shape ([n_envs,] n_links, 3)   link-frame origins, world coordinates
 # links_quat: shape ([n_envs,] n_links, 4)   orientations, (w, x, y, z)
 ```
 
-`get_jacobian` takes an optional `local_point` (a length-3 point in the link's local frame) to evaluate the Jacobian somewhere other than the link origin. `forward_kinematics` accepts `qs_idx_local`, `links_idx_local`, and `envs_idx` to compute a subset of the configuration, links, or environments; the returned poses are in the world frame, consistent with the world-frame `qpos` input.
+`get_jacobian` takes an optional `local_point` (a length-3 point in the link's local frame) to evaluate the Jacobian somewhere other than the link origin. `forward_kinematics_query` returns the world-frame pose of every link of the entity, and takes `envs_idx` to evaluate a subset of environments. It restores the solver's configuration before returning, so the query leaves the simulation state unchanged.
 
 :::{note}
-`forward_kinematics` reuses the IK solver's internal buffers, which are allocated the first time you call `inverse_kinematics` on the entity. Solve IK at least once before calling it standalone.
+The `requires_jac_and_IK` morph argument is deprecated: passing it logs a warning and has no effect.
 :::

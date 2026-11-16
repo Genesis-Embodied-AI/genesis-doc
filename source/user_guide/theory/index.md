@@ -4,12 +4,12 @@ This section explains how the engine works underneath the API. Where the rest of
 
 A `scene.step()` advances every active solver by `dt`, or by `dt / substeps` per substep, and the coupler reconciles them in between. Which solver holds an entity follows from its material.
 
+To choose a coupler or compute gradients through a step, see {doc}`Coupling </user_guide/physics/coupling/index>` and {doc}`Differentiable simulation </user_guide/configuration/differentiable_simulation>`.
+
 ## In this section
 
 - **{doc}`rigid_solver/index`:** the three layers of a rigid step (forward dynamics, collision detection, and the constraint solve), plus hibernation.
 - **{doc}`soft_solvers`:** the five continuum and particle solvers, and the constitutive models they integrate.
-- **{doc}`coupling/index`:** how solvers exchange forces where their materials meet, and which coupler to use.
-- **{doc}`differentiable_simulation`:** how gradients flow through a step.
 
 ## Further reading
 
@@ -21,6 +21,4 @@ These pages describe the models Genesis World implements and the options that se
 
 rigid_solver/index
 soft_solvers
-coupling/index
-differentiable_simulation
 ```

@@ -150,6 +150,25 @@ terrain = scene.add_entity(
 
 `spacing` is the grid step in the mesh's own units, and `oversample` casts extra rays per cell so peaks inside a cell are not missed (memory grows as `oversample²`). Pass `up_axis="y"` for meshes authored Y-up, such as glTF; the function rotates them to Z-up before sampling. Cells with no ray hit come back as `NaN`.
 
+## Querying the surface height
+
+`scene.add_entity(gs.morphs.Terrain(...))` returns a {py:class}`TerrainEntity <genesis.engine.entities.rigid_entity.terrain_entity.TerrainEntity>`, whose `get_terrain_height` reports the elevation of the terrain surface at world-frame x-y positions. The heights come from the same piecewise-planar surface that bodies collide with, so a locomotion policy can read how far the ground is below each foot.
+
+```python
+positions = torch.tensor([[1.0, 1.0], [2.0, 3.5]], device=gs.device)  # x-y, meters
+heights = terrain.get_terrain_height(positions)  # shape ([n_envs,] n_points), meters
+```
+
+The query applies the terrain's translation and yaw, so give positions in the world frame rather than in grid coordinates. The shape of `positions` decides how the query is batched:
+
+- **`(2,)`:** one point, and the result drops the point dimension.
+- **`(n_points, 2)`:** points shared across every environment.
+- **`(n_envs, n_points, 2)`:** per-environment positions.
+
+Pass `envs_idx` alongside any of them to restrict the query to a subset of environments.
+
+A position up to one grid cell outside the terrain is clamped to its edge, and one farther out reports `NaN`. So does a position holding `NaN` or infinity, and every position on a terrain tilted more than 0.001 rad from world vertical.
+
 ## Caching generated terrains
 
 Generating a terrain (the height field, the collision mesh, and the visual mesh) runs every time the scene is built. Pass `name="my_terrain"` to generate it only once for a given set of options and load it from cache on later builds. This holds even when `randomize=True`, so naming a terrain is how you reproduce a randomized one exactly across runs.
@@ -157,5 +176,6 @@ Generating a terrain (the height field, the collision mesh, and the visual mesh)
 ## See also
 
 - {doc}`gs.morphs.Terrain API reference </api_reference/engine/entity/morph/file_morph/terrain>`: every keyword argument.
+- {doc}`TerrainEntity API reference </api_reference/engine/entity/terrain_entity>`: the entity `add_entity` returns, and its height query.
 - {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`: the init–scene–build–step loop these examples assume.
 - {doc}`Locomotion training </user_guide/policy_training/examples/locomotion>`: training a walking policy, where terrain becomes the training ground.

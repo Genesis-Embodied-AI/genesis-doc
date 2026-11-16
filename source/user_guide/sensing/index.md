@@ -12,7 +12,7 @@ import genesis as gs
 gs.init(backend=gs.gpu)
 scene = gs.Scene()
 scene.add_entity(gs.morphs.Plane())
-robot = scene.add_entity(gs.morphs.URDF(file="urdf/go2/urdf/go2.urdf"))
+robot = scene.add_entity(gs.morphs.URDF(file="urdf/go2/urdf/go2.urdf", links_to_keep=("FL_foot",)))
 
 contact = scene.add_sensor(
     gs.sensors.Contact(

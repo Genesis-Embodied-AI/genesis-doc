@@ -8,7 +8,7 @@ The rigid solver advances articulated rigid bodies: robots, mechanisms, and rigi
 
 The three layers are configured through {py:class}`gs.options.RigidOptions <genesis.options.solvers.RigidOptions>`.
 
-A {doc}`coupler </user_guide/theory/coupling/index>` handles soft-body and particle contact against rigid geometry.
+A {doc}`coupler </user_guide/physics/coupling/index>` handles soft-body and particle contact against rigid geometry.
 
 ```{toctree}
 :hidden:

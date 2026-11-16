@@ -56,9 +56,9 @@ A force field goes through four stages. Getting the order right matters: adding 
    wind = gs.force_fields.Constant(direction=(1, 0, 0), strength=5.0)
    ```
 
-2. **Register** it with the scene using `scene.add_force_field(field)`, which returns the same field. This must happen **before** `scene.build()`: the number of registered fields is baked into the compiled solver kernels, so a field added afterward is never evaluated.
+2. **Register** it with the scene using `scene.add_force_field(field)`, which returns the same field. This must happen **before** `scene.build()`: the number of registered fields is baked into the compiled solver kernels, so calling `add_force_field` after `scene.build()` raises an error.
 
-3. **Activate** it with `field.activate()`. A field is inactive when created (`field.active` is `False`) and contributes zero acceleration until activated. Toggle `activate()` and `deactivate()` at any time after building, including mid-simulation, and read `field.active` to check the current state.
+3. **Activate** it with `field.activate()`. A field is inactive when created (`field.active` is `False`) and contributes zero acceleration until activated. `Custom` is the exception: its function replaces the activation check, so a `Custom` field always applies once registered, whatever `active` says. Toggle `activate()` and `deactivate()` at any time after building, including mid-simulation, and read `field.active` to check the current state.
 
 4. **Step** the scene. On each substep the solver adds the active field's acceleration to every affected particle.
 

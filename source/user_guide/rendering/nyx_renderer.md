@@ -10,7 +10,7 @@ The other rendering backends are selected once for the entire scene with `gs.Sce
 
 ## When to use Nyx
 
-Genesis World offers several ways to turn a scene into pixels (see {doc}`Rendering <index>` for the full list). Choose by what you need:
+Genesis World offers several ways to turn a scene into pixels (see {doc}`Rendering </user_guide/rendering/cameras>` for the full list). Choose by what you need:
 
 | You want… | Use |
 |---|---|

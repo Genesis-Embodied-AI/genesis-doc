@@ -4,14 +4,14 @@ Genesis World provides utilities for file operations, path handling, and loading
 
 ## Cache and source directories
 
-Genesis World caches compiled kernels and processed assets. These helpers, exposed under `gs.utils`, resolve the cache, source, and asset directories.
+Genesis World caches compiled kernels and processed assets. These helpers resolve the cache, source, and asset directories, and clear the in-memory caches.
 
 ```{eval-rst}
-.. autofunction:: genesis.utils.misc.get_cache_dir
-.. autofunction:: genesis.utils.misc.get_gsd_cache_dir
+.. autofunction:: genesis.utils.cache.get_cache_dir
+.. autofunction:: genesis.utils.cache.get_gsd_cache_dir
 .. autofunction:: genesis.utils.misc.get_src_dir
 .. autofunction:: genesis.utils.misc.get_assets_dir
-.. autofunction:: genesis.utils.misc.clear_caches
+.. autofunction:: genesis.utils.cache.clear_caches
 ```
 
 ## Loading models and meshes

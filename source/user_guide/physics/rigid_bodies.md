@@ -1,6 +1,6 @@
 # Rigid bodies
 
-A rigid body is the default kind of entity in Genesis World: a solid that does not deform, simulated by the rigid solver. It is what you get from {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`, and it covers most of robotics: robot arms, grippers, mobile bases, and the props they interact with. The rest of this section covers the non-rigid families that build on the same `Scene`.
+A rigid body is the default kind of entity in Genesis World: a solid that does not deform, simulated by the rigid solver. It is what you get from {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>`, and it covers most of robotics: robot arms, grippers, mobile bases, and the props they interact with. The linked guides cover joint parameters, drones, and terrain. For materials that deform or flow, see {doc}`Deformables and fluids <beyond_rigid_bodies>`.
 
 ## Adding a rigid body
 
@@ -57,7 +57,16 @@ scene = gs.Scene(
 
 Choose the elliptic `friction_cone` when resting objects have to stay put rather than creeping slowly. Paired with the default Newton `constraint_solver` it also unlocks the `signorini` contact resolution, which we then select by default: friction is bounded by the normal force the contact has developed, so a fast-sliding body decelerates at `friction` times gravity instead of lifting off a flat floor. Set `contact_resolution` explicitly to override that choice.
 
+Two examples show each coefficient on its own. [`examples/rigid/torsional_grasp.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/torsional_grasp.py) pinches a ball between two plates and spins it, and the point contact resists the spin only through `friction_torsional`. [`examples/rigid/rolling_coast.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/rolling_coast.py) rolls two balls side by side, and only the one with a `friction_rolling` coefficient coasts to a stop.
+
 The rigid solver governs how these bodies actually push on each other: contact, collision geometry, and constraints. {doc}`Theory and modeling </user_guide/theory/rigid_solver/index>` documents that model, and covers {doc}`contact resolution </user_guide/theory/rigid_solver/constraints>` in full.
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+joints_and_actuators
+```
 
 ## See also
 
@@ -65,3 +74,12 @@ The rigid solver governs how these bodies actually push on each other: contact, 
 - {doc}`/user_guide/robot_control/inverse_kinematics_motion_planning`: inverse kinematics and collision-free planning.
 - {doc}`beyond_rigid_bodies`: the non-rigid solvers (MPM, FEM, PBD, SPH) that share the scene.
 - {doc}`/user_guide/theory/rigid_solver/index`: the contact and constraint model behind rigid dynamics.
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+dynamic_equality_constraints
+drone_entity
+terrain
+```

@@ -40,6 +40,7 @@ extensions = [
     "sphinxcontrib.video",
     "sphinx_togglebutton",
     "sphinx_design",
+    "sphinx_reredirects",
 ]
 
 # https://myst-parser.readthedocs.io/en/latest/syntax/optional.html
@@ -173,3 +174,17 @@ autodoc_typehints_description_target = "all"
 autodoc_default_flags = ["members", "show-inheritance", "undoc-members"]
 autodoc_member_order = "bysource"
 autosummary_generate = True
+
+# Old page paths that moved, so external links keep working.
+redirects = {
+    "user_guide/robot_control/constraints": "../physics/dynamic_equality_constraints.html",
+    "user_guide/theory/coupling/index": "../../physics/coupling/index.html",
+    "user_guide/theory/coupling/ipc_coupler": "../../physics/coupling/ipc_coupler.html",
+    "user_guide/theory/coupling/sap_coupler": "../../physics/coupling/sap_coupler.html",
+    "user_guide/theory/differentiable_simulation": "../configuration/differentiable_simulation.html",
+    "user_guide/developers/profiling": "../performance/profiling.html",
+    "user_guide/policy_training/best_practices/index": "../../performance/efficient_environment.html",
+    "user_guide/policy_training/best_practices/efficient_environment": "../../performance/efficient_environment.html",
+    "user_guide/policy_training/best_practices/domain_randomization": "../domain_randomization.html",
+    "user_guide/policy_training/multi_gpu": "../performance/multi_gpu.html",
+}

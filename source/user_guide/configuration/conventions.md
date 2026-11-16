@@ -44,9 +44,9 @@ An asset exported from Blender at default settings therefore arrives at the orie
 
 ### glTF (.gltf, .glb)
 
-glTF assets are [always Y-up by specification](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#coordinate-system-and-units), so we always convert them, with no switch to turn that off: a glTF file that follows the spec then behaves the same everywhere.
+glTF assets are [always Y-up by specification](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#coordinate-system-and-units), so we always convert them by default: a glTF file that follows the spec then behaves the same everywhere.
 
-Blender writes a Z-up glTF if you uncheck **+Y-up**, though it cannot read that file back correctly afterward. Since our conversion assumes the spec, a Z-up glTF imports rotated. Re-export with the default **+Y-up** option rather than overriding the axis on import.
+Blender writes a Z-up glTF if you uncheck **+Y-up**, though it cannot read that file back correctly afterward. Since our conversion assumes the spec, a Z-up glTF imports rotated unless you pass `file_meshes_are_zup=True`, in which case we record a compensating rotation in the morph's `offset_quat`. Re-export with the default **+Y-up** option rather than overriding the axis on import.
 
 ![Blender glTF exporter panel with the +Y-up transform option enabled](../../_static/images/blender_gltf_export.png)
 
@@ -81,7 +81,7 @@ obj = scene.add_entity(
 After import, the `imported_as_zup` metadata flag on each mesh records whether a conversion ran:
 
 ```python
-obj.vgeoms[0].mesh.metadata["imported_as_zup"]  # False if a Y-up -> Z-up conversion ran
+obj.vgeoms[0].vmesh.metadata["imported_as_zup"]  # False if a Y-up -> Z-up conversion ran
 ```
 
 ## Units
@@ -113,6 +113,10 @@ The `[n_envs,]` bracket means: **present when the scene is built with multiple e
 
 Methods that read or write per-environment state take an `envs_idx` argument to address a subset of environments. Passing `envs_idx=None` (the default) applies to all of them; passing a tensor of indices selects only those rows along the batch dimension.
 
+## Index arguments
+
+`envs_idx` and the per-entity index arguments (`links_idx_local`, `dofs_idx_local`, `qs_idx_local`, and the like) accept the same forms: an integer, a `range`, a `slice`, a list or tuple, a NumPy array, or a PyTorch tensor, with `None` selecting everything. Negative indices count from the end as they do in Python and NumPy, so `envs_idx=-1` is the last environment. A boolean array acts as a mask, and must span the full length of the dimension it selects from.
+
 ## Data types and precision
 
 Tensors returned by the API are **PyTorch tensors** placed on the active device (`gs.device`). Their dtype follows the precision chosen at initialization:
@@ -120,4 +124,4 @@ Tensors returned by the API are **PyTorch tensors** placed on the active device 
 - **Floating-point values** are `float32` by default, or `float64` when you initialize with `precision="64"`.
 - **Integer indices** (entity, link, and dof indices, `envs_idx`, and the like) are always `int32`, independent of the float precision.
 
-`gs.init()` sets PyTorch's global default dtype and device to match, so tensors you allocate yourself line up with what the API returns. See {doc}`initialization` for how to choose the backend and precision.
+`gs.init()` leaves PyTorch's global default dtype and device untouched, so pass `dtype=gs.tc_float` (or `gs.tc_int`) and `device=gs.device` to tensors you allocate yourself to line them up with what the API returns. See {doc}`initialization` for how to choose the backend and precision.

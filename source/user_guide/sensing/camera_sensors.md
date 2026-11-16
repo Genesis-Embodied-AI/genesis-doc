@@ -5,7 +5,7 @@ A camera sensor renders the scene to an RGB image off-screen and returns it thro
 Genesis World has two other ways to look at a scene:
 
 - The **viewer** (`show_viewer=True`) is the interactive window a human watches. It renders live and hands nothing back to your code. See {doc}`/user_guide/interaction/visualization`.
-- The **visualization camera** (`scene.add_camera().render(...)`) renders color, depth, segmentation, and surface-normal images on demand, and captures video with `start_recording()`. Use it when you want those four channels or a video of the scene. See {doc}`/user_guide/rendering/index`.
+- The **visualization camera** (`scene.add_camera().render(...)`) renders color, depth, segmentation, and surface-normal images on demand, and captures video with `start_recording()`. Use it when you want those four channels or a video of the scene. See {doc}`/user_guide/rendering/cameras`.
 
 The complete script is [`examples/sensors/camera_as_sensor.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/camera_as_sensor.py).
 
@@ -140,7 +140,7 @@ All `BatchRendererCameraOptions` cameras in a scene must share the same resoluti
 ## Notes and gotchas
 
 :::{note}
-**Camera sensors return RGB only.** `read()` returns the color image and nothing else. For depth, segmentation masks, or surface normals, use the visualization camera's `render()` method (see {doc}`/user_guide/rendering/index`) or, for depth specifically, the {doc}`depth-camera raycaster sensor <raycaster>`.
+**Camera sensors return RGB only.** `read()` returns the color image and nothing else. For depth, segmentation masks, or surface normals, use the visualization camera's `render()` method (see {doc}`/user_guide/rendering/cameras`) or, for depth specifically, the {doc}`depth-camera raycaster sensor <raycaster>`.
 :::
 
 :::{warning}
@@ -149,6 +149,6 @@ Camera sensors do not support `history_length`. They render lazily on `read()` a
 
 ## See also
 
-- {doc}`/user_guide/rendering/index`: the visualization camera's four image channels, video recording, and rendering backends.
+- {doc}`/user_guide/rendering/cameras`: the visualization camera's four image channels, video recording, and rendering backends.
 - {doc}`Sensors <index>`: the sensor pipeline, batched reads, and other sensor families.
 - {doc}`Raycaster sensors <raycaster>`: depth camera and lidar with configurable ray patterns.

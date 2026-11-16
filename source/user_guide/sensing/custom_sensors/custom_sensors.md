@@ -304,6 +304,26 @@ To pick the right hooks, mirror the closest built-in sensor. Every one implement
 
 Every `SimpleSensor` inherits `_apply_hardware_imperfections` unchanged; override it only for a non-standard imperfection model.
 
+## Drawing debug markers
+
+A sensor created with `draw_debug=True` draws markers in the viewer, and in the cameras rendering debug geometry, at every refresh. Override `_draw_debug(self, context, envs_idx)` to define them. It returns the markers instead of adding them: build each one with a `context.make_debug_*` method (`line`, `arrow`, `sphere`, `spheres`, `box`, `mesh`, `frame`, `frames`, `points`, `pyramid`, taking the same arguments as the matching `scene.draw_debug_*`), and return one `(env_idx, node, None)` triple per marker. The viewer adds them, and replaces them at the next refresh.
+
+`envs_idx` lists the rendered environments to draw, as indices into `context.rendered_envs_idx`. `env_idx` is the rendered environment a marker belongs to, or `None` for a marker spanning several environments, such as one drawn from the first environment and shown in all of them:
+
+```python
+def _draw_debug(self, context, envs_idx):
+    # Draw the reading of the first rendered environment, if it is not stale
+    if 0 not in envs_idx:
+        return []
+    env_idx = context.rendered_envs_idx[0] if self._manager._sim.n_envs > 0 else None
+    if not self.read(env_idx):
+        return []
+    pos = self._link.get_pos(env_idx, relative=False).reshape((3,))
+    return [(None, context.make_debug_sphere(pos=pos, radius=0.02, color=(1.0, 0.0, 0.0, 1.0)), None)]
+```
+
+The data of a sensor is computed by a step, so it no longer matches the scene once the state changes without one, for instance through `entity.set_pos(...)` or `entity.set_qpos(...)`. The class attribute `invalidated_by` lists the kinds of change (`gs.engine.solvers.base_solver.StateChange`) of the rigid and kinematic solvers that make the data stale until the next step. It defaults to every kind of change, which is always safe. A sensor whose data depends on part of the state only may narrow it, such as `frozenset((StateChange.GEOMETRY,))` for one that depends on where the links are alone. The debug markers show the data, so they are hidden in the environments such a change touches until the next step, rather than showing the previous data at the new pose.
+
 ## Things to double-check
 
 - **Populate `raw_data_T` in place; never rebind it.** Assigning `raw_data_T = something_new` leaves the framework-owned buffer untouched and silently breaks the pipeline. Write via `raw_data_T.copy_(...)`, `raw_data_T[...] = ...`, or a kernel that takes it as an output argument.

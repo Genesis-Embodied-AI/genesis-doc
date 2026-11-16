@@ -57,10 +57,10 @@ The same applies to entities. Inspect the Franka arm to see its geoms and links:
 Go one level deeper with `franka.links[0]`:
 
 ```{figure} ../../_static/images/interactive_link.png
-:alt: IPython repr of a single link showing geoms, vgeoms, inertial_mass, idx, entity, and joint
+:alt: IPython repr of a single link showing geoms, vgeoms, idx, entity, and joints
 ```
 
-A link exposes its collision geoms (`geoms`), visual geoms (`vgeoms`), `inertial_mass`, its global index in the scene (`idx`), the `entity` it belongs to, and its `joint`.
+A link exposes its collision geoms (`geoms`), visual geoms (`vgeoms`), its global index in the scene (`idx`), the `entity` it belongs to, and its `joints`. Read its mass with `get_mass()`.
 
 ## Drawing debug geometry
 
@@ -116,6 +116,8 @@ The available primitives:
 
 See {doc}`/api_reference/engine/scene` for the full signatures and defaults.
 
+The markers that the scene draws on its own show what the last step computed: the contact arrows of `visualize_contact` and the markers of the sensors created with `draw_debug=True`. They are drawn anew at every refresh of the viewer. A setter that moves the scene, such as `entity.set_pos(...)`, hides them in the environments it touches until the next step, since the contacts and the sensor readings they show belong to the previous pose.
+
 ## Interactive GUI panel
 
 The **ImGui overlay** adds a Dear ImGui panel on top of the viewer, so you can drive the simulation without editing code. It exposes:
@@ -132,7 +134,7 @@ The overlay ships behind Genesis World's `render` extras. Install them before en
 pip install "genesis-world[render]"
 ```
 
-If pre-built `imgui-bundle` wheels are unavailable for your Python and OS combination (for example Python 3.10 on Linux aarch64), install with `pip install imgui-bundle`, which builds from source and requires CMake. Enabling the GUI without the dependency raises an error pointing back at this step.
+If pre-built `imgui-bundle` wheels are unavailable for your Python and OS combination, install with `pip install imgui-bundle`, which builds from source and requires CMake. Enabling the GUI without the dependency raises an error pointing back at this step.
 :::
 
 The simplest way to get the panel is to set `enable_gui=True` on `ViewerOptions`. The viewer attaches the overlay for you and lets it manage scene editing internally, so a plain {py:class}`gs.Scene <genesis.engine.scene.Scene>` is the whole setup:
@@ -175,5 +177,5 @@ The full example is [`imgui_joint_control.py`](https://github.com/Genesis-Embodi
 ## See also
 
 - {doc}`/user_guide/interaction/viewer_plugin`: keybindings and writing your own viewer plugins.
-- {doc}`/user_guide/rendering/index`: cameras, rendering, and recording.
+- {doc}`/user_guide/rendering/cameras`: cameras, rendering, and recording.
 - {doc}`/user_guide/getting_started/hello_genesis`: the core simulation loop.

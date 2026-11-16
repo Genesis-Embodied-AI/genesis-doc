@@ -6,6 +6,11 @@
     "preferred": true
   },
   {
+    "name": "v1.4.5",
+    "version": "v1.4.5",
+    "url": "https://genesis-world.readthedocs.io/en/v1.4.5/"
+  },
+  {
     "name": "v1.2.2",
     "version": "v1.2.2",
     "url": "https://genesis-world.readthedocs.io/en/v1.2.2/"

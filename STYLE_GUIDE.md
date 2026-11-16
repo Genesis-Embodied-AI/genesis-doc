@@ -354,7 +354,7 @@ One sentence: what it is and when to use it, with a link to the How-to in the Us
 the code formatting even when the title names a class or a `gs.*` symbol. (Inline code inside the body keeps its
 backticks as normal.)
 
-**The API Reference mirrors the code.** Its top-level sections correspond to `genesis` subpackages, so the reference tree and import paths line up: the `engine` section mirrors `genesis.engine` (scene, simulator, entities, materials, solvers, couplers, sensors, states), and `visualization`, `recording`, `differentiation`, and `utilities` mirror `genesis.vis`, `genesis.recorders`, `genesis.grad`, and `genesis.utils`. When you add a component, place its page where the code lives, not by theme. Utilities autodoc individual symbols with explicit `.. autofunction::` / `.. autoclass::` rather than `.. automodule:: :members:`, because the global `undoc-members` setting would otherwise surface internal helpers.
+**The API Reference mirrors the code.** Its top-level sections correspond to `genesis` subpackages, so the reference tree and import paths line up: the `engine` section mirrors `genesis.engine` (scene, simulator, entities, materials, solvers, couplers, sensors, states), and `visualization`, `recording`, and `utilities` mirror `genesis.vis`, `genesis.recorders`, and `genesis.utils`. When you add a component, place its page where the code lives, not by theme. Utilities autodoc individual symbols with explicit `.. autofunction::` / `.. autoclass::` rather than `.. automodule:: :members:`, because the global `undoc-members` setting would otherwise surface internal helpers.
 
 **Options come first, the built object below, each under its own heading.** Most components pair an options class the user configures (`RigidOptions`, `IMU`, `Rasterizer`) with the built object the engine constructs from it (`RigidSolver`, `IMUSensor`, the rasterizer backend). On a page that documents both, keep the options class co-located with its object (do not split options into a separate section), and give each its own `##` heading so the reader sees a clear boundary between what to set and what to call:
 
@@ -389,6 +389,19 @@ A configuration class that is itself the public API with no separate built objec
 **Active voice, present tense.** "Genesis World compiles the kernels on the first build," not "the kernels will be compiled." Describe what the software *does*, as a fact about the present.
 
 **One idea per sentence, and no nesting.** A parenthetical inside a parenthetical, or a third subordinate clause, is a sentence that wants to be two. Splitting is not the same as chopping: join the halves with the word that names their relationship ("because", "so", "while") rather than leaving two stubs side by side. See §2 on rhythm.
+
+**Procedures take inspiration from Simplified Technical English.** We borrow selected rules from [ASD-STE100](https://www.asd-ste100.org/) to make sequences easier to follow with a terminal open. A procedure is any sequence the reader performs in order: installing, configuring a scene step by step, running a training script.
+
+- Write the steps as a numbered list, with one instruction per step.
+- Keep each instruction short and focused on one action. Put lengthy explanations before the list or after the instruction, while keeping a brief reason attached when it helps.
+- Put a warning or caution *before* the step it applies to, never after. A reader who has already run the command cannot act on a warning below it.
+- Start each step with the verb, and give the step its object: "Install PyTorch", not "Next, PyTorch should be installed".
+
+Use sentence length as a readability check rather than a word limit. Keep a longer sentence when a "because" or "so" connects the reason to the claim (see §2 on rhythm). We do not use the STE dictionary, since our technical names (raycasting, rendering, hibernation) are not in it.
+
+**Use consistent technical terms.** Give each technical term the same meaning across pages, and use the settled term for each concept. "Body" means a rigid body in the physics sense and never an entity, "environment" is never a "world" or an "instance", and "build" never means "compile". §6 lists the settled terms and the words they replace.
+
+**Prefer a single verb to a phrasal verb.** "Configure" over "set up", "enable" over "turn on", "start" over "spin up", "remove" over "get rid of". A phrasal verb often has several meanings, and readers who learned English as a second language parse the single verb faster. Keep the phrasal verb when it is the API name (`set_up_*`) or when no single verb says the same thing.
 
 **Define a term once, then reuse it exactly.** Don't alternate between "degree of freedom", "dof", and "motor" for the same thing. Introduce the term, bold it on first use, then use it consistently. (See §6 for the terms we've standardized.)
 
@@ -569,6 +582,8 @@ The `[n_envs,]` bracket means "present when the scene is built with multiple env
 Before opening a docs PR, confirm:
 
 - [ ] Every code block runs against the current release, and I've run it.
+- [ ] Procedures use short, numbered instructions, one action each, with warnings before the step they apply to.
+- [ ] Technical terms match §6 and keep the same meaning across pages.
 - [ ] Every fenced block is tagged with a lowercase language (`python`, `bash`, …).
 - [ ] No space-aligned keyword arguments; Python is `black`-clean.
 - [ ] The page leads with what it's for and a runnable example within one screen.

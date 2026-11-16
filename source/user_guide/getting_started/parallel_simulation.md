@@ -68,7 +68,7 @@ The same `envs_idx` argument is available on the state-reading methods (for exam
 
 ## Scaling up
 
-Genesis World supports tens of thousands of environments on a single GPU. Turn off the viewer for headless throughput and raise `n_envs`; memory use grows with the batch, so reduce it if your GPU runs out of VRAM. To measure throughput on your own hardware, use the scripts in [`examples/speed_benchmark`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/speed_benchmark) and see {doc}`/user_guide/developers/profiling`.
+Genesis World supports tens of thousands of environments on a single GPU. Turn off the viewer for headless throughput and raise `n_envs`; memory use grows with the batch, so reduce it if your GPU runs out of VRAM. To measure throughput on your own hardware, use the scripts in [`examples/speed_benchmark`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/speed_benchmark) and see {doc}`/user_guide/performance/profiling`.
 
 :::{tip}
 Genesis World prints the real-time simulation speed (FPS) to the terminal by default. Pass `profiling_options=gs.options.ProfilingOptions(show_FPS=False)` to `gs.Scene` to quiet it.

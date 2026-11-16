@@ -1,6 +1,6 @@
 # File writers
 
-A file writer records sampled data to disk. Pass one as the `rec_options` argument of `scene.add_recorder`, and the recorder manager samples your data function on schedule and writes each sample to the file. See {doc}`index` for the recording workflow and the shared options (`hz`, `buffer_size`, `save_on_reset`) that every writer inherits.
+A file writer records sampled data to disk. Pass one as the `rec_options` argument of `scene.add_recorder`, and the recorder manager samples your data function on schedule and writes each sample to the file. See {doc}`index` for the recording workflow and the shared options (`hz`, `buffer_size`, `buffer_full_wait_time`) that every writer inherits.
 
 ## `gs.recorders.NPZFile`
 

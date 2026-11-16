@@ -20,10 +20,10 @@ To run on CUDA, make sure a matching NVIDIA driver is installed on your machine.
 
 ## Prerequisites
 
-- **Python:** 3.10 to 3.13 (`>=3.10,<3.14`).
+- **Python:** 3.12 to 3.14 (`>=3.12,<3.15`).
 - **Operating system:** Linux, macOS, or Windows. Linux with a CUDA-compatible GPU gives the best performance.
 
-Genesis World is cross-platform across CPUs and GPUs: NVIDIA through CUDA (`gs.cuda`), AMD through ROCm (`gs.amdgpu`), and Apple Silicon through Metal (`gs.metal`), with a CPU backend (`gs.cpu`) available everywhere. `gs.gpu` resolves to whichever of the three your machine has. An Intel GPU drives the viewer and offscreen rendering but has no simulation backend, so run the physics on `gs.cpu` there. The following combinations are supported:
+Genesis World is cross-platform across CPUs and GPUs: NVIDIA through CUDA (`gs.cuda`), AMD through ROCm (`gs.amdgpu`), and Apple Silicon through Metal (`gs.metal`), with a CPU backend (`gs.cpu`) available everywhere. `gs.gpu` resolves to whichever of the three your machine has, and falls back to `gs.cpu` with a warning if it has none. An Intel GPU drives the viewer and offscreen rendering but has no simulation backend, so run the physics on `gs.cpu` there. The following combinations are supported:
 
 | OS | GPU | GPU simulation | CPU simulation | Interactive viewer | Headless rendering |
 |---|---|:---:|:---:|:---:|:---:|
@@ -35,20 +35,21 @@ Genesis World is cross-platform across CPUs and GPUs: NVIDIA through CUDA (`gs.c
 | Windows | Intel | ❌ | ✅ | ✅ | ✅ |
 | macOS | Apple Silicon | ✅ | ✅ | ✅ | ✅ |
 
+GPU simulation on AMD through ROCm is still experimental and may be unstable, especially on Windows.
+
 ## Optional components
 
 ### Surface reconstruction
 
-To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, Genesis World reconstructs a mesh from the internal particle representation. It uses [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) out of the box. `ParticleMesher`, our OpenVDB-based tool, reconstructs faster but produces lower-quality surfaces; enable it by adding its library to your path:
-
-```bash
-echo "export LD_LIBRARY_PATH=${PWD}/ext/ParticleMesher/ParticleMesherPy:$LD_LIBRARY_PATH" >> ~/.bashrc
-source ~/.bashrc
-```
+To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, Genesis World reconstructs a mesh from the internal particle representation. It uses [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) by default, which extracts a smooth surface from the particle density but requires all particles to share one radius. Set `recon_backend="levelset"` on the surface to wrap the union of the particle spheres instead: it supports a radius per particle, at the cost of a bumpier surface. Both backends work on every platform with no extra install. `recon_backend="openvdb"` is a deprecated alias of `"levelset"`.
 
 ### Ray-tracing renderer
 
-For photorealistic stills, Genesis World includes a ray-tracing renderer built on [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute). It is built from source; see {doc}`/user_guide/rendering/index` for setup. For new work, prefer the {doc}`Nyx renderer </user_guide/rendering/nyx_renderer>`.
+For photorealistic stills, Genesis World includes a ray-tracing renderer built on [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute). It is built from source; see {doc}`/user_guide/rendering/cameras` for setup. For new work, prefer the {doc}`Nyx renderer </user_guide/rendering/nyx_renderer>`, installed with `pip install gs-nyx`.
+
+### IPC coupler
+
+The [libuipc](https://github.com/spiriMirror/libuipc)-based IPC coupler (`gs.options.IPCCouplerOptions`) needs `pip install pyuipc`, available on Linux and Windows x86 with an NVIDIA GPU. See {doc}`/user_guide/physics/coupling/ipc_coupler`.
 
 ### USD assets
 
@@ -58,22 +59,13 @@ To load USD assets into scenes, see the [USD import setup](../assets/usd_import.
 
 ### `Genesis hasn't been initialized`
 
-Importing an engine submodule before calling `gs.init()` raises this error:
+Creating a scene or a morph before calling `gs.init()` raises this error:
 
-```python
+```text
 genesis.GenesisException: Genesis hasn't been initialized. Did you call `gs.init()`?
 ```
 
-Engine submodules must be imported after initialization so they can configure low-level Quadrants features such as the fast-cache mechanism and dynamic array mode. This is rarely a problem in practice, because Genesis World constructs the engine classes for you. If you need to import one for type checking, guard the import:
-
-```python
-from typing import TYPE_CHECKING
-
-import genesis as gs
-
-if TYPE_CHECKING:
-    from genesis.engine.entities.drone_entity import DroneEntity
-```
+Call `gs.init()` first: initialization selects the backend and configures low-level Quadrants features such as the fast-cache mechanism and dynamic array mode.
 
 ### Circular import error
 
@@ -123,7 +115,7 @@ To ensure GPU rendering is active:
    ln -s /usr/lib/x86_64-linux-gnu/libcuda.so.1 /usr/lib/x86_64-linux-gnu/libcuda.so
    ```
 
-5. Genesis World tries EGL by default, so you usually do not need to set `PYOPENGL_PLATFORM`. In custom setups (Docker, headless servers) these variables can help:
+5. Genesis World selects the offscreen OpenGL backend for your operating system (EGL on Linux, CGL on macOS, and pyglet elsewhere), so you usually do not need to set `PYOPENGL_PLATFORM`. To override that choice, set it to `egl`, `osmesa`, `cgl` (macOS only), or `pyglet`. In custom setups (Docker, headless servers) these variables can help:
 
    ```bash
    export NVIDIA_DRIVER_CAPABILITIES=all
@@ -165,7 +157,7 @@ Use `glxinfo -B` to check which OpenGL vendor is active. As a last resort, force
 
 ### Quadrants falls back to CPU in an Ubuntu VM on Windows 11 (WSL2)
 
-If PyTorch initializes on CUDA but Quadrants falls back to CPU (or Vulkan) with `libcuda.so lib not found`, the CUDA libraries are not on the library path. Confirm they are present and add them:
+If PyTorch initializes on CUDA but Quadrants falls back to CPU with `libcuda.so lib not found`, the CUDA libraries are not on the library path. Confirm they are present and add them:
 
 ```bash
 ls /usr/lib/wsl/lib/

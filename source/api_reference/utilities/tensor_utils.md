@@ -12,13 +12,12 @@ Genesis World keeps simulation data in three formats:
 
 ## Conversion helpers
 
-The helpers below are exposed under `gs.utils`. They accept Genesis, PyTorch, or array-like inputs and handle any GPU-to-CPU transfer internally.
+The helpers below are exposed under `gs.utils`. They accept PyTorch tensors or array-like inputs. `tensor_to_cpu` and `tensor_to_array` handle the GPU-to-CPU transfer internally, and `to_gs_tensor` moves the data to `gs.device`.
 
 ```{eval-rst}
 .. autofunction:: genesis.utils.misc.tensor_to_array
 .. autofunction:: genesis.utils.misc.tensor_to_cpu
 .. autofunction:: genesis.utils.misc.to_gs_tensor
-.. autofunction:: genesis.utils.misc.assert_gs_tensor
 ```
 
 ## See also

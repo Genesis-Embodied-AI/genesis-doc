@@ -1,6 +1,6 @@
 # Developers
 
-This section is for building on Genesis World rather than only using it: extending the engine with your own resources, following the conventions the codebase holds itself to, and measuring where a simulation spends its time. To add a new **sensor** type, see {doc}`Custom sensors </user_guide/sensing/custom_sensors/index>`.
+This section is for building on Genesis World rather than only using it: extending the engine with your own resources and following the conventions the codebase holds itself to. To measure where a simulation spends its time, see {doc}`Performance </user_guide/performance/index>`. To add a new **sensor** type, see {doc}`Custom sensors </user_guide/sensing/custom_sensors/index>`.
 
 ```{toctree}
 :hidden:
@@ -8,5 +8,4 @@ This section is for building on Genesis World rather than only using it: extendi
 
 extending_genesis
 naming_and_variables
-profiling
 ```

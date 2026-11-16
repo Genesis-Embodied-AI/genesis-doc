@@ -63,10 +63,10 @@ Termination is the classic place a sync sneaks in. Computing which environments 
 self.reset_buf = self.episode_length_buf > self.max_episode_length
 self.reset_buf |= torch.abs(self.base_euler[:, 1]) > self.env_cfg["termination_if_pitch_greater_than"]
 self.reset_buf |= torch.abs(self.base_euler[:, 0]) > self.env_cfg["termination_if_roll_greater_than"]
-self.reset_buf |= self.scene.rigid_solver.get_error_envs_mask()
+self.reset_buf |= self.scene.get_error_envs_mask()
 ```
 
-The last line folds rigid-solver failures into the normal episode termination path. Read {py:meth}`RigidSolver.get_error_envs_mask() <genesis.engine.solvers.rigid.rigid_solver.RigidSolver.get_error_envs_mask>` after `scene.step()` and reset the selected environments before the next step. See {doc}`simulation_stability` for numerical recovery, capacity errors, and diagnosis of repeated failures.
+The last line folds in numerical divergence. When any solver hits a NaN, a contact overflow, or a constraint failure in some environment, `scene.get_error_envs_mask()` returns a `(n_envs,)` boolean mask of the affected environments. A flagged error raises at the start of the next step until it is cleared, either by resetting the environment or with `scene.clear_errno(envs_idx)`. Reset those environments with the same machinery as a normal episode end, so a single diverged environment terminates on its own instead of crashing the batch.
 
 Genesis World setters and the solver accept a boolean `envs_idx` mask directly, so you never have to materialize indices to use one.
 
@@ -118,10 +118,10 @@ Once the environment is finalized, `gs.init(performance_mode=True)` bakes the no
 
 ## Verify with the profiler
 
-Do not guess where the syncs are. Attach the PyTorch profiler around a few steps and look for gaps between kernel launches, which are the CPU waiting on the GPU. See {doc}`/user_guide/developers/profiling` for the profiling setup and how to read Quadrants kernel timings.
+Do not guess where the syncs are. Attach the PyTorch profiler around a few steps and look for gaps between kernel launches, which are the CPU waiting on the GPU. See {doc}`/user_guide/performance/profiling` for the profiling setup and how to read Quadrants kernel timings.
 
 ## See also
 
 - {doc}`/user_guide/getting_started/parallel_simulation`: how batched builds and `n_envs` work.
-- {doc}`domain_randomization`: vary physics across environments without breaking the sync-free step.
-- {doc}`/user_guide/developers/profiling`: measure kernel time and launch latency.
+- {doc}`/user_guide/policy_training/domain_randomization`: vary physics across environments without breaking the sync-free step.
+- {doc}`/user_guide/performance/profiling`: measure kernel time and launch latency.

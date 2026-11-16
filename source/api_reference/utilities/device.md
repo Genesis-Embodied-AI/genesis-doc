@@ -11,7 +11,7 @@ import genesis as gs
 
 gs.init(backend=gs.gpu)
 
-print(gs.backend)  # the backend it settled on: gs.cuda, gs.amdgpu, gs.metal, or gs.cpu
+print(gs.backend.name)  # the backend it settled on: cuda, amdgpu, metal, or cpu
 print(gs.device)  # the matching PyTorch device: cuda:0, mps:0, or cpu
 ```
 

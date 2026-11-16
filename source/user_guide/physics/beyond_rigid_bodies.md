@@ -1,4 +1,4 @@
-# Beyond rigid bodies
+# Deformables and fluids
 
 The {doc}`Hello, Genesis World </user_guide/getting_started/hello_genesis>` tutorial simulated a rigid robot. That same `Scene` can hold water, sand, cloth, and soft tissue at the same time, because Genesis World unifies several physics **solvers** under one scene. A solver is the set of algorithms that advances one family of materials; the material you assign to an entity decides which solver simulates it.
 
@@ -101,13 +101,13 @@ Skinning a flat 2D cloth mesh with `vis_mode="visual"` can produce degenerate ba
 
 ## SPH: free-surface liquids
 
-Smoothed-Particle Hydrodynamics is a purely Lagrangian (particle-only) solver aimed at liquids. Use SPH when you want fluid governed by physical parameters (rest density `rho` in kg/m³, viscosity `mu`, and surface tension `gamma`) rather than the coarser liquid model MPM provides.
+Smoothed-Particle Hydrodynamics is a purely Lagrangian (particle-only) solver aimed at liquids. Use SPH when you want fluid governed by physical parameters (rest density `rho` in kg/m³, viscosity `mu`, and surface tension `surface_tension` in N/m) rather than the coarser liquid model MPM provides.
 
 Turning a rigid block into water is one line: give it an SPH liquid material. Tune the flow with its parameters:
 
 ```python
 liquid = scene.add_entity(
-    material=gs.materials.SPH.Liquid(),  # or Liquid(mu=0.02, gamma=0.02) for a thicker fluid
+    material=gs.materials.SPH.Liquid(),  # or Liquid(mu=0.02) for a thicker fluid
     morph=gs.morphs.Box(pos=(0.0, 0.0, 0.65), size=(0.4, 0.4, 0.4)),
     surface=gs.surfaces.Default(color=(0.4, 0.8, 1.0), vis_mode="particle"),
 )
@@ -126,17 +126,17 @@ An SPH liquid block collapsing and spreading across the ground, contained within
 The `Liquid` material accepts a `sampler` that controls how particles fill the morph: `"regular"` (a grid lattice, the SPH default for numerical stability), `"pbs"` (physics-based sampling, which runs extra steps for a natural arrangement), or `"random"`.
 :::
 
-## SF: gaseous phenomena (smoke)
-
-The Stable Fluid solver works on a fixed 3D grid (Eulerian): it advects a velocity field and one or more scalar density fields, then makes the velocity divergence-free with a Jacobi pressure projection. Use it for smoke and other gases, and set the grid resolution with `SFOptions.res`.
-
-SF has no Lagrangian entity you add and move: gas enters through velocity **jets** you register on the solver, and the solver stays inactive until at least one jet exists. Each substep advects the velocity and density fields (RK3 backtracing with trilinear interpolation), injects momentum at the jets, then runs `solver_iters` Jacobi pressure iterations to keep the velocity divergence-free. State lives on the fixed grid, so there are no per-entity get/set methods, and SF does not participate in checkpointing. Read the density grid back for rendering.
-
-Full script, including the jet class and writing the density field to images: [`examples/fluid/smoke.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/fluid/smoke.py).
-
 ## See also
 
-- {doc}`Soft robots <soft_robots>`: actuate MPM and FEM muscles.
+- {doc}`Muscle actuation <soft_robots>`: actuate MPM and FEM muscles.
 - {doc}`Hybrid entities <hybrid_entity>`: couple a rigid skeleton to a soft skin.
 - {doc}`Particle emitters <emitters>`: stream MPM, SPH, or PBD particles into a scene.
-- {doc}`Solvers and coupling </user_guide/theory/coupling/index>`: how solvers exchange forces across material boundaries. Runnable pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling), and the IPC contact solver for stiff soft-body contact in [`examples/ipc`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/ipc).
+- {doc}`Solvers and coupling </user_guide/physics/coupling/index>`: how solvers exchange forces across material boundaries. Runnable pairings live in [`examples/coupling`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/coupling), and the IPC contact solver for stiff soft-body contact in [`examples/ipc`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/main/examples/ipc).
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+soft_robots
+hybrid_entity
+```

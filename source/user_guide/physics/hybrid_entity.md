@@ -123,5 +123,5 @@ A hybrid entity can also be built from a bare {py:class}`gs.morphs.Mesh <genesis
 
 ## See also
 
-- {doc}`Soft robots <soft_robots>`: muscle actuation for standalone FEM and MPM soft bodies.
-- {doc}`Beyond rigid bodies <beyond_rigid_bodies>`: fluids, cloth, and other deformable simulation.
+- {doc}`Muscle actuation <soft_robots>`: muscle actuation for standalone FEM and MPM soft bodies.
+- {doc}`Deformables and fluids <beyond_rigid_bodies>`: fluids, cloth, and other deformable simulation.

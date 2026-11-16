@@ -15,7 +15,7 @@ A state snapshot assumes the scene it came from is already built. A scene file c
 
 A snapshot captures only the *dynamic* state: the fields that change as the simulation steps. It does not capture the scene's *structure*: the entities, their morphs, the solver options, or the number of environments. That structure is fixed by how you build the scene, and restoring a snapshot assumes it is already in place.
 
-- **`SimState`:** the object returned by `scene.get_state()`. It holds one per-solver state object for each active solver, batched over environments.
+- **`SimState`:** the object returned by `scene.get_state()`. Its `solvers` dictionary holds the state of each active solver under the name of its class, batched over environments.
 - **Dynamic state:** positions, velocities, and the internal fields each solver integrates. This is what a snapshot holds.
 - **Static structure:** entities, morphs, geometry, and solver configuration. A snapshot leaves it out, and a scene file is how it travels (see below).
 
@@ -45,15 +45,14 @@ A reset also sets the simulated time of the environments it touches back to zero
 Passing `state` to `reset()` also registers it as the scene's initial state. A subsequent bare `scene.reset()` returns to *this* snapshot, not to the state the scene had at build time. Keep a separate reference to your build-time state if you need both.
 :::
 
-The per-solver state objects are plain attribute holders. The rigid solver's state carries `qpos`, `dofs_vel`, `links_pos`, and `links_quat`; reading one field looks like this:
+A `SimState` is a copy of the state, kept outside of the autograd graph of a differentiable rollout. Read positions and velocities through the entity and solver getters instead, which return live tensors and carry gradients:
 
 ```python
-state = scene.get_state()
-rigid_state = state.solvers_state[scene.solvers.index(scene.rigid_solver)]
-qpos = rigid_state.qpos  # shape ([n_envs,] n_qs)
+qpos = robot.get_qpos()  # shape ([n_envs,] n_qs)
+particles_pos = scene.mpm_solver.get_particles_pos()  # shape ([n_envs,] n_particles, 3)
 ```
 
-The differentiable example [`examples/deformable/differentiable_push.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/deformable/differentiable_push.py) uses this pattern: it calls `scene.reset()` to restart each optimization pass from a fixed initial state, and reads `scene.get_state().solvers_state[...]` to compute a loss from particle positions mid-rollout.
+The differentiable example [`examples/deformable/differentiable_push.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/deformable/differentiable_push.py) uses this pattern: it calls `scene.reset()` to restart each optimization pass from a fixed initial state, and reads `scene.mpm_solver.get_particles_pos()` to compute a loss from particle positions mid-rollout.
 
 ## Resetting environments in parallel simulation
 
@@ -101,7 +100,7 @@ Adding an entity resolves its description, so a scene is exported before it is b
 
 The file names what it holds rather than carrying code to run. Genesis World creates only the options, descriptions and meshes the file declares, and rejects a value that contradicts its declared type, so a scene from a stranger is safe to open. A load also compares the layout of every class the file holds with the current one, and refuses a file written when a class meant something else, naming the class. A file written by another version of Genesis World whose classes still match loads with a warning that the simulation it describes may run differently.
 
-Every option the scene was created with travels as one {py:class}`SceneOptions <genesis.options.scene.SceneOptions>` object, reachable as `scene.options` on any scene. Passing it to `gs.Scene(options=other.options)` creates a scene from what another was created with, which is also how a loaded scene gets its options back. The physics options stand as recorded, since they size the arrays a recorded state fills, and the viewer, visualizer, and renderer options may be replaced at load, so a scene recorded headless opens in the viewer a debugging session needs:
+Every option the scene was created with travels as one {py:class}`SceneOptions <genesis.options.scene.SceneOptions>` object, reachable as `scene.options` on any scene. Passing it to `gs.Scene(options=other.options)` creates a scene from what another was created with, which is also how a loaded scene gets its options back. The physics options stand as recorded, since they size the arrays a recorded state fills. The viewer and visualizer options passed at load override the recorded ones for the fields they set, while every other field keeps its recorded value, and a renderer passed at load replaces the recorded one as a whole. A scene recorded headless thus opens in the viewer a debugging session needs:
 
 ```python
 scene = gs.Scene.load(
@@ -118,7 +117,7 @@ What a description carries is what travels, and `export` tells you about the res
 
 ## Checkpointing a built scene
 
-A `SimState` holds what you read back as positions and velocities. A **checkpoint** holds everything a step reads from one step to the next: the reduced-space state and the control inputs, the contacts and the constraint solution, the warm-start caches, and the link and geom poses the last step derived. Stepping a restored scene therefore lands bit-for-bit where the original went, on every backend.
+A `SimState` holds what you read back as positions and velocities. A **checkpoint** holds everything a step reads from one step to the next: the reduced-space state and the control inputs, the contacts and the constraint solution, the warm-start caches, and the link and geom poses the last step derived. Stepping a restored scene therefore lands bit-for-bit where the original went, on every backend. Checkpoints, checkpoint files, and trajectories cover the rigid and kinematic solvers only for now: a scene with any other active solver, or one coupled by IPC, raises when you checkpoint it.
 
 The checkpoint is the pickle protocol. `scene.__getstate__()` returns a {py:class}`SceneCheckpoint <genesis.engine.scene.SceneCheckpoint>`: the scene description, the environment layout the scene was built with, and the arrays of every solver, copied where they live, so a save and a restore within one process stay on the device. `scene.__setstate__(checkpoint)` puts a scene built from the same description and layout back in that state, and rejects a checkpoint from another build by the name of what differs. Pickling a scene reads the same record, and unpickling creates and builds the scene before restoring it:
 
@@ -137,7 +136,7 @@ for _ in range(50):
 scene.__setstate__(checkpoint)  # back to step 100, and the next 50 steps land where they did
 ```
 
-A restore also restarts what surrounds the state, as a reset does: the gradient tape, the sensors, and the recorders forget the run that led there, and the viewer redraws. The simulated time of each environment comes back as recorded, since it is state. A differentiable scene carries the gradients of its arrays along, so a checkpoint taken after a backward pass restores them.
+A restore also restarts what surrounds the state, as a reset does: the autograd graph of the rollout, the sensors, and the recorders forget the run that led there, and the viewer redraws. The simulated time of each environment comes back as recorded, since it is state. A differentiable scene carries the gradients of its arrays along, so a checkpoint taken after a backward pass restores them.
 
 ## Checkpoint and trajectory files
 
@@ -162,14 +161,16 @@ for _ in range(1000):
 scene.stop_recording()
 ```
 
-The writer runs on the stepping thread, so every frame is kept, and compresses and writes each completed chunk on a thread of its own while the simulation steps on. Two modes trade size for exactness, and `exact` picks one:
+Every frame is kept. A step only copies its frame aside, without waiting for a GPU to finish the step, while a thread of its own compresses the frames and another writes the file, so recording holds real time on a single environment. Two modes trade size for exactness, and `mode` picks one:
 
-- **Exact** (the default for a single environment): every frame holds everything a step reads or writes, so a replay is bit-for-bit and the simulation resumes from any frame.
-- **Compressed** (the default for a batched scene, with a warning): every frame holds the model parameters, configuration, velocities, accelerations, control inputs, contacts, and constraint forces. The file is several times smaller, and a load recomputes the link and geom poses by forward kinematics, which may differ at the last bits.
+- **Exact**: a replay is bit-for-bit, and the simulation resumes from any frame exactly as it ran, but recording slows the simulation down significantly for large batch sizes.
+- **Minimal**: frames hold only the bare minimum state, which makes them far smaller: everything else is recovered by running a full simulation step, and may differ at the last bits, except the contacts of hibernated links, which are taken from the scene as it stood before the seek. A replay that plays the frames in order from the first one in a freshly loaded scene is unaffected.
+
+By default a trajectory records in exact mode as long as a frame stays within 4 MiB, and in minimal mode otherwise, since every recorded step copies a whole frame.
 
 `hz` records every few steps, `chunk_size` sets how many frames a chunk holds (larger chunks compress better and seek slower), and `max_size` caps the file, closing it as a valid log and raising at the next step past the cap, so a run left recording fills the disk by at most 2 GiB by default.
 
-`gs.Scene.load_trajectory(path)` creates and builds the recorded scene and returns a {py:class}`Trajectory <genesis.recorders.trajectory.Trajectory>` that plays in it. Frame `i` is the state after `i` steps; `seek(i)` puts the scene there, `play()` seeks every frame and redraws the viewer at the pace the recording ran at, `frame(i)` returns the arrays of a frame by name, and `time(i)` the simulated time of each environment. A negative index counts from the end. The last frame, like a checkpoint file, holds every array but the configs and constants, the scratch of the solvers included, for the analysis of a failure that may depend on the platform and never reproduce once shared:
+`gs.Scene.load_trajectory(path)` creates and builds the recorded scene and returns a {py:class}`Trajectory <genesis.recorders.trajectory.Trajectory>` that plays in it. Frame `i` is the state after `i` steps; `seek(i)` puts the scene there, `play()` seeks every frame and redraws the viewer at the pace the recording ran at, `frame(i)` returns the arrays of a frame by name, `time(i)` the simulated time of each environment, and `timings(i)` the wall time of each phase of the step that led to frame `i`, as `scene.timings` names them. A negative index counts from the end. A file written in an earlier version of the format is refused, with its version named. The last frame, like a checkpoint file, holds every array but the configs and constants, the scratch of the solvers included, for the analysis of a failure that may depend on the platform and never reproduce once shared:
 
 ```python
 trajectory = gs.Scene.load_trajectory("run.gstraj", show_viewer=True)
@@ -182,16 +183,18 @@ A trajectory replays on another machine, backend, or precision: the frames are s
 
 ## What a snapshot contains
 
-The dynamic state each solver contributes to a `SimState`:
+Each entry of `SimState.solvers` is a {py:class}`SolverCheckpoint <genesis.engine.states.solvers.SolverCheckpoint>`, whose `arrays` dictionary holds the state arrays of that solver under their internal names, such as `rigid_info.qpos` or `mpm_state.particles.pos`. The dynamic state each solver contributes:
 
-| Solver | State fields |
+| Solver | State arrays |
 |---|---|
-| Rigid | `qpos`, `dofs_vel`, `dofs_acc`, `links_pos`, `links_quat`, `friction_ratio` |
-| Kinematic | `qpos`, `dofs_vel`, `links_pos`, `links_quat` |
-| MPM | `pos`, `vel`, `C`, `F`, `Jp`, `active` |
-| SPH | `pos`, `vel`, `active` |
-| PBD | `pos`, `vel`, `free` |
-| FEM | `pos`, `vel`, `active` |
+| Rigid | Joint positions, dof velocities and accelerations, link poses, control targets, hibernation flags, and the contact and constraint warm-start caches |
+| Kinematic | Joint positions, dof velocities and accelerations, link poses, and control targets |
+| MPM | Particle positions, velocities, `C`, `F`, `Jp`, actuation, and activity flags |
+| SPH | Particle positions, velocities, accelerations, densities, pressures, and activity flags |
+| PBD | Particle positions, velocities, and the free and activity flags |
+| FEM | Vertex positions and velocities, and element actuation |
+
+The legacy coupler also contributes its state, under `LegacyCoupler`.
 
 ## Reproducibility notes
 

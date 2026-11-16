@@ -1,6 +1,6 @@
 # Visualization
 
-This page covers watching a Genesis World scene as it runs: the interactive **viewer** window, and the `gs` command-line tools that open it without writing a script. Both are for developing on a machine with a display. To render images off-screen (color, depth, segmentation, video) or produce photorealistic frames, see {doc}`Rendering </user_guide/rendering/index>`.
+This page covers watching a Genesis World scene as it runs: the interactive **viewer** window, and the `gs` command-line tools that open it without writing a script. Both are for developing on a machine with a display. To render images off-screen (color, depth, segmentation, video) or produce photorealistic frames, see {doc}`Rendering </user_guide/rendering/cameras>`.
 
 Every scene owns a `visualizer` (`scene.visualizer`) that drives both the viewer and the cameras added with `scene.add_camera()`. The viewer runs in its own thread and follows the simulation in real time; cameras render frames on demand and work headless.
 
@@ -30,13 +30,17 @@ scene = gs.Scene(
 
 `camera_pos` and `camera_lookat` are in meters, in the right-handed, Z-up world frame. `camera_fov` is the vertical field of view in degrees. If `res` is `None`, Genesis World opens a 4:3 window sized to half your display height.
 
-The viewer always renders with the rasterizer. To select the backend used by the scene's cameras (rasterizer, ray tracer, or batch renderer), see {doc}`Rendering backends </user_guide/rendering/index>`.
+The viewer always renders with the rasterizer. To select the backend used by the scene's cameras (rasterizer, ray tracer, or batch renderer), see {doc}`Rendering backends </user_guide/rendering/cameras>`.
 
 :::{note}
 To cap the viewer frame rate, set `refresh_rate` on `ViewerOptions`. The older `max_FPS` argument is deprecated and maps to `refresh_rate`.
 :::
 
-`realtime_factor` sets the pace of the simulation itself: how many seconds of simulated time one second of wall-clock time covers, `1.0` for real time and `2.0` for twice as fast. When the viewer is shown, the simulation is throttled to it and falls behind gracefully when it cannot keep up; set it to `None` to always run as fast as possible. It also sets the playback speed of the videos recorded by a {doc}`camera </user_guide/rendering/index>`, viewer or not, with `None` recording at real time since there is no pace to follow. `scene.viewer.realtime_factor` changes it while the scene runs.
+`realtime_factor` sets the pace of the simulation itself: how many seconds of simulated time one second of wall-clock time covers, `1.0` for real time and `2.0` for twice as fast. When the viewer is shown, each step of the simulation is throttled to it and falls behind gracefully when it cannot keep up; set it to `None` to always run as fast as possible. It also sets the playback speed of the videos recorded by a {doc}`camera </user_guide/rendering/cameras>`, viewer or not, with `None` recording at real time since there is no pace to follow. `scene.viewer.realtime_factor` changes it while the scene runs.
+
+Only the steps of the simulation are paced. A change of state made outside of a step by a setter such as `entity.set_qpos(...)` is shown by the viewer on its own at its next refresh, without calling `scene.visualizer.update()` and without slowing down the loop that makes it. `scene.reset()` redraws the viewer right away. While the simulation is paused from the viewer, the stepping loop waits for the next refresh of the viewer instead of the pace of the simulation. The window stays responsive while a step waits for its pace: on macOS, where the window is driven by the stepping loop, it keeps being repainted and handles the mouse and keyboard during the wait.
+
+A step run with `scene.step(update_visualizer=False)` leaves the viewer untouched and is not paced. Call `scene.visualizer.update(force=False)` after such a step to show it and pace it like any other, or `scene.visualizer.update()` to redraw everything right away.
 
 Once the scene exists, reach the viewer through the `scene.viewer` shortcut to read or set the camera pose at runtime:
 
@@ -49,7 +53,9 @@ scene.viewer.set_camera_pose(pos=(3.5, 0.0, 2.5), lookat=(0, 0, 0.5))
 
 Installing Genesis World adds a `gs` command with a few subcommands, so you can open the viewer without writing a script. Run `gs` with no arguments to list them.
 
-**`gs launch [asset]`** opens an asset in the interactive viewer. It accepts a Mesh, URDF, MJCF, or USD file, and for a USD stage it loads every rigid entity in the stage. The viewer's overlay exposes per-joint sliders and play, pause, step, and reset controls, and it starts paused so you can inspect and pose the asset first. With no file, it opens an empty scene to which you can add entities live. Useful flags: `-c` visualize collision geometry, `-r` slowly rotate the asset, `-s SCALE` scale it, and `-l` show link frames.
+Every subcommand runs on the CPU by default. Pass `-b BACKEND` to run it on `gpu`, `cuda`, `amdgpu`, or `metal` instead: keep the CPU for a few environments, because it compiles faster, and switch to a GPU for many environments, which it simulates faster. `gpu` picks the first GPU backend available on your machine and falls back to the CPU.
+
+**`gs launch [asset]`** opens an asset in the interactive viewer. It accepts a Mesh, URDF, MJCF, or USD file, and for a USD stage it loads every rigid entity in the stage. It also opens a `.gscene` file written by `scene.export`, with every entity and physics option the scene was exported with (see {doc}`Checkpoints and simulation state </user_guide/configuration/checkpoints>`). The viewer's overlay exposes per-joint sliders and play, pause, step, and reset controls, and it starts paused so you can inspect and pose the asset first. With no file, it opens an empty scene to which you can add entities live. Useful flags: `-c` visualize collision geometry, `-r` slowly rotate the asset, `-s SCALE` scale it, and `-l` show link frames.
 
 ```bash
 gs launch xml/franka_emika_panda/panda.xml
@@ -67,10 +73,10 @@ gs play xml/franka_emika_panda/panda.xml
 gs animate 'frames/*.png' --fps 60
 ```
 
-**`gs replay file.gstraj`** opens the scene a trajectory was recorded from and replays the recording in the viewer, in a loop, until the viewer is closed. See {doc}`Checkpoints and simulation state </user_guide/configuration/checkpoints>` for recording one.
+**`gs replay file.gstraj`** opens the scene a trajectory was recorded from and replays the recording in the viewer, in a loop, until the viewer is closed. The recording plays at the pace the simulation would run, honoring `realtime_factor`, each frame being held for the steps it spans. See {doc}`Checkpoints and simulation state </user_guide/configuration/checkpoints>` for recording one. Pass `-e` with the indices of the environments to render, so that a recording of many environments replays faster by drawing only a few of them.
 
 ```bash
-gs replay run.gstraj
+gs replay run.gstraj -b gpu -e 0 3
 ```
 
 :::{note}
@@ -79,6 +85,6 @@ gs replay run.gstraj
 
 ## See also
 
-- {doc}`Rendering </user_guide/rendering/index>`: cameras, image types, video, lighting, and rendering backends.
+- {doc}`Rendering </user_guide/rendering/cameras>`: cameras, image types, video, lighting, and rendering backends.
 - {doc}`Interactive GUI and debugging </user_guide/interaction/interactive_debugging>`: inspecting objects, drawing debug geometry, and the in-viewer control panel.
 - {doc}`Viewer interaction and plugins </user_guide/interaction/viewer_plugin>`: extending the viewer with keybindings and plugins.

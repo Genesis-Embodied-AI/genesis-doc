@@ -1,6 +1,6 @@
-# Rigid-body constraints
+# Dynamic equality constraints
 
-A **constraint** ties two rigid links together so the solver keeps a geometric relationship between them: coincident points, a fixed relative pose, or coupled joint values. A model file declares most constraints once, and they hold for the whole simulation. One kind, the **weld** constraint, can be added and removed while the simulation runs, so a suction gripper can pick an object up and release it.
+A **constraint** ties two rigid links together so the solver keeps a geometric relationship between them: coincident points, a fixed relative pose, or coupled joint values. A model file declares most constraints once, and they hold for the whole simulation. Two kinds, the **weld** and **screw** constraints, can be added and removed while the simulation runs, so a suction gripper can pick an object up and release it.
 
 The complete runnable example is [`examples/rigid/suction_cup.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/suction_cup.py): a Franka arm reaches a cube, welds it to the hand, lifts and moves it, then releases.
 
@@ -46,7 +46,7 @@ The two link indices are the same across environments; only the environment sele
 
 ## Budgeting for dynamic constraints
 
-Runtime welds draw from a fixed pool sized before the scene is built. The pool holds `max_dynamic_constraints` welds (default 8), set on {py:class}`gs.options.RigidOptions <genesis.options.solvers.RigidOptions>`:
+Runtime welds and screws draw from a fixed pool sized before the scene is built. The pool holds `max_dynamic_constraints` of them together (default 8), set on {py:class}`gs.options.RigidOptions <genesis.options.solvers.RigidOptions>`:
 
 ```python
 scene = gs.Scene(
@@ -55,7 +55,7 @@ scene = gs.Scene(
 ```
 
 :::{warning}
-Adding a weld once the pool is full has no effect: the solver logs a warning and ignores the request rather than raising. If a gripper silently fails to hold its object, check that you have released stale welds and that `max_dynamic_constraints` is large enough for the number held at once.
+Adding a weld once the pool is full raises an error asking you to increase `max_dynamic_constraints`, and no environment receives the weld. Welding two links that are already welded raises as well. Release stale welds before adding new ones, and size `max_dynamic_constraints` for the number held at once.
 :::
 
 ## Querying active welds
@@ -70,17 +70,24 @@ Pass `to_torch=False` for NumPy arrays, or `as_tensor=False` to get a per-enviro
 
 ## Constraint types
 
-Genesis World supports three equality-constraint types. Weld is the only one you add at runtime, and the other two come from a model's `<equality>` block when Genesis World loads an MJCF or URDF.
+Genesis World supports four equality-constraint types. Weld and screw are the ones you add at runtime, and connect and joint come from the model: an MJCF `<equality>` block, or a URDF `<mimic>` tag for joint constraints.
 
 | Type | Constrains | Declared in | Runtime API |
 |---|---|---|---|
 | Connect | A point on each link to coincide (3 dofs), a ball joint. | MJCF | — |
 | Weld | Relative pose fully fixed (6 dofs). | MJCF, or `add_weld_constraint` | `add_weld_constraint` / `delete_weld_constraint` |
-| Joint | One joint's value tied to another's by a polynomial. | MJCF, URDF | — |
+| Screw | Relative motion restricted to a helix about an axis of the first link (5 dofs), with optional travel limits and dry friction. | `add_screw_constraint` | `add_screw_constraint` / `delete_screw_constraint` |
+| Joint | One joint's value tied to another's by a polynomial, or held at a constant offset when the model names a single joint. | MJCF, URDF | — |
+
+`add_screw_constraint` takes the axis in the frame of the first link and the travel per full turn as `pitch`, in meters. A pitch of zero gives a revolute motion and an infinite one a prismatic motion. The two links stop colliding with each other while the constraint holds, and it is not supported yet when `requires_grad=True`:
+
+```python
+rigid.add_screw_constraint(link_bolt, link_nut, axis=(0.0, 0.0, 1.0), pitch=0.003, limit=(-0.02, 0.0))
+```
 
 A connect or joint constraint enters the simulation with its host model. There is no runtime API to add or remove it; edit the model file's equality section instead.
 
 ## See also
 
 - {doc}`Control your robot </user_guide/getting_started/control_your_robot>`: joint-level position, velocity, and force control.
-- {doc}`Inverse kinematics and motion planning <inverse_kinematics_motion_planning>`: the IK solving and path planning the suction example uses to reach the object.
+- {doc}`Inverse kinematics and motion planning </user_guide/robot_control/inverse_kinematics_motion_planning>`: the IK solving and path planning the suction example uses to reach the object.

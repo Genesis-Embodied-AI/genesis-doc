@@ -18,12 +18,11 @@ Each physics solver has its own entity type. Choosing a material selects the sol
 
 - **`RigidEntity`:** articulated rigid bodies and robots simulated by the rigid solver. It is the type used for most manipulation and locomotion tasks, and it exposes links, joints, and dofs.
 - **`DroneEntity`:** a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>` subclass that adds propeller and thrust control for quadrotor simulation.
+- **`TerrainEntity`:** a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>` subclass that `gs.morphs.Terrain` builds, with a query for the surface height at any point.
 - **`MPMEntity`:** elastic and plastic solids, sand, snow, and similar continua simulated with the Material Point Method (MPM) solver.
 - **`FEMEntity`:** deformable solids simulated with the Finite Element Method (FEM) solver.
 - **PBD entities:** cloth, ropes, and particle-based fluids simulated by the Position Based Dynamics (PBD) solver. The material determines the concrete type: for example `PBD2DEntity` for cloth and `PBD3DEntity` for elastic volumes.
 - **`SPHEntity`:** liquids and gases simulated with the Smoothed Particle Hydrodynamics (SPH) solver.
-- **`SFParticleEntity`:** smoke and gaseous media simulated with the Stable Fluid (SF) solver.
-- **`ToolEntity`:** a kinematically-scripted collider that couples one-way with soft and particle-based entities to push or deform them.
 - **`HybridEntity`:** an entity composed of both rigid and soft components, used to couple, for example, a soft body to a rigid skeleton.
 - **`Emitter`:** a helper that continuously injects particles into a particle-based entity during simulation, for spraying and streaming effects.
 
@@ -35,10 +34,9 @@ mpm_entity
 fem_entity
 pbd_entity/index
 sph_entity
-sf_entity
 drone_entity
+terrain_entity
 hybrid_entity
-tool_entity
 emitter
 ```
 

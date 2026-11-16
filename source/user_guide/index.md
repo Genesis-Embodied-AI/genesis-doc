@@ -15,6 +15,7 @@ sensing/index
 rendering/index
 assets/index
 policy_training/index
+performance/index
 theory/index
 developers/index
 ```

@@ -84,7 +84,7 @@ These methods share the pattern used throughout the control API: a tensor of val
 - `set_*` writes the robot state directly, without consulting the dynamics. The dof lands on the requested value in a single step.
 - `control_*` sends a target to the controller, which produces forces that move the robot toward it over several steps, respecting the dynamics and the force range set above.
 
-Use `set_dofs_position` to reset an episode or place a robot at a starting configuration, and keep it out of a control loop. On a rigid entity it zeroes the dof velocities as well, so the robot starts from rest; pass `zero_velocity=False` to keep the velocities it had:
+Use `set_dofs_position` to reset an episode or place a robot at a starting configuration, and keep it out of a control loop. On a rigid entity, pass `zero_velocity=True` to also zero the velocities of all the entity's dofs, so the robot starts from rest:
 
 ```python
 for i in range(150):
@@ -140,11 +140,11 @@ Two accessors report the forces at each dof after a step:
 ```python
 # force applied by the controller
 print("control force:", franka.get_dofs_control_force(motors_dof_idx))
-# actual force experienced by each dof
+# control force plus passive forces, minus bias forces
 print("internal force:", franka.get_dofs_force(motors_dof_idx))
 ```
 
-`get_dofs_control_force` is what the controller commanded, computed from the target and gains under position or velocity control, and equal to your input under force control. `get_dofs_force` is the total force the dof actually experiences, combining that control force with internal effects such as contact and Coriolis forces.
+Both report the force over the last step. `get_dofs_control_force` is the force the controller applied, computed from the target and gains under position or velocity control, equal to your input under force control, and clamped to the force range of the dof. A target set since the last step shows only in the force of the next step. `get_dofs_force` adds the passive damping and stiffness forces to that control force and subtracts the bias forces of gravity, Coriolis and centrifugal effects. It leaves out constraint, contact and external forces.
 
 Running the full example produces this sequence:
 
@@ -168,7 +168,7 @@ for i in range(150):
     scene.step()
 ```
 
-Both components are optional, and `apply_external_force` and `apply_external_torque` are shortcuts for the one-sided cases. Forces are in newtons and torques in newton-meters. To drive many links in one call, `RigidEntity.apply_links_external_wrench` and `RigidSolver.apply_links_external_wrench` take the same arguments plus a `links_idx`, with force and torque of shape `([n_envs,] n_links, 3)`.
+Both components are optional, and `apply_external_force` and `apply_external_torque` are shortcuts for the one-sided cases. Forces are in newtons and torques in newton-meters. To drive many links in one call, `RigidEntity.apply_links_external_wrench` and `RigidSolver.apply_links_external_wrench` take the same arguments plus the link indices (`links_idx_local` on the entity, scene-level `links_idx` on the solver), with force and torque of shape `([n_envs,] n_links, 3)`.
 
 Three arguments decide where the wrench acts and in which coordinates it is read:
 

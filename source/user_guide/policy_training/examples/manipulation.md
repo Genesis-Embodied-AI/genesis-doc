@@ -118,7 +118,7 @@ Start training:
 python examples/manipulation/grasp_train.py --stage=rl
 ```
 
-By default this runs 2048 parallel environments (`-b/--num-envs`) for 300 iterations. More environments give PPO more samples per update; the ceiling is your GPU memory. See {doc}`Efficient environment design </user_guide/policy_training/best_practices/efficient_environment>` for how to push batch sizes higher.
+By default this runs 2048 parallel environments (`-b/--num-envs`) for 300 iterations. More environments give PPO more samples per update; the ceiling is your GPU memory. See {doc}`Efficient environment design </user_guide/performance/efficient_environment>` for how to push batch sizes higher.
 
 Monitor progress with TensorBoard:
 
@@ -181,7 +181,7 @@ python examples/manipulation/grasp_eval.py --stage=rl
 :width: 100%
 ```
 
-Student policy, reading only the stereo cameras. Pass `--record` to save the rendered views to `logs/grasp_bc/` as video:
+Student policy, reading only the stereo cameras. Pass `--record` to save the rendered views to `out/grasp_bc/` as video (`video.mp4`, `left_cam.mp4`, and `right_cam.mp4`):
 
 ```bash
 python examples/manipulation/grasp_eval.py --stage=bc --record
