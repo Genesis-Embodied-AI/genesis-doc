@@ -17,9 +17,10 @@ Use this page to choose which Genesis World settings to investigate when rigid c
 ## Before changing solver settings
 
 1. Reduce the scene to the smallest script that still shows the problem.
-2. Check units, masses, inertias, joint axes, and limits against the intended model.
-3. Show collision geometry with `vis_mode="collision"` in `scene.add_entity(...)`; check initial overlaps and unwanted self-collision.
-4. Check controller targets and force limits, including abrupt target changes and joints commanded beyond their limits.
+2. Check units, masses, inertias, joint axes, and limits against the intended model. Extreme mass ratios along a kinematic chain and nearly singular inertias make the constraint solve ill-conditioned.
+3. Show collision geometry with `vis_mode="collision"` in `scene.add_entity(...)`; check initial overlaps and unwanted self-collision, especially between adjacent links.
+4. Check that the initial state respects the joint limits and the equality constraints. Redundant equality constraints, and closed kinematic loops whose constraints cannot all hold at once, make the constraint solve diverge.
+5. Check controller targets and force limits, including abrupt target changes and joints commanded beyond their limits.
 
 Choose a measure of success before changing a parameter: penetration, drift, tracking error, task completion, or runtime. Rerun the script from the same initial conditions and command sequence after each change. A `.gstraj` recording helps inspect the original failure, but replaying its frames does not evaluate new settings; seeking a frame restores the recorded model parameters too.
 
@@ -61,7 +62,7 @@ Material properties and solver options affect different parts of contact:
 - Compare `RigidOptions.friction_cone` when a resting stack or grasp creeps. The elliptic cone avoids the pyramidal approximation and can reduce drift; measure both the drift and solve time in your scene. `impratio` controls friction impedance relative to the normal response.
 - Enable `enable_torsional_friction` in `RigidOptions` for resistance to twisting. For rolling resistance, enable both `enable_torsional_friction` and `enable_rolling_friction`; rolling friction requires torsional friction. Their strengths come from `friction_torsional` and `friction_rolling` on the material. [`examples/rigid/torsional_grasp.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/torsional_grasp.py) combines these with the elliptic cone.
 
-`RigidOptions.constraint_timeconst` controls how quickly constraints correct errors. A smaller value makes the response stiffer, but can introduce jitter; it is clamped to at least twice the integration interval. Check penetration and oscillation together when changing it.
+`RigidOptions.constraint_timeconst` controls how quickly constraints correct errors. A smaller value makes the response stiffer, but can introduce jitter; it is clamped to at least twice the integration interval. It applies to the geoms whose model does not set a time constant of its own. Check penetration and oscillation together when changing it.
 
 `use_gjk_collision` changes collision detection from MPR to GJK. Compare it when the detector produces poor contacts for your geometry, and measure the runtime change. It does not adjust how the constraint solver responds to the contacts it receives.
 
