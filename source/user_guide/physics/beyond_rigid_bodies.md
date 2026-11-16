@@ -72,6 +72,20 @@ Three MPM objects falling and deforming: an elastic cube, a liquid cube, and an 
 
 The Finite Element Method discretizes an entity into a tetrahedral mesh and solves the elasticity equations on it. Choose FEM over MPM when mesh-level accuracy matters: stiff elastic bodies, volumetric muscles, and contact-rich soft-body manipulation. {py:class}`gs.materials.FEM.Elastic <genesis.engine.materials.FEM.elastic.Elastic>` exposes the physical parameters directly, such as Young's modulus `E` (Pa) and Poisson ratio `nu`.
 
+To hold some vertices of an FEM entity in place, such as a soft pad clamped by one face, build the entity from an entity spec, {py:class}`gs.entities.FEM <genesis.options.entities.FEM>`, and select the vertices on it. `gs.indices.Vertex.in_box` and `gs.indices.Vertex.closest_to` take positions in the frame of the morph, relative to its `pos`:
+
+```python
+pad_spec = gs.entities.FEM(
+    morph=gs.morphs.Box(pos=(0.0, 0.0, 0.5), size=(0.2, 0.2, 0.2)),
+    material=gs.materials.FEM.Elastic(E=1.0e5, nu=0.45),
+)
+# Clamp the top face: the box spans -0.1 to 0.1 in the frame of its morph
+pad_spec.select(gs.indices.Vertex.in_box((-0.1, -0.1, 0.099), (0.1, 0.1, 0.1))).set_is_fixed(True)
+pad = scene.add_entity(spec=pad_spec)
+```
+
+The fixed vertices become vertex constraints at build, which `pad.remove_vertex_constraints()` releases. [`examples/deformable/fem_hard_and_soft_constraint.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/deformable/fem_hard_and_soft_constraint.py) fixes vertices by box and by closest point.
+
 FEM underpins the {doc}`soft robots tutorial <soft_robots>`, which actuates a volumetric muscle. FEM entities also couple to rigid arms for grasping; see [`examples/coupling/fem_cube_linked_with_arm.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/coupling/fem_cube_linked_with_arm.py).
 
 ## PBD: cloth and topology-preserving deformables

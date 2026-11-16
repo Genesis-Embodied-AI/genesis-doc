@@ -59,7 +59,7 @@ struct_particle_state_render = qd.types.struct(
 )
 
 self.particles_render = struct_particle_state_render.field(
-    shape=(self._n_particles, self._B),  # every particle in the scene, across all envs
+    shape=(self._n_particles, self.n_envs_),  # every particle in the scene, across all envs
     needs_grad=False,
     layout=qd.Layout.SOA,
 )
