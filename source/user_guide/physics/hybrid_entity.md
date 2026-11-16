@@ -103,12 +103,12 @@ robot.part_soft    # the MPMEntity skin
 robot.n_dofs       # dofs of the skeleton
 ```
 
-`solver_rigid` and `solver_soft` return the respective solvers.
+`robot.part_rigid.solver` and `robot.part_soft.solver` return the respective solvers.
 
 ## Notes and gotchas
 
 :::{note}
-The rigid and soft solvers must share the same `dt`. Genesis World asserts this at construction, so set the timestep once in `sim_options` rather than per solver.
+The rigid and soft solvers must share the same `dt`. Genesis World raises an exception at build otherwise, so set the timestep once in `sim_options` rather than per solver.
 :::
 
 :::{warning}
