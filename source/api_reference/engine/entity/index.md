@@ -8,6 +8,8 @@ Create an entity by calling {py:meth}`scene.add_entity <genesis.engine.scene.Sce
 - **Material:** the physical model that decides which solver simulates the entity and how it responds to forces. See {doc}`/api_reference/engine/material/index`.
 - **Surface:** the visual appearance used for rendering: color, texture, and visualization mode. See {doc}`/api_reference/engine/entity/surface/index`.
 
+To set density, friction or fixed vertices on parts of an entity, pass an entity spec such as `gs.entities.Rigid` as `add_entity(spec=...)` instead. See {doc}`entity_spec`.
+
 For a worked example of adding an entity and stepping the scene, see {doc}`/user_guide/getting_started/hello_genesis`.
 
 `add_entity` returns the entity object. Its concrete type depends on the material's solver: a rigid material yields a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`, an MPM material yields an `MPMEntity`, and so on. You interact with an entity through its own methods, whose return tensors follow the batched-optional shape convention; see {doc}`/user_guide/configuration/conventions`.
@@ -47,6 +49,7 @@ The morph (geometry and pose) and the surface (appearance, with textures supplyi
 ```{toctree}
 :titlesonly:
 
+entity_spec
 morph/index
 surface/index
 texture/index

@@ -52,7 +52,7 @@ qpos = robot.get_qpos()  # shape ([n_envs,] n_qs)
 particles_pos = scene.mpm_solver.get_particles_pos()  # shape ([n_envs,] n_particles, 3)
 ```
 
-The differentiable example [`examples/deformable/differentiable_push.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/deformable/differentiable_push.py) uses this pattern: it calls `scene.reset()` to restart each optimization pass from a fixed initial state, and reads `scene.mpm_solver.get_particles_pos()` to compute a loss from particle positions mid-rollout.
+The differentiable example [`examples/deformable/differentiable_push.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/deformable/differentiable_push.py) uses this pattern: it calls `scene.reset()` to restart each optimization pass from a fixed initial state, and reads the `get_particles_pos()` of each MPM entity to compute a loss from particle positions mid-rollout.
 
 ## Resetting environments in parallel simulation
 
