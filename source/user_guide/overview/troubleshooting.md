@@ -4,15 +4,28 @@ Find the error or symptom below and check its likely causes first. If the proble
 
 ## The simulation raises an error
 
-The rigid solver checks for errors periodically and raises a `gs.GenesisException` that names the cause.
+Genesis World checks the errors of every solver at the start of each step, and raises a `gs.GenesisException` that names the cause. On a CUDA device, the check reads the errors without waiting for the GPU, so the exception can come one step later. In a scene with parallel environments, the message ends with the environments that hit the error, for example `Failing environments: [3, 17].` The error keeps raising at every step until these environments are reset.
 
-**`Invalid constraint forces causing 'nan'` or `Invalid accelerations causing 'nan'`.** The integration became unstable. Reduce `dt`, or increase `substeps` in `SimOptions`. {doc}`Tuning simulation parameters </user_guide/configuration/simulation_tuning>` explains how to choose them.
+**`Invalid constraint forces causing 'nan'` or `Invalid accelerations causing 'nan' or 'inf'`.** The integration became unstable. Reduce `dt`, or increase `substeps` in `SimOptions`. {doc}`Tuning simulation parameters </user_guide/configuration/simulation_tuning>` explains how to choose them, and what to check in the model when the error keeps coming back.
 
 **`Exceeding max number of candidate contact points`.** Increase `max_collision_pairs` in `RigidOptions`.
 
 **`Exceeding max number of post-pruning contact points`.** Increase `max_contacts` in `RigidOptions`.
 
+Resetting an environment clears a capacity error, but the same contacts overflow the buffer again, so raise the capacity instead.
+
 **`Collision detection reported a contact whose position, normal or penetration is not finite`.** This is an internal solver error. Capture the run as described below and report it.
+
+### Keep training when an environment fails
+
+When an occasional environment diverges during training, reset it after the step rather than stopping the run, so that the other environments carry on:
+
+```python
+scene.step()
+scene.reset(envs_idx=scene.get_error_envs_mask())
+```
+
+`scene.get_error_envs_mask()` returns a boolean mask with one value per environment. {doc}`Writing an efficient RL environment </user_guide/performance/efficient_environment>` shows how to fold this mask into the episode termination of a training environment.
 
 ## Objects pass through each other or jitter
 

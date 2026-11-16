@@ -107,7 +107,7 @@ self.robot.control_dofs_position(target_dof_pos[:, self.actions_dof_idx], slice(
 
 Two details keep this cheap.
 
-- **Address dofs with a `slice`, not an index tensor.** The third argument to `control_dofs_position` selects which dofs to drive. A `slice(6, 18)` is a free view; an index tensor forces a gather. Go2 arranges its actuated dofs contiguously and precomputes `actions_dof_idx = torch.argsort(self.motors_dof_idx)` once at init, so policy outputs ordered by joint name can be permuted into that contiguous layout before the call.
+- **Address dofs with a `slice`, not an index tensor.** The second argument to `control_dofs_position` selects which dofs to drive. A `slice(6, 18)` is a free view; an index tensor forces a gather. Go2 arranges its actuated dofs contiguously and precomputes `actions_dof_idx = torch.argsort(self.motors_dof_idx)` once at init, so policy outputs ordered by joint name can be permuted into that contiguous layout before the call.
 - **Reuse the target buffer where you can.** Every `a * scale + b` allocates a fresh tensor. Where a buffer's identity must stay stable, build the target into a pre-allocated tensor with `out=` writes instead. (Operations that change shape, such as `torch.concatenate` when assembling an observation vector, necessarily allocate; that is an accepted exception, not a rule to fight.)
 
 The zero-copy command writers on a rigid entity are `control_dofs_position`, `control_dofs_velocity`, and `control_dofs_force` for PD targets and direct forces, and `set_dofs_position` / `set_dofs_velocity` / `set_qpos` for direct state writes.
