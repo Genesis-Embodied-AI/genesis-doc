@@ -12,7 +12,11 @@ Each section below opens with a landing page that frames the topic and points to
 
 ## Have feedback for us?
 
-We are just getting started and we understand that our content may require urgent updates. See a broken link? Need a new or a better example? Need a code fix? We welcome your feedback and encourage you to submit your requests [here](https://github.com/Genesis-Embodied-AI/genesis-world/issues). Our team is on it! 
+We are just getting started and we understand that our content may require urgent updates. See a broken link? Need a new or a better example? Need a code fix? We welcome your feedback and encourage you to submit your requests. Our team is on it!
+
+- Report bugs and request features through GitHub [Issues](https://github.com/Genesis-Embodied-AI/genesis-world/issues).
+
+- Ask questions and share ideas in GitHub [Discussions](https://github.com/Genesis-Embodied-AI/genesis-world/discussions).
 
 ## Table of Contents
 
