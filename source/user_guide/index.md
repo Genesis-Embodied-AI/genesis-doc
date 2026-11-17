@@ -1,6 +1,6 @@
 # User Guide
 
-Welcome to Genesis AI! This user guide provides an introduction to Genesis World and its capabilities, covering everything from installation and foundational concepts to simulation, physics, robot control, sensors, rendering, and policy training. Each topic is organized to help you understand the platform, explore its core capabilities, and find the information relevant to your work. Whether you are getting started or exploring more advanced functionality, use the sections below to navigate the topics and tutorials that support your development.
+This user guide provides an introduction to Genesis World and its capabilities, covering everything from installation and foundational concepts to simulation, physics, robot control, sensors, rendering, and policy training. Each topic is organized to help you understand the platform, explore its core capabilities, and find the information relevant to your work. Whether you are getting started or exploring more advanced functionality, use the sections below to navigate the topics and tutorials that support your development.
 
 To help you get started, begin with the {doc}`Overview <overview/index>`. This section introduces the platform, its core components, and its role in the physical AI development. It also provides additional guidance to help you prepare your environment.
 
