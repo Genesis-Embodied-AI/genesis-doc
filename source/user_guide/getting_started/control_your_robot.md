@@ -77,6 +77,10 @@ franka.set_dofs_force_range(
 
 These methods share the pattern used throughout the control API: a tensor of values paired with the dof indices they apply to, lining up element by element.
 
+`set_dofs_kp` also decides what a position target means. It makes the actuator of each dof a PD controller, so from then on the targets of `control_dofs_position` are joint positions, in radians for a revolute dof and meters for a prismatic one. A URDF asset loads with PD actuators already. An MJCF actuator keeps the gain and bias written in the file, so its targets can be in other control units until you call `set_dofs_kp`.
+
+The finger actuator of `panda.xml` is one of these. It takes targets from 0 (closed) to 255 (open at 0.04 m), so without the call above, the `0.04` finger targets below would close the gripper. {doc}`Joints and actuators </user_guide/physics/joints_and_actuators>` covers the general actuator that MJCF files describe.
+
 ## Setting state versus controlling
 
 `set_*` and `control_*` look similar and do different things.
@@ -132,6 +136,10 @@ franka.control_dofs_force(
     motors_dof_idx,
 )
 ```
+
+:::{warning}
+A force that drives a dof against its joint limit while its links touch each other can push the dof past the limit and leave it stuck there, so that a later position target or opposite force no longer moves it. Closing the fingers of `panda.xml` from fully open with -20 N each drives them about 5 mm past their lower limit of 0 m, and neither a position target nor +20 N opens them again.
+:::
 
 ## Reading forces back
 
