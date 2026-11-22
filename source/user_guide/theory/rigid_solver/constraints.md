@@ -45,7 +45,7 @@ $$
 \pm\,\mu\,\mathbf d_2 - \mathbf n .
 $$
 
-A non-negative multiplier on any edge produces a force whose tangential part is bounded by $\mu$ times its normal part, keeping the total inside the pyramid $|\mathbf f_t| \le \mu f_n$. The pyramid makes the friction limit direction-dependent.
+A non-negative multiplier on any edge produces a force whose tangential part is bounded by $\mu$ times its normal part, keeping the total inside the pyramid $|\mathbf f_t| \le \mu f_n$. The pyramid makes the friction limit direction-dependent. It also lets a grasped object slip. Squeezed between two contacts, the object gives way under a pull or a twist well below $\mu f_n$, and a larger $\mu$ does not raise that threshold. The elliptic cone below holds the grasp up to the Coulomb limit, at a much higher solve cost. Under the pyramidal cone, `noslip_iterations` adds a correction after the main solve that holds it for a smaller overhead.
 
 **Elliptic cone.** With `friction_cone=gs.friction_cone.elliptic` the normal and tangential rows stay separate and friction is bounded by its Euclidean limit $\sqrt{f_{t_1}^2 + f_{t_2}^2} \le \mu f_n$ in every direction, so the limit is isotropic. `impratio`, the tangential-to-normal impedance ratio, defaults to 100 under this cone. The elliptic cone is unsupported with differentiable simulation.
 
