@@ -19,7 +19,6 @@ scene = gs.Scene(
     vis_options=gs.options.VisOptions(
         show_world_frame=True,  # draw the world coordinate frame at the origin
         world_frame_size=1.0,  # length of each axis, in meters
-        show_link_frame=False,  # do not draw per-link frames
         show_cameras=False,  # do not draw camera meshes and frustums
         plane_reflection=True,
         ambient_light=(0.1, 0.1, 0.1),
@@ -38,7 +37,7 @@ To cap the viewer frame rate, set `refresh_rate` on `ViewerOptions`. The older `
 
 `realtime_factor` sets the pace of the simulation itself: how many seconds of simulated time one second of wall-clock time covers, `1.0` for real time and `2.0` for twice as fast. When the viewer is shown, each step of the simulation is throttled to it and falls behind gracefully when it cannot keep up; set it to `None` to always run as fast as possible. It also sets the playback speed of the videos recorded by a {doc}`camera </user_guide/rendering/cameras>`, viewer or not, with `None` recording at real time since there is no pace to follow. `scene.viewer.realtime_factor` changes it while the scene runs.
 
-Only the steps of the simulation are paced. A change of state made outside of a step by a setter such as `entity.set_qpos(...)` is shown by the viewer on its own at its next refresh, without calling `scene.visualizer.update()` and without slowing down the loop that makes it. `scene.reset()` redraws the viewer right away. While the simulation is paused from the viewer, the stepping loop waits for the next refresh of the viewer instead of the pace of the simulation. The window stays responsive while a step waits for its pace: on macOS, where the window is driven by the stepping loop, it keeps being repainted and handles the mouse and keyboard during the wait.
+Only the steps of the simulation are paced. A change of state made outside of a step by a setter such as `entity.set_qpos(...)` is shown by the viewer on its own at its next refresh, without calling `scene.visualizer.update()`. Each setter syncs the renderer of the viewer with the new state, so a tight loop of setters, such as a debugging script, runs faster with `ViewerOptions(update_on_setters=False)`, which defers that sync to the next refresh. `scene.reset()` redraws the viewer right away. While the simulation is paused from the viewer, the stepping loop waits for the next refresh of the viewer instead of the pace of the simulation. The window stays responsive while a step waits for its pace: on macOS, where the window is driven by the stepping loop, it keeps being repainted and handles the mouse and keyboard during the wait.
 
 A step run with `scene.step(update_visualizer=False)` leaves the viewer untouched and is not paced. Call `scene.visualizer.update(force=False)` after such a step to show it and pace it like any other, or `scene.visualizer.update()` to redraw everything right away.
 
@@ -47,6 +46,41 @@ Once the scene exists, reach the viewer through the `scene.viewer` shortcut to r
 ```python
 pose = scene.viewer.camera_pose
 scene.viewer.set_camera_pose(pos=(3.5, 0.0, 2.5), lookat=(0, 0, 0.5))
+```
+
+(debug-view)=
+## Debug view
+
+The debug view shows the scene as the simulation sees it rather than as it looks: the collision geometry of a rigid entity, the particles of an MPM, SPH, or PBD entity, and the tetrahedra of an FEM entity. Use it to check that the collision meshes match the visual ones, or to see how a deformable entity is discretized. Enable it with `VisOptions(debug=True)`, or toggle it with the "Debug View" checkbox of the {doc}`GUI panel </user_guide/interaction/interactive_debugging>`. A camera added with `scene.add_camera(debug=True)` shows what the viewer shows, debug view included, so it records the debug view headless.
+
+```python
+scene = gs.Scene(
+    vis_options=gs.options.VisOptions(debug=True),
+)
+```
+
+To inspect a few entities while the rest of the scene keeps its looks, set `vis` on the spec of each one with {py:class}`gs.options.EntityVisOptions <genesis.options.vis.EntityVisOptions>`. With `debug=True`, the viewer shows that entity in its debug representation whatever `VisOptions.debug` says. `debug_vis_mode` picks the representation where a kind of entity has several, such as `"sdf"` for the signed distance field of the collision geoms of a rigid entity:
+
+```python
+duck = scene.add_entity(
+    spec=gs.entities.Rigid(
+        morph=gs.morphs.Mesh(file="meshes/duck/duck.obj", scale=0.05),
+        vis=gs.options.EntityVisOptions(debug=True),
+    ),
+)
+```
+
+The markers that the viewer and the debug cameras draw on top of the scene belong to the options of the solver that draws them: link frames and contact-force arrows to {py:class}`gs.options.RigidVisOptions <genesis.options.solvers.RigidVisOptions>`, and the box bounding the particle domain to {py:class}`gs.options.ParticleVisOptions <genesis.options.solvers.ParticleVisOptions>`. Pass them as the `vis` of the solver options:
+
+```python
+scene = gs.Scene(
+    rigid_options=gs.options.RigidOptions(
+        vis=gs.options.RigidVisOptions(link_frames=True, link_frame_size=0.1),  # meters
+    ),
+    mpm_options=gs.options.MPMOptions(
+        vis=gs.options.ParticleVisOptions(boundary=True),
+    ),
+)
 ```
 
 ## Command-line tools

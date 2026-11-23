@@ -12,7 +12,7 @@ No runnable example ships for this feature yet, so the snippet below is illustra
 
 ## Minimal example
 
-Add a field to a scene, activate it, build, and step. Here a constant crosswind blows a column of SPH liquid sideways as it falls:
+Add a field to a scene, build, and step. Here a constant crosswind blows a column of SPH liquid sideways as it falls:
 
 ```python
 import genesis as gs
@@ -41,14 +41,13 @@ scene.add_force_field(wind)
 
 scene.build()
 
-wind.activate()  # fields start inactive; turn it on to apply acceleration
 for i in range(1000):
     scene.step()
 ```
 
 ## Lifecycle
 
-A force field goes through four stages. Getting the order right matters: adding after `build()` or forgetting to activate are the two easiest mistakes to make.
+A force field goes through three stages. Getting the order right matters: adding a field after `build()` raises an error.
 
 1. **Instantiate** a field from `gs.force_fields.*`, passing its parameters:
 
@@ -58,9 +57,9 @@ A force field goes through four stages. Getting the order right matters: adding 
 
 2. **Register** it with the scene using `scene.add_force_field(field)`, which returns the same field. This must happen **before** `scene.build()`: the number of registered fields is baked into the compiled solver kernels, so calling `add_force_field` after `scene.build()` raises an error.
 
-3. **Activate** it with `field.activate()`. A field is inactive when created (`field.active` is `False`) and contributes zero acceleration until activated. `Custom` is the exception: its function replaces the activation check, so a `Custom` field always applies once registered, whatever `active` says. Toggle `activate()` and `deactivate()` at any time after building, including mid-simulation, and read `field.active` to check the current state.
+3. **Step** the scene. On each substep the solver adds the active field's acceleration to every affected particle.
 
-4. **Step** the scene. On each substep the solver adds the active field's acceleration to every affected particle.
+A field is active once created (`field.active` is `True`). Call `field.deactivate()` to stop it contributing acceleration and `field.activate()` to resume, at any time after building, including mid-simulation.
 
 ## Available field types
 

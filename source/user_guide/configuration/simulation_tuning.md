@@ -18,7 +18,7 @@ Use this page to choose which Genesis World settings to investigate when rigid c
 
 1. Reduce the scene to the smallest script that still shows the problem.
 2. Check units, masses, inertias, joint axes, and limits against the intended model.
-3. Show collision geometry with `vis_mode="collision"` in `scene.add_entity(...)`; check initial overlaps and unwanted self-collision.
+3. Show collision geometry with `gs.options.VisOptions(debug=True)`; check initial overlaps and unwanted self-collision.
 4. Check controller targets and force limits, including abrupt target changes and joints commanded beyond their limits.
 
 Choose a measure of success before changing a parameter: penetration, drift, tracking error, task completion, or runtime. Rerun the script from the same initial conditions and command sequence after each change. A `.gstraj` recording helps inspect the original failure, but replaying its frames does not evaluate new settings; seeking a frame restores the recorded model parameters too.

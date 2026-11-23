@@ -8,6 +8,12 @@ The `MPMSolver` implements the Material Point Method (MPM) for simulating elasti
 .. autoclass:: genesis.options.solvers.MPMOptions
 ```
 
+The MPM and SPH solvers share their visualization options.
+
+```{eval-rst}
+.. autoclass:: genesis.options.solvers.ParticleVisOptions
+```
+
 ## MPMSolver
 
 ```{eval-rst}

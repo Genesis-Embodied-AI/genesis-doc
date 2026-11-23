@@ -8,6 +8,10 @@ The `KinematicSolver` is a lightweight solver for ghost or reference entities th
 .. autoclass:: genesis.options.solvers.KinematicOptions
 ```
 
+```{eval-rst}
+.. autoclass:: genesis.options.solvers.KinematicVisOptions
+```
+
 ## KinematicSolver
 
 ```{eval-rst}

@@ -99,7 +99,6 @@ scene.add_stage(
         decimate=True,  # Simplify collision meshes (fewer faces) for speed and stability.
         align=False,  # Keep the USD root-link frames (don't re-center to the center of mass).
     ),
-    vis_mode="visual",  # Render the asset's own USD materials, not the per-collision debug colors.
 )
 ```
 
@@ -107,7 +106,7 @@ scene.add_stage(
 - **`decimate`** simplifies collision meshes toward `decimate_face_num` (default 500) faces. It defaults to `True` when `convexify` is on.
 - **`align`** re-frames floating-base root links so the origin sits at the center of mass. It defaults to `False`.
 
-`vis_mode="collision"` renders the collision geometry instead of the visual meshes, which is the fastest way to check that collision shapes match what you expect.
+The {ref}`debug view <debug-view>` (`gs.options.VisOptions(debug=True)`) renders the collision geometry instead of the visual meshes, which is the fastest way to check that collision shapes match what you expect.
 
 ## Joint dynamics attributes
 

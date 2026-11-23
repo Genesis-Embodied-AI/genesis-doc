@@ -10,4 +10,5 @@ texture
 color_texture
 image_texture
 batch_texture
+dynamic_texture
 ```

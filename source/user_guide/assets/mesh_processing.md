@@ -16,17 +16,19 @@ A non-articulated mesh is loaded through {py:class}`gs.morphs.Mesh <genesis.opti
 ```python
 import genesis as gs
 
+scene = gs.Scene(
+    vis_options=gs.options.VisOptions(debug=True),  # render the processed collision meshes
+)
 tank = scene.add_entity(
     gs.morphs.Mesh(
         file="meshes/tank.obj",
         scale=5.0,
         fixed=True,
     ),
-    vis_mode="collision",  # render the processed collision mesh instead of the visual mesh
 )
 ```
 
-The `vis_mode` shortcut is how you inspect the result of processing. It renders either `"visual"` (the default) or `"collision"` geometry, so you can see exactly what the solver sees.
+The {ref}`debug view <debug-view>` is how you inspect the result of processing. It renders the collision geometry of every rigid entity in place of its visual mesh, so you can see exactly what the solver sees.
 
 :::{note}
 The processing described below applies when the morph becomes a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>`. Deformable entities (FEM, MPM, and other particle-based materials) do not convexify their meshes; see {doc}`Deformables and fluids </user_guide/physics/beyond_rigid_bodies>`.

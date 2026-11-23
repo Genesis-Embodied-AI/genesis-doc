@@ -41,7 +41,7 @@ GPU simulation on AMD through ROCm is still experimental and may be unstable, es
 
 ### Surface reconstruction
 
-To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, Genesis World reconstructs a mesh from the internal particle representation. It uses [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) by default, which extracts a smooth surface from the particle density but requires all particles to share one radius. Set `recon_backend="levelset"` on the surface to wrap the union of the particle spheres instead: it supports a radius per particle, at the cost of a bumpier surface. Both backends work on every platform with no extra install. `recon_backend="openvdb"` is a deprecated alias of `"levelset"`.
+To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, Genesis World reconstructs a mesh from the internal particle representation. It uses [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) by default, which extracts a smooth surface from the particle density but requires all particles to share one radius. Set `recon_backend="levelset"` in the `vis` options of the particle solver, such as `gs.options.SPHOptions(vis=gs.options.ParticleVisOptions(recon_backend="levelset"))`, to wrap the union of the particle spheres instead: it supports a radius per particle, at the cost of a bumpier surface. Both backends work on every platform with no extra install. `recon_backend="openvdb"` is a deprecated alias of `"levelset"`.
 
 ### Ray-tracing renderer
 
