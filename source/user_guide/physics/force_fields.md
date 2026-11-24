@@ -55,7 +55,7 @@ A force field goes through three stages. Getting the order right matters: adding
    wind = gs.force_fields.Constant(direction=(1, 0, 0), strength=5.0)
    ```
 
-2. **Register** it with the scene using `scene.add_force_field(field)`, which returns the same field. This must happen **before** `scene.build()`: the number of registered fields is baked into the compiled solver kernels, so calling `add_force_field` after `scene.build()` raises an error.
+2. **Register** it with the scene using `scene.add_force_field(field)`, which returns the same field. This must happen **before** `scene.build()`: calling `add_force_field` after the build raises an error.
 
 3. **Step** the scene. On each substep the solver adds the active field's acceleration to every affected particle.
 
@@ -97,7 +97,7 @@ scene.add_force_field(gs.force_fields.Custom(swirl))
 - **It is acceleration, not force.** The value is in m/s² and is independent of particle mass, so heavy and light particles gain the same velocity per step. Multiply by mass yourself if you are reasoning about forces.
 - **Only PBD and SPH particles are affected.** Add a particle-based entity (an SPH liquid, a PBD cloth or fluid) for the field to have anything to act on.
 - **Fields stack.** The solver sums every active field, so a `Constant` gravity offset, a `Drag` term, and a `Turbulence` gust combine into one acceleration.
-- **Activation is free to toggle.** Because activation flips a runtime flag rather than the compiled kernel, switching a field on or off mid-simulation costs nothing and needs no rebuild.
+- **Activation is free to toggle.** Switching a field on or off mid-simulation costs nothing and needs no rebuild.
 
 ## See also
 

@@ -126,15 +126,7 @@ For the material side of deformable simulation, see {doc}`Muscle actuation </use
 
 ## Caching
 
-Mesh processing is expensive, so Genesis caches each result on disk keyed by a SHA-256 hash of the input geometry and the options that produced it. Change a relevant option and the key changes, so Genesis bypasses the stale entry and reprocesses the mesh. Subsequent loads with identical inputs read straight from cache.
-
-| Result | Extension | Produced by |
-|---|---|---|
-| Convex decomposition | `.cvx` | Convexification |
-| Tetrahedral mesh | `.tet` | FEM tetrahedralization |
-| Signed distance field | `.gsd` | SDF-based collision |
-| Remeshed surface | `.rm` | Remeshing for tetrahedralization |
-| Particle samples | `.ptc` | Particle sampling |
+Mesh processing is expensive, so Genesis World caches each result under `~/.cache/genesis`, keyed on the input geometry and the options that produced it. Change a relevant option and Genesis World reprocesses the mesh. Later loads with identical inputs read straight from the cache.
 
 ## See also
 

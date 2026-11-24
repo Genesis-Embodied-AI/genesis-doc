@@ -9,7 +9,7 @@ To choose a coupler or compute gradients through a step, see {doc}`Coupling </us
 ## In this section
 
 - **{doc}`rigid_solver/index`:** the three layers of a rigid step (forward dynamics, collision detection, and the constraint solve), plus hibernation.
-- **{doc}`soft_solvers`:** the five continuum and particle solvers, and the constitutive models they integrate.
+- **{doc}`soft_solvers`:** the four continuum and particle solvers, and the constitutive models they integrate.
 
 ## Further reading
 

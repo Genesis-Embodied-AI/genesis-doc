@@ -49,23 +49,7 @@ A single scene often holds many entities of the same kind, and a solver stores t
 
 ### One field for the whole scene
 
-A solver keeps its state in a structured **field**, a Quadrants array whose every element is a small struct. The MPM solver's per-particle render state is a compact example:
-
-```python
-struct_particle_state_render = qd.types.struct(
-    pos=gs.qd_vec3,
-    vel=gs.qd_vec3,
-    active=gs.qd_bool,
-)
-
-self.particles_render = struct_particle_state_render.field(
-    shape=(self._n_particles, self.n_envs_),  # every particle in the scene, across all envs
-    needs_grad=False,
-    layout=qd.Layout.SOA,
-)
-```
-
-The field's length is `n_particles`, the total across *all* MPM entities in the scene. Genesis World stores those entities contiguously and remembers where each one starts, rather than tagging every element with an entity id, which would cost memory and bandwidth on every kernel that touches the field.
+A solver keeps its state in **fields**, arrays that hold one element per particle, dof, or other unit of every entity of its kind, across all environments. For example, the particle fields of the MPM solver span the particles of *all* MPM entities in the scene. Genesis World stores those entities contiguously and remembers where each one starts, rather than tagging every element with an entity id, which would cost memory and bandwidth on every kernel that touches the field.
 
 ### Two views of the same data
 
@@ -94,7 +78,7 @@ Internally this maps to global index `2 + rigid_entity.dof_start` before touchin
 
 Prefer the entity APIs, such as `get_dofs_position`. They apply the offset, return batch-first tensors, and stay correct as the internals change. Go to the field itself only for a value no API yet exposes, and expect that code to be slower and more fragile.
 
-Every entity exposes its solver through `entity.solver`, each physical quantity lives at a known place in that solver (dof positions at `dofs_state.pos`, for example), and the field is globally indexed. So a supported call like:
+Every entity exposes its solver through `entity.solver`, whose fields are globally indexed. So a supported call like:
 
 ```python
 tgt = entity.get_dofs_position()  # shape ([n_envs,] entity.n_dofs)

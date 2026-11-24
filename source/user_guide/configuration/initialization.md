@@ -24,7 +24,7 @@ The `backend` argument selects the device the physics runs on. Pass one of the b
 | `gs.amdgpu` | An AMD ROCm GPU. |
 | `gs.metal` | An Apple Silicon GPU. |
 
-Genesis World resolves `gs.gpu` (and the default `backend=None`) in order, **CUDA → AMD → Metal → CPU**, taking the first one that initializes on your machine, so `gs.gpu` is portable across hardware. With no GPU usable it falls back to the CPU and logs a warning rather than failing.
+Genesis World resolves `gs.gpu` (and the default `backend=None`) in order, **CUDA → AMD → Metal → CPU**, taking the first one that initializes on your machine, so `gs.gpu` is portable across hardware. With no GPU usable, `gs.gpu` falls back to the CPU and logs a warning rather than failing. With `debug=True`, the default `backend=None` selects the CPU.
 
 ```python
 gs.init(backend=gs.gpu)   # portable: use a GPU if present, else CPU
@@ -67,7 +67,7 @@ Pass `seed` to make a run repeatable. It seeds Python, NumPy, PyTorch, and the Q
 gs.init(backend=gs.gpu, seed=0)
 ```
 
-Seeding alone does not guarantee bit-for-bit determinism on a GPU, where some kernels are non-deterministic by default. For fully deterministic runs, add `debug=True`:
+Seeding together with {ref}`deterministic mode <deterministic-mode>`, on by default, makes runs repeatable. To debug with bit-exact runs on the CPU, add `debug=True`:
 
 ```python
 gs.init(backend=gs.cpu, seed=0, debug=True)
@@ -75,6 +75,7 @@ gs.init(backend=gs.cpu, seed=0, debug=True)
 
 `debug=True` turns on PyTorch's deterministic algorithms, disables cuDNN autotuning, and raises the log level to `DEBUG`. Use it to reproduce a bug or validate a result rather than for a production run, because deterministic kernels are considerably slower, and keep to `gs.cpu` where determinism has to hold: GPU backends support it only partially.
 
+(deterministic-mode)=
 ## Deterministic mode
 
 `use_deterministic_algorithms=True` guarantees that a scene replays a rollout identically: reset it, drive it with the same inputs, and every step reproduces the previous run bit-for-bit on a given machine.
@@ -83,23 +84,7 @@ gs.init(backend=gs.cpu, seed=0, debug=True)
 gs.init(backend=gs.gpu, use_deterministic_algorithms=True)
 ```
 
-The default, `use_deterministic_algorithms=None`, enables the mode unless kernels use static arrays, that is with `performance_mode=True` or the `GS_ENABLE_NDARRAY=0` environment variable, in which case it stays off. Pass `False` or `True` to override it either way. The guarantee is paid for in throughput, which is why performance mode leaves it off. Left off, Genesis is free to decide at runtime how a computation is carried out wherever that buys speed, with nothing requiring the decision to come out the same way twice. Today that freedom is spent picking between implementations: several interchangeable ones of the same computation, each written for a different workload, with every site timing its own candidates as the simulation runs and landing on the one fastest for the state the scene is currently in.
-
-Interchangeable implementations compute the same thing by construction, but agree only to within floating-point noise, and a simulation amplifies such a difference until the two runs have visibly parted ways. Which one ran at which step is therefore part of the trajectory, and nothing about that is reproducible: the timings follow how busy the machine is, and the measurements accumulate across resets, so a rollout also depends on everything the process ran before it. They accumulate on purpose - environments in a training loop reset constantly, often one at a time, and starting the measurements over at every reset would leave them forever measuring instead of exploiting what they measured. Deterministic mode gives up the freedom altogether: every such choice is settled up front, on the option that suits most scenes, and never revisited.
-
-What it costs therefore depends on the scene and on how far its state travels: nothing at all while the settled choice is the one that would have been picked anyway, and up to the gap between the implementations whenever another would have taken over. Where throughput dominates, policy training in particular, measure your scene with `use_deterministic_algorithms=False` before deciding to keep the mode; keep it on to compare two runs or to track down a divergence.
-
-The choice can also be made by hand, by pinning one implementation through the Quadrants `QD_PERFDISPATCH_FORCE` environment variable, which removes the measurement just as the mode does and is therefore reproducible on its own. Use it when the implementation deterministic mode settles on is the wrong one for your scene. For the constraint solve, which is where the choice matters most today, the two candidates are:
-
-```bash
-# One thread per environment, each solved as a whole; favored when the environment count alone keeps the GPU busy.
-QD_PERFDISPATCH_FORCE=func_solve_body:func_solve_body_monolith python my_script.py
-
-# Parallelism inside each environment; favored when too few environments run to keep the GPU busy on their own.
-QD_PERFDISPATCH_FORCE=func_solve_body:func_solve_decomposed python my_script.py
-```
-
-Note that this is a workaround naming internal implementations: it is no part of the public API, and may change or disappear in any release.
+The default, `use_deterministic_algorithms=None`, enables the mode unless kernels use static arrays, that is with `performance_mode=True` or the `GS_ENABLE_NDARRAY=0` environment variable, in which case it stays off. Pass `False` or `True` to override it either way. The guarantee is paid for in throughput, which is why performance mode leaves it off. Left off, Genesis World may pick at runtime between implementations of the same computation that agree only to within floating-point noise, so two runs drift apart. What the mode costs depends on the scene: where throughput dominates, policy training in particular, measure your scene with `use_deterministic_algorithms=False` before deciding to keep the mode, and keep it on to compare two runs or to track down a divergence.
 
 ## Logging
 

@@ -46,7 +46,7 @@ for link_name in foot_link_names:
 force = sensor.read()  # shape ([n_envs,] 3), N, in the link-local frame
 ```
 
-Both `Contact` and `ContactForce` accept `filter_link_idx`, a list of **global** link indices to ignore, so the sensor reads as if those counterparts were not touching. Use it to scope a reading, for example a foot's force from the ground while excluding self-contact. `Contact` additionally has a contact `threshold`, and `ContactForce` clamps each axis to `[min_force, max_force]`; see {doc}`the contact reference </api_reference/engine/sensors/contact>` for these and their defaults.
+Both `Contact` and `ContactForce` accept `filter_link_idx`, a list of **global** link indices to ignore, so the sensor reads as if those counterparts were not touching. Use it to scope a reading, for example a foot's force from the ground while excluding self-contact. `Contact` additionally has a contact `threshold`, and `ContactForce` zeroes any axis whose magnitude is below `min_force` and saturates each axis at `max_force`; see {doc}`the contact reference </api_reference/engine/sensors/contact>` for these and their defaults.
 
 ```{figure} ../../_static/images/contact_force_sensor.png
 :alt: A Go2 quadruped standing on a ground plane, with a magenta arrow drawn at each foot showing the contact force reported by that foot's ContactForce sensor

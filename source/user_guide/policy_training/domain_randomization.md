@@ -39,7 +39,7 @@ The three methods differ in what they modify:
 - **`set_links_mass`:** sets the mass of each link in kg, shape `(n_envs, n_links)`, and leaves its inertia as authored. It takes the mass itself, which is why the example reads the model's masses back with `get_links_mass` and writes scaled ones.
 - **`set_links_COM`:** sets the center of mass of each link in meters, shape `(n_envs, n_links, 3)`, as an offset in the link's local frame. It takes the position itself too, so the example shifts what `get_links_COM` returns.
 
-`set_friction_ratio` writes per-environment state, so it works in any scene. A per-environment mass or center of mass describes the model itself, which Genesis World stores per environment only when the scene is built with `batch_links_info=True` (see the warning below). A single value shared by every environment needs no flag. Pass `envs_idx` to any of them to restrict the update to a subset of environments.
+`set_friction_ratio` writes per-environment state, so it works in any scene. A per-environment mass or center of mass describes the model itself, which Genesis World stores per environment only when the scene is built with `batch_links_info=True` (see the warning below). A single value shared by every environment needs no flag. Pass `envs_idx` to restrict an update to a subset of environments. The mass, center of mass and inertia setters accept it only when the scene is built with `batch_links_info=True`.
 
 ## Randomizing actuator gains
 
@@ -55,7 +55,7 @@ robot.set_dofs_armature(0.01 + 0.02 * torch.rand(scene.n_envs, len(motors_dof_id
 `set_dofs_kp` and `set_dofs_kv` set the position and velocity gains of the PD controller; `set_dofs_armature` sets the reflected motor inertia, which stabilizes stiff joints. The second positional argument is `dofs_idx_local`, the entity-local dof indices to update, matching the `motors_dof_idx` you build from joint names.
 
 :::{warning}
-Per-environment dof gains require batched dof info, and per-environment link masses, centers of mass and inertias require batched link info. Both live in the model's static info fields, which are stored per environment only when the scene is built with the corresponding option. Enable it in {py:class}`RigidOptions <genesis.options.solvers.RigidOptions>`:
+Per-environment dof gains require batched dof info, and per-environment link masses, centers of mass and inertias require batched link info. These properties are shared by all environments unless the scene is built with the corresponding option. Enable it in {py:class}`RigidOptions <genesis.options.solvers.RigidOptions>`:
 
 ```python
 scene = gs.Scene(
@@ -77,7 +77,7 @@ Task randomization changes every episode, so it belongs in the reset path rather
 def gs_rand(lower, upper, batch_shape):
     # Uniform in [lower, upper), broadcast over the batch dimensions.
     assert lower.shape == upper.shape
-    return (upper - lower) * torch.rand(size=(*batch_shape, *lower.shape), device=gs.device) + lower
+    return (upper - lower) * torch.rand(size=(*batch_shape, *lower.shape), dtype=gs.tc_float, device=gs.device) + lower
 ```
 
 The environment then resamples commands only for the environments passed in `envs_idx`, leaving the rest untouched:

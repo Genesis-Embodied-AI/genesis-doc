@@ -1,6 +1,6 @@
 # FileMorph
 
-File morphs load geometry and pose from an external file: a mesh, a URDF or MJCF robot description, a USD stage, a terrain heightfield, or a drone model.
+File morphs load geometry and pose from an external file: a mesh, a URDF or MJCF robot description, a USD stage, or a drone model.
 
 ```{toctree}
 :titlesonly:
@@ -12,7 +12,6 @@ mesh_set
 urdf
 mjcf
 usd
-terrain
 drone
 coacd_options
 ```

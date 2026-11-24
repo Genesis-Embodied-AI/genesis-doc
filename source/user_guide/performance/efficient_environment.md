@@ -72,14 +72,13 @@ Genesis World setters and the solver accept a boolean `envs_idx` mask directly, 
 
 ## Reset a batch without syncing
 
-Reset writes the initial state into the selected environments. The sync-free combination is a boolean `envs_idx` mask, pre-allocated source tensors, and two keyword flags on the setter:
+Reset writes the initial state into the selected environments. The sync-free combination is a boolean `envs_idx` mask, pre-allocated source tensors, and the `zero_velocity` flag of the setter:
 
 ```python
-self.robot.set_qpos(self.init_qpos, envs_idx=envs_idx, zero_velocity=True, skip_forward=True)
+self.robot.set_qpos(self.init_qpos, envs_idx=envs_idx, zero_velocity=True)
 ```
 
-- **`zero_velocity=True`:** clears velocities as part of the same write, instead of a second setter call.
-- **`skip_forward=True`:** defers forward kinematics so it runs once on the next `scene.step()`, rather than inside every setter call during reset.
+`zero_velocity=True`, the default on a rigid entity, clears velocities as part of the same write, instead of a second setter call.
 
 Branch once on whether this is a full or partial reset. When resetting *all* environments, pass `envs_idx=None`; the implementation takes a faster full-overwrite path and you can use the cheaper `zero_()` / `fill_()` on your own buffers instead of masked writes.
 
@@ -94,7 +93,7 @@ else:
     self.reset_buf.masked_fill_(envs_idx, True)
 ```
 
-For a coarse reset that restores every solver state at once, `scene.rigid_solver.set_state(f, state, envs_idx=mask, partial=True)` is the bulk equivalent. Keep `partial=True`: `partial=False` rebuilds the whole scene's auxiliary state and is significantly slower.
+To restore a saved state in some environments at once, call `scene.reset(state, envs_idx=mask)`.
 
 ## Apply commands efficiently
 
@@ -107,7 +106,7 @@ self.robot.control_dofs_position(target_dof_pos[:, self.actions_dof_idx], slice(
 
 Two details keep this cheap.
 
-- **Address dofs with a `slice`, not an index tensor.** The third argument to `control_dofs_position` selects which dofs to drive. A `slice(6, 18)` is a free view; an index tensor forces a gather. Go2 arranges its actuated dofs contiguously and precomputes `actions_dof_idx = torch.argsort(self.motors_dof_idx)` once at init, so policy outputs ordered by joint name can be permuted into that contiguous layout before the call.
+- **Address dofs with a `slice`, not an index tensor.** The second argument, `dofs_idx_local`, selects which dofs to drive. A `slice(6, 18)` is a free view; an index tensor forces a gather. Go2 arranges its actuated dofs contiguously and precomputes `actions_dof_idx = torch.argsort(self.motors_dof_idx)` once at init, so policy outputs ordered by joint name can be permuted into that contiguous layout before the call.
 - **Reuse the target buffer where you can.** Every `a * scale + b` allocates a fresh tensor. Where a buffer's identity must stay stable, build the target into a pre-allocated tensor with `out=` writes instead. (Operations that change shape, such as `torch.concatenate` when assembling an observation vector, necessarily allocate; that is an accepted exception, not a rule to fight.)
 
 The zero-copy command writers on a rigid entity are `control_dofs_position`, `control_dofs_velocity`, and `control_dofs_force` for PD targets and direct forces, and `set_dofs_position` / `set_dofs_velocity` / `set_qpos` for direct state writes.

@@ -46,7 +46,7 @@ The lidar needs geometry to cast against: a raycaster raises at build time if th
 
 A pattern is a purely local description of the rays: it fixes a start point and a unit direction for each ray in the sensor's own frame, independent of where the sensor ends up in the world. The pattern's `return_shape` (for example `(n_horizontal, n_vertical)` for a spherical scan) sets the layout every read preserves.
 
-At each `read()`, Genesis World places the pattern in the world by composing the attached link's pose with the sensor's `pos_offset` and `euler_offset`, then casts every ray against an acceleration structure built over the scene's geometry. Each ray reports the first surface it hits. A ray that hits nothing within `max_range`, or closer than `min_range`, reports `no_hit_value` (which defaults to `max_range`) so the returned tensors keep a fixed shape.
+At each `scene.step()`, Genesis World places the pattern in the world by composing the attached link's pose with the sensor's `pos_offset` and `euler_offset`, then casts every ray against an acceleration structure built over the scene's geometry. Each ray reports the first surface it hits. A ray that hits nothing within `max_range`, or closer than `min_range`, reports `no_hit_value` (which defaults to `max_range`) so the returned tensors keep a fixed shape.
 
 Attach a sensor to a link by setting `entity_idx` and `link_idx_local`; the rays then move with that link. Leave `entity_idx` unset (or `None`) for a world-fixed sensor, in which case `pos_offset` and `euler_offset` apply in the world frame.
 

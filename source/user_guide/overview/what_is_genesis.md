@@ -23,7 +23,7 @@ Genesis World is shaped by a few convictions about what a simulator for physical
 - **One scene, one state:** rigid, FEM, MPM, and particle (PBD/SPH) solvers share a single scene and a single state, and where their entities touch, an explicit coupler resolves the interaction.
 - **Fast at full accuracy:** Genesis World parallelizes simulation across environments on the GPU, measured at up to 10–80× the throughput of prior GPU-accelerated simulators such as Isaac Gym/Sim/Lab and MuJoCo MJX without trading away accuracy. See the [blog post](https://www.genesis.ai/blog/the-role-of-simulation-in-scalable-robotics-genesis-world-10-and-the-path-forward) for methodology.
 - **Differentiable by design:** autodiff and backpropagation run through the [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants) compiler, with hand-derived gradients for the hardest kernels, so gradients flow through the physics.
-- **Perception built in:** physically accurate, differentiable tactile sensors sit alongside IMU, lidar, depth-camera, contact-force, surface-distance, and temperature-grid sensors, and all three renderers are exposed through the same camera-sensor interface, usable out of the box in parallel and heterogeneous environments.
+- **Perception built in:** physically accurate, differentiable tactile sensors sit alongside IMU, lidar, depth-camera, contact-force, surface-distance, and temperature-grid sensors, and the renderers are exposed through the same camera-sensor interface, usable out of the box in parallel and heterogeneous environments.
 - **Easy to start, easy to scale:** a single `pip install`, a small API, and the same code path from one environment on a laptop to thousands on a datacenter GPU.
 
 ## Mission

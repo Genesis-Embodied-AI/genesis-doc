@@ -5,7 +5,7 @@
 Two runnable examples are the source of truth for this page:
 
 - [`examples/usd/import_stage.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/usd/import_stage.py): load a single articulated asset and animate its joints.
-- [`examples/usd/kitchen.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/usd/kitchen.py): load a multi-entity kitchen scene with per-asset processing options.
+- [`examples/usd/kitchen.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/usd/kitchen.py): load a multi-entity kitchen scene, keeping or freeing the authored fixed bases.
 
 ## Installation
 
@@ -84,11 +84,11 @@ gs.morphs.USD(file="robot.usd", fixed=True)  # weld the base to the world
 
 ## Axis and units
 
-USD stages carry their own `upAxis` and `metersPerUnit` metadata, and Genesis World honors it when transforming the asset into its right-handed, Z-up, meters world. When a referenced mesh omits that information, the `file_meshes_are_zup` morph option controls interpretation the same way it does for other mesh formats. See {doc}`/user_guide/configuration/conventions` for the full axis- and unit-handling rules, including the Blender-aligned Y-up ↔ Z-up mapping Genesis World follows.
+USD stages carry their own `upAxis` and `metersPerUnit` metadata, and Genesis World honors it when transforming the asset into its right-handed, Z-up, meters world. `gs.morphs.USD` does not accept `file_meshes_are_zup`. See {doc}`/user_guide/configuration/conventions` for the full axis- and unit-handling rules, including the Blender-aligned Y-up ↔ Z-up mapping Genesis World follows.
 
 ## Mesh processing
 
-Genesis World derives collision meshes from the asset's geometry. Three options control that derivation; `examples/usd/kitchen.py` sets all three to honor the asset as authored:
+Genesis World derives collision meshes from the asset's geometry. Three options control that derivation, set here to honor the asset as authored:
 
 ```python
 scene.add_stage(
@@ -104,7 +104,7 @@ scene.add_stage(
 
 - **`convexify`** wraps each mesh in one or more convex hulls (decomposing with `coacd` when a single hull is too coarse). It defaults to `True` for rigid entities. Set it to `False` to keep concave collision geometry the asset already provides.
 - **`decimate`** simplifies collision meshes toward `decimate_face_num` (default 500) faces. It defaults to `True` when `convexify` is on.
-- **`align`** re-frames floating-base root links so the origin sits at the center of mass. It defaults to `False`.
+- **`align`** re-frames floating-base root links so the origin sits at the center of mass. It defaults to `None`, which aligns free rigid objects without articulation and keeps articulated models in their authored frames.
 
 The {ref}`debug view <debug-view>` (`gs.options.VisOptions(debug=True)`) renders the collision geometry instead of the visual meshes, which is the fastest way to check that collision shapes match what you expect.
 
@@ -135,7 +135,7 @@ Our defaults already cover Isaac Sim and common community conventions, so overri
 | `prismatic_joint_stiffness_attr_candidates` | `dofs_stiffness` | passive stiffness (prismatic) |
 | `prismatic_joint_damping_attr_candidates` | `dofs_damping` | passive damping (prismatic) |
 
-PD control gains authored through the USD `PhysicsDriveAPI` (`physics:stiffness`, `physics:angular:damping`) are read into `dofs_kp` and `dofs_kv` directly, since those are standard USD attributes.
+PD control gains authored through `UsdPhysics.DriveAPI` (`drive:<axis>:physics:stiffness` and `drive:<axis>:physics:damping`) set the joint's `kp` and `kv`, which `get_dofs_kp()` and `get_dofs_kv()` read back.
 
 ## Separating visual and collision geometry
 

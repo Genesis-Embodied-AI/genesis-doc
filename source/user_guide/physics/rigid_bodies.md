@@ -43,7 +43,7 @@ box = scene.add_entity(
 )
 ```
 
-Torsional and rolling friction take effect only once you enable them on the solver, since they add constraint rows to every contact:
+Torsional and rolling friction take effect only once you enable them on the solver, since they slow down the constraint solve on every contact:
 
 ```python
 scene = gs.Scene(

@@ -129,7 +129,7 @@ This controls the rasterizer only. The ray tracer ignores `VisOptions.lights` an
 
 ### Photorealistic rendering with Luisa (deprecating)
 
-Genesis World also ships a Luisa-based ray-tracing backend. Enable it by passing `renderer=gs.renderers.RayTracer()` when creating the scene; it exposes extra parameters such as `tracing_depth`, `env_surface`, and `lights`, and unlocks the `spp`, `aperture`, and `model="thinlens"` arguments of `scene.add_camera()`.
+Genesis World also ships a Luisa-based ray-tracing backend. Enable it by passing `renderer=gs.renderers.RayTracer()` when creating the scene; it exposes extra parameters such as `tracing_depth`, `env_surface`, and `lights`, and unlocks the `spp` and `denoise` arguments of `scene.add_camera()`, plus `lens=gs.options.ThinLens(...)` for depth of field.
 
 :::{warning}
 This backend is deprecated in favor of Nyx and requires building `LuisaRender` from source.
@@ -169,7 +169,7 @@ Setup, tested on Ubuntu 22.04 with CUDA 12.4:
 ```
 
 :::{note}
-Prebuilt LuisaRender binaries for common CUDA and Python combinations are available [on Google Drive](https://drive.google.com/drive/folders/1Ah580EIylJJ0v2vGOeSBU_b8zPDWESxS?usp=sharing), named `build_<commit-tag>_cuda<version>_python<version>`. Download the one matching your system, rename it to `build/`, and place it in `genesis/ext/LuisaRender`. For build and CUDA-toolkit troubleshooting, see the [genesis-world README](https://github.com/Genesis-Embodied-AI/genesis-world#quick-installation).
+Prebuilt LuisaRender binaries for common CUDA and Python combinations are available [on Google Drive](https://drive.google.com/drive/folders/1Ah580EIylJJ0v2vGOeSBU_b8zPDWESxS?usp=sharing), named `build_<commit-tag>_cuda<version>_python<version>`. Download the one matching your system, rename it to `build/`, and place it in `genesis/ext/LuisaRender`.
 :::
 
 ### Batch rendering with gs-madrona

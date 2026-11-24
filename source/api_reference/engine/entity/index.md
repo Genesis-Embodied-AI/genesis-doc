@@ -6,7 +6,7 @@ Create an entity by calling {py:meth}`scene.add_entity <genesis.engine.scene.Sce
 
 - **Morph:** the geometry and pose: a primitive shape, a mesh, or a robot description loaded from URDF, MJCF, or USD. See {doc}`/api_reference/engine/entity/morph/index`.
 - **Material:** the physical model that decides which solver simulates the entity and how it responds to forces. See {doc}`/api_reference/engine/material/index`.
-- **Surface:** the visual appearance used for rendering: color, texture, and visualization mode. See {doc}`/api_reference/engine/entity/surface/index`.
+- **Surface:** the visual appearance used for rendering: color and texture. See {doc}`/api_reference/engine/entity/surface/index`.
 
 For a worked example of adding an entity and stepping the scene, see {doc}`/user_guide/getting_started/hello_genesis`.
 

@@ -13,7 +13,7 @@ SAP coupling imposes two hard requirements:
 
 SAP runs in both precisions. Single precision runs fastest, while `precision="64"` solves the contacts about ten times more accurately for a quarter to two thirds more Newton iterations.
 
-SAP does not support differentiable simulation. Calls into the gradient path raise and direct you to the default coupler.
+SAP does not support differentiable simulation: building a scene with `requires_grad=True` and the SAP coupler raises an error. Use the default coupler for differentiable simulation.
 
 ## Minimal example
 

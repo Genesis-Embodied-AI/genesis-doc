@@ -6,8 +6,8 @@ Describe the layout once with `probe_local_pos`, a set of `(x, y, z)` offsets in
 
 Two families share this interface but estimate contact differently:
 
-- **SDF-query probes** ({py:class}`ContactProbe <genesis.options.sensors.tactile.ContactProbe>`, {py:class}`ContactDepthProbe <genesis.options.sensors.tactile.ContactDepthProbe>`, and {py:class}`KinematicTaxel <genesis.options.sensors.tactile.KinematicTaxel>`) query the signed distance from each probe to nearby collision geometry directly. They need no list of target links, though an optional `filter_link_idx` (global link indices) can exclude chosen counterpart links from the query.
-- **Point-cloud probes** ({py:class}`ElastomerTaxel <genesis.options.sensors.tactile.ElastomerTaxel>` and {py:class}`ProximityTaxel <genesis.options.sensors.tactile.ProximityTaxel>`) sample a point cloud from the meshes named in `track_link_idx` (global link indices) and measure against those points. `n_sample_points` sets the sample budget.
+- **SDF-query probes** ({py:class}`ContactProbe <genesis.options.sensors.tactile.ContactProbe>`, {py:class}`ContactDepthProbe <genesis.options.sensors.tactile.ContactDepthProbe>`, and {py:class}`KinematicTaxel <genesis.options.sensors.tactile.KinematicTaxel>`) query the signed distance from each probe to the geometry in contact with the sensor link, so they need no list of target links. An optional `filter_link_idx` (global link indices) excludes chosen counterpart links from the query. A sensor on a fixed entity does not detect other fixed entities.
+- **Point-cloud probes** ({py:class}`ElastomerTaxel <genesis.options.sensors.tactile.ElastomerTaxel>` and {py:class}`ProximityTaxel <genesis.options.sensors.tactile.ProximityTaxel>`) sample a point cloud from the meshes named in `track_link_idx` (global link indices). `ProximityTaxel` measures against those points, while `ElastomerTaxel` uses them for shear and queries the signed distance of the tracked geometry for dilation. `n_sample_points` sets the sample budget.
 
 Readings are geometric estimates, not solver impulses, and are uncalibrated. Treat them as relative signals unless you tune the coefficients to your setup. The taxels also expose hardware-style [imperfections](#sensor-imperfections), so you can train a policy against the noise a real sensor produces. For how sensors are sampled, read back, and batched, see the {doc}`sensors overview <index>`.
 
@@ -28,6 +28,8 @@ Still, if you use them in your research, **please cite**:
 :::
 
 ## Choosing a sensor
+
+The trailing axes of each shape follow `probe_local_pos`: `n_probes` for an `(N, 3)` set, `M, N` for an `(M, N, 3)` grid.
 
 | Sensor | `read()` returns | Shape | Frame / units |
 |---|---|---|---|
@@ -59,7 +61,7 @@ depth_probe = scene.add_sensor(
 depth = depth_probe.read()  # shape ([n_envs,] n_probes), m
 ```
 
-`probe_radius` is the taxel's sensing radius, not a tolerance: each reading is `depth = max(0, probe_radius - signed_distance_to_surface)`, so a larger radius both extends the detection range and adds a constant offset to the reported depth. The SDF-query probes select the contact-depth backend with `contact_depth_query`: `"sdf"` (default) queries each geom's analytic SDF grid, while `"raycast"` walks the rigid solver's collision-mesh BVH and takes the signed distance to the nearest triangle (sharing the BVH with `RaycasterSensor`). The mode is class-wide: all sensors of the same class must agree.
+`probe_radius` is the taxel's sensing radius, not a tolerance: each reading is `depth = max(0, probe_radius - signed_distance_to_surface)`, so a larger radius both extends the detection range and adds a constant offset to the reported depth. The SDF-query probes select the contact-depth backend with `contact_depth_query`: `"sdf"` (default) queries each geom's analytic SDF grid, while `"raycast"` takes the signed distance to the nearest triangle of the collision meshes. The mode is class-wide: all sensors of the same class must agree.
 
 `ContactProbe` gates its boolean output with a Schmitt trigger to suppress chatter: it latches on when depth reaches `contact_threshold` (default `1e-4` m) and releases when depth falls back to `release_threshold` (default equals `contact_threshold`, i.e. no hysteresis; may be negative to require separation before release).
 
@@ -121,7 +123,7 @@ tactile = scene.add_sensor(
     )
 )
 
-displacement = tactile.read()  # shape ([n_envs,] n_probes, 3), m, link-local
+displacement = tactile.read()  # shape ([n_envs,] ny, nx, 3), m, link-local
 ```
 
 `dilate_scale` and `shear_scale` scale the indentation and shear response; `lambda_d` and `lambda_s` control how far each effect spreads across neighboring markers. The out-of-plane (normal) bulge scales as `depth ** normal_exponent` (default `2.0`, the HydroShear quadratic response); tangential dilation and shear stay linear in depth regardless of `normal_exponent`. When `probe_local_pos` is a regular planar grid with a single shared normal, Genesis World computes the dilation term with an FFT to keep large arrays fast. The shear anchor is gated by the same `contact_threshold` / `release_threshold` Schmitt trigger (a tracked point begins anchoring shear at `contact_threshold` penetration and releases once it separates back to `release_threshold`).
@@ -164,7 +166,7 @@ Your browser does not support the video tag.
 
 ## Sensor imperfections
 
-On top of the generic per-sensor imperfections (`noise`, `bias`, `resolution`, `delay`, `jitter`, available on every sensor), the tactile probe and taxel sensors expose hardware-style imperfections. They apply to the **measured branch only**: `read()` returns the imperfect signal, while `read_ground_truth()` stays clean.
+On top of the generic imperfections that every non-camera sensor accepts (`noise`, `bias`, `random_walk`, `resolution`, `delay`, `jitter`), the tactile probe and taxel sensors expose hardware-style imperfections. They apply to the **measured branch only**: `read()` returns the imperfect signal, while `read_ground_truth()` stays clean.
 
 | Option(s) | Models | Applies to |
 |---|---|---|
@@ -174,7 +176,7 @@ On top of the generic per-sensor imperfections (`noise`, `bias`, `resolution`, `
 | `crosstalk_strength`, `crosstalk_sigma` | Gaussian spatial crosstalk: each taxel's force/torque bleeds onto its grid neighbors (`crosstalk_strength=1` is a pure Gaussian blur of width `crosstalk_sigma`). | Grid taxels: `KinematicTaxel`, `ProximityTaxel` |
 | `crosstalk_kernel` | Explicit point-spread kernel for spatial crosstalk (odd dims; center tap is the self weight). Mutually exclusive with the Gaussian options. `genesis.utils.misc.gaussian_crosstalk_kernel(n_rows, n_cols, sigma)` builds an L1-normalized Gaussian kernel. | Grid taxels: `KinematicTaxel`, `ProximityTaxel` |
 
-Spatial crosstalk requires a regular planar `(M, N, 3)` grid `probe_local_pos`; pad irregular layouts with `probe_radius=0` filler taxels, which read zero and are skipped.
+Spatial crosstalk requires a regular planar `(M, N, 3)` grid `probe_local_pos`; pad irregular `KinematicTaxel` layouts with `probe_radius=0` filler taxels, which read zero and are skipped. `ProximityTaxel` needs a regular grid.
 
 ```python
 import genesis.utils.misc as misc

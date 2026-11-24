@@ -9,5 +9,5 @@ A morph carries both the geometry and the pose of an entity. Pick the matching m
 morph
 primitive/index
 file_morph/index
-nowhere
+file_morph/terrain
 ```
