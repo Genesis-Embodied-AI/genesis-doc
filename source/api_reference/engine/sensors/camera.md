@@ -19,6 +19,7 @@ Each backend is a separate options class and sensor, all returning the same `Cam
 
 .. autoclass:: genesis.engine.sensors.camera.RasterizerCameraSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```
@@ -30,6 +31,7 @@ Each backend is a separate options class and sensor, all returning the same `Cam
 
 .. autoclass:: genesis.engine.sensors.camera.RaytracerCameraSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```
@@ -41,6 +43,7 @@ Each backend is a separate options class and sensor, all returning the same `Cam
 
 .. autoclass:: genesis.engine.sensors.camera.BatchRendererCameraSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```

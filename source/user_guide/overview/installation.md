@@ -41,7 +41,7 @@ GPU simulation on AMD through ROCm is still experimental and may be unstable, es
 
 ### Surface reconstruction
 
-To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, Genesis World reconstructs a mesh from the internal particle representation. It uses [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) by default, which extracts a smooth surface from the particle density but requires all particles to share one radius. Set `recon_backend="levelset"` on the surface to wrap the union of the particle spheres instead: it supports a radius per particle, at the cost of a bumpier surface. Both backends work on every platform with no extra install. `recon_backend="openvdb"` is a deprecated alias of `"levelset"`.
+To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, Genesis World reconstructs a mesh from the internal particle representation. It uses [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) by default, which extracts a smooth surface from the particle density but requires all particles to share one radius. Set `recon_backend="levelset"` in the `vis` options of the particle solver, such as `gs.options.SPHOptions(vis=gs.options.ParticleVisOptions(recon_backend="levelset"))`, to wrap the union of the particle spheres instead: it supports a radius per particle, at the cost of a bumpier surface. Both backends work on every platform with no extra install. `recon_backend="openvdb"` is a deprecated alias of `"levelset"`.
 
 ### Ray-tracing renderer
 
@@ -69,7 +69,7 @@ Call `gs.init()` first: initialization selects the backend and configures low-le
 
 ### Circular import error
 
-Importing `genesis` fails with a circular import when the current directory is the Genesis World source directory and the package is installed in non-editable mode (from PyPI or from source). Either move out of the source directory before running Python, or switch to an editable install: uninstall `genesis-world`, then run `pip install -e ".[render]"` inside the source directory.
+Importing `genesis` fails with a circular import when the current directory is the Genesis World source directory and the package is installed in non-editable mode (from PyPI or from source). Either move out of the source directory before running Python, or switch to an editable install: uninstall `genesis-world`, then run `pip install -e ".[dev]"` inside the source directory.
 
 ### Slow rendering on native Ubuntu (CPU fallback)
 
@@ -77,10 +77,10 @@ If `cam.render()` or the viewer becomes extremely slow, the system may be silent
 
 To ensure GPU rendering is active:
 
-1. Install the NVIDIA GL libraries:
+1. Install the NVIDIA GL libraries of your driver branch, the major version that `nvidia-smi` reports as `Driver Version`. For a 580 driver:
 
    ```bash
-   sudo apt update && sudo apt install -y libnvidia-gl-525
+   sudo apt update && sudo apt install -y libnvidia-gl-580
    ```
 
 2. Check that EGL points to the NVIDIA driver:

@@ -1,11 +1,17 @@
 # MPMSolver
 
-The `MPMSolver` implements the Material Point Method (MPM) for simulating elastic solids, granular materials, fluids, and phase transitions. It combines Lagrangian particles that track material points with a background Eulerian grid that solves the momentum equations, transferring between them with the moving least squares material point method (MLS-MPM) scheme, which fuses stress and the affine velocity field into one transfer. The materials it supports are listed in {doc}`/api_reference/engine/material/mpm/index`. For usage, see {doc}`/user_guide/physics/beyond_rigid_bodies`.
+The `MPMSolver` implements the Material Point Method (MPM) for simulating elastic solids, granular materials, fluids, and phase transitions. It combines Lagrangian particles that track material points with a background Eulerian grid that solves the momentum equations. The materials it supports are listed in {doc}`/api_reference/engine/material/mpm/index`. For usage, see {doc}`/user_guide/physics/beyond_rigid_bodies`.
 
 ## Options
 
 ```{eval-rst}
 .. autoclass:: genesis.options.solvers.MPMOptions
+```
+
+The MPM and SPH solvers share their visualization options.
+
+```{eval-rst}
+.. autoclass:: genesis.options.solvers.ParticleVisOptions
 ```
 
 ## MPMSolver

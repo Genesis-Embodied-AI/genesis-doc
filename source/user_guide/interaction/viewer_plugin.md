@@ -147,7 +147,7 @@ scene.viewer.add_plugin(
 
 Click-to-select and drag-in-3D need a ray from the camera through the cursor. Subclass `RaycasterViewerPlugin` instead of `ViewerPlugin`: it builds a raycaster over the scene's rigid collision geometry and gives you `_screen_position_to_ray(x, y)`, which returns a `Ray` (origin and direction in the world frame). It also overrides `update_on_sim_step()` to keep the raycaster in sync as bodies move, so hits stay accurate while the simulation runs.
 
-Pass `use_visual_geom=True` to cast against visual meshes instead, so picking follows what is drawn on screen and reaches entities whose only geometry is visual. The cost is rescanning every visual triangle each step, several times the price of the collision meshes on detailed geometry. Only entities whose material sets `use_visual_raycasting=True` are visible to that cast, the same opt-in the {doc}`raycaster sensors </user_guide/sensing/raycaster>` use.
+Pass `use_visual_geom=True` to cast against visual meshes instead, so picking follows what is drawn on screen and reaches entities whose only geometry is visual. The cost is rescanning every visual triangle each step, several times the price of the collision meshes on detailed geometry. Only entities whose spec sets `use_visual_raycasting=True`, such as `gs.entities.Rigid(..., use_visual_raycasting=True)`, are visible to that cast, the same opt-in the {doc}`raycaster sensors </user_guide/sensing/raycaster>` use.
 
 Cast the ray with `self._raycaster.cast(*ray)`. A hit is a `RayHit` with `distance`, `position`, `normal` (all in the world frame), and `geom`, the `RigidGeom` that was struck, or the `RigidVisGeom` under `use_visual_geom=True`; `geom.link` is the owning link:
 

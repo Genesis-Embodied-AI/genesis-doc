@@ -6,7 +6,15 @@ Create an entity by calling {py:meth}`scene.add_entity <genesis.engine.scene.Sce
 
 - **Morph:** the geometry and pose: a primitive shape, a mesh, or a robot description loaded from URDF, MJCF, or USD. See {doc}`/api_reference/engine/entity/morph/index`.
 - **Material:** the physical model that decides which solver simulates the entity and how it responds to forces. See {doc}`/api_reference/engine/material/index`.
-- **Surface:** the visual appearance used for rendering: color, texture, and visualization mode. See {doc}`/api_reference/engine/entity/surface/index`.
+- **Surface:** the visual appearance used for rendering: color and texture. See {doc}`/api_reference/engine/entity/surface/index`.
+
+To set density, friction, surfaces or fixed vertices on parts of an entity, pass an entity spec such as `gs.entities.Rigid` as `add_entity(spec=...)` instead. See {doc}`entity_spec`.
+
+```{toctree}
+:titlesonly:
+
+entity_spec
+```
 
 For a worked example of adding an entity and stepping the scene, see {doc}`/user_guide/getting_started/hello_genesis`.
 
@@ -17,6 +25,7 @@ For a worked example of adding an entity and stepping the scene, see {doc}`/user
 Each physics solver has its own entity type. Choosing a material selects the solver, and therefore the type of the returned entity.
 
 - **`RigidEntity`:** articulated rigid bodies and robots simulated by the rigid solver. It is the type used for most manipulation and locomotion tasks, and it exposes links, joints, and dofs.
+- **`KinematicEntity`:** an articulated body that the kinematic solver moves without dynamics, such as a ghost robot. `RigidEntity` derives from it.
 - **`DroneEntity`:** a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>` subclass that adds propeller and thrust control for quadrotor simulation.
 - **`TerrainEntity`:** a {py:class}`RigidEntity <genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity>` subclass that `gs.morphs.Terrain` builds, with a query for the surface height at any point.
 - **`MPMEntity`:** elastic and plastic solids, sand, snow, and similar continua simulated with the Material Point Method (MPM) solver.
@@ -30,6 +39,7 @@ Each physics solver has its own entity type. Choosing a material selects the sol
 :titlesonly:
 
 rigid_entity/index
+kinematic_entity
 mpm_entity
 fem_entity
 pbd_entity/index

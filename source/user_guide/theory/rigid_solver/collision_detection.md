@@ -6,7 +6,7 @@ The second layer of a step finds which rigid bodies touch, generates a contact m
 
 Detection runs in two phases each step, from a cheap approximate cull to an exact contact manifold.
 
-**Broad phase.** Each geometry gets a world-space axis-aligned bounding box (AABB), recomputed every step because rigid bodies move. A Sweep-and-Prune pass then reports only the geometry pairs whose boxes overlap, turning an all-pairs comparison into a near-linear one. The same pass drops pairs that cannot physically collide:
+**Broad phase.** Each geometry gets a world-space axis-aligned bounding box (AABB), recomputed every step because rigid bodies move. A broad-phase pass then reports only the geometry pairs whose boxes overlap (sweep-and-prune on CPU, or a parallel all-pairs test on GPU, see `broadphase_traversal`), turning an all-pairs comparison into a near-linear one. The same pass drops pairs that cannot physically collide:
 
 - **Adjacency:** two geometries on the same link, or on directly connected links.
 - **Collision masks:** pairs excluded by their `contype` / `conaffinity` bitmasks.
@@ -18,7 +18,7 @@ Detection runs in two phases each step, from a cheap approximate cull to an exac
 | Geometry pair | Path |
 |---|---|
 | General convex–convex, including plane–convex | Minkowski Portal Refinement (MPR) by default, with GJK and EPA refining the contacts MPR cannot resolve reliably. GJK with EPA throughout when `use_gjk_collision=True`. |
-| Plane–box and box–box | Analytic special case, for stability when a box lies flush on a plane. |
+| Plane–box, and box–box with `box_box_detection=True` | Analytic special case, for stability when a box lies flush on a plane. |
 | Any geometry against height-field terrain | Terrain routine that can emit several contact points per supporting cell. |
 | Non-convex meshes | Signed-distance-field sampling: vertices first (vertex–face), then edges (edge–edge), keeping the deepest penetration. |
 

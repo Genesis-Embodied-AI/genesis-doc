@@ -14,6 +14,10 @@ Two options objects configure the viewer: `ViewerOptions` sets its initial camer
 .. autoclass:: genesis.options.VisOptions
 ```
 
+```{eval-rst}
+.. autoclass:: genesis.options.vis.EntityVisOptions
+```
+
 ## Viewer
 
 ```{eval-rst}

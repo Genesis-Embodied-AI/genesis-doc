@@ -8,6 +8,8 @@ The `SPHSolver` implements Smoothed Particle Hydrodynamics for liquid simulation
 .. autoclass:: genesis.options.solvers.SPHOptions
 ```
 
+The `vis` field takes {py:class}`ParticleVisOptions <genesis.options.solvers.ParticleVisOptions>`, documented with the {doc}`MPM solver <mpm_solver>`.
+
 ## SPHSolver
 
 ```{eval-rst}

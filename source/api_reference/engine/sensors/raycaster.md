@@ -15,6 +15,7 @@
 ```{eval-rst}
 .. autoclass:: genesis.engine.sensors.raycaster.RaycasterSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```
@@ -30,6 +31,7 @@ A raycaster with a `DepthCameraPattern`; `read_image()` reshapes the per-ray dis
 ```{eval-rst}
 .. autoclass:: genesis.engine.sensors.depth_camera.DepthCameraSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```

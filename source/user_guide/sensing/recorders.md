@@ -2,7 +2,7 @@
 
 A **recorder** samples data from your simulation on a schedule and processes it for you (writing it to a file or drawing it in a live plot) without you threading logging code through your step loop. Describe *what* to record and *how*, then step the scene as usual.
 
-Recording runs on a background thread by default, so it adds little overhead to the simulation itself.
+`NPZFile` and `CSVFile` write on a background thread, so they add little overhead to the simulation itself. Video, plotter and trajectory recorders run on the stepping thread.
 
 The complete runnable example for this page is [`examples/sensors/imu_franka.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/sensors/imu_franka.py), which logs an IMU sensor to an `.npz` file and plots it live:
 

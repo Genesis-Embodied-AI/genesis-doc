@@ -1,6 +1,6 @@
 # Camera sensors
 
-A camera sensor renders the scene to an RGB image off-screen and returns it through the sensor pipeline, with no viewer window involved. Add one with `scene.add_sensor(...)`, step the simulation, and call `read()` to get pixels back as a tensor. It is a first-class {doc}`sensor <index>`: it renders lazily on `read()`, joins the batched `scene.read_sensors()` path, and mounts on a moving link like any other sensor.
+A camera sensor renders the scene to an RGB image off-screen and returns it through the sensor pipeline, with no viewer window involved. Add one with `scene.add_sensor(...)`, step the simulation, and call `read()` to get pixels back as a tensor. It is a first-class {doc}`sensor <index>`: it renders lazily on `read()` and mounts on a moving link like any other sensor. Read cameras individually: `scene.read_sensors()` does not render them.
 
 Genesis World has two other ways to look at a scene:
 

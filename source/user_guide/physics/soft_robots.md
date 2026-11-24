@@ -50,7 +50,7 @@ for i in range(1000):
 Everything else (the plane, the scene, `build`, `step`) is the standard flow from {doc}`/user_guide/getting_started/hello_genesis`.
 
 :::{note}
-The constitutive `model` names differ between solvers. MPM uses `"corotation"` or `"neohooken"`; FEM uses `"linear"`, `"stable_neohookean"`, or `"linear_corotated"`. (`"stable_neohooken"` is a deprecated spelling of the FEM model and logs a warning.)
+The constitutive `model` names differ between solvers. MPM uses `"corotation"` or `"neohooken"`; FEM uses `"linear"`, `"stable_neohookean"`, or `"linear_corotated"`.
 :::
 
 ## Timestep and gravity
@@ -104,7 +104,7 @@ scene.build(n_envs=3)
 `set_muscle` takes two per-unit arrays, where a *unit* is a particle for MPM and an element for FEM:
 
 - `muscle_group`: an integer in `[0, n_groups)` per unit, naming which muscle each unit belongs to.
-- `muscle_direction`: a fiber direction per unit. MPM also accepts one shared vector; FEM requires one per element. Genesis does **not** normalize it: pass unit vectors (FEM asserts that they are).
+- `muscle_direction`: a fiber direction per unit, or one vector shared by all units. Genesis does **not** normalize it: pass unit vectors (FEM asserts that they are).
 
 The worm example carves the body into upper/lower and fore/hind quarters by particle position, then points every fiber along `+Y`:
 

@@ -68,8 +68,7 @@ The conventions above surface names you also see when reading solver code. If yo
 
 - **`*_state`:** dynamic state updated every solver step (for example `dofs_state`, `links_state`).
 - **`*_info`:** static properties fixed for the simulation, such as mass or stiffness (`dofs_info`, `geoms_info`).
-- **`*_render`:** fields consumed only by visualization, never by physics (`particles_render`).
-- **`*_ng`:** a state variant with `requires_grad` disabled (`particles_ng`); `*_reordered` marks a spatially reordered cache.
+- **`*_reordered`:** a spatially reordered copy of the particle state (`particles_reordered`).
 
 **Loop indices are `i_<representation-initial>`.** Kernels iterate flat arrays with short names whose letter names the thing being indexed. These are the global indices described above, not local ones:
 

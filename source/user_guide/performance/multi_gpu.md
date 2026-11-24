@@ -35,7 +35,7 @@ def run(gpu_id, func):
 ```
 
 ```python
-num_gpus = 2
+num_gpus = max(torch.cuda.device_count(), 1)
 processes = []
 for i in range(num_gpus):
     p = multiprocessing.Process(target=run, args=(i, main))
@@ -67,7 +67,7 @@ os.environ["QD_VISIBLE_DEVICE"] = str(local_rank)
 gs.init(backend=gs.gpu, seed=local_rank)  # distinct seed per rank
 ```
 
-Build the scene and initialize the process group afterward. Because `CUDA_VISIBLE_DEVICES` already narrowed this process to one GPU, that device is `cuda:0` here and the DDP wrapper binds to it:
+Build the scene and initialize the process group afterward. Because `CUDA_VISIBLE_DEVICES` already narrowed this process to one GPU, that device is `cuda:0` here and the DDP wrapper binds to it. On a machine without CUDA, the example falls back to the `gloo` backend on the CPU:
 
 ```python
 scene.build(n_envs=args.num_envs)
@@ -81,12 +81,12 @@ model = TinyMLP(obs_dim, act_dim).to(device)
 model = DDP(model, device_ids=[gpu_id])
 ```
 
-The training loop steps the simulation, reads state into a tensor, and lets DDP synchronize gradients. The observations come straight from the rigid solver's generalized coordinates, so no data leaves the GPU:
+The training loop steps the simulation, reads state into a tensor, and lets DDP synchronize gradients. The observations are the generalized positions of the Franka entity, so no data leaves the GPU:
 
 ```python
 for step in range(args.steps):
     scene.step()
-    qpos = rigid.get_qpos()  # shape (n_envs, n_qs), on the GPU
+    qpos = franka.get_qpos().to(device)  # shape (n_envs, n_qs)
 
     obs = qpos + torch.randn_like(qpos)
     logits = model(obs)
@@ -108,11 +108,10 @@ gs.destroy()
 
 ## Reading simulation state into tensors
 
-On a GPU backend, entity state is already device-resident, so you can feed it to a model without a host round-trip. The DDP example reads generalized positions from the rigid solver:
+On a GPU backend, entity state is already device-resident, so you can feed it to a model without a host round-trip. The DDP example reads the generalized positions of the Franka entity:
 
 ```python
-rigid = scene.sim.rigid_solver
-qpos = rigid.get_qpos()  # shape ([n_envs,] n_qs)
+qpos = franka.get_qpos()  # shape ([n_envs,] n_qs)
 ```
 
 The returned tensor carries a leading `n_envs` dimension when the scene is built with parallel environments and drops it for a single-environment scene, following the {doc}`shape convention </user_guide/getting_started/parallel_simulation>` used throughout Genesis World. After `gs.init()`, `gs.device` and `gs.backend` report the resolved PyTorch device and backend, which is useful for placing your own tensors on the same GPU.

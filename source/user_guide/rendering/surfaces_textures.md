@@ -54,7 +54,7 @@ surface = gs.surfaces.Default(
 
 Two constraints follow from how the shortcuts map onto channels:
 
-- A shortcut and its texture cannot both be set: passing `color=...` together with the texture it fills (`diffuse_texture` on most surfaces, `specular_texture` on `Glass` and `Water`, `emissive_texture` on `Emission`) raises an error, because the texture already carries the color. Surface types with a default roughness (`Rough`, `Smooth`, `Reflective`, `Metal`, `Glass`, `Water`) count it as set, so pass `roughness=None` before giving them a `roughness_texture`.
+- A shortcut and its texture cannot both be set: passing `color=...` together with the texture it fills (`diffuse_texture` on most surfaces, `specular_texture` on `Glass` and `Water`, `emissive_texture` on `Emission`) raises an error, because the texture already carries the color.
 - A shortcut only applies to channels the surface actually has. `metallic` is meaningful on `Default`/`BSDF`; `Metal`, `Glass`, and the plastics ignore it because their reflectance is fixed by their type.
 
 Genesis World treats a fourth color component as opacity, so `color=(r, g, b, a)` is the concise way to make a surface semi-transparent:
@@ -71,6 +71,7 @@ When a property varies across a surface (a wood grain, a painted logo, a roughne
 - `gs.textures.ColorTexture(color=...)`: a single uniform color. Equivalent to the `color` shortcut, useful when an argument requires a texture object.
 - `gs.textures.ImageTexture(image_path=..., encoding=...)`: an image map sampled over the mesh's UV coordinates.
 - {py:class}`gs.textures.BatchTexture <genesis.options.textures.BatchTexture>`: a stack of textures, one per environment, for {doc}`parallel rendering </user_guide/getting_started/parallel_simulation>`.
+- {py:class}`gs.textures.DynamicTexture <genesis.options.textures.DynamicTexture>`: an image that changes while the simulation runs (see [Changing a texture at runtime](#changing-a-texture-at-runtime)).
 
 Assign a texture to the channel it drives. The base color goes to `diffuse_texture`; data maps go to `roughness_texture`, `normal_texture`, `opacity_texture`, and so on:
 
@@ -87,6 +88,33 @@ Set `encoding="linear"` for any map that stores data rather than a color: roughn
 :::
 
 Genesis World resolves an image path against your working directory first, then against the bundled asset directory (`genesis/assets`), so `"textures/checker.png"` loads the checker image that ships with the library. A loaded asset (a `.glb` or textured `.obj`, for example) brings its own surface; pass a `surface` to `add_entity` only when you want to override it.
+
+### Changing a texture at runtime
+
+A `DynamicTexture` fills the diffuse or the emissive map with an image that changes while the simulation runs, such as a screen or an indicator light. Declare the `resolution` of its images and its `variants`, the images each environment switches between, then show one per environment after the build with `set_texture(variant=...)`. With `is_batched=True`, each environment also holds an image of its own, which `set_texture(pixels)` writes. The full script is [`examples/rendering/dynamic_texture.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rendering/dynamic_texture.py):
+
+```python
+duck = scene.add_entity(
+    gs.morphs.Mesh(file="meshes/duck/duck.obj", scale=0.0005, euler=(90.0, 0.0, 90.0), fixed=True),
+    surface=gs.surfaces.Default(
+        diffuse_texture=gs.textures.DynamicTexture(
+            resolution=(256, 256),  # (width, height), pixels
+            variants={
+                "asset": None,  # the texture the asset gives the map
+                "purple": gs.textures.ColorTexture(color=(0.71, 0.62, 0.86)),
+            },
+            is_batched=True,
+        ),
+    ),
+)
+scene.build(n_envs=2)
+
+duck.set_texture(variant="purple")  # every environment
+duck.set_texture(variant=["asset", "purple"])  # one variant per environment
+duck.set_texture(np.random.rand(2, 3))  # one RGB color per environment, written to the batched variant
+```
+
+Every environment shows the first variant at build and after a reset. The mesh needs texture coordinates, and only the rasterizer draws a dynamic texture.
 
 ## Lighting a ray-traced scene
 
@@ -113,19 +141,9 @@ scene = gs.Scene(
 Surfaces render on both the interactive viewer's rasterizer and the ray tracer, but reflections, refraction, transmission, and emission-based lighting are only fully resolved by the ray tracer. See {doc}`Rendering </user_guide/rendering/cameras>` for how to choose and configure a renderer.
 :::
 
-## Visualizing something other than the visual mesh
+## Geometry a surface is drawn on
 
-`vis_mode` selects *which* geometry of an entity the renderer draws, independent of the surface's material. It matters most for particle-based entities, whose "shape" is a point cloud rather than a mesh:
-
-```python
-# draw a fluid entity as its raw particles
-gs.surfaces.Rough(color=(0.6, 0.8, 1.0), vis_mode="particle")
-
-# reconstruct a smooth surface mesh from those particles
-gs.surfaces.Glass(color=(0.7, 0.85, 1.0, 0.7), vis_mode="recon")
-```
-
-The accepted values are `"visual"`, `"collision"`, `"particle"`, `"sdf"`, and `"recon"`. Use `"collision"` to inspect the collision geometry that physics actually sees.
+The material of an entity decides which geometry its surface is drawn on. A solid draws its visual mesh, moved or deformed to follow the simulation. A liquid or granular material draws a surface reconstructed from its particles. To see the collision geometry, the particles, or the tetrahedra instead, switch to the {ref}`debug view <debug-view>`, which leaves the surface as it is.
 
 ## Foam and spray
 
@@ -138,7 +156,6 @@ scene.add_entity(
     material=gs.materials.SPH.Liquid(),
     morph=gs.morphs.Box(pos=(0.0, 0.0, 0.5), size=(0.4, 0.4, 0.4)),
     surface=gs.surfaces.Water(
-        vis_mode="recon",  # foam sits on the reconstructed fluid surface
         generate_foam=True,
         foam_options=gs.options.FoamOptions(
             radius_scale=0.2,  # foam particle radius relative to a fluid particle

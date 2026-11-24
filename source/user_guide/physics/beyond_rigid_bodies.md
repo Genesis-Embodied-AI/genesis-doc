@@ -39,13 +39,13 @@ mpm_options=gs.options.MPMOptions(
 )
 ```
 
-**3. Set the material and how it renders.** Swap the entity's `material` to pick the solver, and pass a `surface` to control appearance. `vis_mode="particle"` draws the underlying particles; `vis_mode="visual"` deforms the original mesh to follow the internal state (called *skinning* in computer graphics).
+**3. Set the material and how it renders.** Swap the entity's `material` to pick the solver, and pass a `surface` to control appearance. The material decides what the surface is drawn on: a solid deforms its original mesh to follow the internal state (called *skinning* in computer graphics), and a liquid or granular material draws a surface reconstructed from its particles. To draw the underlying particles instead, set `vis=gs.options.EntityVisOptions(debug=True)` on the entity spec, or switch the whole scene to the {ref}`debug view <debug-view>`.
 
 ```python
 obj = scene.add_entity(
     material=gs.materials.MPM.Elastic(),
     morph=gs.morphs.Box(pos=(0.0, -0.5, 0.25), size=(0.2, 0.2, 0.2)),
-    surface=gs.surfaces.Default(color=(1.0, 0.4, 0.4), vis_mode="visual"),
+    surface=gs.surfaces.Default(color=(1.0, 0.4, 0.4)),
 )
 ```
 
@@ -72,6 +72,20 @@ Three MPM objects falling and deforming: an elastic cube, a liquid cube, and an 
 
 The Finite Element Method discretizes an entity into a tetrahedral mesh and solves the elasticity equations on it. Choose FEM over MPM when mesh-level accuracy matters: stiff elastic bodies, volumetric muscles, and contact-rich soft-body manipulation. {py:class}`gs.materials.FEM.Elastic <genesis.engine.materials.FEM.elastic.Elastic>` exposes the physical parameters directly, such as Young's modulus `E` (Pa) and Poisson ratio `nu`.
 
+To hold some vertices of an FEM entity in place, such as a soft pad clamped by one face, build the entity from an entity spec, {py:class}`gs.entities.FEM <genesis.options.entities.FEM>`, and select the vertices on it. `gs.indices.Vertex.in_box` and `gs.indices.Vertex.closest_to` take positions in the frame of the morph, relative to its `pos`:
+
+```python
+pad_spec = gs.entities.FEM(
+    morph=gs.morphs.Box(pos=(0.0, 0.0, 0.5), size=(0.2, 0.2, 0.2)),
+    material=gs.materials.FEM.Elastic(E=1.0e5, nu=0.45),
+)
+# Clamp the top face: the box spans -0.1 to 0.1 in the frame of its morph
+pad_spec.select(gs.indices.Vertex.in_box((-0.1, -0.1, 0.099), (0.1, 0.1, 0.1))).set_is_fixed(True)
+pad = scene.add_entity(spec=pad_spec)
+```
+
+[`examples/deformable/fem_hard_and_soft_constraint.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/deformable/fem_hard_and_soft_constraint.py) fixes vertices by box and by closest point.
+
 FEM underpins the {doc}`soft robots tutorial <soft_robots>`, which actuates a volumetric muscle. FEM entities also couple to rigid arms for grasping; see [`examples/coupling/fem_cube_linked_with_arm.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/coupling/fem_cube_linked_with_arm.py).
 
 ## PBD: cloth and topology-preserving deformables
@@ -96,7 +110,7 @@ Two PBD cloth sheets: one pinned at four corners, a second dropping onto it pinn
 </video>
 
 :::{warning}
-Skinning a flat 2D cloth mesh with `vis_mode="visual"` can produce degenerate barycentric weights, which shows up as distorted rendering, especially with a non-zero `euler`. Use `vis_mode="particle"` for flat sheets until this is resolved.
+Skinning a flat 2D cloth mesh can produce degenerate barycentric weights, which shows up as distorted rendering, especially with a non-zero `euler`. Draw flat sheets as their particles in the viewer, with `vis=gs.options.EntityVisOptions(debug=True)` on the entity spec, until this is resolved.
 :::
 
 ## SPH: free-surface liquids
@@ -109,7 +123,7 @@ Turning a rigid block into water is one line: give it an SPH liquid material. Tu
 liquid = scene.add_entity(
     material=gs.materials.SPH.Liquid(),  # or Liquid(mu=0.02) for a thicker fluid
     morph=gs.morphs.Box(pos=(0.0, 0.0, 0.65), size=(0.4, 0.4, 0.4)),
-    surface=gs.surfaces.Default(color=(0.4, 0.8, 1.0), vis_mode="particle"),
+    surface=gs.surfaces.Default(color=(0.4, 0.8, 1.0)),
 )
 ```
 

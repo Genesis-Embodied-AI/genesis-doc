@@ -13,6 +13,7 @@ Reports the nearest distance from each probe point to the mesh surfaces of a set
 
 .. autoclass:: genesis.engine.sensors.surface_distance_probe.SurfaceDistanceProbeSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```
@@ -30,6 +31,7 @@ Supply material properties through `properties_dict`, which maps a global rigid-
 
 .. autoclass:: genesis.engine.sensors.temperature.TemperatureGridSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```
@@ -43,6 +45,7 @@ Measures the generalized effort delivered at each selected actuator's output sha
 
 .. autoclass:: genesis.engine.sensors.joint_torque.JointTorqueSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```

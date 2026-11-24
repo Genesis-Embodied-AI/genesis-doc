@@ -13,6 +13,7 @@ The total contact force on the associated link, in its local frame.
 ```{eval-rst}
 .. autoclass:: genesis.engine.sensors.contact_force.ContactForceSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```
@@ -28,6 +29,7 @@ A boolean: whether the associated link is in contact.
 ```{eval-rst}
 .. autoclass:: genesis.engine.sensors.contact_force.ContactSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```

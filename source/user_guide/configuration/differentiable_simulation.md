@@ -72,10 +72,11 @@ An input given after the last state the loss reads cannot affect the loss, so it
 
 ## Limitations
 
-- **Supported solvers and couplings:** the rigid and kinematic solvers, the MPM solver without CPIC, and the FEM solver with its explicit integrator support gradients. The PBD, SPH and SF solvers, the implicit FEM solver, the coupling of FEM with rigid, MPM or SPH entities, and the SAP and IPC couplers do not. `scene.build()` raises an error that names each unsupported component.
+- **Supported solvers and couplings:** the rigid and kinematic solvers, the MPM solver without CPIC, and the FEM solver with its explicit integrator support gradients. The PBD and SPH solvers, the implicit FEM solver, the coupling of FEM with rigid, MPM or SPH entities, and the SAP and IPC couplers do not. `scene.build()` raises an error that names each unsupported component.
 - **Memory scales with horizon:** each step saves the state it starts from, so long trajectories consume proportionally more GPU memory.
 - **Some contact and collision paths have no gradients:** gradients through them may be zero or undefined. The rigid solver uses the GJK collision path when gradients are required (see {doc}`/user_guide/theory/rigid_solver/collision_detection`), and the elliptic friction cone and `box_box_detection=True` are unsupported (see {doc}`/user_guide/theory/rigid_solver/constraints`).
-- **Coupler support:** the default legacy coupler carries gradients; the SAP coupler does not. See {doc}`/user_guide/physics/coupling/index`.
+- **Coupler support:** the default legacy coupler carries gradients; the SAP and IPC couplers do not. See {doc}`/user_guide/physics/coupling/index`.
+- **Rigid solver options:** noslip, torsional and rolling friction, and integrators other than `approximate_implicitfast` are unavailable when `requires_grad=True`.
 - **Hibernation:** unavailable when `requires_grad=True`; see {doc}`/user_guide/theory/rigid_solver/collision_detection`.
 - **Numerical stability over long horizons:** gradients backpropagated through many steps can vanish or explode, as with any long recurrent computation.
 
