@@ -69,7 +69,7 @@ Call `gs.init()` first: initialization selects the backend and configures low-le
 
 ### Circular import error
 
-Importing `genesis` fails with a circular import when the current directory is the Genesis World source directory and the package is installed in non-editable mode (from PyPI or from source). Either move out of the source directory before running Python, or switch to an editable install: uninstall `genesis-world`, then run `pip install -e ".[render]"` inside the source directory.
+Importing `genesis` fails with a circular import when the current directory is the Genesis World source directory and the package is installed in non-editable mode (from PyPI or from source). Either move out of the source directory before running Python, or switch to an editable install: uninstall `genesis-world`, then run `pip install -e ".[dev]"` inside the source directory.
 
 ### Slow rendering on native Ubuntu (CPU fallback)
 
@@ -77,10 +77,10 @@ If `cam.render()` or the viewer becomes extremely slow, the system may be silent
 
 To ensure GPU rendering is active:
 
-1. Install the NVIDIA GL libraries:
+1. Install the NVIDIA GL libraries of your driver branch, the major version that `nvidia-smi` reports as `Driver Version`. For a 580 driver:
 
    ```bash
-   sudo apt update && sudo apt install -y libnvidia-gl-525
+   sudo apt update && sudo apt install -y libnvidia-gl-580
    ```
 
 2. Check that EGL points to the NVIDIA driver:

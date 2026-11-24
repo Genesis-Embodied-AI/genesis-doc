@@ -15,7 +15,6 @@ Almost every component in Genesis World is configured through an **Options** cla
 | {doc}`/api_reference/engine/simulator` | `gs.options.SimOptions` |
 | {doc}`/api_reference/engine/solvers/index` | `gs.options.RigidOptions`, `gs.options.MPMOptions`, `gs.options.FEMOptions`, `gs.options.PBDOptions`, `gs.options.SPHOptions`, `gs.options.KinematicOptions` |
 | {doc}`/api_reference/engine/couplers/index` | `gs.options.LegacyCouplerOptions`, `gs.options.SAPCouplerOptions`, `gs.options.IPCCouplerOptions` |
-| {doc}`/api_reference/engine/entity/entity_spec` | `gs.entities.*`, `gs.indices.*`, `gs.options.Geom`, `gs.options.Vertex` |
 | {doc}`/api_reference/engine/entity/morph/index` | `gs.morphs.*` |
 | {doc}`/api_reference/engine/entity/surface/index` | `gs.surfaces.*`, `gs.textures.*` |
 | {doc}`/api_reference/visualization/viewer` | `gs.options.ViewerOptions`, `gs.options.VisOptions` |

@@ -37,7 +37,7 @@ To cap the viewer frame rate, set `refresh_rate` on `ViewerOptions`. The older `
 
 `realtime_factor` sets the pace of the simulation itself: how many seconds of simulated time one second of wall-clock time covers, `1.0` for real time and `2.0` for twice as fast. When the viewer is shown, each step of the simulation is throttled to it and falls behind gracefully when it cannot keep up; set it to `None` to always run as fast as possible. It also sets the playback speed of the videos recorded by a {doc}`camera </user_guide/rendering/cameras>`, viewer or not, with `None` recording at real time since there is no pace to follow. `scene.viewer.realtime_factor` changes it while the scene runs.
 
-Only the steps of the simulation are paced. A change of state made outside of a step by a setter such as `entity.set_qpos(...)` is shown by the viewer on its own at its next refresh, without calling `scene.visualizer.update()`. Each setter syncs the renderer of the viewer with the new state, so a tight loop of setters, such as a debugging script, runs faster with `ViewerOptions(update_on_setters=False)`, which defers that sync to the next refresh. `scene.reset()` redraws the viewer right away. While the simulation is paused from the viewer, the stepping loop waits for the next refresh of the viewer instead of the pace of the simulation. The window stays responsive while a step waits for its pace: on macOS, where the window is driven by the stepping loop, it keeps being repainted and handles the mouse and keyboard during the wait.
+Only the steps of the simulation are paced. A change of state made outside of a step by a setter such as `entity.set_qpos(...)` is shown by the viewer on its own at its next refresh, without calling `scene.visualizer.update()`. `scene.reset()` redraws the viewer right away. While the simulation is paused from the viewer, the stepping loop waits for the next refresh of the viewer instead of the pace of the simulation. The window stays responsive while a step waits for its pace: on macOS, where the window is driven by the stepping loop, it keeps being repainted and handles the mouse and keyboard during the wait.
 
 A step run with `scene.step(update_visualizer=False)` leaves the viewer untouched and is not paced. Call `scene.visualizer.update(force=False)` after such a step to show it and pace it like any other, or `scene.visualizer.update()` to redraw everything right away.
 
@@ -59,7 +59,7 @@ scene = gs.Scene(
 )
 ```
 
-To inspect a few entities while the rest of the scene keeps its looks, set `vis` on the spec of each one with {py:class}`gs.options.EntityVisOptions <genesis.options.vis.EntityVisOptions>`. With `debug=True`, the viewer shows that entity in its debug representation whatever `VisOptions.debug` says. `debug_vis_mode` picks the representation where a kind of entity has several, such as `"sdf"` for the signed distance field of the collision geoms of a rigid entity:
+To inspect a few entities while the rest of the scene keeps its looks, set `vis` on the spec of each one with {py:class}`gs.options.EntityVisOptions <genesis.options.vis.EntityVisOptions>`. With `debug=True`, the viewer shows that entity in its debug representation whatever `VisOptions.debug` says.:
 
 ```python
 duck = scene.add_entity(
@@ -75,7 +75,7 @@ The markers that the viewer and the debug cameras draw on top of the scene belon
 ```python
 scene = gs.Scene(
     rigid_options=gs.options.RigidOptions(
-        vis=gs.options.RigidVisOptions(link_frames=True, link_frame_size=0.1),  # meters
+        vis=gs.options.RigidVisOptions(link_frames=True),
     ),
     mpm_options=gs.options.MPMOptions(
         vis=gs.options.ParticleVisOptions(boundary=True),

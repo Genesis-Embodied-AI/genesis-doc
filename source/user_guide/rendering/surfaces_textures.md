@@ -114,7 +114,7 @@ duck.set_texture(variant=["asset", "purple"])  # one variant per environment
 duck.set_texture(np.random.rand(2, 3))  # one RGB color per environment, written to the batched variant
 ```
 
-Every environment shows the first variant at build and after a reset. The mesh needs texture coordinates, and only the rasterizer draws a dynamic texture. Rigid, kinematic, and FEM entities take one, and so do PBD cloth and elastic entities.
+Every environment shows the first variant at build and after a reset. The mesh needs texture coordinates, and only the rasterizer draws a dynamic texture.
 
 ## Lighting a ray-traced scene
 
@@ -143,7 +143,7 @@ Surfaces render on both the interactive viewer's rasterizer and the ray tracer, 
 
 ## Geometry a surface is drawn on
 
-The material of an entity decides which geometry its surface is drawn on. Rigid, kinematic, and FEM entities, PBD cloth and elastic entities, and MPM solids draw their visual mesh, moved or deformed to follow the simulation. A liquid or granular material (SPH, MPM liquid, sand, and snow, PBD liquid and particles) draws a surface reconstructed from its particles, and so does an MPM solid in an environment where it tears. To see the collision geometry, the particles, or the tetrahedra instead, switch to the {ref}`debug view <debug-view>`, which leaves the surface as it is.
+The material of an entity decides which geometry its surface is drawn on. A solid draws its visual mesh, moved or deformed to follow the simulation. A liquid or granular material draws a surface reconstructed from its particles. To see the collision geometry, the particles, or the tetrahedra instead, switch to the {ref}`debug view <debug-view>`, which leaves the surface as it is.
 
 ## Foam and spray
 
