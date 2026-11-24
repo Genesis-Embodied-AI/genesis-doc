@@ -12,4 +12,5 @@ metal/index
 emission
 glass/index
 foam_options
+dynamic_vertices
 ```

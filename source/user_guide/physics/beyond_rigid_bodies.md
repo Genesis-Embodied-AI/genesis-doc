@@ -72,7 +72,7 @@ Three MPM objects falling and deforming: an elastic cube, a liquid cube, and an 
 
 The Finite Element Method discretizes an entity into a tetrahedral mesh and solves the elasticity equations on it. Choose FEM over MPM when mesh-level accuracy matters: stiff elastic bodies, volumetric muscles, and contact-rich soft-body manipulation. {py:class}`gs.materials.FEM.Elastic <genesis.engine.materials.FEM.elastic.Elastic>` exposes the physical parameters directly, such as Young's modulus `E` (Pa) and Poisson ratio `nu`.
 
-To hold some vertices of an FEM entity in place, such as a soft pad clamped by one face, build the entity from an entity spec, `gs.entities.FEM`, and select the vertices on it. `gs.indices.Vertex.in_box` and `gs.indices.Vertex.closest_to` take positions in the frame of the morph, relative to its `pos`:
+To hold some vertices of an FEM entity in place, such as a soft pad clamped by one face, build the entity from an entity spec, {py:class}`gs.entities.FEM <genesis.options.entities.FEM>`, and select the vertices on it. `gs.indices.Vertex.in_box` and `gs.indices.Vertex.closest_to` take positions in the frame of the morph, relative to its `pos`:
 
 ```python
 pad_spec = gs.entities.FEM(

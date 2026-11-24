@@ -3,6 +3,7 @@
 ```{eval-rst}
 .. autoclass:: genesis.engine.entities.rigid_entity.rigid_entity.RigidEntity
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```

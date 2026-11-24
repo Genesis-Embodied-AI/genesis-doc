@@ -15,6 +15,7 @@
 ```{eval-rst}
 .. autoclass:: genesis.engine.sensors.imu.IMUSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```

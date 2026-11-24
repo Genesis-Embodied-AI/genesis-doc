@@ -61,7 +61,7 @@ Two examples show each coefficient on its own. [`examples/rigid/torsional_grasp.
 
 ### Properties of selected links and geoms
 
-The material applies to every collision geom of the entity. To give some links or geoms their own density or friction, build the entity from an entity spec, `gs.entities.Rigid`, and select those parts on it before adding it. Here the fingers of a Franka arm grip harder than the rest of the arm:
+The material applies to every collision geom of the entity. To give some links or geoms their own density or friction, build the entity from an entity spec, {py:class}`gs.entities.Rigid <genesis.options.entities.Rigid>`, and select those parts on it before adding it. Here the fingers of a Franka arm grip harder than the rest of the arm:
 
 ```python
 franka_spec = gs.entities.Rigid(
@@ -71,7 +71,7 @@ franka_spec.select(gs.indices.Link.named("left_finger", "right_finger")).set_fri
 franka = scene.add_entity(spec=franka_spec)
 ```
 
-`gs.indices.Link` selects links by name or glob pattern, and `gs.indices.Geom` selects collision geoms by name or by their order in the asset. The selection setters are `set_rho`, `set_friction`, `set_friction_torsional` and `set_friction_rolling`. A value set on geoms overrides one set on their links, which overrides the material. [`examples/rigid/franka_cube.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/franka_cube.py) raises the friction of the fingertip pads alone.
+`gs.indices.Link` selects links by name or glob pattern, and `gs.indices.Geom` selects collision geoms by name or by their order in the asset. The selection setters are `set_rho`, `set_friction`, `set_friction_torsional` and `set_friction_rolling`. A value set on geoms overrides one set on their links, which overrides the material. {doc}`/api_reference/engine/entity/entity_spec` lists the selectors and setters. [`examples/rigid/franka_cube.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/rigid/franka_cube.py) raises the friction of the fingertip pads alone.
 
 The rigid solver governs how these bodies actually push on each other: contact, collision geometry, and constraints. {doc}`Theory and modeling </user_guide/theory/rigid_solver/index>` documents that model, and covers {doc}`contact resolution </user_guide/theory/rigid_solver/constraints>` in full.
 

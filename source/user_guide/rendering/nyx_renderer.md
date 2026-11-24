@@ -29,10 +29,6 @@ Nyx ships as the separate `gs-nyx` package:
 pip install gs-nyx
 ```
 
-:::{note}
-`gs-nyx` is currently distributed through an internal package index while we prepare the project for public release. We will publish public installation instructions at the [Nyx repository](https://github.com/Genesis-Embodied-AI/genesis-nyx) once the wheel is on PyPI.
-:::
-
 Verify the install by importing the plugin alongside Genesis World:
 
 ```python

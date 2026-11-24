@@ -11,6 +11,7 @@ Thresholds each probe's penetration depth into a per-probe boolean contact flag.
 
 .. autoclass:: genesis.engine.sensors.kinematic_tactile.ContactProbeSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```
@@ -24,6 +25,7 @@ Reports the penetration depth at each probe, in meters.
 
 .. autoclass:: genesis.engine.sensors.kinematic_tactile.ContactDepthProbeSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```
@@ -37,11 +39,13 @@ Adds a spring-damper force model on top of the depth query, estimating per-taxel
 
 .. autoclass:: genesis.engine.sensors.kinematic_tactile.KinematicTaxelSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.kinematic_tactile.KinematicTaxelReturnType
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```
@@ -55,6 +59,7 @@ Models a soft tactile skin, reporting a 3D marker displacement per probe from in
 
 .. autoclass:: genesis.engine.sensors.point_cloud_tactile.ElastomerTaxelSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```
@@ -68,11 +73,13 @@ Estimates per-taxel force and torque from a point cloud sampled on the tracked m
 
 .. autoclass:: genesis.engine.sensors.point_cloud_tactile.ProximityTaxelSensor
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 
 .. autoclass:: genesis.engine.sensors.point_cloud_tactile.ProximityTaxelReturnType
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```
