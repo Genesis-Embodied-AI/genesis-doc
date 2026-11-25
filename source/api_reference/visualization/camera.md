@@ -15,6 +15,12 @@ Do not confuse this with the {doc}`camera sensor </api_reference/engine/sensors/
     :show-inheritance:
 ```
 
+## Thin lens
+
+```{eval-rst}
+.. autoclass:: genesis.options.vis.ThinLens
+```
+
 ## See also
 
 - {doc}`/user_guide/rendering/cameras`: cameras, image types, and video.

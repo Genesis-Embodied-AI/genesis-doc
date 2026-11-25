@@ -55,9 +55,9 @@ These components add features that most setups do not need. Install one only if 
 
 ### Surface reconstruction
 
-Genesis World renders particle-based entities, such as fluids and deformables, as smooth surfaces. It reconstructs a mesh from the internal particle representation. The default backend is [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf). It extracts a smooth surface from the particle density, but requires all particles to share one radius. 
+Genesis World renders particle-based entities, such as fluids and deformables, as smooth surfaces. It reconstructs a mesh from the internal particle representation. The default backend is [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf). It extracts a smooth surface from the particle density, but requires all particles to share one radius.
 
-To use a different radius for each particle, set `recon_backend="levelset"` on the surface. This backend wraps the union of the particle spheres at the cost of a bumpier surface. Both backends work on every platform with no extra install. `recon_backend="openvdb"` is a deprecated alias of `"levelset"`.
+To use a different radius for each particle, set `recon_backend="levelset"` in the `vis` options of the particle solver, such as `gs.options.SPHOptions(vis=gs.options.ParticleVisOptions(recon_backend="levelset"))`. This backend wraps the union of the particle spheres at the cost of a bumpier surface. Both backends work on every platform with no extra install. `recon_backend="openvdb"` is a deprecated alias of `"levelset"`.
 
 ### Ray-tracing renderer
 
@@ -99,7 +99,7 @@ To fix it, do one of the following:
 
   1. Uninstall `genesis-world`.
 
-  2. Inside the source directory, run `pip install -e ".[render]"`.
+  2. Inside the source directory, run `pip install -e ".[dev]"`.
 
 ### Slow rendering on native Ubuntu (CPU fallback)
 
@@ -107,10 +107,10 @@ If `cam.render()` or the viewer becomes extremely slow, the system may be silent
 
 To ensure GPU rendering is active:
 
-1. Install the NVIDIA GL libraries:
+1. Install the NVIDIA GL libraries of your driver branch, the major version that `nvidia-smi` reports as `Driver Version`. For a 580 driver:
 
    ```bash
-   sudo apt update && sudo apt install -y libnvidia-gl-525
+   sudo apt update && sudo apt install -y libnvidia-gl-580
    ```
 
 2. Check that EGL points to the NVIDIA driver:

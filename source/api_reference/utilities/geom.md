@@ -2,7 +2,7 @@
 
 The `genesis.utils.geom` module provides geometry helpers for rotations, quaternions, and rigid transforms, also exposed at the top level as `gs.<name>`. They accept NumPy arrays or PyTorch tensors and operate on single values or batches.
 
-They follow the project conventions: quaternions are `(w, x, y, z)` scalar-first (Hamilton), Euler angles are degrees in extrinsic x-y-z order, and the world frame is right-handed and Z-up. See {doc}`/user_guide/configuration/conventions`.
+They follow the project conventions: quaternions are `(w, x, y, z)` scalar-first (Hamilton), Euler angles are in extrinsic x-y-z order, in degrees for the `euler_*` helpers and in radians for the `xyz_*` helpers unless `degrees=True`, and the world frame is right-handed and Z-up. See {doc}`/user_guide/configuration/conventions`.
 
 ## Rotation conversions
 
@@ -52,8 +52,6 @@ They follow the project conventions: quaternions are `(w, x, y, z)` scalar-first
 .. autofunction:: genesis.utils.geom.spherical_to_cartesian
 .. autofunction:: genesis.utils.geom.generate_grid_points_on_plane
 .. autofunction:: genesis.utils.geom.generate_ring_points_on_sphere
-.. autoclass:: genesis.utils.geom.SpatialHasher
-    :members:
 ```
 
 ## See also

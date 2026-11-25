@@ -158,7 +158,7 @@ The schedule phases are counted in calls to `profiler.step()`, so call it at lea
 - **`active`:** steps actually recorded. One is usually enough and keeps memory low.
 - **`repeat`:** how many times to run the cycle. Leave it at 1 to record once and stop.
 
-The values above are a starting point rather than a recommendation, so adjust them to your scene; the [PyTorch profiler schedule documentation](https://docs.pytorch.org/docs/stable/profiler.html#torch.profiler.schedule) covers the rest. Open `trace.json` in [Perfetto](https://ui.perfetto.dev/). [`examples/speed_benchmark/timers.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/timers.py) shows the other common output, a trace written for [TensorBoard](https://www.tensorflow.org/tensorboard) through `on_trace_ready=torch.profiler.tensorboard_trace_handler("./benchmark")`.
+The values above are a starting point rather than a recommendation, so adjust them to your scene; the [PyTorch profiler schedule documentation](https://docs.pytorch.org/docs/stable/profiler.html#torch.profiler.schedule) covers the rest. Open `trace.json` in [Perfetto](https://ui.perfetto.dev/). To write a trace for [TensorBoard](https://www.tensorflow.org/tensorboard) instead, pass `on_trace_ready=torch.profiler.tensorboard_trace_handler("./benchmark")` to the profiler.
 
 For the CPU side alone, a sampling profiler such as [py-spy](https://github.com/benfred/py-spy) gives a similar flame graph. The PyTorch profiler has two advantages here: the schedule keeps initialization out of the trace and records the same steps on every run, so timings compare from one run to the next, and it records the actual sequence of calls rather than a statistical sample of them.
 
@@ -207,7 +207,7 @@ To time consecutive blocks, such as `Time.LineSearch` and `Time.UpdateGradient` 
 
 The counter returns raw cycles, not seconds, so compare readings with each other rather than reading them as durations. On CUDA it counts the cycles of the streaming multiprocessor running the thread, and its rate follows the GPU clock, which boosts and throttles. `qd.clock_freq_hz()` gives the nominal clock rate of the GPU, from which you can derive an approximate duration. On Metal the counter always reads 0, and the buffer holds 32-bit integers instead of 64-bit ones.
 
-[`examples/speed_benchmark/timers.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/speed_benchmark/timers.py) reads the buffer after each step and plots row 0 per environment in the terminal, which works on a remote server without a display:
+Read the buffer as a tensor after each step:
 
 ```python
 from genesis.utils.misc import qd_to_torch
@@ -215,7 +215,7 @@ from genesis.utils.misc import qd_to_torch
 timers = qd_to_torch(scene.rigid_solver.constraint_solver.constraint_state.timers)
 ```
 
-Run it without arguments to collect and plot the timings, or with `--profiling` to attach the PyTorch profiler instead. Add a label to its `TIMER_LABELS` for each extra row you fill. Instrumenting the solver means editing its kernels, so this is aimed at contributors optimizing the physics rather than at typical simulation code.
+Instrumenting the solver means editing its kernels, so this is aimed at contributors optimizing the physics rather than at typical simulation code.
 
 ## See also
 

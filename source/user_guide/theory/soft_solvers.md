@@ -72,11 +72,7 @@ Liquids sustain no shear stress at rest and resist only volume change. The three
 
 {py:class}`gs.materials.MPM.Liquid <genesis.engine.materials.MPM.liquid.Liquid>` is weakly compressible: each step discards the shape of $\mathbf F$ and keeps its volumetric part $J^{1/3}\mathbf I$, so no shear stress accumulates and pressure comes from volume change alone. `viscous=True` retains a deviatoric viscous term for a thicker fluid.
 
-{py:class}`gs.materials.SPH.Liquid <genesis.engine.materials.SPH.liquid.Liquid>` derives pressure from a Tait equation of state,
-
-$$p_i = k\left[\left(\frac{\rho_i}{\rho_0}\right)^{n} - 1\right],$$
-
-with $k$ from `stiffness`, $n$ from `exponent`, and rest density $\rho_0$ from `rho`. Viscosity and surface tension are set directly, by `mu` and `gamma`.
+{py:class}`gs.materials.SPH.Liquid <genesis.engine.materials.SPH.liquid.Liquid>` is incompressible: divergence-free SPH (DFSPH) solves for the pressure that holds each particle at its rest density `rho`, within `SPHOptions.max_density_error_percent`. Viscosity and surface tension are set directly, by `mu` and `surface_tension`.
 
 {py:class}`gs.materials.PBD.Liquid <genesis.engine.materials.PBD.liquid.Liquid>` enforces a per-particle density constraint positionally rather than through pressure, tuned by `density_relaxation` and `viscosity_relaxation`.
 
@@ -104,7 +100,7 @@ Both take `n_groups` to define independently actuated fiber groups. The control 
 | Dents and holds its shape | `MPM.ElastoPlastic` | `use_von_mises`, `von_mises_yield_stress` |
 | Granular media | `MPM.Sand` | `friction_angle` |
 | Compacting snow | `MPM.Snow` | `yield_lower`, `yield_higher` |
-| Flowing liquid | `MPM.Liquid`, `SPH.Liquid`, `PBD.Liquid` | `viscous`; `stiffness`, `mu`, `gamma` for SPH |
+| Flowing liquid | `MPM.Liquid`, `SPH.Liquid`, `PBD.Liquid` | `viscous`; `mu`, `surface_tension` for SPH |
 | Actuated soft body | `MPM.Muscle`, `FEM.Muscle` | `n_groups` |
 | Cloth and shells | `PBD.Cloth`, `FEM.Cloth` | compliances; `thickness` for FEM |
 

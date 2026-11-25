@@ -5,6 +5,7 @@ A `TerrainEntity` is the rigid entity that `scene.add_entity(gs.morphs.Terrain(.
 ```{eval-rst}
 .. autoclass:: genesis.engine.entities.rigid_entity.terrain_entity.TerrainEntity
     :members:
+    :inherited-members:
     :undoc-members:
     :show-inheritance:
 ```

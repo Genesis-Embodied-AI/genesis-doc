@@ -1,6 +1,6 @@
 # LegacyCoupler
 
-The `LegacyCoupler` is the default: a scene that names no `coupler_options` gets it. It handles every cross-solver pair (rigid, MPM, SPH, PBD, FEM), which suits general multi-physics scenes. It is slated for deprecation in favor of the SAP and IPC couplers.
+The `LegacyCoupler` is the default: a scene that names no `coupler_options` gets it. It couples the rigid solver with MPM, SPH, PBD and FEM, and MPM with SPH and PBD, and FEM with MPM and SPH, which suits general multi-physics scenes. It is slated for deprecation in favor of the SAP and IPC couplers.
 
 ## Options
 

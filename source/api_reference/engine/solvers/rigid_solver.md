@@ -8,6 +8,10 @@ The `RigidSolver` handles rigid body dynamics, including articulated bodies, rob
 .. autoclass:: genesis.options.solvers.RigidOptions
 ```
 
+```{eval-rst}
+.. autoclass:: genesis.options.solvers.RigidVisOptions
+```
+
 ### Option enums
 
 The values accepted by the `RigidOptions` fields above. The model each one selects is described in

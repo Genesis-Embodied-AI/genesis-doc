@@ -67,7 +67,7 @@ See [Blender's Wavefront OBJ exporter](https://docs.blender.org/manual/en/4.0/fi
 
 ### Declaring the up-axis on import
 
-Pass `file_meshes_are_zup` to a mesh morph to tell Genesis World how the referenced meshes are oriented. It defaults to `True` (already Z-up); set it to `False` for a Y-up asset that needs conversion:
+Pass `file_meshes_are_zup` to a mesh morph to tell Genesis World how the referenced meshes are oriented. It defaults to `None`, which means Z-up for every format except glTF and GLB (Y-up by specification). Set it to `False` for a Y-up OBJ or STL asset that needs conversion:
 
 ```python
 obj = scene.add_entity(

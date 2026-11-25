@@ -52,7 +52,7 @@ qpos = robot.get_qpos()  # shape ([n_envs,] n_qs)
 particles_pos = scene.mpm_solver.get_particles_pos()  # shape ([n_envs,] n_particles, 3)
 ```
 
-The differentiable example [`examples/deformable/differentiable_push.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/deformable/differentiable_push.py) uses this pattern: it calls `scene.reset()` to restart each optimization pass from a fixed initial state, and reads `scene.mpm_solver.get_particles_pos()` to compute a loss from particle positions mid-rollout.
+The differentiable example [`examples/deformable/differentiable_push.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/main/examples/deformable/differentiable_push.py) uses this pattern: it calls `scene.reset()` to restart each optimization pass from a fixed initial state, and reads the `get_particles_pos()` of each MPM entity to compute a loss from particle positions mid-rollout.
 
 ## Resetting environments in parallel simulation
 
@@ -113,7 +113,7 @@ scene = gs.Scene.load(
 What a description carries is what travels, and `export` tells you about the rest:
 
 - **Refused, by name:** anything that alters the simulation and that a description leaves out, since a file without it would restore other physics: an emitter, a force field, and any entity that carries no description, which is every entity that is neither rigid nor kinematic.
-- **Written without, with a warning naming it:** what observes or draws the simulation rather than shaping it. A camera, a recorder, a sensor, a callback Genesis World calls at every step, a texture read from an HDR or EXR file, and the visual vertices an entity was given at runtime. Add those back on the loaded scene.
+- **Written without, with a warning naming it:** what observes or draws the simulation rather than shaping it. A camera, a sensor, a callback Genesis World calls at every step, a texture read from an HDR or EXR file, and the visual vertices an entity was given at runtime. Add those back on the loaded scene. A recorder is left out without a warning.
 
 ## Checkpointing a built scene
 
@@ -161,7 +161,7 @@ for _ in range(1000):
 scene.stop_recording()
 ```
 
-Every frame is kept. A step only copies its frame aside, without waiting for a GPU to finish the step, while a thread of its own compresses the frames and another writes the file, so recording holds real time on a single environment. Two modes trade size for exactness, and `mode` picks one:
+Every frame is kept. Compression and writing run on a background thread, so recording slows the simulation only when the disk cannot keep up. Two modes trade size for exactness, and `mode` picks one:
 
 - **Exact**: a replay is bit-for-bit, and the simulation resumes from any frame exactly as it ran, but recording slows the simulation down significantly for large batch sizes.
 - **Minimal**: frames hold only the bare minimum state, which makes them far smaller: everything else is recovered by running a full simulation step, and may differ at the last bits, except the contacts of hibernated links, which are taken from the scene as it stood before the seek. A replay that plays the frames in order from the first one in a freshly loaded scene is unaffected.
@@ -198,8 +198,8 @@ The legacy coupler also contributes its state, under `LegacyCoupler`.
 
 ## Reproducibility notes
 
-- **Configuration must match.** A snapshot restores fields by position into an already-built scene. The entities, solver options, and environment count must match the scene that produced it. There is no compatibility check: a mismatch fails or silently corrupts state. A checkpoint or a trajectory frame restores arrays by name and checks their shapes, so one from another build is rejected and named. Both also carry a digest of the scene description, its entities and physics options, and restore only into a scene sharing it, whatever its viewer, visualizer and renderer options. The digest exports the description in memory, meshes included, once per built scene and once per trajectory opened, never per restore.
-- **Precision limits exactness.** Genesis World uses 32-bit floats by default (see {doc}`initialization`). Reproducing a run by stepping a loaded scene, or restoring a snapshot that went through a file, is therefore accurate to roughly single precision, not bit-exact. Initialize with `precision="64"` if you need tighter reproducibility.
+- **Configuration must match.** A snapshot restores the arrays of each solver by name into an already-built scene. The entities, solver options, and environment count must match the scene that produced it. There is no compatibility check: a mismatch fails or silently corrupts state. A checkpoint or a trajectory frame restores arrays by name and checks their shapes, so one from another build is rejected and named. Both also carry a digest of the scene description, its entities and physics options, and restore only into a scene sharing it, whatever its viewer, visualizer and renderer options. The digest exports the description in memory, meshes included, once per built scene and once per trajectory opened, never per restore.
+- **Precision limits exactness.** Genesis World uses 32-bit floats by default (see {doc}`initialization`). Reproducing a run by stepping a loaded scene file, by seeking a minimal-mode trajectory, or by loading a file in another precision is therefore accurate to roughly single precision, not bit-exact. Exact checkpoints and trajectories restore bit-for-bit. Initialize with `precision="64"` if you need tighter reproducibility.
 
 ## See also
 

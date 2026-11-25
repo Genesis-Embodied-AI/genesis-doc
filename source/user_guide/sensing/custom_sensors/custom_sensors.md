@@ -67,7 +67,9 @@ class MyProximitySensor(
 
     @classmethod
     def _update_raw_data(cls, shared_context, shared_metadata, raw_data_T):
-        pos = shared_metadata.solver.get_links_pos(shared_metadata.links_idx)  # (B, N, 3)
+        pos = shared_metadata.solver.get_links_pos(shared_metadata.links_idx)
+        if shared_metadata.solver.n_envs == 0:
+            pos = pos[None]  # (B, N, 3), with B = 1 in a scene without parallel environments
         dist = pos.norm(dim=-1).clamp(max=shared_metadata.max_range)           # (B, N)
         raw_data_T.copy_(dist.T)  # write in place; buffer is (cols, B), column-major
 ```
@@ -114,7 +116,9 @@ The split between an instance method for shape and a classmethod for dtype is de
 ```python
 @classmethod
 def _update_raw_data(cls, shared_context, shared_metadata, raw_data_T):
-    pos = shared_metadata.solver.get_links_pos(shared_metadata.links_idx)  # (B, N, 3)
+    pos = shared_metadata.solver.get_links_pos(shared_metadata.links_idx)
+    if shared_metadata.solver.n_envs == 0:
+        pos = pos[None]  # (B, N, 3)
     raw_data_T.copy_(pos.reshape(pos.shape[0], -1).T)                      # (3*N, B)
 ```
 
@@ -302,27 +306,40 @@ To pick the right hooks, mirror the closest built-in sensor. Every one implement
 | `TemperatureGridSensor` | yes | yes (RC filter reading `timeline.at(1)`) | identity |
 | Any `*CameraSensor` | — | — | identity; derives from `BaseCameraSensor` |
 
-Every `SimpleSensor` inherits `_apply_hardware_imperfections` unchanged; override it only for a non-standard imperfection model.
+Most built-in sensors inherit `_apply_hardware_imperfections` unchanged, and the tactile probes extend it for dead taxels. Override it only for a non-standard imperfection model.
 
 ## Drawing debug markers
 
-A sensor created with `draw_debug=True` draws markers in the viewer, and in the cameras rendering debug geometry, at every refresh. Override `_draw_debug(self, context, envs_idx)` to define them. It returns the markers instead of adding them: build each one with a `context.make_debug_*` method (`line`, `arrow`, `sphere`, `spheres`, `box`, `mesh`, `frame`, `frames`, `points`, `pyramid`, taking the same arguments as the matching `scene.draw_debug_*`), and return one `(env_idx, node, None)` triple per marker. The viewer adds them, and replaces them at the next refresh.
-
-`envs_idx` lists the rendered environments to draw, as indices into `context.rendered_envs_idx`. `env_idx` is the rendered environment a marker belongs to, or `None` for a marker spanning several environments, such as one drawn from the first environment and shown in all of them:
+A sensor created with `draw_debug=True` draws markers in the viewer, and in the cameras rendering debug geometry. Override `_update_markers(self, markers, envs_idx)` to define them. At the first call `markers` is empty: create each marker shape once, with arrays over every environment, then write the readings of the environments `envs_idx` into those arrays in place and return the markers. `envs_idx` is `None` in a scene without parallel environments, which indexes the single row of the arrays. The built-in `IMU` sensor draws its readings as `Arrows` this way.
 
 ```python
-def _draw_debug(self, context, envs_idx):
-    # Draw the reading of the first rendered environment, if it is not stale
-    if 0 not in envs_idx:
-        return []
-    env_idx = context.rendered_envs_idx[0] if self._manager._sim.n_envs > 0 else None
-    if not self.read(env_idx):
-        return []
-    pos = self._link.get_pos(env_idx, relative=False).reshape((3,))
-    return [(None, context.make_debug_sphere(pos=pos, radius=0.02, color=(1.0, 0.0, 0.0, 1.0)), None)]
+import torch
+
+import genesis as gs
+from genesis.engine.render_context import Points
+from genesis.engine.state_change import StateChange
+
+
+def _update_markers(self, markers, envs_idx):
+    # A red sphere on the link wherever the sensor detects a contact
+    if not markers:
+        n_envs = self._manager.n_envs_
+        markers = (
+            Points(
+                torch.zeros((n_envs, 1, 3), dtype=gs.tc_float, device=gs.device),
+                radius=0.02,
+                color=(1.0, 0.0, 0.0, 1.0),
+                is_active=torch.zeros((n_envs, 1), dtype=gs.tc_bool, device=gs.device),
+                invalidated_by={self._shared_metadata.solver: (StateChange.GEOMETRY,)},
+            ),
+        )
+    (marker,) = markers
+    marker.pos[envs_idx] = self._link.get_pos(envs_idx, relative=False)[..., None, :]
+    marker.is_active[envs_idx] = self.read(envs_idx)
+    return markers
 ```
 
-The data of a sensor is computed by a step, so it no longer matches the scene once the state changes without one, for instance through `entity.set_pos(...)` or `entity.set_qpos(...)`. The class attribute `invalidated_by` lists the kinds of change (`gs.engine.solvers.base_solver.StateChange`) of the rigid and kinematic solvers that make the data stale until the next step. It defaults to every kind of change, which is always safe. A sensor whose data depends on part of the state only may narrow it, such as `frozenset((StateChange.GEOMETRY,))` for one that depends on where the links are alone. The debug markers show the data, so they are hidden in the environments such a change touches until the next step, rather than showing the previous data at the new pose.
+The data of a sensor is computed by a step, so it no longer matches the scene once the state changes without one, for instance through `entity.set_qpos(...)`. The `invalidated_by` argument of each marker lists the kinds of change (`StateChange`) that make its content stale until the next step, and the marker stays hidden in the environments such a change touches until then. A marker that follows where the links are lists `StateChange.GEOMETRY` alone.
 
 ## Things to double-check
 

@@ -12,14 +12,7 @@ scene = gs.Scene(
 
 ## How coupling works
 
-Solvers advance independently within a timestep, and the coupler reconciles them in between. Each substep runs four phases in order:
-
-- **Preprocess:** the coupler prepares the cross-solver data a solver needs before it integrates, such as the per-particle rigid-surface normals that the compatible particle-in-cell (CPIC) variant of MPM uses to tell which side of a thin geometry each particle is on.
-- **Advance (pre-coupling):** every active solver integrates its own material forward by one substep, ignoring the others.
-- **Couple:** the coupler detects contact between entities in different solvers and exchanges momentum so they no longer interpenetrate.
-- **Postprocess (post-coupling):** each solver finalizes the substep with the coupled state.
-
-The default coupler resolves contact with an **impulse-based** response. For each candidate contact it queries the signed distance to the rigid or solid geometry and blends the response with a smooth influence weight, so contact turns on gradually rather than snapping. It then splits the relative velocity into a normal and a tangential part, applies a restitution rule along the normal and a Coulomb-friction rule along the tangent, and applies the equal-and-opposite momentum change back on the rigid body as an external force. Three per-geometry material parameters govern the response:
+Solvers advance independently within a timestep, and the coupler reconciles them in between. The default coupler resolves contact between solvers with an impulse-based response, tuned per rigid material by three parameters:
 
 - **`coup_softness`:** the thickness of the contact zone. Larger values spread the influence farther from the surface and soften the impulse.
 - **`coup_restitution`:** bounce along the normal, from `0` (perfectly inelastic) to `1` (perfectly elastic).
