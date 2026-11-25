@@ -1,5 +1,3 @@
-# Installation
-
 ## Install
 
 1. Install PyTorch. Refer to the [official instructions](https://pytorch.org/get-started/locally/) for your platform and CUDA version.

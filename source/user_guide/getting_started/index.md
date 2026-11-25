@@ -1,6 +1,16 @@
 # Getting Started
 
-These tutorials teach Genesis World by building working programs, one idea at a time: initialize the engine, describe and build a scene, step it, control what is in it, and scale to thousands of parallel copies on the GPU. Work through them in order if you are new; each assumes the one before.
+These tutorials teach Genesis World through working programs, one idea at a time. You will learn to:
+
+- Initialize the engine.
+
+- Build and step a scene.
+
+- Control what is in it.
+
+- Scale to thousands of parallel copies on the GPU. 
+
+If you are new, work through them in order. Each tutorial assumes the one before it.
 
 ```{toctree}
 :hidden:
