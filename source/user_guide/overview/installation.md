@@ -1,11 +1,5 @@
 # Installation
 
-Genesis World installs from PyPI in two steps:
-
-1. Install PyTorch.
-
-2. Install Genesis World. It runs on Linux, macOS, and Windows, on the CPU and on NVIDIA, AMD, and Apple Silicon GPUs.
-
 ## Install
 
 1. Install PyTorch. Refer to the [official instructions](https://pytorch.org/get-started/locally/) for your platform and CUDA version.
@@ -57,15 +51,7 @@ GPU simulation on AMD through ROCm is experimental. It may be unstable, especial
 
 ## Optional components
 
-The optional components include:
-
-- Surface reconstruction
-
-- Ray-tracing renderer
-
-- IPC coupler
-
-- USD assets
+These components add features that most setups do not need. Install one only if you use it.
 
 ### Surface reconstruction
 
@@ -109,9 +95,11 @@ To fix it, do one of the following:
 
 - Move out of the source directory before you run Python.
 
-- Switch to an editable install. First uninstall `genesis-world`.
+- Switch to an editable install:
 
-- Then, inside the source directory, run `pip install -e ".[render]"`.
+  1. Uninstall `genesis-world`.
+
+  2. Inside the source directory, run `pip install -e ".[render]"`.
 
 ### Slow rendering on native Ubuntu (CPU fallback)
 
