@@ -2,6 +2,10 @@
 
 This guide defines how we write documentation for Genesis World: how the prose should read, what belongs on a page, how to structure it, and how to mark it up. It is prescriptive, describing the standard we are moving *toward* rather than how every existing page reads today, so bring any page you touch closer to it.
 
+The voice follows the Genesis brand voice: write the way we build, with no unnecessary parts. The
+[Introduction](source/user_guide/overview/what_is_genesis.md) page is the reference for the voice to match. New
+writers read this guide before their first docs pull request.
+
 Our model is the class of technical documentation that developers actively enjoy using: Stripe, Django, and the Python standard library. What those share is a set of habits rather than a house style. They respect the reader's time, they are accurate to a fault, and they read as one voice across many authors.
 
 ---
@@ -14,24 +18,46 @@ Every rule below descends from five principles. When a rule doesn't fit a situat
 2. **Run every code block and check every claim against the current version.** A single wrong argument name or stale output destroys trust in the whole page.
 3. **Lead with a correct, runnable example.** It answers more questions than three paragraphs of description.
 4. **One voice.** A reader should not be able to tell that fifty people wrote these pages. Consistency in terminology, structure, and tone is worth more than any individual author's preference.
-5. **Delete sentences that fail to help the reader.** Keep the explanations that earn their lines: see §2 on explaining generously.
+5. **Delete sentences that fail to help the reader, and shorten every sentence that can be shorter without losing meaning.** A reason attached to an instruction is meaning, so it stays: see §2 on explaining, then instructing.
+
+### Who reads these pages
+
+Engineers and researchers read these pages. They came for the work, and they will test what we claim. Assume
+they know basic Python, so explain what is specific to Genesis World and never the language itself.
+
+| Reader | What they want | What that means for the page |
+|---|---|---|
+| Someone trying to use the code | To get it running | Install steps and a working example before anything else |
+| A researcher judging the work | Proof | Numbers, methods, and links they can check |
+| A possible hire | A sense of how we work | Clear, careful writing is the signal |
+| A reader with English as a second language | To understand on the first read | Short sentences, plain words, no idioms |
 
 ---
 
 ## 2. Voice and tone
 
-Write the way a senior engineer with a sense of humor explains something to a capable colleague. That person wants the reason along with the instruction, and they will forgive you a longer sentence if it saves them a question. Being short comes from knowing what you want to say, never from cutting sentences in half.
+Write the way a senior engineer explains something to a capable colleague: state the outcome, give the reason, and stop. Being short comes from knowing what you want to say, never from cutting sentences in half, so a sentence keeps its "because" while everything else that can go, goes.
 
-The failure mode these pages fall into is compression. A page that has had every connective word squeezed out of it reads as choppy and authorless, and the reader ends up reassembling the logic the writer threw away. Readers tell us so. Length is not the enemy: a paragraph that explains why a step exists earns its lines, and a page of clipped declaratives does not become clearer by being shorter.
+The brand voice has three tones, and each one has a plain meaning on a docs page.
 
-**Warmth and sloppiness are different things.** Enthusiasm about a real capability is welcome, and so is telling the reader plainly that something is easy when it is. What we cut is looser writing that costs the reader time:
+| Tone | On a docs page | Do | Don't |
+|---|---|---|---|
+| Precise (no filler) | State the outcome, then explain it | Give exact versions, numbers, and commands. Use the active voice. | Open with background. Write "various improvements". |
+| Restrained (nothing extra) | Let the results carry the excitement | Report the benchmark and stop | Use superlatives, exclamation marks, or emoji |
+| Deliberate (lead, don't follow) | Decide what the reader should do next, and say it | End on one clear next step. Explain choices: "We chose X because Y." | Leave a thread open with "we'll look into it" |
+
+**State limitations as facts.** A known limitation is information the reader needs, so state it plainly and
+point to the tracking issue: ✅ "Soft-body contact is not supported yet. Tracking in #123." Hedging is the vague
+version of the same sentence: ❌ "We hope to potentially support this at some point in the future."
+
+**Cut writing that costs the reader time:**
 
 - ❌ "…or simply use `'dumb'` if you are a black-and-white person." (a joke that leaves the option undocumented)
 - ❌ "You can stop here if you want, but if you are patient enough, let's walk through it step by step together." (narrator escorting the reader)
 - ❌ "…up to 10~80x (yes, this is a bit sci-fi) faster…" (an aside standing in for the methodology)
 - ✅ "Genesis World parallelizes simulation across environments on the GPU, measured at up to 10–80× the throughput of prior GPU-accelerated simulators without trading away accuracy. See the [blog post](…) for methodology."
 
-**Keep marketing out of the docs.** Superlatives ("world's fastest", "unprecedented", "effortless") belong on the landing page and in the README, not in reference or tutorial material. State capabilities as facts the reader can verify, and let benchmarks live behind a link.
+**Keep marketing out of the docs.** Write no superlatives ("world's fastest", "unprecedented", "effortless") anywhere, including the landing pages and the README. State capabilities as facts the reader can verify, and let benchmarks live behind a link. Specificity is what makes a claim credible.
 
 - ✅ "Parallel simulation runs across environments on a single GPU. See [benchmarks](…) for measured throughput."
 - ❌ "Genesis World is the world's fastest physics engine, with unprecedented speed."
@@ -43,29 +69,17 @@ The failure mode these pages fall into is compression. A page that has had every
 Choosing the subject of a sentence deliberately is most of what makes these pages sound like one person.
 Three forms carry almost all of them.
 
-- **The bare imperative** for anything the reader does. This is the default, and it is shorter and more direct
-  than naming the reader: ✅ "Configure the solver through `RigidOptions`." ❌ "You configure the solver
-  through `RigidOptions`."
+- **You** for the reader: "You can pin individual particles after building", "Anything you omit uses its
+  defaults." A step in a numbered procedure is a bare imperative: "Install PyTorch."
 - **Genesis World** for what the software does: "Genesis World compiles the kernels on the first build."
-- **We** for decisions and conventions the project made: "We follow SciPy's extrinsic x-y-z convention for
-  Euler angles", "We call one copy of the scene an environment."
+- **We** for the Genesis World team, the people who made the decisions and conventions: "We follow SciPy's extrinsic x-y-z
+  convention for Euler angles", "We call one copy of the scene an environment."
 
-Lead with the verb when the sentence is an instruction. "You configure", "You create", and "You must
-reconstruct" are instructions wearing a subject they do not need, and dropping the pronoun leaves them clearer:
-"Configure", "Create", "Reconstruct".
-
-The test is whether the reader is being told to do something. An imperative replaces an instruction, and never
-a statement of fact or of capability: "Almost every component is configured through an Options class" describes
-the library, and "Configure almost every component through an Options class" orders the reader to do something
-nobody does. A page's defining sentence stays a definition. Where the fact needs an actor, give it a real one
-rather than the reader: ✅ "Genesis World constructs the solvers for you." ❌ "You rarely construct a solver
-directly."
-
-Keep "you" wherever the reader genuinely is the subject: a possessive ("your scene", "the GPU your machine
-has"), a contrast between what you do and what the engine does in response, a subordinate clause where an
-imperative cannot go ("anything you omit uses its defaults"), and a capability the reader may or may not want
-("you can pin individual particles after building"). Converting one of those to an imperative changes what the
-sentence says.
+An imperative replaces an instruction, and never a statement of fact or of capability: "Almost every component
+is configured through an Options class" describes the library, and "Configure almost every component through an
+Options class" orders the reader to do something nobody does. A page's defining sentence stays a definition.
+Where the fact needs an actor, give it a real one: ✅ "Genesis World constructs the solvers for you." ❌ "You
+rarely construct a solver directly."
 
 Cut a relative clause whose only content is that the value came from the reader: "rotated by any `euler_offset`
 you supply", "the `n_envs` you passed", "the mesh file you gave it". Naming the option already says where its
@@ -76,8 +90,8 @@ recommendations, and the things we support. What it never does is escort the rea
 together", "now we will look at the viewer", "if you are patient enough, let's continue". The reader is
 reading, not accompanying you.
 
-Keep the verbs active. "Parallelism is turned on when the scene is built" has nobody in it, while "turn
-parallelism on at build time" is both shorter and an instruction. When you catch yourself writing "is handled",
+Keep the verbs active. "Parallelism is turned on when the scene is built" has nobody in it, while "enable
+parallelism at build time" is both shorter and an instruction. When you catch yourself writing "is handled",
 "is performed", or "can be configured", find the actor and put them in front, or recast the sentence as an
 imperative. This holds for headings too: prefer "Composing a scene from options" over "A scene is assembled
 from options".
@@ -111,8 +125,8 @@ against the detail that follows them, and cutting them leaves the section openin
 
 ### Ornament is not warmth
 
-Warming up cold prose tempts you into decoration, which reads as written-by-machine just as badly as the
-clipped version did. Both of the following say the same thing; the second one wastes the reader's attention on
+Warming up cold prose tempts you into decoration, which reads as written-by-machine just as badly as clipped
+prose does. Both of the following say the same thing; the second one wastes the reader's attention on
 a flourish and then editorializes about stiff gains.
 
 - ✅ "`set_dofs_force_range` caps the controller's output."
@@ -149,10 +163,10 @@ and a reason attached to an instruction, never from ornament. Specifically:
 
 ### Rhythm
 
-Telegraph style is the most common way these pages go wrong: every sentence five words long, starting with a
-verb, sitting on its own line. Write a paragraph that makes one point and then stops.
+Short sentences are the goal, and telegraph style is how they go wrong: every sentence five words long,
+starting with a verb, sitting on its own line. Write a paragraph that makes one point and then stops.
 
-Vary the sentence length and let the clauses connect. A "because" or a "so" in the middle of a sentence is
+Keep the sentences short, and connect the clauses that belong together. A "because" or a "so" in the middle of a sentence is
 usually clearer than the same content split across a full stop, because it names the relationship instead of
 leaving the reader to infer it. Fragments belong in a list, a table, or a code comment, and read as curt in
 prose.
@@ -190,9 +204,12 @@ The habit, then the replacement.
 - **Uniform hedging.** "You might want to consider possibly using X" is three hedges around one
   recommendation. Be decisive where we have a recommendation, and say so plainly where we do not: "Use the
   Newton solver", or "either value works, so pick by which failure you would rather debug".
-- **Emphatic capitals and bold slogans.** Replace the emphasis with a better fact, and reserve bold for the
-  term being defined rather than for a whole clause. An exclamation mark is fine where you mean it; what does
-  not work is one standing in for the evidence.
+- **Emphatic capitals, bold slogans, and exclamation marks.** Replace the emphasis with a better fact, and
+  reserve bold for the term being defined rather than for a whole clause. Write no exclamation marks.
+- **Question headings.** "How to navigate this user guide?" and "Have feedback for us?" are slower to scan
+  than a label. A heading names what the section holds: "Feedback".
+- **Apologizing in advance.** "We understand that our content may require urgent updates. Our team is on it!"
+  apologizes before the reader has found a problem, then cheers. Ask for the report and say where to send it.
 - **Narrating history.** "This option was previously called `n_worlds`", "we have now added USD support". A
   page describes what is true at the current version, and version history lives in the changelog.
 - **Em dashes.** Default to a colon, a comma, or a full stop, and keep at most one per paragraph for a
@@ -234,7 +251,10 @@ visualization camera. Three paragraphs of it does not.
 Nobody says these out loud.
 
 - "reach for", "dive into", "delve", "unpack" (except a tuple), "leverage" as a verb, "surface" as a verb,
-  "spin up", "seamlessly", "effortlessly", "simply", and "just" as a minimizer.
+  "spin up", "seamlessly", "effortlessly", "simply", "easy", and "just" as a minimizer. A step that is easy
+  for one reader is not easy for everyone, and calling it easy tells the stuck reader they are the problem.
+- "cutting-edge", "industry-leading", "revolutionary", "groundbreaking", "world-class", "unlock", "thrilled",
+  "excited", "incredible". Each one claims without proving.
 - "it's worth noting", "it's important to understand", "keep in mind", "note that" as a sentence opener,
   "that said", "at the end of the day", "the key insight here". Conjugating around one of these does not
   count. If the fact matters, state it; if it does not, delete it.
@@ -257,18 +277,15 @@ objects from creeping" is the fact a reader can act on.
 Somebody reads these pages in five years with no idea who wrote them or what the thread was, so they carry no
 in-jokes, no winks at the reader, and no emoji in prose or headings.
 
-That is not a vow of blandness, and flat prose is the more common problem here. Being enthusiastic about
-something we built is welcome as long as the enthusiasm is attached to a fact: differentiable tactile sensors,
-gradients that flow through contact, thousands of environments on one GPU. Write those the way you would say
-them to a colleague who would find them interesting, because they are interesting. Saying that something is
-easy is fine when it is easy, and "that is all it takes" is a real sentence. What we avoid is hype with
-nothing under it: a superlative the reader cannot verify ("world's fastest"), an adjective standing in for a
-property ("robust", "powerful"), or a claim whose only evidence is an exclamation mark.
+Let the results carry the excitement. Differentiable tactile sensors, gradients that flow through contact, and
+thousands of environments on one GPU are interesting without help, so report the fact and the number and stop.
+What we avoid is hype: a superlative the reader cannot verify ("world's fastest"), an adjective standing in for
+a property ("robust", "powerful"), or an exclamation mark standing in for evidence.
 
-Passages that speak to the community rather than to a task keep their warmth in full. The mission statement,
-the invitation to contribute, and the request to report a page that disagrees with the code are the project
-talking to a person, so "we would love to hear from you" belongs there. Leave that register alone when you
-edit those passages; everything above is about the pages that explain how something works.
+Passages that speak to the community rather than to a task, such as the mission statement and the invitation to
+contribute, are the project talking to a person. Keep them direct and candid: ✅ "It is early, and a small team
+will not get everything right on a first release, so contributions of every kind are welcome." ❌ "Sorry for any
+issues! We're working hard to improve."
 
 ### Worked example
 
@@ -323,6 +340,18 @@ Structure every page so a reader can find their answer without reading the whole
 
 **Follow the inverted pyramid.** Most common case first, edge cases and configuration later, deep internals last. A reader should be able to stop reading as soon as their need is met.
 
+**Each kind of page leads with one thing.**
+
+| Page | Lead with | Then | Avoid |
+|---|---|---|---|
+| Landing page (section index) | What the section covers, in one or two sentences | Where a new reader should start | Restating the table of contents as prose, or as a "Table of contents" heading above the toctree |
+| Overview or concept | What the thing is, in one sentence | How the parts fit and why we designed it that way, with links to the proof | History before the definition |
+| Tutorial | The complete program, or what the reader will have built by the end | A walkthrough in the order the code runs, the output to expect | Theory in the middle of a step |
+| How-to | The task, named in the title | The shortest path, with requirements listed first | "Simply", "just", "easy" |
+| API reference | What the class or function does and when to use it, in one line | The autodoc directives, and a link to the User Guide page that shows it in use | Opinion, storytelling, and usage examples |
+
+End every page on one clear next step for the reader, such as the page to read next under "See also".
+
 **A task-oriented page (tutorial / how-to) follows this skeleton:**
 
 ```
@@ -371,7 +400,7 @@ A configuration class that is itself the public API with no separate built objec
 - **The runnable example file is the single source of truth for the complete code.** Link it prominently (for example, `examples/tutorials/hello_genesis.py`). Never paste a long script in full, and never paste it *twice* (a walkthrough followed by the whole script at the bottom is the pattern to kill).
 - **Pull short excerpts into the page, one per teaching point.** An excerpt anchors an explanation; it does not reproduce the file. If an excerpt has nothing to teach, cut it.
 - **Comments say _what_; prose says _why_.** Don't write prose that restates the next line of code ("`scene.build()` builds the scene"). Explain the reason, the trade-off, or the gotcha instead.
-- A short, self-contained script (under ~15 lines) may be shown once in full as the minimal working example. Anything longer is excerpted, with the full file linked.
+- A short, self-contained script (under ~15 lines) may be shown once in full as the minimal working example. Put it directly under the title, before any explanation: "Here is a complete Genesis World program:", the code, then "This tutorial walks through each step." Anything longer is excerpted, with the full file linked.
 
 **User Guide vs API Reference: one home per fact.** The two top-level sections have different jobs, and no fact should live in both.
 
@@ -397,7 +426,7 @@ A configuration class that is itself the public API with no separate built objec
 - Put a warning or caution *before* the step it applies to, never after. A reader who has already run the command cannot act on a warning below it.
 - Start each step with the verb, and give the step its object: "Install PyTorch", not "Next, PyTorch should be installed".
 
-Use sentence length as a readability check rather than a word limit. Keep a longer sentence when a "because" or "so" connects the reason to the claim (see §2 on rhythm). We do not use the STE dictionary, since our technical names (raycasting, rendering, hibernation) are not in it.
+Keep sentences short, because many readers are not native English speakers. A longer sentence is right only when a "because" or "so" connects the reason to the claim (see §2 on rhythm). We do not use the STE dictionary, since our technical names (raycasting, rendering, hibernation) are not in it.
 
 **Use consistent technical terms.** Give each technical term the same meaning across pages, and use the settled term for each concept. "Body" means a rigid body in the physics sense and never an entity, "environment" is never a "world" or an "instance", and "build" never means "compile". §6 lists the settled terms and the words they replace.
 
@@ -407,7 +436,12 @@ Use sentence length as a readability check rather than a word limit. Keep a long
 
 **Prefer concrete over abstract.** "Returns a tensor of shape `(n_envs, 3)`" beats "returns the relevant data."
 
+**Spell out an acronym on first use in each file**, with the acronym in parentheses: "Incremental Potential Contact (IPC)".
+
+**Link text says where it goes.** ✅ "See the [installation guide](…)." ❌ "Click [here](…)."
+
 **Numbers, units, and symbols:**
+- Give a performance figure with its unit and how it was measured, and link the benchmark or script.
 - Always state units. "9.81 m/s²", "0.01 s", "0.5 m". A bare number is a bug report waiting to happen.
 - Use the actual symbol or identifier in code font: `dt`, `max_range`, `n_envs`.
 - Write "10–80×" with an en dash and a real multiplication sign, not "10~80x". (Better: avoid the range and cite a benchmark.)
@@ -474,6 +508,7 @@ force = contact_sensor.read()
   )
   ```
 - Use double quotes for strings, matching the codebase.
+- Put one shell command per ` ```bash ` block, so the reader can copy and run it.
 
 **Comment only what the code cannot say.** A comment explains *why*, or annotates a non-obvious value: units, conventions, tensor shapes. Never narrate what the line plainly says.
 
@@ -509,7 +544,7 @@ Consistency here is what makes the docs read as one voice. These are settled; us
 | viewer | GUI, window | The interactive window. |
 | renderer / camera sensor | — | Rendering happens through camera sensors. |
 
-**Product and component names** are proper nouns: **Nyx** (renderer), **Quadrants** (compiler). Capitalize and link on first mention per page.
+**Product and component names** are proper nouns: **Nyx** (renderer), **Quadrants** (compiler), **GENE-26.5**, **Eno**. Spell them exactly, capitalize and link them on first mention per page, and put no adjective in front of them.
 
 ---
 
@@ -518,6 +553,7 @@ Consistency here is what makes the docs read as one voice. These are settled; us
 We build with Sphinx + MyST Markdown (`pydata_sphinx_theme`). Use the following, and only the following, so pages render consistently.
 
 **Headings**
+- **A heading is a label for what the section holds, never a question.** `Feedback`, not "Have feedback for us?".
 - One `#` H1 per page, matching the page's job. **No emoji in headings.** They break scannability, sorting, and search, and read as decoration. (Existing emoji headings should be removed as pages are touched.)
 - **Content headings use sentence case; navigation titles use Title Case.** Every heading inside a page is sentence case. The exception is navigation: the two top-level section landing titles (`User Guide`, `API Reference`) and the sidebar `:caption:` labels in a `{toctree}` (`Getting Started`, `Robot Control`, …) are Title Case, because they read as proper section names rather than page content.
 - **Don't start a page or section title with an article.** Name the subject directly: `Sensor pipeline`, not "The sensor pipeline"; `Support field`, not "The support field". A leading "The"/"A"/"An" adds nothing to a title, sorts and scans worse, and pushes the real word right. (An article mid-title, or in a content heading where it reads naturally, is fine.)
@@ -596,7 +632,7 @@ Before opening a docs PR, confirm:
 - [ ] Internal links use `{doc}` / `{py:*}` roles; no hard-coded genesis-doc URLs.
 - [ ] Tensor shapes, coordinate frame, quaternion order, and units are stated where relevant.
 - [ ] Alt text on every image; assets live under `_static/` and are referenced relatively.
-- [ ] Instructions lead with the verb, and every imperative replaces an instruction rather than a statement of fact.
+- [ ] Procedure steps lead with the verb, "you" addresses the reader elsewhere, and every imperative replaces an instruction rather than a statement of fact.
 - [ ] Every orphaned passive has an actor in front of it, and no passive was flipped away from its paragraph's topic.
 - [ ] "We" appears where the page states one of our conventions, defaults, or recommendations.
 - [ ] Each non-obvious instruction carries its reason, no fact appears twice, and every section still opens on its thesis.
@@ -605,6 +641,12 @@ Before opening a docs PR, confirm:
 - [ ] No banned word or phrase from §2, and every adjective is a verifiable property.
 - [ ] Claims state what is, each negation is load-bearing, and every claim about the engine is one I checked against the source.
 - [ ] No slogan headings, rhetorical setup, or trailing pitch clause.
-- [ ] No in-jokes or emoji in prose, and any exclamation mark is one you meant.
+- [ ] No in-jokes, emoji, or exclamation marks, and no heading is a question.
+- [ ] The first sentence says what the page is or what changed.
+- [ ] Every claim is backed by a number, a link, or code that runs.
+- [ ] Limitations and breaking changes are stated plainly, with the tracking issue linked.
+- [ ] The page ends on one clear next step for the reader.
 - [ ] Every edit changes what a sentence says or how it reads; nothing is a synonym swap.
-- [ ] I read the page top to bottom and deleted every sentence that didn't help the reader act.
+- [ ] I read the page top to bottom, deleted every sentence that didn't help the reader act, and shortened every sentence that could be shorter without losing meaning.
+
+**Pull request and commit titles say what changed.** ✅ "Add feedback links to User Guide landing page." ❌ "Update User Guide." The description says why, and how you checked that the docs build.
