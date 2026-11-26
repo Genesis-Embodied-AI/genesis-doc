@@ -33,4 +33,4 @@ This repository holds the documentation only. For anything about Genesis World i
 
 ## Publishing
 
-The site is built and hosted by [Read the Docs](https://readthedocs.org/). The `genesis-world` repository includes this repository as a Git submodule, so a documentation change does not appear on the published site until the submodule pointer in `genesis-world` is updated to the new commit. After your changes merge here, bump that submodule reference in `genesis-world`.
+[Read the Docs](https://readthedocs.org/) builds and hosts the site from this repository, as configured in `.readthedocs.yaml`. A change merged to `main` publishes to the `latest` version of the site. That build installs Genesis World from the `main` branch of `genesis-world`, so the API reference follows the current source.
