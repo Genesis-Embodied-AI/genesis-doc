@@ -1,10 +1,6 @@
-# Installation
-
-Genesis World installs from PyPI in two steps: install PyTorch, then install Genesis World. It runs on Linux, macOS, and Windows, on the CPU and on NVIDIA, AMD, and Apple Silicon GPUs.
-
 ## Install
 
-1. Install PyTorch by following the [official instructions](https://pytorch.org/get-started/locally/) for your platform and CUDA version.
+1. Install PyTorch. Refer to the [official instructions](https://pytorch.org/get-started/locally/) for your platform and CUDA version.
 
 2. Install Genesis World from PyPI:
 
@@ -15,41 +11,59 @@ Genesis World installs from PyPI in two steps: install PyTorch, then install Gen
 Once installed, initialize the library with `gs.init()`. See {doc}`Initialization and backends </user_guide/configuration/initialization>` for backend selection, precision, and reproducibility.
 
 :::{note}
-To run on CUDA, make sure a matching NVIDIA driver is installed on your machine.
+To run on CUDA, ensure a matching NVIDIA driver is installed on your machine.
 :::
 
 ## Prerequisites
 
 - **Python:** 3.12 to 3.14 (`>=3.12,<3.15`).
-- **Operating system:** Linux, macOS, or Windows. Linux with a CUDA-compatible GPU gives the best performance.
+- **Operating system (OS):** Linux, macOS, or Windows. Linux with a CUDA-compatible GPU gives the best performance.
 
-Genesis World is cross-platform across CPUs and GPUs: NVIDIA through CUDA (`gs.cuda`), AMD through ROCm (`gs.amdgpu`), and Apple Silicon through Metal (`gs.metal`), with a CPU backend (`gs.cpu`) available everywhere. `gs.gpu` resolves to whichever of the three your machine has, and falls back to `gs.cpu` with a warning if it has none. An Intel GPU drives the viewer and offscreen rendering but has no simulation backend, so run the physics on `gs.cpu` there. The following combinations are supported:
+Genesis World is cross-platform across CPUs and GPUs: 
 
-| OS | GPU | GPU simulation | CPU simulation | Interactive viewer | Headless rendering |
-|---|---|:---:|:---:|:---:|:---:|
-| Linux | Nvidia | ✅ | ✅ | ✅ | ✅ |
-| Linux | AMD | ✅ | ✅ | ✅ | ✅ |
-| Linux | Intel | ❌ | ✅ | ✅ | ✅ |
-| Windows | Nvidia | ✅ | ✅ | ✅ | ✅ |
-| Windows | AMD | ✅ | ✅ | ✅ | ✅ |
-| Windows | Intel | ❌ | ✅ | ✅ | ✅ |
-| macOS | Apple Silicon | ✅ | ✅ | ✅ | ✅ |
+- NVIDIA through CUDA (`gs.cuda`)
 
-GPU simulation on AMD through ROCm is still experimental and may be unstable, especially on Windows.
+- AMD through ROCm (`gs.amdgpu`)
+
+- Apple Silicon through Metal (`gs.metal`), with a CPU backend (`gs.cpu`) available everywhere. 
+
+`gs.gpu `selects the GPU backend your machine has. If it has none, `gs.gpu` falls back to `gs.cpu` and shows a warning. An Intel GPU drives the viewer and offscreen rendering but has no simulation backend. On a machine with an Intel GPU, run the physics on `gs.cpu`. 
+
+Genesis World supports these combinations:
+
+| OS          | GPU           | GPU simulation | CPU simulation | Interactive viewer | Headless rendering |
+| :---------- | :------------ | :------------: | :------------: | :----------------: | :----------------: |
+| **Linux**   | NVIDIA        |       ✓        |       ✓        |         ✓          |         ✓          |
+|             | AMD           |       ✓        |       ✓        |         ✓          |         ✓          |
+|             | Intel         |       ✗        |       ✓        |         ✓          |         ✓          |
+| **Windows** | NVIDIA        |       ✓        |       ✓        |         ✓          |         ✓          |
+|             | AMD           |       ✓        |       ✓        |         ✓          |         ✓          |
+|             | Intel         |       ✗        |       ✓        |         ✓          |         ✓          |
+| **macOS**   | Apple Silicon |       ✓        |       ✓        |         ✓          |         ✓          |
+
+:::{note}
+
+GPU simulation on AMD through ROCm is experimental. It may be unstable, especially on Windows.
+
+:::
 
 ## Optional components
 
+These components add features that most setups do not need. Install one only if you use it.
+
 ### Surface reconstruction
 
-To render particle-based entities (fluids, deformables, and the like) as smooth surfaces, Genesis World reconstructs a mesh from the internal particle representation. It uses [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf) by default, which extracts a smooth surface from the particle density but requires all particles to share one radius. Set `recon_backend="levelset"` in the `vis` options of the particle solver, such as `gs.options.SPHOptions(vis=gs.options.ParticleVisOptions(recon_backend="levelset"))`, to wrap the union of the particle spheres instead: it supports a radius per particle, at the cost of a bumpier surface. Both backends work on every platform with no extra install. `recon_backend="openvdb"` is a deprecated alias of `"levelset"`.
+Genesis World renders particle-based entities, such as fluids and deformables, as smooth surfaces. It reconstructs a mesh from the internal particle representation. The default backend is [splashsurf](https://github.com/InteractiveComputerGraphics/splashsurf). It extracts a smooth surface from the particle density, but requires all particles to share one radius.
+
+To use a different radius for each particle, set `recon_backend="levelset"` in the `vis` options of the particle solver, such as `gs.options.SPHOptions(vis=gs.options.ParticleVisOptions(recon_backend="levelset"))`. This backend wraps the union of the particle spheres at the cost of a bumpier surface. Both backends work on every platform with no extra install. `recon_backend="openvdb"` is a deprecated alias of `"levelset"`.
 
 ### Ray-tracing renderer
 
-For photorealistic stills, Genesis World includes a ray-tracing renderer built on [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute). It is built from source; see {doc}`/user_guide/rendering/cameras` for setup. For new work, prefer the {doc}`Nyx renderer </user_guide/rendering/nyx_renderer>`, installed with `pip install gs-nyx`.
+Genesis World includes a ray-tracing renderer built on [LuisaCompute](https://github.com/LuisaGroup/LuisaCompute) for photorealistic stills. It is built from source. See {doc}`/user_guide/rendering/cameras` for setup. For new work, refer to the {doc}`Nyx renderer </user_guide/rendering/nyx_renderer>`. Install it with `pip install gs-nyx`.
 
 ### IPC coupler
 
-The [libuipc](https://github.com/spiriMirror/libuipc)-based IPC coupler (`gs.options.IPCCouplerOptions`) needs `pip install pyuipc`, available on Linux and Windows x86 with an NVIDIA GPU. See {doc}`/user_guide/physics/coupling/ipc_coupler`.
+The [libuipc](https://github.com/spiriMirror/libuipc)-based IPC coupler (`gs.options.IPCCouplerOptions`) needs `pip install pyuipc`. It is available on Linux and Windows x86 with an NVIDIA GPU. See {doc}`/user_guide/physics/coupling/ipc_coupler`.
 
 ### USD assets
 
@@ -57,7 +71,7 @@ To load USD assets into scenes, see the [USD import setup](../assets/usd_import.
 
 ## Troubleshooting
 
-### `Genesis hasn't been initialized`
+### `"Genesis hasn't been initialized" `
 
 Creating a scene or a morph before calling `gs.init()` raises this error:
 
@@ -65,15 +79,29 @@ Creating a scene or a morph before calling `gs.init()` raises this error:
 genesis.GenesisException: Genesis hasn't been initialized. Did you call `gs.init()`?
 ```
 
-Call `gs.init()` first: initialization selects the backend and configures low-level Quadrants features such as the fast-cache mechanism and dynamic array mode.
+Call `gs.init()` first. It selects the backend and configures low-level Quadrants features such as the fast-cache mechanism and dynamic array mode.
 
 ### Circular import error
 
-Importing `genesis` fails with a circular import when the current directory is the Genesis World source directory and the package is installed in non-editable mode (from PyPI or from source). Either move out of the source directory before running Python, or switch to an editable install: uninstall `genesis-world`, then run `pip install -e ".[dev]"` inside the source directory.
+`import genesis` fails with a circular import error when both of these are true:
+
+- Your current directory is the Genesis World source directory.
+
+- You installed the package in non-editable mode, from PyPI or from source.
+
+To fix it, do one of the following:
+
+- Move out of the source directory before you run Python.
+
+- Switch to an editable install:
+
+  1. Uninstall `genesis-world`.
+
+  2. Inside the source directory, run `pip install -e ".[dev]"`.
 
 ### Slow rendering on native Ubuntu (CPU fallback)
 
-If `cam.render()` or the viewer becomes extremely slow, the system may be silently falling back to MESA (CPU) rendering instead of using the GPU. Genesis World relies on PyRender and EGL for GPU offscreen rendering; if `libnvidia-egl` is not set up correctly, rendering falls back to software even when the GPU is otherwise accessible.
+If `cam.render()` or the viewer becomes extremely slow, the system may be silently falling back to MESA (CPU) rendering instead of using the GPU. Genesis World uses PyRender and EGL for GPU offscreen rendering. If `libnvidia-egl` is not set up correctly, rendering falls back to software even when the GPU is otherwise accessible.
 
 To ensure GPU rendering is active:
 
@@ -89,7 +117,7 @@ To ensure GPU rendering is active:
    ldconfig -p | grep EGL
    ```
 
-   You want to see `libEGL_nvidia.so.0`. You may also see `libEGL_mesa.so.0`; some systems handle both, but remove Mesa if rendering is slow.
+   The output should include libEGL_nvidia.so.0. It may also include libEGL_mesa.so.0. Some systems handle both, but if rendering is slow, remove Mesa.
 
 3. Optionally remove MESA to prevent fallback, then recheck:
 
@@ -115,7 +143,7 @@ To ensure GPU rendering is active:
    ln -s /usr/lib/x86_64-linux-gnu/libcuda.so.1 /usr/lib/x86_64-linux-gnu/libcuda.so
    ```
 
-5. Genesis World selects the offscreen OpenGL backend for your operating system (EGL on Linux, CGL on macOS, and pyglet elsewhere), so you usually do not need to set `PYOPENGL_PLATFORM`. To override that choice, set it to `egl`, `osmesa`, `cgl` (macOS only), or `pyglet`. In custom setups (Docker, headless servers) these variables can help:
+5. Genesis World selects the offscreen OpenGL backend for your operating system (EGL on Linux, CGL on macOS, and pyglet elsewhere). You usually do not need to set `PYOPENGL_PLATFORM`. To override that choice, set it to `egl`, `osmesa`, `cgl` (macOS only), or `pyglet`. In custom setups (Docker, headless servers) these variables can help:
 
    ```bash
    export NVIDIA_DRIVER_CAPABILITIES=all
